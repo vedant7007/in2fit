@@ -33,7 +33,38 @@ class LlamaCppRuntime private constructor(private var handle: Long) : LlamaRunti
         nativeFree(h)
     }
 
+    /**
+     * What the last [generate] call actually did, straight from the native side.
+     *
+     * Prompt processing and token generation are reported SEPARATELY. They run at very different
+     * speeds, and averaging them produces a figure that is neither: a short prompt makes generation
+     * look slow and a long one makes it look fast. A tokens-per-second number that does not say
+     * which of the two it measures is not usable.
+     */
+    fun lastTimings(): Timings? {
+        val h = handle
+        if (h == 0L) return null
+        val v = nativeLastTimings(h) ?: return null
+        return Timings(
+            promptTokens = v[0],
+            evalTokens = v[1],
+            promptMillis = v[2] / 1000.0,
+            evalMillis = v[3] / 1000.0,
+        )
+    }
+
+    data class Timings(
+        val promptTokens: Long,
+        val evalTokens: Long,
+        val promptMillis: Double,
+        val evalMillis: Double,
+    ) {
+        val promptTokensPerSecond: Double get() = if (promptMillis <= 0) 0.0 else promptTokens * 1000.0 / promptMillis
+        val evalTokensPerSecond: Double get() = if (evalMillis <= 0) 0.0 else evalTokens * 1000.0 / evalMillis
+    }
+
     private external fun nativeGenerate(handle: Long, prompt: String, maxTokens: Int, stop: Array<String>): String
+    private external fun nativeLastTimings(handle: Long): LongArray?
     private external fun nativeFree(handle: Long)
 
     companion object {

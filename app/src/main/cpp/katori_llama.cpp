@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <chrono>
 
 #include "llama.h"
 
@@ -37,7 +38,20 @@ struct Handle {
     const llama_vocab * vocab = nullptr;
     int32_t n_ctx = 0;
     std::mutex lock;
+
+    // Timings from the last generate call. They live here rather than being derived in Kotlin
+    // because Kotlin cannot see how many tokens the prompt became or how many were produced, and
+    // a tokens-per-second figure guessed from a character count is not a measurement.
+    int64_t last_prompt_tokens = 0;
+    int64_t last_eval_tokens   = 0;
+    int64_t last_prompt_us     = 0;
+    int64_t last_eval_us       = 0;
 };
+
+int64_t now_us() {
+    return (int64_t) std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+}
 
 std::once_flag g_backend_once;
 
@@ -195,11 +209,25 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeGenerate(
     std::string error;
     llama_batch batch = llama_batch_get_one(tokens.data(), (int32_t) tokens.size());
 
+    h->last_prompt_tokens = (int64_t) tokens.size();
+    h->last_eval_tokens   = 0;
+    h->last_prompt_us     = 0;
+    h->last_eval_us       = 0;
+    const int64_t t_start = now_us();
+    int64_t t_prompt_done = 0;
+
     const int32_t budget = maxTokens > 0 ? maxTokens : 128;
     for (int32_t produced = 0; produced < budget; produced++) {
         if (llama_decode(h->ctx, batch) != 0) {
             error = "decode failed";
             break;
+        }
+        if (produced == 0) {
+            // The first decode is the whole prompt. Everything after it is one token at a time,
+            // and mixing the two into one average is how a prompt-bound number gets quoted as a
+            // generation speed.
+            t_prompt_done = now_us();
+            h->last_prompt_us = t_prompt_done - t_start;
         }
         const llama_token id = llama_sampler_sample(sampler, h->ctx, -1);
         if (llama_vocab_is_eog(h->vocab, id)) break;
@@ -212,6 +240,8 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeGenerate(
             break;
         }
         out.append(piece, (size_t) n);
+        h->last_eval_tokens++;
+        h->last_eval_us = now_us() - (t_prompt_done > 0 ? t_prompt_done : t_start);
         if (endsWithAny(out, stopStrings)) {
             // Trim the stop sequence itself; the caller asked for what came before it.
             for (const auto & s : stopStrings) {
@@ -233,6 +263,25 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeGenerate(
         return nullptr;
     }
     return env->NewStringUTF(out.c_str());
+}
+
+// [prompt tokens, eval tokens, prompt microseconds, eval microseconds] from the last generate.
+JNIEXPORT jlongArray JNICALL
+Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeLastTimings(
+        JNIEnv * env, jobject, jlong handle) {
+    auto * h = reinterpret_cast<Handle *>(handle);
+    if (h == nullptr) return nullptr;
+    jlong values[4];
+    {
+        std::lock_guard<std::mutex> guard(h->lock);
+        values[0] = (jlong) h->last_prompt_tokens;
+        values[1] = (jlong) h->last_eval_tokens;
+        values[2] = (jlong) h->last_prompt_us;
+        values[3] = (jlong) h->last_eval_us;
+    }
+    jlongArray out = env->NewLongArray(4);
+    if (out != nullptr) env->SetLongArrayRegion(out, 0, 4, values);
+    return out;
 }
 
 JNIEXPORT void JNICALL

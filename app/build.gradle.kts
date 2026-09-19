@@ -136,8 +136,17 @@ dependencies {
     implementation(libs.mlkit.text.recognition)
     implementation(libs.mlkit.barcode.scanning)
 
+    // Loaded on the hardware probe path only, to MEASURE the resident cost of the ASR and TTS
+    // models rather than estimate it. sherpa-onnx brings the same runtime when slice F lands.
+    implementation(libs.onnxruntime.android)
+
     testImplementation(libs.junit)
     testImplementation(libs.sqlite.jdbc)
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }
 
 /**
