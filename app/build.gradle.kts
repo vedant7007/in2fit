@@ -111,11 +111,37 @@ dependencies {
  * Reading the merged manifest matters. A permission can arrive from a dependency's manifest without
  * appearing anywhere in our own source, and only the merged result shows that.
  */
+
+/**
+ * The complete set of permissions the `demo` build is allowed to declare.
+ *
+ * WHY A WHITELIST AND NOT A BAN ON INTERNET. The first version of this check only looked for
+ * INTERNET, and it did catch a real one: com.google.android.datatransport:transport-backend-cct,
+ * a telemetry uploader pulled in transitively by ML Kit, contributed INTERNET and
+ * ACCESS_NETWORK_STATE that no file in this project declared.
+ *
+ * But a denylist only finds what it already knows to look for. The next dependency might add
+ * ACCESS_FINE_LOCATION, READ_CONTACTS or READ_PHONE_STATE, and a check for INTERNET would pass
+ * while the app shipped with them. On stage the claim is that this build can do nothing but
+ * listen and look, so the check is now: these permissions and no others.
+ *
+ * Adding an entry here is a deliberate act that needs a reason written next to it.
+ */
+val ALLOWED_DEMO_PERMISSIONS = sortedSetOf(
+    // Voice logging. The core input, spec 5.1.
+    "android.permission.RECORD_AUDIO",
+    // Lab report and label scanning, spec 5.6 and 12.1.
+    "android.permission.CAMERA",
+    // Added by the platform itself for runtime-registered receivers on newer API levels.
+    // Not requested by this project and not grantable by a user.
+    "io.github.vedant7007.katori.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+)
+
 androidComponents {
     onVariants(selector().withFlavor("delivery" to "demo")) { variant ->
-        val verify = tasks.register("verify${variant.name.replaceFirstChar { it.uppercase() }}HasNoInternet") {
+        val verify = tasks.register("verify${variant.name.replaceFirstChar { it.uppercase() }}Permissions") {
             group = "verification"
-            description = "Fails if the merged ${variant.name} manifest declares INTERNET"
+            description = "Fails if the merged ${variant.name} manifest declares a permission not on the allow list"
 
             val manifestFile = variant.artifacts.get(SingleArtifact.MERGED_MANIFEST)
             val reportFile = rootProject.layout.projectDirectory
@@ -129,16 +155,22 @@ androidComponents {
                 reportFile.parentFile.mkdirs()
                 reportFile.writeText(text)
 
-                val offenders = Regex("""uses-permission[^>]*android\.permission\.INTERNET""")
-                    .findAll(text).map { it.value }.toList()
+                val declared = Regex("""uses-permission[^>]*android:name="([^"]+)"""")
+                    .findAll(text).map { it.groupValues[1] }.toSortedSet()
 
-                if (offenders.isNotEmpty()) {
+                val unexpected = declared - ALLOWED_DEMO_PERMISSIONS
+                if (unexpected.isNotEmpty()) {
                     throw GradleException(
-                        "The ${variant.name} build declares INTERNET, which breaks the offline " +
-                            "guarantee in spec 14.4. Offending lines: $offenders"
+                        "The ${variant.name} build declares permissions that are not on the allow " +
+                            "list: $unexpected\n" +
+                            "Allowed: $ALLOWED_DEMO_PERMISSIONS\n" +
+                            "A permission can arrive from a dependency without appearing in our own " +
+                            "source. If this one is genuinely needed, add it to ALLOWED_DEMO_PERMISSIONS " +
+                            "in app/build.gradle.kts with a comment saying why. If it is not, remove it " +
+                            "in app/src/demo/AndroidManifest.xml with tools:node=\"remove\"."
                     )
                 }
-                println("[verify] ${variant.name}: no INTERNET permission in the merged manifest")
+                println("[verify] ${variant.name}: permissions are exactly $declared")
                 println("[verify] merged manifest copied to ${reportFile.absolutePath}")
             }
         }

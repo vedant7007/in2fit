@@ -1,99 +1,104 @@
 # Katori status
 
-Updated 19 Sep 2026, 08:25. Autonomous run while Vedant is at college.
+Updated 19 Sep 2026, 09:50.
 
 ---
 
 ## BLOCKED ON VEDANT
 
-Answer from your phone, one line each. Nothing is waiting on these; I have moved on.
+**Nothing right now.** Your three answers unblocked everything.
 
-**Q1. Will Katori ever be commercial or ad-supported, even later?**
-`YES` or `NO`.
-Why it matters: the only ready-made Hindi text-to-speech models are either
-non-commercial (CC-BY-NC) or under a custom IITM licence nobody has read. If NO, Hindi
-TTS is solved today. If YES, the demo speaks Telugu and English only until we find or
-train a Hindi voice.
-
-**Q2. Is the live demo spoken in Telugu or Hindi?**
-`TELUGU` or `HINDI` or `BOTH`.
-Why it matters: Telugu TTS is licence-clean right now (CC-BY-4.0). Hindi is not. If the
-demo is Telugu, Q1 stops being urgent.
-
-**Q3. The Telugu and Hindi speech models the spec named do not exist. Proceed with the
-IndicConformer replacement?**
-`YES` or `PICK ANOTHER`.
-Details below. The spec already named IndicConformer as the fallback, so this is the
-planned path, but the only ready-made export is one person's repo.
+One recurring cost you should know about: **laptop control times out after 30 minutes idle**,
+and it is what runs builds and downloads. It bit once this morning and cost about an hour. If
+you see me report it again, re-granting from your phone is all it takes.
 
 ---
 
 ## VERIFIED ON HARDWARE
 
-**Nothing. All day. Not one line.** No phone has been connected, nothing has been
-installed, no model has been loaded. Every claim below is compile-time or desktop-only.
+**Nothing. All day. Not one line.** No phone connected, nothing installed, no model loaded.
 
-Still unverified and unverifiable until you are back with the Realme 11: model load time,
-inference speed, ASR accuracy, ASR/LLM/TTS co-residency, camera, OCR, any latency number.
+Still unverified: model load, inference speed, ASR accuracy, ASR/LLM/TTS co-residency, camera,
+OCR, every latency number. All of it waits for the Realme 11.
 
 ---
 
 ## VERIFIED ON EMULATOR
 
-Nothing yet. The emulator variant is not built.
+Nothing. The emulator variant is not built yet.
 
 ---
 
 ## COMPILE AND UNIT TEST ONLY
 
-- `assembleDemoDebug` green, APK 34.06 MB, arm64-v8a native libs only.
-- `testDemoDebugUnitTest` green, 2 tests.
-- Merged `demo` manifest: CAMERA and RECORD_AUDIO only, no INTERNET.
-- 13 contract files compile.
+Everything below is from a redirected log, read off disk.
 
----
+- `assembleDemoDebug` green, APK 34.17 MB, arm64-v8a only
+- `testDemoDebugUnitTest` green: **47 tests, 0 failures**
+  - NetworkIsolationTest 2
+  - FoodTextMatchingTest 11
+  - SqliteFoodLookupTest 18, against the real shipped database
+  - RulesEngineTest 16
+- Merged demo manifest permissions are **exactly** CAMERA, RECORD_AUDIO, and the platform's own
+  DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION. Now enforced as a whitelist, not a ban on INTERNET.
 
-## TODAY'S TWO REAL FINDINGS
+### Food layer, done
 
-**1. The Telugu and Hindi Whisper packs in spec 10.2 do not exist.**
-`vasista22/whisper-telugu-*` and `whisper-hindi-*` are real and Apache-2.0, but they ship
-PyTorch weights only. There is no sherpa-onnx INT8 conversion of them, by anyone. A sweep
-of all 767 `csukuangfj` repos found no Indic ASR at all.
+Bundled read-only SQLite built from USDA. All four import rules enforced **and asserted after
+import**, so a violation aborts the build instead of shipping:
 
-This does not change the four demo beats, so I did not stop. Spec 10.2 already named
-IndicConformer as the alternative, and the ruling on the ASR interface already said the
-model family is decided by measurement with the interface kept pluggable. That is exactly
-what this is.
+- energy coalesces 1008, then 2048, then 2047. It fired for real on the jowar record
+- every food has an energy value, asserted
+- dairy comes only from SR Legacy, asserted
+- no enriched or known-defective record imported, asserted
+- absent nutrients stay absent. 2 of 272 values are genuinely unknown and read as Unknown,
+  never as zero. 21 are assumed-zero, which is different and comes from the source saying so
 
-Replacement in use: `parismitaglobalsolutions/indicconformer-sherpa-onnx`, Apache-2.0,
-NeMo CTC conformers, one model per language, about 197 MB each for te and hi, 175 MB for
-en. Caveat worth knowing: 4 likes, no recorded downloads, one person's export. It needs a
-smoke test on hardware before anyone trusts it. That is Q3.
+34 ingredients, 230 aliases across roman, Telugu and Devanagari, 21 household unit conversions.
 
-**2. Two model licence problems, handled the same way as IFCT.**
-- `csukuangfj/sherpa-onnx-whisper-tiny` has NO licence stated anywhere: no licence field,
-  no tag, no LICENSE file, no README. Absence of a licence is absence of a grant, so it is
-  NOT being used. English now comes from the same Apache-2.0 IndicConformer repo instead.
-- MMS TTS for Telugu and Hindi is CC-BY-NC-4.0, non-commercial. Not downloaded. That is Q1.
+**Ragi, bajra, jaggery, curry leaves and asafoetida** resolve to a named refusal with the reason,
+never to a substitute. There is a test that fails if any of them ever resolves to a food.
+
+### Rules engine, done
+
+Pure. No clock, no randomness, no I/O, no model. The required test passes: identical input at two
+different times gives an identical digest **and** an identical evaluation.
+
+Eight safety-reviewed sentences, and a test that fails if any of them ever contains "diabetes",
+"anaemia", "hypertension", "deficiency" or six other words.
+
+### Models, downloaded and checksummed
+
+1669.6 MB total, against the ~2 GB budget. Disk C: 215 GB free.
+Nothing has been loaded or run. Sizes match what the repositories publish, byte for byte.
 
 ---
 
 ## DECIDED WITHOUT ASKING
 
-- Models whose licence does not permit redistribution are not downloaded at all, so they
-  cannot drift into the build. `docs/decisions/0005-model-sourcing-and-licences.md`
-- English ASR moved to the Apache-2.0 IndicConformer export, away from the unlicensed
-  Whisper conversion. Same file, same interface. `0005`
-- Telugu TTS is the Piper `te_IN-padmavathi` voice, CC-BY-4.0 via IndicVoices-R. `0005`
-- SDK root, JDK 21, and how builds are run. `docs/decisions/0003-sdk-root-and-toolchain.md`
-- AGP 9.4.1 and Gradle 9.6.0, and the transitive INTERNET permission removal.
-  `docs/decisions/0004-agp-9-and-the-telemetry-permission.md`
-- USDA import rules, all four enforced with post-import assertions.
-  `docs/decisions/0002-usda-import-rules.md`
+- **No nutrient preference means no suggestions at all.** Found by a test asserting beat 4's own
+  claim. With nothing to rank by, every candidate scored zero and the list fell back to
+  alphabetical order, which happened to match the ranked order, making "the advice changed"
+  silently false. An arbitrary order presented as advice is the same failure as a made-up number.
+  `docs/decisions/0006`
+- **Lab markers respond to the direction that matters clinically.** A glucose above its range and
+  one below it are not mirror images, and ranking them as though they were would be worse than
+  doing nothing. A marker with no reviewed policy produces no preferences at all.
+- **Permission check is now a whitelist.** A denylist only finds what it already knows to look
+  for. `docs/decisions/0004`
+- Model sourcing, the licences, and the non-commercial register. `docs/decisions/0005`
+- USDA import rules and the gap tiering. `docs/decisions/0002`
 
 ---
 
-## IN PROGRESS
+## NON-COMMERCIAL REGISTER: EMPTY
 
-Working the vertical slice order. Priority A first, because it carries three of the four
-beats and needs no phone: USDA import, then FoodLookup, then the rules engine.
+You allowed non-commercial licences and, as it turned out, none was needed. Everything shipped is
+Apache-2.0, CC-BY-4.0, MIT or public domain. Telugu TTS came in at CC-BY-4.0, so the allowance was
+not spent. Full table in `docs/decisions/0005`.
+
+---
+
+## NEXT
+
+KSP, Room compiler and Hilt, timeboxed. Then the LLM layer with NumericGuard, then the UI.
