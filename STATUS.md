@@ -55,11 +55,24 @@ exactly CAMERA and RECORD_AUDIO against a whitelist.
     expected-miss             10    correctly missed     10
     WRONG FOOD                 0    <- the number that matters
 
+> **THIS 100% IS CIRCULAR AND MUST NOT BE QUOTED TO JUDGES.**
+>
+> The utterance set was written by the same people who wrote the aliases, so it can only
+> contain phrasings somebody already thought of. It cannot contain the phrasing nobody
+> anticipated, which is exactly the case that will come up on stage.
+>
+> What the number IS: a regression guard. If a change breaks a phrasing that used to work,
+> or resolves something to the wrong food, the build fails.
+>
+> What it is NOT: a measure of real-world coverage, and not an accuracy figure. There is no
+> real-world number yet and there will not be one until Abhinav's recorded transcripts
+> replace the authored set. Saying "100% accurate" on a slide would be false.
+
 The match rate is not the number to watch. WRONG FOOD is. A miss is honest and the user gets
 asked; a wrong food silently puts a wrong number in a health app. The test fails the build on
 either a wrong food or a rate regression.
 
-The utterance set is **authored, not recorded**. It gets replaced by Abhinav's real transcripts
+The utterance set is **authored, not recorded**, which is what makes the number circular. It gets replaced by Abhinav's real transcripts
 when they exist.
 
 ### Corpus

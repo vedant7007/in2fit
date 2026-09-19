@@ -2,7 +2,10 @@ import com.android.build.api.artifact.SingleArtifact
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -17,6 +20,13 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Exported schemas are committed, so a schema change shows up as a reviewable diff
+        // instead of being discovered as a crash on someone's phone.
+        ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
+        // Exported schemas are committed, so a schema change shows up as a reviewable diff
+        // instead of being discovered as a crash on someone's phone.
 
         ndk {
             // arm64 only. 32-bit devices cannot run the model, and building armeabi-v7a
@@ -51,6 +61,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
     buildFeatures {
         compose = true
@@ -95,10 +110,14 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
-    // Room runtime only. The compiler is a KSP processor and is added once KSP is pinned;
-    // the contracts compile without it because nothing yet asks for a generated DAO.
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

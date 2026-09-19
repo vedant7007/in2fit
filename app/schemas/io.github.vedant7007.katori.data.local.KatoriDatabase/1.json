@@ -1,0 +1,690 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "662fa445a7ed8cf17cd66c52e6c7bc88",
+    "entities": [
+      {
+        "tableName": "meals",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `logged_at_epoch_ms` INTEGER NOT NULL, `raw_transcript` TEXT, `confidence_band` TEXT NOT NULL, `language_tag` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "logged_at_epoch_ms",
+            "columnName": "logged_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "raw_transcript",
+            "columnName": "raw_transcript",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "confidence_band",
+            "columnName": "confidence_band",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language_tag",
+            "columnName": "language_tag",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_meals_logged_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "logged_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meals_logged_at_epoch_ms` ON `${TABLE_NAME}` (`logged_at_epoch_ms`)"
+          }
+        ]
+      },
+      {
+        "tableName": "meal_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meal_id` INTEGER NOT NULL, `spoken_name` TEXT NOT NULL, `quantity` REAL, `unit` TEXT, `grams` REAL, `food_source` TEXT, `food_id` TEXT, `confidence_band` TEXT NOT NULL, `confidence_reasons` TEXT NOT NULL, FOREIGN KEY(`meal_id`) REFERENCES `meals`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meal_id",
+            "columnName": "meal_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "spoken_name",
+            "columnName": "spoken_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "grams",
+            "columnName": "grams",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "food_source",
+            "columnName": "food_source",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "food_id",
+            "columnName": "food_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "confidence_band",
+            "columnName": "confidence_band",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidence_reasons",
+            "columnName": "confidence_reasons",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_meal_items_meal_id",
+            "unique": false,
+            "columnNames": [
+              "meal_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meal_items_meal_id` ON `${TABLE_NAME}` (`meal_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meals",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "meal_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "meal_item_nutrients",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meal_item_id` INTEGER NOT NULL, `nutrient` TEXT NOT NULL, `state` TEXT NOT NULL, `amount` REAL, `unit` TEXT NOT NULL, PRIMARY KEY(`meal_item_id`, `nutrient`), FOREIGN KEY(`meal_item_id`) REFERENCES `meal_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "meal_item_id",
+            "columnName": "meal_item_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutrient",
+            "columnName": "nutrient",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "meal_item_id",
+            "nutrient"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "meal_items",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "meal_item_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "profile",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `age_years` INTEGER, `weight_kg` REAL, `height_cm` REAL, `sex` TEXT, `goal` TEXT, `life_context` TEXT, `diet_type` TEXT, `updated_at_epoch_ms` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "age_years",
+            "columnName": "age_years",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "weight_kg",
+            "columnName": "weight_kg",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "height_cm",
+            "columnName": "height_cm",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "sex",
+            "columnName": "sex",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "goal",
+            "columnName": "goal",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "life_context",
+            "columnName": "life_context",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "diet_type",
+            "columnName": "diet_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "updated_at_epoch_ms",
+            "columnName": "updated_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "conditions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `source` TEXT NOT NULL, `recorded_at_epoch_ms` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recorded_at_epoch_ms",
+            "columnName": "recorded_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_conditions_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_conditions_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "lab_values",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `test_name` TEXT NOT NULL, `value` REAL NOT NULL, `unit` TEXT NOT NULL, `reference_low` REAL, `reference_high` REAL, `report_date` TEXT NOT NULL, `captured_at_epoch_ms` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "test_name",
+            "columnName": "test_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reference_low",
+            "columnName": "reference_low",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "reference_high",
+            "columnName": "reference_high",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "report_date",
+            "columnName": "report_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "captured_at_epoch_ms",
+            "columnName": "captured_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_lab_values_report_date",
+            "unique": false,
+            "columnNames": [
+              "report_date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_lab_values_report_date` ON `${TABLE_NAME}` (`report_date`)"
+          },
+          {
+            "name": "index_lab_values_test_name",
+            "unique": false,
+            "columnNames": [
+              "test_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_lab_values_test_name` ON `${TABLE_NAME}` (`test_name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "activity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`date` TEXT NOT NULL, `steps` INTEGER, `active_minutes` INTEGER, `heart_rate_bpm` INTEGER, PRIMARY KEY(`date`))",
+        "fields": [
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "steps",
+            "columnName": "steps",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "active_minutes",
+            "columnName": "active_minutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "heart_rate_bpm",
+            "columnName": "heart_rate_bpm",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "date"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_activity_date",
+            "unique": true,
+            "columnNames": [
+              "date"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_activity_date` ON `${TABLE_NAME}` (`date`)"
+          }
+        ]
+      },
+      {
+        "tableName": "exercise_sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movement` TEXT NOT NULL, `reps` INTEGER NOT NULL, `form_score` INTEGER, `corrections_given` TEXT, `started_at_epoch_ms` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "movement",
+            "columnName": "movement",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reps",
+            "columnName": "reps",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "form_score",
+            "columnName": "form_score",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "corrections_given",
+            "columnName": "corrections_given",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "started_at_epoch_ms",
+            "columnName": "started_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_exercise_sessions_started_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "started_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_exercise_sessions_started_at_epoch_ms` ON `${TABLE_NAME}` (`started_at_epoch_ms`)"
+          }
+        ]
+      },
+      {
+        "tableName": "suggestions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meal_id` INTEGER, `advice_text` TEXT NOT NULL, `trigger_text` TEXT, `triggering_rule_id` TEXT, `input_digest` TEXT NOT NULL, `profile_state_json` TEXT NOT NULL, `created_at_epoch_ms` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meal_id",
+            "columnName": "meal_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "advice_text",
+            "columnName": "advice_text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trigger_text",
+            "columnName": "trigger_text",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "triggering_rule_id",
+            "columnName": "triggering_rule_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "input_digest",
+            "columnName": "input_digest",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profile_state_json",
+            "columnName": "profile_state_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "created_at_epoch_ms",
+            "columnName": "created_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_suggestions_created_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "created_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_suggestions_created_at_epoch_ms` ON `${TABLE_NAME}` (`created_at_epoch_ms`)"
+          }
+        ]
+      },
+      {
+        "tableName": "unit_conversions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`unit` TEXT NOT NULL, `food_class` TEXT NOT NULL, `grams` REAL NOT NULL, `updated_at_epoch_ms` INTEGER NOT NULL, PRIMARY KEY(`unit`, `food_class`))",
+        "fields": [
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "food_class",
+            "columnName": "food_class",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "grams",
+            "columnName": "grams",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updated_at_epoch_ms",
+            "columnName": "updated_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "unit",
+            "food_class"
+          ]
+        }
+      },
+      {
+        "tableName": "context_foods",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`life_context` TEXT NOT NULL, `food_source` TEXT NOT NULL, `food_id` TEXT NOT NULL, `included` INTEGER NOT NULL, PRIMARY KEY(`life_context`, `food_source`, `food_id`))",
+        "fields": [
+          {
+            "fieldPath": "life_context",
+            "columnName": "life_context",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "food_source",
+            "columnName": "food_source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "food_id",
+            "columnName": "food_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "included",
+            "columnName": "included",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "life_context",
+            "food_source",
+            "food_id"
+          ]
+        }
+      },
+      {
+        "tableName": "unmatched_utterances",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `spoken_name` TEXT NOT NULL, `full_transcript` TEXT, `language_tag` TEXT NOT NULL, `recorded_at_epoch_ms` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "spoken_name",
+            "columnName": "spoken_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "full_transcript",
+            "columnName": "full_transcript",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "language_tag",
+            "columnName": "language_tag",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recorded_at_epoch_ms",
+            "columnName": "recorded_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_unmatched_utterances_recorded_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "recorded_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_unmatched_utterances_recorded_at_epoch_ms` ON `${TABLE_NAME}` (`recorded_at_epoch_ms`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '662fa445a7ed8cf17cd66c52e6c7bc88')"
+    ]
+  }
+}

@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
  * demo data (spec risk 8). Everything here is either a fact about the build or an explicit
  * not-implemented state.
  */
+
+@dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

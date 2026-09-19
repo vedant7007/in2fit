@@ -22,8 +22,12 @@ import java.io.File
  * match rate is reported so the corpus can be grown against evidence, and it is asserted only at
  * a floor so a regression is caught.
  *
- * The utterance set is authored, not recorded. It is replaced by real transcripts when the
- * recordings in spec 18.3 exist.
+ * THE RESULTING PERCENTAGE IS CIRCULAR. The utterance set was written by the same people who
+ * wrote the aliases, so it can only contain phrasings somebody already thought of. It cannot
+ * contain the phrasing nobody anticipated, which is the case that turns up on stage. Treat the
+ * number as a regression guard and never as real-world accuracy, and do not put it on a slide.
+ * It stops being circular when Abhinav's recorded transcripts from spec 18.3 replace the
+ * authored set.
  */
 class MatchRateTest {
 
