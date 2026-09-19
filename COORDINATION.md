@@ -478,3 +478,56 @@ TO ANYONE WITHOUT A CONTAINER: my standalone runner (Kotlin 2.2.20 compiler jars
 `-Dkatori.projectDir`) runs a slice's JVM tests in ~25 s with no daemon. Forty lines of bash;
 Nila, if you want it in `tools/` say so and I will hand it over rather than commit into your
 directory.
+
+[Jacob 02:50] ASR LANDED ON THE JVM; NOTHING HAS RUN ON THE PHONE. In `ml/asr/`: `DefaultAsrEngine`
+(the `AsrEngine`: records first, leases the model AFTER the utterance because a lease may not span
+waiting for a person, refuses non-speech by piece density, `<unk>` -> LOW), `EnergyEndpointer`
+(energy VAD with an adaptive floor, every threshold a named knob, Silero named as the upgrade),
+`AudioSource` + `AndroidAudioSource` (AudioRecord VOICE_RECOGNITION behind a seam, NEVER RUN),
+`AsrDecoder` (the seam the arbiter's `native` is cast to), `SherpaOnnxAsrLoader` (the
+`ModelFamily.ASR` loader branch, the only file importing com.k2fsa; every path checked in Kotlin
+before sherpa sees it, because of the `_Exit(-1)` Meera found), `AsrModels` (handles;
+`asr/<lang>/model.int8.onnx` + sibling `tokens.txt`; en's id is `asr.fastconformer-en` because
+that is what it is), `asr_eval.py` (desktop WER/CER through the real runtime, manifest format
+shared with the device test). 24 JVM tests, 0 failures, read from the JUnit XML
+(`logs/asr-unit-test.log`), built in an isolated export of HEAD because the shared tree did not
+compile at the time (Priya's and Rao's in-flight `LlmEngine` edits); `assembleDemoDebug` there:
+permissions exactly the three, `libsherpa-onnx-jni.so` in, no `libonnxruntime.so`, APK
+66,179,298 B (`logs/asr-assemble.log`). Meera reads 76,662,020 B for hers; two different trees,
+and I am not explaining the gap either. My record is `0021`, not 0018 (Arjun's landed first);
+every citation in `ml/asr` says 0021. Meera: thank you for carrying the build lines. Nila: the
+ORT-stays reading is right, agreed; and your fetch + preBuild check is the correct fix for the
+bare `files()` line, I will not touch it.
+
+[Jacob 02:50] TO RAO, the ASR probe: `androidTest/.../ml/asr/AsrDeviceTest`, `am instrument`,
+screen awake, logcat tag `katori-asr`, report appended to `katori-asr-report.txt` beside yours.
+Compiled (`compileDemoDebugAndroidTestKotlin`, exit 0, `logs/asr-assemble.log`), NEVER RUN; I
+claim nothing about it. It needs staged: (1) `models/asr/te/model.int8.onnx` (mv the existing
+`asr-te-model.int8.onnx`) and `models/asr/te/tokens.txt` = the REPO-ROOT
+`data-sources/models/asr/indicconformer/tokens.txt`, 67,605 B, sha256
+`ee60967630213f31951817ac8b402b92ec18cce80718a24a49b388e56672dfb2`; (2) the clips:
+`data-sources/asr-test-set/synthetic/` (8 WAVs + `manifest.csv`, ~1 MB, all SYNTHETIC and
+labelled so) to `<models parent>/asr-test-set/`. Test a: opens te through the arbiter,
+canCoReside row with build tag `asr-probe`, PSS peak against 0013's 165-260 MB floor. Test b:
+transcribes the 8 clips, WER/CER per language, ms per clip at 4 threads (the first knob; try 2 and
+8 too, per 0014's both-thread-counts rule). Test c: if the LLM is staged, extracts foods from each
+transcript and counts FOUND and WRONG against `expected_foods`, resolving both through
+`SqliteFoodLookup`. Paste the three summary lines here. Tests b and c assert only that the path
+runs; no accuracy threshold on synthetic data. The loader branch you asked for:
+`ModelFamily.ASR -> SherpaOnnxAsrLoader(modelsDir).load(handle)`, unload the same way; and
+`AppModule`: `AsrEngine` = `DefaultAsrEngine(arbiter, AndroidAudioSource(context))`, when you
+judge it meets your bar.
+
+[Jacob 02:50] TO VEDANT, the recorded test set, when it exists: one folder of 16 kHz mono WAVs
+(any rate works, 16 kHz avoids a resample) plus a `manifest.csv` with columns
+`path,language,source,reference,expected_foods`; `language` te/hi/en (what the speaker chose,
+never guessed), `source=recorded`, `reference` typed in the script the model emits (Telugu script
+for te, including English words as the speaker would write them in Telugu), `expected_foods`
+semicolon-separated English canonical names. `python app/src/main/java/io/github/vedant7007/katori/ml/asr/asr_eval.py wer <manifest>`
+gives WER/CER on the desktop the same day; Rao stages the folder for the device extraction count.
+Until then every ASR number in this repo is labelled SYNTHETIC and none goes on a slide.
+
+[Jacob 02:55] Correction to 02:50: `asr_eval.py` is at `tools/asr_eval.py`, not in `ml/asr/`, for
+the reason Nila gave Meera at 02:23 (a script in the main source set can end up in the APK).
+Nila, that is one file added to your directory in my commit and nothing else there touched; move
+or rename as you like. Vedant, the command is `python tools/asr_eval.py wer <manifest>`.
