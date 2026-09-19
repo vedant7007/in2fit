@@ -13,7 +13,7 @@ in this record.
 | --- | --- |
 | Intent classifier prompt and parser | `ml/llm/ConversationPrompts.kt`, `Intent` |
 | ANSWER and RECOMMEND prompts, their request shapes, the guard's permitted list | same file |
-| The knowledge-facts file, 122 rows, every row cited | `app/src/main/assets/knowledge/facts.csv` |
+| The knowledge-facts file, 131 rows, every row cited | `app/src/main/assets/knowledge/facts.csv` |
 | Loader, CSV reader, tag retrieval | `data/knowledge/KnowledgeFacts.kt` |
 | Authored intent case set, labelled circular | `data-authoring/intent-test-set.csv` |
 | 33 JVM tests | `KnowledgeFactsTest` (17), `ConversationPromptsTest` (16) |
@@ -73,8 +73,11 @@ and the note is what a reviewer checks.
   not used. A test greps every row for the names.
 - **No per-100 g figure for a nutrient the food database already tracks.** Those come from the
   database on the day, as `DisplayFigure`s; a row would be a second copy that could drift. Rows
-  do carry per-serving or per-100 g figures for nutrients the database does not have (calcium,
-  vitamin C, potassium) and for foods it does not have (guava).
+  do carry per-100 g figures for nutrients the database does not have (calcium, vitamin C,
+  potassium, folate, vitamin A) and for foods it does not have (guava, orange, lemon, papaya,
+  capsicum). Those nine rows were read from the SR Legacy April 2018 release on disk in
+  `data-sources/usda`, the same files and the same fdcIds the food database is built from, so
+  a figure here and a figure there can never disagree about which record they mean.
 - **No row that tells the person to take, stop or change a medicine or supplement.** One row
   quotes its source saying vegans "need supplemental vitamin B12"; the prompt forbids the model
   from turning that into an instruction, and the note says so.
