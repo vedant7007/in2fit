@@ -1,0 +1,72 @@
+# Utterances to measure the intent classifier against. docs/decisions/0015 and 0020.
+#
+# HONESTY NOTE, the same one as utterance-test-set.csv and sharper: this set is AUTHORED, not
+# recorded, by the same hand that wrote the classifier prompt on the same day. It can only
+# contain phrasings its author thought of, so the percentage it produces is a REGRESSION GUARD
+# and not accuracy. It is not shown to judges. It is replaced by Vedant's recorded transcripts
+# when they exist (spec 18.3), which is also when it stops being circular.
+#
+# This set cannot be scored on the JVM: the classifier is the model. IntentClassifierTest checks
+# the file's shape and the parser; the score itself is read off the phone, by Rao, through the
+# hardware probe (COORDINATION.md). No figure for this prompt exists until that run.
+#
+# expect: LOG | ANSWER | SUGGEST | RECOMMEND
+# lang:   the language tag the caller would pass. Roman-script Telugu and Hindi are used because
+#         that is what the recogniser emits in practice; native-script rows need a fluent reader
+#         to confirm the expected form and are left out rather than guessed at (0017 rule 3).
+#
+# The four examples from the brief are the first four rows.
+utterance,expect,lang,note
+I ate paneer curry with two spoons of oil and two cucumbers,LOG,en-IN,from the brief
+How much protein did I eat today,ANSWER,en-IN,from the brief
+I'm having rice and palak paneer what should I add,SUGGEST,en-IN,from the brief
+I have anaemia what should I eat to increase iron,RECOMMEND,en-IN,from the brief
+I had two rotis and a katori of dal,LOG,en-IN,
+just had idli and sambar for breakfast,LOG,en-IN,
+drank 200 ml of milk and one boiled egg,LOG,en-IN,quantity with a unit
+lunch was curd rice and a banana,LOG,en-IN,
+ate three dosas with coconut chutney,LOG,en-IN,
+had chicken biryani in the canteen,LOG,en-IN,
+maine do roti aur thoda chawal khaya,LOG,hi-IN,code-mixed Hindi
+aaj subah poha khaya,LOG,hi-IN,
+nenu annam pappu tinnanu,LOG,te-IN,roman-script Telugu
+rendu idli sambar tinnanu,LOG,te-IN,
+morning lo upma tinna,LOG,te-IN,code-mixed
+I also had a glass of buttermilk,LOG,en-IN,an addition is still a log
+a plate of vegetable biryani and some raita,LOG,en-IN,no verb at all
+tea with two biscuits,LOG,en-IN,no verb no pronoun
+what did I eat on Tuesday,ANSWER,en-IN,
+how much iron did I get this week,ANSWER,en-IN,
+how many calories were in my lunch,ANSWER,en-IN,
+did I have enough protein yesterday,ANSWER,en-IN,yes-no question about history
+what was my sodium today,ANSWER,en-IN,
+how many rotis have I eaten today,ANSWER,en-IN,
+show me what I logged this morning,ANSWER,en-IN,
+aaj maine kitna protein khaya,ANSWER,hi-IN,code-mixed Hindi
+kal kya khaya tha,ANSWER,hi-IN,
+ee roju entha protein tinnanu,ANSWER,te-IN,roman-script Telugu
+ninna em tinnanu,ANSWER,te-IN,
+was there any B12 in what I ate today,ANSWER,en-IN,B12 must not be read as a quantity
+I'm eating rice and sambar what should I add,SUGGEST,en-IN,
+having dal and roti now anything I should add for protein,SUGGEST,en-IN,names a nutrient but describes a plate
+about to eat upma is that fine or should I add something,SUGGEST,en-IN,
+having poha for breakfast what goes well with it,SUGGEST,en-IN,
+I'm making chicken curry tonight what should I serve it with,SUGGEST,en-IN,
+eating curd rice what can I add to make it better,SUGGEST,en-IN,
+lunch is rice and rasam should I add an egg,SUGGEST,en-IN,yes-no about a plate in front of them
+main abhi dal chawal kha raha hoon kya add karun,SUGGEST,hi-IN,code-mixed Hindi
+ippudu annam pappu tintunna inka emi add cheyali,SUGGEST,te-IN,roman-script Telugu
+what should I eat for more iron,RECOMMEND,en-IN,
+I have diabetes what should I eat for breakfast,RECOMMEND,en-IN,declared condition
+what are good vegetarian sources of protein,RECOMMEND,en-IN,borderline with ANSWER; either route gives a usable reply
+my haemoglobin is low what foods help,RECOMMEND,en-IN,a lab value they mention themselves
+I have high BP what should I avoid,RECOMMEND,en-IN,
+what should I eat in the hostel mess to get more protein,RECOMMEND,en-IN,context in the request
+which dal has the most protein,ANSWER,en-IN,a general nutrition question; borderline with RECOMMEND
+is jaggery better than sugar for me,RECOMMEND,en-IN,'for me' makes it a recommendation; jaggery is a no-data item and routing still applies
+what can I eat to lose weight,RECOMMEND,en-IN,
+mujhe iron ke liye kya khana chahiye,RECOMMEND,hi-IN,code-mixed Hindi
+sugar hai to kya khana chahiye,RECOMMEND,hi-IN,
+iron kosam emi tinali,RECOMMEND,te-IN,roman-script Telugu
+naaku diabetes undi emi tinali,RECOMMEND,te-IN,
+does tea reduce iron absorption,ANSWER,en-IN,a general nutrition question; no plate and no history

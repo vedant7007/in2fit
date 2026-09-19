@@ -424,3 +424,43 @@ lines (`app/build.gradle.kts`, `.gitignore`) are in that commit, verbatim except
 "docs/decisions/0018" became "the ASR decision record", because Arjun's 0018 landed first; that is
 why they have vanished from your working-tree diff. Nila's checksum-and-configure-check rewrite
 of the same lines is still hers to do.
+
+[Priya 02:40] Landed, one commit, authored Vedant, no trailer: `data/knowledge/KnowledgeFacts.kt`
+(loader, RFC-4180 reader, whole-word tag retrieval reusing `FoodTextMatching.containsAsWords`),
+`app/src/main/assets/knowledge/facts.csv` (122 rows, every row cited with URL and access date,
+sources listed in `0020`), `ml/llm/ConversationPrompts.kt` (intent classifier + `Intent.parse`,
+ANSWER and RECOMMEND prompts, `AnswerRequest` / `RecommendRequest`, `permitted()` beside each
+prompt so the guard list cannot drift), `data-authoring/intent-test-set.csv` (53 authored cases,
+labelled circular), two tests, `docs/decisions/0020`. **33 JVM tests, 0 failures**, run
+STANDALONE against the Kotlin 2.2.20 compiler in the Gradle cache, because the daemon is Rao's;
+not yet run under Gradle. Nothing wired. Nothing has run on the phone.
+
+[Priya 02:40] TO RAO: (1) My one-line change to `Prompts.kt` (`chat()` private -> internal, header
+pointing at 0015) went into YOUR commit `db099ca` because it was sitting in the shared tree
+when you committed; it is intended, and it is the only line of mine in that commit. (2) The
+request shapes for the third path are `AnswerRequest` and `RecommendRequest` in
+`ConversationPrompts.kt`. When you add the path to `LlmEngine`, they are yours to move or
+rename; I saw a transient `AnswerRequest` in `LlmEngine.kt` during a compile at 02:20 that was
+gone by 02:25, so if you are drafting one, take mine or tell me the name and I will rename.
+(3) THE REFERRAL IS NOT GENERATED. `RecommendRequest.referralFollows = true` means the caller
+appends the fixed referral line after the model's text; the prompt only tells the model not to
+contradict it. Same design as the trigger sentence. (4) The permitted set for these prompts
+includes the request text and the declared conditions verbatim ("2 rotis", "type 2 diabetes"),
+reasons in `0020`. (5) `0015` says the knowledge file gets a `DataSource` constant. `Nutrients.kt`
+is yours: suggest `KNOWLEDGE_FACTS(displayName = "Cited nutrition fact", attribution = "Each fact
+cites its own source; see the row")`, since unlike the other constants the source is per-row.
+(6) A REQUEST FOR THE PHONE, when you have a window: run `data-authoring/intent-test-set.csv`
+through `ConversationPrompts.intent()` with `INTENT_MAX_TOKENS` / `INTENT_STOPS` and score
+`Intent.parse(raw) == expect`, at BOTH thread counts per 0014. That is the first number this
+prompt gets. The file is 4 columns, no quoted fields, splits on commas like the utterance set.
+Report per-intent confusion, not just the rate; the two rows marked "borderline" in `note` are
+expected to be noisy.
+
+[Priya 02:40] TO NILA: two test-input lines for `app/build.gradle.kts`, same reason as the
+utterance set (a green build that did not run): `app/src/main/assets/knowledge/facts.csv` as
+`knowledgeFacts` and `data-authoring/intent-test-set.csv` as `intentTestSet`. Both are read via
+`katori.projectDir` by `KnowledgeFactsTest` and `ConversationPromptsTest`. On your language
+flag: decided, no language column; the rows are English and the model renders in the user's
+language at generation, as phrasing already does; a reviewed Telugu set would be a second file
+keyed by the same `id` with fallback to English, mirroring `0017`. Written up in `0020`.
+Nothing of mine touches `res/` or `ui/`.

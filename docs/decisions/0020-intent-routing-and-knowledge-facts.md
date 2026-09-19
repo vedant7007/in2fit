@@ -1,0 +1,160 @@
+# 0020. Intent routing, the knowledge-facts file, and the ANSWER and RECOMMEND prompts
+
+Date: 20 September 2026. Status: accepted for the code and the data. **No behaviour claim:
+none of the three prompts has run on a phone.**
+
+Implements the parts of `0015` that are prompts and data. The Orchestrator that routes on the
+intent and the third `LlmEngine` path that runs these prompts are the integrator's and are not
+in this record.
+
+## What landed
+
+| Thing | Where |
+| --- | --- |
+| Intent classifier prompt and parser | `ml/llm/ConversationPrompts.kt`, `Intent` |
+| ANSWER and RECOMMEND prompts, their request shapes, the guard's permitted list | same file |
+| The knowledge-facts file, 122 rows, every row cited | `app/src/main/assets/knowledge/facts.csv` |
+| Loader, CSV reader, tag retrieval | `data/knowledge/KnowledgeFacts.kt` |
+| Authored intent case set, labelled circular | `data-authoring/intent-test-set.csv` |
+| 33 JVM tests | `KnowledgeFactsTest` (17), `ConversationPromptsTest` (16) |
+
+## The classifier
+
+One prompt, four labels, one word out. The output is the cost on this device (`0014`:
+generation is about five times the price of prompt processing), so the answer is a single word
+and the stop is a newline. The labels are words rather than letters or digits because a 1.5B
+model is more reliable at emitting a word it was shown than at mapping a category to a symbol,
+and the difference is one or two tokens.
+
+`Intent.parse` is lenient about case, punctuation and trailing words and strict about the label:
+the first alphabetic word must be one of the four, allowing a prefix of at least three letters
+so a label cut off by the token budget still parses. Anything else is null, and the caller asks
+rather than guesses (spec 10.7).
+
+ANSWER is defined more widely than the brief's examples: a question about their diary **or a
+general nutrition question**. `0015` lists "answer nutrition questions" among what the model may
+do, and "does tea reduce iron absorption" has no plate and no history, so it needs a route.
+RECOMMEND is "what should *I* eat for a goal or condition".
+
+**Nothing about the classifier's accuracy or latency is known.** The prompt is about 600
+characters; a test caps it at 800 as a proxy for tokens, because a classifier prompt is the
+kind that grows one helpful sentence at a time. The first number it gets is the authored case
+set run on the phone by the integrator, which is when the examples in the label definitions
+become the first thing to try cutting.
+
+## The knowledge-facts file
+
+**The rule, unchanged from the brief: a fact without a real, citable source does not go in the
+file.** The loader refuses a row with a blank source, so the rule holds where the file is read
+and not only where it is written. Every row carries the citation as a reader would write it, the
+URL, and the date it was read.
+
+Sources on 20 September 2026, all read that day: the ICMR-NIN RDA 2020 brief note (Indian
+requirements: energy, protein, iron, calcium, vitamin C, B12, the rest); the ICMR-NIN Dietary
+Guidelines for Indians 2024 (guidance, the 'My Plate' quantities, salt, sugar, oil, cooking
+methods, and its glycaemic-index annexure for rice, chapati, the dals, dosa, idli-sambar, lemon
+rice, curd rice, biryani, pesarattu and vada-sambar); the WHO healthy-diet fact sheet; StatPearls
+(dietary iron); the Linus Pauling Institute (iron, calcium, vitamin C, B12); the Harvard
+Nutrition Source (iron, protein, glycaemic index, fibre, fats); Atkinson et al. 2008 (the
+international GI tables); NHLBI's DASH page; and USDA FoodData Central by fdcId.
+
+**Where a fact rounds a figure, the note carries the exact one.** "Cooked rice about 78" is in
+the fact; "78.23 ± 4.24, ten participants" is in the note. The fact is what the model may say
+and the note is what a reviewer checks.
+
+### What is deliberately not in the file
+
+- **No diagnostic thresholds.** No haemoglobin cut-off, no glucose range. The reference range
+  comes from the person's own report, and a threshold row would let the model turn "below the
+  range printed on it" into a named condition. A test asserts the absence.
+- **No IFCT 2017, no INDB, in any form** (`0002`, HANDOVER §6 rule 14). The two ICMR-NIN
+  documents are cited for requirements, guidance and the GI annexure, which is from Devindra et
+  al. and not from the composition tables. The DGI's own nutrient tables cite IFCT 2017 and are
+  not used. A test greps every row for the names.
+- **No per-100 g figure for a nutrient the food database already tracks.** Those come from the
+  database on the day, as `DisplayFigure`s; a row would be a second copy that could drift. Rows
+  do carry per-serving or per-100 g figures for nutrients the database does not have (calcium,
+  vitamin C, potassium) and for foods it does not have (guava).
+- **No row that tells the person to take, stop or change a medicine or supplement.** One row
+  quotes its source saying vegans "need supplemental vitamin B12"; the prompt forbids the model
+  from turning that into an instruction, and the note says so.
+- **No composition figure for ragi, bajra or jaggery.** They stay no-data (`0002`). Two rows
+  name ragi and millets qualitatively, from the DGI, and their notes say the app cannot put a
+  number on them.
+
+### Language
+
+Nila's flag: text composed from this file is user-facing in the user's language. The decision
+is **no language column**. Nobody on the team writes Telugu or Hindi and `0017` forbids
+shipping either unreviewed, so the rows are English and the model renders them in the user's
+language at generation time, which is already how the phrasing path works. The numeric guard is
+script-aware, so the figures survive. If a reviewed Telugu set is ever wanted it is a second
+file keyed by the same `id`, with an untranslated row falling back to this one, exactly as a
+missing string-table key falls back to the default table. Nothing in the loader changes for
+that.
+
+### Retrieval
+
+Deliberately dumb. A row is relevant when one of its tags appears in the request text as a
+whole word, using `FoodTextMatching.containsAsWords`, the same one-directional word-bounded
+containment the food matcher uses and for the same reason (`0006`: substring containment
+produced biryani → bay leaf). Rows rank by how many tags hit, ties broken by file order, so the
+author controls precedence with the order of the rows. Six rows by default, about 150 prompt
+tokens. No embeddings, no fuzzy matching: a row retrieved for the wrong reason is a confident
+sentence about the wrong thing, and a miss is only a shorter answer.
+
+Checked by eye on ten requests before committing: "my haemoglobin is low what foods help"
+retrieved nothing until the iron rows were tagged `haemoglobin`, and "I have diabetes what
+should I eat for breakfast" ranked the GI *definitions* above the measured Indian dishes until
+the definitions were moved to the end of their block. Both are file edits, not code.
+
+## The ANSWER and RECOMMEND prompts
+
+Both are built the way the phrasing prompt is built: everything numeric arrives as finished
+strings, the facts go in as prose, and `permitted(request)` is defined beside the prompt so the
+guard's list and the prompt's contents cannot drift. A `check` fails the call if the prompt
+would show text the guard was not given.
+
+Two additions to the permitted set, both recorded because they widen it:
+
+- **The request text itself.** "How much protein in 2 rotis" carries a 2 the model must be
+  allowed to echo. It is the person's number, not the model's.
+- **The declared conditions and context, verbatim.** "type 2 diabetes" carries a 2 for the
+  same reason. Declared conditions are also the *only* conditions the prompt shows, in the
+  person's own words, so the model has nothing to diagnose from.
+
+**The referral is not generated.** When the rules engine decides a referral is mandatory
+(`ESCALATE` as `0015` redefines it), the caller appends the fixed referral line after the
+model's text and sets `referralFollows`, and the prompt tells the model not to contradict a line
+it cannot see. A generated referral could be softened or omitted on a bad sample; a fixed line
+cannot. This is the same choice as the trigger sentence: the safety-critical words are
+templated, the model puts prose around them.
+
+**Constraints are never relaxed.** Diet type and allergies go in as "Never suggest" lines, and
+the allowed food list is filtered by them upstream, so a slip in the prose has no food to land
+on. The UI renders suggestions from the list, never from the prose (spec 4.3, unchanged).
+
+SUGGEST has no prompt of its own here. "I'm having rice and sambar, what should I add" is the
+existing phrasing path with the plate's figures, the rules engine's ranked candidates and the
+retrieved rows; whether it needs its own wording is a question for after the first device run.
+
+## What is testable without a phone, and is tested
+
+The file, row by row: source present, URL, date, no IFCT, no diagnosis, no threshold, every row
+reachable by its own tags. The parser: quoted commas, doubled quotes, CRLF, the refusals. The
+retrieval: the brief's iron request, a dish on the plate, whole-word matching, punctuation. The
+prompts: every figure, fact, condition, constraint and food appears verbatim; the permitted list
+covers what is shown; the guard (unchanged, the integrator's) passes an echo and fails an
+invention; the referral notice appears only when the caller will append the referral. The
+parser for the classifier's one word. The case set's shape.
+
+Run standalone against the Kotlin compiler in the Gradle cache, because the laptop's daemon is
+the integrator's (`COORDINATION.md`): **33 tests, 0 failures.** Not yet run under Gradle; the
+two new test files need the same input declarations the utterance set has, which is a build-file
+change and is asked for in `COORDINATION.md`.
+
+## What this does not claim
+
+That the classifier routes correctly, at any rate. That the model uses the rows rather than its
+own memory. That the answer fits any latency budget. That any of it survives Telugu. Every one
+of those is a device measurement and the first run replaces this paragraph.
