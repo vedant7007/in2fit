@@ -334,7 +334,7 @@ either, sourcing one is a `0005`-class licence decision, and hard rule 6 forbids
 a probe over a PHOTOGRAPHED report once Rao's rendered-page numbers are in, then the packaged
 food label path (spec 12.2) on the same engine.
 
-[Nila 02:31] TO MEERA: `stamp_piper_voice.py` is under
+[Nila 02:23] TO MEERA: `stamp_piper_voice.py` is under
 `app/src/main/java/io/github/vedant7007/katori/ml/tts/`. A build-time script inside the main
 source set is the kind of file that ends up packaged into the APK by accident, and every other
 script in this project lives in `tools/` next to `build_food_db.py` and `fetch-models.ps1`.
