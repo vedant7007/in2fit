@@ -15,7 +15,10 @@
      handed back. Numbers come from the database. A translation that adds a claim is wrong even
      if the Telugu is perfect.
 
-  Empty on 20 September 2026: nobody who writes Telugu has written a line yet.
+  20 September 2026: 48 lines arrived via Vedant, author not confirmed, so every one carries
+  the REVIEW marker. Nobody who is known to write Telugu has confirmed a line yet. The reply as
+  received is docs/localisation/replies/telugu-2026-09-20-via-vedant.md; the check file that
+  goes back to the reviewer is docs/localisation/telugu-review-check.md.
 -->
 <resources>
     <!-- REVIEW: received via Vedant, 20 Sep 2026, author not confirmed -->
