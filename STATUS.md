@@ -1,104 +1,111 @@
 # Katori status
 
-Updated 19 Sep 2026, 09:50.
+Updated 19 Sep 2026, 11:45.
 
 ---
 
 ## BLOCKED ON VEDANT
 
-**Nothing right now.** Your three answers unblocked everything.
+**Nothing.**
 
-One recurring cost you should know about: **laptop control times out after 30 minutes idle**,
-and it is what runs builds and downloads. It bit once this morning and cost about an hour. If
-you see me report it again, re-granting from your phone is all it takes.
+Laptop control timed out once more (30 minutes idle) and I re-requested it immediately, as
+agreed. Cost this time was minutes, not an hour, because I switched to work that needs no run.
 
 ---
 
 ## VERIFIED ON HARDWARE
 
-**Nothing. All day. Not one line.** No phone connected, nothing installed, no model loaded.
+**Nothing. Still not one line.** No phone connected, nothing installed on a device.
 
-Still unverified: model load, inference speed, ASR accuracy, ASR/LLM/TTS co-residency, camera,
-OCR, every latency number. All of it waits for the Realme 11.
+Unverified and unverifiable until the Realme 11: model load on a phone, inference speed on a
+phone, ASR accuracy, ASR/LLM/TTS co-residency, camera, OCR, every latency number.
+
+---
+
+## VERIFIED ON DESKTOP, WHICH IS NOT HARDWARE
+
+**llama.cpp loads and runs Qwen 2.5 1.5B Q4_K_M.** On a 2-core Linux VM, CPU only:
+load 10.1 s, 9.89 tok/s eval, and on the real extraction prompt it returned valid JSON first
+try: `{"rotis": 2, "dal": "a katori"}`.
+
+**Nobody may quote 9.89 tok/s as a Katori number.** Two desktop cores are not a phone. It means
+the runtime and this model file work together, and nothing else.
+
+**libllama.so cross-compiles for arm64-v8a** against NDK 28.2.13676358 at minSdk 26, 39.7 MB,
+plus the three ggml libraries. So the native build path works. Those libraries have never been
+loaded and the JNI bridge is not written.
 
 ---
 
 ## VERIFIED ON EMULATOR
 
-Nothing. The emulator variant is not built yet.
+Nothing. Not built.
 
 ---
 
 ## COMPILE AND UNIT TEST ONLY
 
-Everything below is from a redirected log, read off disk.
+**48 tests, 0 failures.** APK 34.17 MB, arm64-v8a only. Demo manifest permissions asserted as
+exactly CAMERA and RECORD_AUDIO against a whitelist.
 
-- `assembleDemoDebug` green, APK 34.17 MB, arm64-v8a only
-- `testDemoDebugUnitTest` green: **47 tests, 0 failures**
-  - NetworkIsolationTest 2
-  - FoodTextMatchingTest 11
-  - SqliteFoodLookupTest 18, against the real shipped database
-  - RulesEngineTest 16
-- Merged demo manifest permissions are **exactly** CAMERA, RECORD_AUDIO, and the platform's own
-  DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION. Now enforced as a whitelist, not a ban on INTERNET.
+### Measured match rate, the spec 13.5 replacement
 
-### Food layer, done
+    ingredient utterances    144    resolved correctly  144  (100.0 %)
+    no-data utterances        22    refused correctly    22  (100.0 %)
+    expected-miss             10    correctly missed     10
+    WRONG FOOD                 0    <- the number that matters
 
-Bundled read-only SQLite built from USDA. All four import rules enforced **and asserted after
-import**, so a violation aborts the build instead of shipping:
+The match rate is not the number to watch. WRONG FOOD is. A miss is honest and the user gets
+asked; a wrong food silently puts a wrong number in a health app. The test fails the build on
+either a wrong food or a rate regression.
 
-- energy coalesces 1008, then 2048, then 2047. It fired for real on the jowar record
-- every food has an energy value, asserted
-- dairy comes only from SR Legacy, asserted
-- no enriched or known-defective record imported, asserted
-- absent nutrients stay absent. 2 of 272 values are genuinely unknown and read as Unknown,
-  never as zero. 21 are assumed-zero, which is different and comes from the source saying so
+The utterance set is **authored, not recorded**. It gets replaced by Abhinav's real transcripts
+when they exist.
 
-34 ingredients, 230 aliases across roman, Telugu and Devanagari, 21 household unit conversions.
+### Corpus
 
-**Ragi, bajra, jaggery, curry leaves and asafoetida** resolve to a named refusal with the reason,
-never to a substitute. There is a test that fails if any of them ever resolves to a food.
+81 foods, 513 aliases in roman, Telugu and Devanagari, 13 deliberate no-data items.
 
-### Rules engine, done
+**Gongura is in USDA**, as "Roselle, raw". An earlier sweep had reported it absent from every
+source. Same species, no caveat needed.
 
-Pure. No clock, no randomness, no I/O, no model. The required test passes: identical input at two
-different times gives an identical digest **and** an identical evaluation.
+---
 
-Eight safety-reviewed sentences, and a test that fails if any of them ever contains "diabetes",
-"anaemia", "hypertension", "deficiency" or six other words.
+## WHAT MEASURING FOUND, WHICH READING DID NOT
 
-### Models, downloaded and checksummed
+Five wrong answers on the first run, all real:
 
-1669.6 MB total, against the ~2 GB budget. Disk C: 215 GB free.
-Nothing has been loaded or run. Sizes match what the repositories publish, byte for byte.
+- `biryani` resolved to **bay leaf**, through the alias "biryani aaku"
+- `upma` resolved to **semolina**, through "upma rava"
+- `atta` was refused as **curry leaves**, through "kadi patta"
+- `avalu` was refused as **horse gram**, through "ulavalu"
+- `kandi pappu` resolved to the **cooked** dal when it was authored as raw
+
+Three of those are a whole dish collapsing onto one of its ingredients, which is the worst shape
+of wrong answer here, because the number that follows looks completely reasonable.
+
+Fixed four ways, and the new importer assertion then found three more nobody had noticed: "rice",
+"chawal" and "chana" each sat on both a raw and a cooked record, and whichever loaded last won
+silently. Full write-up in `docs/decisions/0006`.
+
+**A separate one worth knowing:** Gradle had been marking the test task UP-TO-DATE after the food
+database was rebuilt, so a green build was reporting the previous run's numbers. The database and
+the utterance set are now declared test inputs. A green build that did not run is worse than a
+red one.
 
 ---
 
 ## DECIDED WITHOUT ASKING
 
-- **No nutrient preference means no suggestions at all.** Found by a test asserting beat 4's own
-  claim. With nothing to rank by, every candidate scored zero and the list fell back to
-  alphabetical order, which happened to match the ranked order, making "the advice changed"
-  silently false. An arbitrary order presented as advice is the same failure as a made-up number.
-  `docs/decisions/0006`
-- **Lab markers respond to the direction that matters clinically.** A glucose above its range and
-  one below it are not mirror images, and ranking them as though they were would be worse than
-  doing nothing. A marker with no reviewed policy produces no preferences at all.
-- **Permission check is now a whitelist.** A denylist only finds what it already knows to look
-  for. `docs/decisions/0004`
-- Model sourcing, the licences, and the non-commercial register. `docs/decisions/0005`
-- USDA import rules and the gap tiering. `docs/decisions/0002`
-
----
-
-## NON-COMMERCIAL REGISTER: EMPTY
-
-You allowed non-commercial licences and, as it turned out, none was needed. Everything shipped is
-Apache-2.0, CC-BY-4.0, MIT or public domain. Telugu TTS came in at CC-BY-4.0, so the allowance was
-not spent. Full table in `docs/decisions/0005`.
+- Smoke-tested the LLM runtime before Hilt, since the spec has been wrong twice about what
+  exists. `docs/decisions/0006`
+- Matcher containment is one-directional and word-bounded; the no-data list is never
+  fuzzy-matched. `0006`
+- Bare food names mean the cooked form, because that is what a person logging a meal means. `0006`
+- No nutrient preference means no suggestions at all. `0006`, and it is why beat 4 is now provable
 
 ---
 
 ## NEXT
 
-KSP, Room compiler and Hilt, timeboxed. Then the LLM layer with NumericGuard, then the UI.
+D: KSP, Room compiler, Hilt, timeboxed. Then E: the JNI bridge and NumericGuard.
