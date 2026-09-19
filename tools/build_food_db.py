@@ -360,6 +360,32 @@ def main():
     else:
         log("RULE 4 ok: no enriched or known-defective record was imported")
 
+    # AMBIGUOUS ALIAS assertion.
+    #
+    # Added after the measured utterance set showed "kandi pappu" resolving to cooked toor dal
+    # when it was authored as raw. The cause was the same alias written on two different foods:
+    # the last one loaded silently won. Nothing in the app could have detected that, and the
+    # figure it produced looked perfectly reasonable.
+    rows = c.execute("""
+        SELECT alias_norm, GROUP_CONCAT(DISTINCT food_key) AS keys, COUNT(DISTINCT food_key) AS n
+        FROM food_aliases GROUP BY alias_norm HAVING n > 1
+    """).fetchall()
+    if rows:
+        failures.append("AMBIGUOUS ALIAS: one spoken name maps to several foods: " +
+                        "; ".join(f"'{r[0]}' -> {r[1]}" for r in rows))
+    else:
+        log("ALIAS ok: every spoken name maps to exactly one food")
+
+    # An alias must not sit on both a real food and a no-data item.
+    rows = c.execute("""
+        SELECT a.alias_norm, a.food_key, n.item_key
+        FROM food_aliases a JOIN no_data_aliases n ON n.alias_norm = a.alias_norm
+    """).fetchall()
+    if rows:
+        failures.append(f"ALIAS COLLISION between a food and a no-data item: {rows}")
+    else:
+        log("ALIAS ok: no name is both a food and a no-data item")
+
     # No-data items must not have any nutrients.
     rows = c.execute("""
         SELECT i.item_key FROM no_data_items i

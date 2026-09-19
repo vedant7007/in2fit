@@ -135,7 +135,10 @@ class SqliteFoodLookup(
     // --- internals ------------------------------------------------------------------------
 
     private fun noDataMatch(query: FoodQuery): Outcome.Unavailable? {
-        val hit = FoodTextMatching.match(query.spokenName, noDataAliasCache) ?: return null
+        // allowFuzzy = false: see FoodTextMatching.match. Refusing a food because its name
+        // merely resembles a no-data item is worse than missing it.
+        val hit = FoodTextMatching.match(query.spokenName, noDataAliasCache, allowFuzzy = false)
+            ?: return null
         val row = db.query(
             "SELECT display_name, reason FROM no_data_items WHERE item_key = ?",
             listOf(hit.key),

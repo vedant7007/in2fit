@@ -66,6 +66,18 @@ android {
         unitTests.all {
             // The import-scan test reads the real source tree rather than a copy.
             it.systemProperty("katori.projectDir", rootProject.projectDir.absolutePath)
+
+            // These tests read real files that Gradle cannot infer as inputs: the bundled food
+            // database and the utterance set. Without declaring them, Gradle marks the test task
+            // UP-TO-DATE after the database is rebuilt and reports a stale pass.
+            //
+            // That actually happened: an alias was added, the database was rebuilt, the build
+            // went green, and the match-rate report was the previous run's. A green build that
+            // did not run is worse than a red one.
+            it.inputs.file(rootProject.file("app/src/main/assets/food/katori-food.db"))
+                .withPropertyName("bundledFoodDatabase")
+            it.inputs.file(rootProject.file("data-authoring/utterance-test-set.csv"))
+                .withPropertyName("utteranceTestSet")
         }
     }
 }

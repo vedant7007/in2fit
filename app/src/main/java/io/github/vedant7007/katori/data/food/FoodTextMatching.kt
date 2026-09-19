@@ -70,13 +70,16 @@ object FoodTextMatching {
      * The maximum edit distance tolerated for a candidate of this length.
      *
      * Short names get no slack at all, because at three characters a single edit reaches a
-     * different word: "dal" to "dahi" must not match. Longer names get proportionally more.
+     * different word: "dal" to "dahi" must not match.
+     *
+     * The middle band was 2 and is now 1. The measured utterance set caught "bendakaya", okra,
+     * being pulled onto "dondakaya", ivy gourd, two edits apart at nine characters. Two Telugu
+     * vegetable names that differ by two letters are common enough that two edits is too generous.
      */
     fun toleranceFor(length: Int): Int = when {
         length <= 4 -> 0
-        length <= 7 -> 1
-        length <= 12 -> 2
-        else -> 3
+        length <= 12 -> 1
+        else -> 2
     }
 
     /** How a candidate was reached. Ordered best to worst; used to pick a winner. */
@@ -100,33 +103,66 @@ object FoodTextMatching {
         )
 
     /**
+     * True when [alias] appears in [query] as a whole run of words.
+     *
+     * WHY WHOLE WORDS. An earlier version tested plain substring containment in BOTH directions,
+     * and the measured utterance set showed exactly what that costs:
+     *
+     *   "biryani" matched the alias "biryani aaku"  -> bay leaf
+     *   "upma"    matched the alias "upma rava"     -> semolina
+     *   "atta"    matched the alias "kadi patta"    -> curry leaves, a no-data item
+     *   "avalu"   matched the alias "ulavalu"       -> horse gram, a no-data item
+     *
+     * Three of those are a whole dish collapsing onto one of its ingredients, which is the worst
+     * kind of wrong answer here because the number that follows looks reasonable.
+     *
+     * So containment now runs in ONE direction only, the alias inside the utterance, and only on
+     * word boundaries. "two spoons of groundnut oil" still finds "groundnut oil"; "biryani" no
+     * longer finds "biryani aaku".
+     */
+    fun containsAsWords(query: String, alias: String): Boolean {
+        val q = query.split(' ').filter { it.isNotEmpty() }
+        val a = alias.split(' ').filter { it.isNotEmpty() }
+        if (a.isEmpty() || a.size > q.size) return false
+        for (i in 0..(q.size - a.size)) {
+            if ((a.indices).all { q[i + it] == a[it] }) return true
+        }
+        return false
+    }
+
+    /**
      * Matches [query] against a table of normalised aliases.
      *
-     * @param aliases normalised alias to food key. Many aliases map to one key.
+     * @param allowFuzzy false disables the edit-distance stage entirely. Used for the no-data
+     *   list: refusing a food because its name merely RESEMBLES something we hold no data for is
+     *   worse than missing it. The measured set caught "gajar" being refused as "gawar", cluster
+     *   beans, one edit apart.
      */
-    fun match(query: String, aliases: Map<String, String>): Candidate? {
+    fun match(query: String, aliases: Map<String, String>, allowFuzzy: Boolean = true): Candidate? {
         val q = normalise(query)
         if (q.isEmpty()) return null
 
-        val out = mutableListOf<Candidate>()
-
         aliases[q]?.let { return Candidate(it, q, MatchStrength.EXACT, 0) }
 
+        val contained = mutableListOf<Candidate>()
         for ((alias, key) in aliases) {
-            if (alias.length >= 4 && (q.contains(alias) || alias.contains(q))) {
-                out += Candidate(key, alias, MatchStrength.CONTAINED, kotlin.math.abs(q.length - alias.length))
+            if (alias.length >= 3 && containsAsWords(q, alias)) {
+                contained += Candidate(key, alias, MatchStrength.CONTAINED, q.length - alias.length)
             }
         }
-        if (out.isNotEmpty()) return best(out)
+        if (contained.isNotEmpty()) return best(contained)
 
+        if (!allowFuzzy) return null
+
+        val fuzzy = mutableListOf<Candidate>()
         for ((alias, key) in aliases) {
             // Never fuzzy-match across scripts: a roman query must not fuzzy onto a Telugu alias.
             if (isNativeScript(alias) != isNativeScript(q)) continue
             val tol = toleranceFor(minOf(alias.length, q.length))
             if (tol == 0) continue
             val d = editDistance(q, alias)
-            if (d <= tol) out += Candidate(key, alias, MatchStrength.FUZZY, d)
+            if (d <= tol) fuzzy += Candidate(key, alias, MatchStrength.FUZZY, d)
         }
-        return best(out)
+        return best(fuzzy)
     }
 }
