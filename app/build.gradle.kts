@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
 
     testImplementation(libs.junit)
+    testImplementation(libs.sqlite.jdbc)
 }
 
 /**

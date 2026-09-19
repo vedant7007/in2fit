@@ -16,6 +16,7 @@ mlkitText = "16.0.1"
 mlkitBarcode = "17.3.0"
 navigationCompose = "2.10.1"
 junit = "4.13.2"
+sqliteJdbc = "3.53.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,9 @@ mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning"
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+# Test only. Lets the food layer be tested on the JVM against the REAL bundled database
+# rather than against fixtures, which is what catches a bad import or a renamed column.
+sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqliteJdbc" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

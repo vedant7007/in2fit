@@ -134,7 +134,7 @@ class SqliteFoodLookup(
 
     // --- internals ------------------------------------------------------------------------
 
-    private fun <T> noDataMatch(query: FoodQuery): Outcome<T>? {
+    private fun noDataMatch(query: FoodQuery): Outcome.Unavailable? {
         val hit = FoodTextMatching.match(query.spokenName, noDataAliasCache) ?: return null
         val row = db.query(
             "SELECT display_name, reason FROM no_data_items WHERE item_key = ?",
