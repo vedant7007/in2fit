@@ -62,9 +62,13 @@ that back; it bought nothing and cost a food, because **generated tokens cost ab
 what prompt tokens cost on this device** (38-52 tok/s in, 9-10 tok/s out). A cheaper prompt that
 makes the model emit a fenced, pretty-printed answer is a net loss. The shortening was reverted.
 
-The remaining lever is the ANSWER, not the prompt: the model emits
-`"quantity":null,"unit":null,"method":null` on every item, and the strict reader already accepts
-those fields as absent. Untried, and measured against the correctness cases before it is believed.
+Attacking the ANSWER instead was tried next, since generated tokens are where the time is: the
+model was told to leave `quantity`, `unit` and `method` out when nothing was said, which the
+strict reader already accepts. **Also reverted.** The correctness cases passed and the very next
+test refused the same transcript with `'quantity' is not a number` at a different thread count.
+Valid at eight threads and invalid at four is a prompt sitting on a decision boundary, not a
+working one. Two latency ideas, both killed by measurement, both for the same reason: the saving
+was real and something else got worse.
 
 **The UI carries the budget.** Ten seconds of silence reads as a hang; ten seconds of visible
 progress reads as work. Recording meter, acknowledgement at endpoint, progress through extraction.

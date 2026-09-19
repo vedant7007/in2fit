@@ -50,16 +50,28 @@ extraction cases on the device.
 Two lines were kept from the experiment because they fix failures it exposed: "Every food they
 named gets an entry" and "Never repeat a field".
 
-## So the lever is the ANSWER, not the prompt
+## The lever is the ANSWER, not the prompt. That was tried too, and it also failed
 
-Untried, and the obvious next thing: the model currently emits
-`"quantity":null,"unit":null,"method":null` on every item even when nothing was said. Three items
-of that is a large share of a 55-token answer. `ExtractionJson` already accepts an absent
-optional field as null, and there is a passing test for it, so the schema does not need these
-keys at all.
+The model emits `"quantity":null,"unit":null,"method":null` on every item even when nothing was
+said. Across three items that is a large share of a 55-token answer, and `ExtractionJson` accepts
+an absent optional field as null with a passing test, so the schema does not need those keys.
 
-That is a change to what the model is asked to emit, so it is measured against the correctness
-cases before it is believed, exactly as the prompt change was.
+So the prompt was changed to show `{"items":[{"name":"..."}]}` and to say leave the field out.
+
+**It is unstable and it is reverted.** The five correctness cases passed. The very next test then
+refused the SAME transcript with `'quantity' is not a number`, at a different thread count,
+because the model had emitted the quantity as a string.
+
+Valid at eight threads and invalid at four is not a working prompt. It is a prompt sitting close
+enough to a decision boundary that floating-point accumulation order pushes it over, which is the
+same effect `0011` records for the toolchain. Showing the model the full shape, nulls included,
+keeps it on that shape.
+
+**This is the second latency idea in a row that measurement killed**, and both died the same way:
+the saving was real and something else got worse. The remaining honest levers are the product
+decisions, not another prompt edit.
+
+Anyone retrying it measures across BOTH thread counts, and treats a pass on one as meaningless.
 
 ## What the UI has to do about it
 

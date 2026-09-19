@@ -259,7 +259,7 @@ class HardwareProbeTest {
                 )
             }
             say("")
-            say("transcript   \"${case.transcript}\"")
+            say("transcript   \"${case.transcript}\"" + if (case.weak) "   [WEAK ASSERTION, not counted]" else "")
             when (outcome) {
                 is Outcome.Ok -> {
                     val items = outcome.value.items
@@ -311,8 +311,10 @@ class HardwareProbeTest {
             }
         }
 
+        val counted = CASES.count { !it.weak }
         say("")
-        say("cases            ${CASES.size}")
+        say("cases            ${CASES.size}, of which $counted assert something that can fail")
+        say("weak, uncounted  ${CASES.size - counted}   <- see the WEAK ASSERTION lines above")
         say("failures         $failures   <- an invented quantity counts here")
         assertTrue("$failures extraction case(s) failed; see the lines above", failures == 0)
     }
@@ -331,6 +333,12 @@ class HardwareProbeTest {
         val unquantified: List<String> = emptyList(),
         /** food substring to the number the speaker actually said. */
         val quantified: List<Pair<String, Double>> = emptyList(),
+        /**
+         * True when this case cannot fail for the reason it exists, so it is reported separately
+         * and NOT counted as coverage. A case that passes because it asserts nothing is worse
+         * than no case, because it inflates the number people quote.
+         */
+        val weak: Boolean = false,
     )
 
     // --- 3. co-residency, the stage-1 item -----------------------------------------------------
@@ -511,12 +519,24 @@ class HardwareProbeTest {
                 expectFoods = listOf("roti"),
                 unquantified = listOf("chawal", "rice"),
             ),
-            // Telugu script. The name must survive as the person said it.
+            // Telugu script.
+            //
+            // WEAK ASSERTION, AND IT DOES NOT COUNT AS COVERAGE. expectFoods is empty, so the
+            // only thing this can currently fail on is an invented quantity. It has passed while
+            // the model returned the pronoun as part of the food name ("నేను పప్పు", "I dal")
+            // and while it invented a unit ("మీటీ"), neither of which this case can see.
+            //
+            // The utterance is "I ate pappu and annam", so the real assertion is that both
+            // పప్పు and అన్నం come back, as food names without the pronoun attached. That needs
+            // someone who reads Telugu to confirm the expected forms; Vedant does. Until then it
+            // is labelled rather than guessed at, because an assertion invented by someone who
+            // cannot read the script is worse than an honest gap.
             Case(
                 transcript = "నేను పప్పు మరియు అన్నం తిన్నాను",
                 lang = "te-IN",
                 expectFoods = emptyList(),
                 unquantified = listOf("పప్పు", "అన్నం", "pappu", "annam", "dal", "rice"),
+                weak = true,
             ),
             // A stated quantity with an explicit unit, which must be captured rather than dropped.
             Case(

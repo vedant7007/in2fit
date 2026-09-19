@@ -56,6 +56,17 @@ internal object Prompts {
      * address failures it exposed: "Every food they named gets an entry" and "Never repeat a
      * field".
      *
+     * THE NULL FIELDS STAY, AND THAT WAS ALSO MEASURED. Asking for `{"items":[{"name":"..."}]}`
+     * and telling the model to leave quantity, unit and method OUT when nothing was said is the
+     * obvious way to cut generated tokens, which is where the time is, and [ExtractionJson]
+     * accepts absent optional fields with a test to prove it. It was tried. The correctness
+     * cases passed, and then the SAME transcript was refused on the next test with "'quantity'
+     * is not a number", at a different thread count, because the model emitted the quantity as a
+     * string. Valid at eight threads and invalid at four is not a prompt that works; it is a
+     * prompt sitting on a decision boundary that floating-point accumulation order can push it
+     * over. Spelling the nulls out keeps the model on the shape it was shown. Anyone retrying
+     * this measures across BOTH thread counts before believing it.
+     *
      * WHAT MUST NOT BE CUT, because each line is the prompt half of a defence that the rest of
      * this package enforces:
      *   - JSON and nothing else, which is what ExtractionJson can refuse cleanly
