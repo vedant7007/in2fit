@@ -81,6 +81,24 @@ changed a field. Assert properties.
 
 ---
 
+### THE PRODUCT CHANGED ON 20 SEPTEMBER. READ `0015` BEFORE THE SPEC.
+
+IN2FIT routes speech to one of four intents — LOG, ANSWER, SUGGEST, RECOMMEND — rather than
+running one logging pipeline. "I have anaemia, what should I eat for iron?" is a first-class
+request, not a follow-up to logging a meal.
+
+The safety line moved with it, and it is narrower than the old fixed-sentence rule. The model may
+explain, guide, suggest swaps, answer nutrition questions and encourage. It may not state a number
+it was not given, name a condition the user has not declared, diagnose, or prescribe. A lab value
+reads "your last report shows iron below the range printed on it", never "you have anaemia", and a
+serious matter gets a doctor referral ALONGSIDE help rather than instead of it.
+
+`docs/spec.md` predates all of this and is stale in places. `0015` lists which of its sections it
+supersedes, and flags five places where the new design conflicts with contracts `0001` froze.
+**Three of those five need the freeze broken deliberately.** If your slice touches
+`Severity.ESCALATE`, `UserIntent`, or the two-path rule on `LlmEngine`, read `0015` first — the
+conflict is already identified and the resolution is written down.
+
 ### WHERE I AM GOING NEXT
 
 `ModelArbiter`, per the handover's recommended order. It is a contract with nothing behind it and
