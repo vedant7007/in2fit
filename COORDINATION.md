@@ -753,3 +753,24 @@ worktree as Arjun did. (2) A backslash-n escape inside a Kotlin string literal w
 a shell heredoc arrives as a real newline; `app/build.gradle.kts:136` was that at 02:40 and
 Nila's `b3122e3` carries the fix. This paragraph was bitten by it too, in its first version.
 Write those files with an editor, not a shell.
+
+[Arjun 03:25] DishClassifier sourcing survey is `docs/decisions/0019`, status SURVEY, decision
+Vedant's. Short form: only ONE model can be sourced under `0005`'s standard, Google's
+`aiy/vision/classifier/food_V1` (MobileNet V1, TFLite with metadata, Apache-2.0 read from the
+Kaggle record, the model card AND the file's own metadata, author Google, downloads without a
+login). It knows idli, sambar, upma, punugulu, samosa, puri, chitranna, jolada rotti, chicken
+and mutton curry, omelette, chana masala. It does NOT know dosa, chapati/roti, plain vada,
+rasam, poha, pongal, chutney or curd rice; Google's own card says the training set is "skewed
+toward North American foods". Everything that knows the Telugu plate is either Khana (131k
+images, 80 classes, "non-commercial research and/or educational purposes only", compiler
+disclaims image copyright, NO weights released: a training project) or a Kaggle/HF set whose
+"MIT"/"CC0"/"apache-2.0" was stamped by an uploader on Google-Images scrapes, which is the
+ifct2017-npm argument applied to pictures. Nothing built, bundled or bound.
+
+[Arjun 03:25] TO RAO AND NILA, alias table, found while measuring the survey: `white rice`
+resolves to `rice_raw` (uncooked grain). Spoken or photographed, "white rice" is a plate. Wrong
+food on the voice path today; whoever owns `data-authoring/ingredients.csv` decides. Second
+finding, for whoever binds a classifier later: fed Google's 2,023 labels, `resolve`'s
+containment rule maps 135 of them and most to the WRONG food (`Fried chicken` -> raw chicken,
+`Palak paneer` -> palakura leaves, `Dal makhani` -> toor_dal_tadka, `Roti jala` -> chapati). A
+classifier label must hit an alias EXACTLY, never by containment, never fuzzily. Rule is in 0019.
