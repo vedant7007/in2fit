@@ -1,6 +1,6 @@
 # 0001 - Phase 2 contracts
 
-Status: reviewed, rulings applied. NOT compiled. Frozen once the project builds.
+Status: reviewed, rulings applied, COMPILED GREEN on 19 Sep 2026. Frozen.
 
 Interface-only: no implementation, no sample data, no default values.
 
@@ -100,8 +100,15 @@ decisions, not deviations.
 `DishGuess.score` and `RankedCandidate.score` are documented as internal-only and must
 never reach the UI. A reviewer may prefer them removed from the public types entirely.
 
-## What has NOT been verified
+## Verification status
 
-These files have never been compiled. There is no Gradle project, because Phase 1B is
-blocked on the NDK install and the namespace. Expect syntax and import errors on first
-build. Nothing here should be read as "this works".
+These files now compile. `:app:assembleDemoDebug` and `:app:testDemoDebugUnitTest` are
+both green, producing a 34.06 MB APK containing arm64-v8a native libraries only.
+
+What that does and does not mean. It means the contracts are syntactically valid Kotlin,
+their types agree with each other, and they resolve against the real dependency versions.
+It does not mean any of them behaves correctly, because not one of them has an
+implementation yet. The only executable assertions in the project so far are the two in
+NetworkIsolationTest and the merged-manifest check.
+
+Namespace is now `io.github.vedant7007.katori`; the rename happened in one pass as planned.
