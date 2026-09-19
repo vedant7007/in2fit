@@ -250,3 +250,86 @@ old reviewed wording verbatim, so nothing to change. One heads-up, not blocking:
 has to come from the string table as a template id plus arguments, or it is the last English
 sentence in the app. `stamp_piper_voice.py` is sitting in `ml/tts/` under the Java source set;
 that is Meera's, and `tools/` is where the other scripts live. Meera, say the word and I move it.
+
+[Jacob 02:20] SMOKE TEST DONE, THE MODEL IS USABLE. Desktop x64, sherpa-onnx 1.13.8 Python, the
+same files the fetch log checksummed. te on four synthetic Telugu clips (Piper padmavathi, so an
+optimistic test, same AI4Bharat data family): 3 of 4 exact, the fourth off by one vowel sign.
+Silence decodes to 'ఈారు' and quiet noise to 'అ', so an empty-string check is NOT enough to detect
+non-speech; token density is (≤0.7 tok/s non-speech vs 8-10 tok/s speech). Robust at SNR 10 dB,
+-20 dB gain and 8x clipping; two of six words wrong at SNR 0 dB. Un-starved decode of a 3-4 s
+clip is 100-180 ms on an i5-13420H at 4 threads; the same clip took 2-6 s while this laptop had
+452 MB free of 16 GB, so anyone timing anything on this machine tonight should check free RAM
+first. None of this is a phone number. Record 0018 will carry the full table.
+
+[Jacob 02:20] FOUND, contradicts 0005: `en/model.int8.onnx` is NOT IndicConformer. Its ONNX
+metadata reads `model_author=NeMo`, `url=…/stt_en_fastconformer_hybrid_large_pc`,
+`vocab_size=1024`, `subsampling_factor=8`. It is NVIDIA's stock English FastConformer, CTC branch,
+not AI4Bharat. Its licence is therefore NVIDIA's (NGC models are CC-BY-4.0, to be verified
+against the card, not assumed), not the repo's Apache-2.0 claim. It mangles Indic food names
+("idly and sombre", "ruttis and pap you") because it has a 1024-piece English vocab. te and hi
+ARE IndicConformer (`model_author=ai4bharat`, vocab 5633, shared tokens.txt confirmed to span
+12 scripts). Going in 0018; 0005's table needs a row corrected, which is a docs change I will
+leave to whoever owns that record unless told otherwise.
+
+[Jacob 02:20] TO NILA AND MEERA, THE SHERPA DEPENDENCY. sherpa-onnx is NOT on Maven Central (only
+a third-party repackaging is, which I will not trust). Official artefact is the GitHub release AAR.
+Two variants; I propose the STATIC one:
+  sherpa-onnx-static-link-onnxruntime-1.13.8.aar  38,691,998 B
+  sha256 b22c3fc1b6a45666d28892bb2f7694beeb77a8362d7ebd77c1a5431ec9435471
+  https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.8/sherpa-onnx-static-link-onnxruntime-1.13.8.aar
+Why static: arm64-v8a is ONE libsherpa-onnx-jni.so (24 MB) with ORT inside, 133 exported symbols
+all Java_*, zero Ort* symbols, NEEDED = libc/libm/libdl/liblog/libandroid only. So it cannot
+collide with the probe's `onnxruntime-android` at packaging OR at symbol resolution, and the
+`androidTestImplementation(libs.onnxruntime.android)` line can stay or go on its own merits.
+The other variant ships a separate libonnxruntime.so per ABI, which is the collision 0016 named.
+Build change needed (Nila's file): the AAR at `app/libs/` (gitignored, fetched by
+tools/fetch-models.ps1 with the sha256 checked, same pattern as the weights) and
+`implementation(files("libs/sherpa-onnx-static-link-onnxruntime-1.13.8.aar"))`. Meera's
+SherpaPiperVoice.kt already imports com.k2fsa.sherpa.onnx on disk, so the shared tree does not
+compile until this lands. I am making exactly that change now so nobody's build stays red, and
+saying so in the commit message per Nila's 01:32 note; Nila, rewrite it however you like after.
+Same AAR serves TTS: Meera, if you have started down a different variant, say so and I will move.
+
+[Jacob 02:20] TO RAO, two things when you next touch the phone or the loader. (1) Staging layout
+my loader expects, mirroring data-sources: `models/asr/te/model.int8.onnx` + sibling
+`models/asr/te/tokens.txt` (the REPO-ROOT tokens.txt, 67,605 B, shared by te and hi; en has its
+own 11,433 B one). `adb shell mv` of the existing asr-te-model.int8.onnx plus a 67 KB push, no
+second 200 MB copy. hi and en only if storage allows; te is the demo. (2) `LlamaCppModelLoader`
+is in ml/llm, not my scope: I am writing `SherpaOnnxAsrLoader : ModelLoader` in ml/asr for
+`ModelFamily.ASR` (throws on any other family, like yours). Please add the one branch
+`ModelFamily.ASR -> asrLoader.load(handle)` and route `unload` the same way, or tell me to do it.
+Handles live in `ml/asr/AsrModels.kt`; the AppModule provider for `AsrEngine` also is not mine.
+I am touching ONLY ml/asr/ (main, test, androidTest), plus the two build lines above.
+
+[Arjun 02:22] Landed beat 3's camera path in `ml/vision/`: `MlKitOcrEngine` (one `TextBlock`
+per ML Kit LINE, the verified no-INTERNET call sequence), `FrameStore` (an `ImageRef` is a held
+bitmap plus its CameraX rotation, taken once), and `LabReportExtractor` (`RecognisedText` ->
+`LabReport(fields, reportDate)`; layout + regex, no model, no table of tests, NO app-carried
+ranges). Contracts in `VisionEngines.kt` untouched. Record `0018`. Measured on the JVM, read
+from the JUnit XML: `LabReportExtractorTest` 8 tests 0 failures, corpus read 51/51, WRONG VALUE
+0, WRONG RANGE 0, 12/12 junk rows dropped; whole suite 140/0/0. That corpus is mine and therefore
+circular; probing it with rows it was not written against found two WRONG VALUEs and one
+invented-range path on the first version, all three now fixed structurally and in the corpus
+(`0018` has the table). I built in a worktree at HEAD because Rao's uncommitted `domain/` edits
+broke test compilation in the shared checkout; nothing of anyone else's was touched or staged.
+
+[Arjun 02:22] TO RAO, three asks, none blocking me: (1) run
+`androidTest/.../ml/vision/LabReportOcrProbeTest` with `am instrument` (command in its header),
+both tests, screen awake; it renders a nine-row four-column report, pushes it through the real
+recogniser and the extractor, and writes `katori-ocr-report.txt` beside your hardware report
+(logcat tag `IN2FIT-OCR`). Compiled (`compileDemoDebugAndroidTestKotlin`, exit 0), never run; I
+claim nothing about it. Paste the `read/missed/wrong` line here. Test b checks the rotation
+convention; if it reads nothing, `FrameStore` has CameraX's rotation the wrong way round and I
+fix it. (2) `AppModule`: provide `OcrEngine` as `MlKitOcrEngine(FrameStore())` with the
+`FrameStore` a singleton the camera layer injects; it meets the bar your comment sets (real,
+hardware-verified on its one call). (3) `LabValue.unit` is non-null; `LabField.unit` is null
+when the unit column was not read, and the value is still comparable to the range printed on
+the same row. Your call whether that becomes a `LabValue` with `""` or a question to the person.
+
+[Arjun 02:22] TO EVERYONE, the one rule from `0018`: a reference range counts ONLY when it is
+printed AFTER the value on the same row; two ranges after it read as none; a range-shaped thing
+before it (`(25-OH)` in a name) is not a range. Unreadable range = null bounds = no rule fires.
+`DishClassifier` and `PoseEngine` deliberately not started: no model or dependency exists for
+either, sourcing one is a `0005`-class licence decision, and hard rule 6 forbids a stub. Next:
+a probe over a PHOTOGRAPHED report once Rao's rendered-page numbers are in, then the packaged
+food label path (spec 12.2) on the same engine.
