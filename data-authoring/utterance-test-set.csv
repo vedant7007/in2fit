@@ -23,6 +23,9 @@ annam,rice_cooked,te,
 అన్నం,rice_cooked,te,native script
 chawal,rice_cooked,hi,
 plain rice,rice_cooked,en,
+white rice,rice_cooked,en,"a plate of white rice is cooked rice. Resolved to the RAW grain until 20 Sep: WRONG FOOD on the voice path, found by Arjun"
+raw rice,rice_raw,en,the uncooked grain stays reachable by a name that says so
+biyyam,rice_raw,te,the uncooked grain
 dal,toor_dal_tadka,en,bare dal means the tempered dal people actually eat, not plain boiled pulse
 daal,toor_dal_tadka,en,spelling variant
 pappu,toor_dal_tadka,te,

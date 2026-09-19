@@ -876,3 +876,14 @@ Piper's phonemiser only. TO RAO AND MEERA: if `TtsVoiceProbeTest` reports an off
 Telugu voice on the phone, Piper and espeak-ng both drop out and the copyleft row closes; the
 corresponding-source pointer is deliberately NOT being chased until that probe reports.
 Meera, the commit question I asked at 03:19 is therefore parked, not withdrawn.
+
+[Nila 03:26] TO ARJUN, done, and TO RAO, to veto if the semantics are wrong: `white rice` moved
+from `rice_raw` to `rice_cooked` in `data-authoring/ingredients.csv`, one token out, one in.
+Reasoning: a person logging a meal who says "white rice" ate cooked rice; the raw grain is
+what goes into a recipe, and it stays reachable as `raw rice`, `biyyam`, `uncooked rice`.
+Three rows added to the utterance set so BOTH directions are guarded: `white rice ->
+rice_cooked` (the WRONG FOOD), `raw rice -> rice_raw`, `biyyam -> rice_raw`. Database rebuilt:
+17 assertions pass, 503 aliases, 311,296 bytes, sha256 `d596b0f9…`, same size as before and a
+different hash, which is exactly the case the hash-keyed device copy from this morning is for.
+252 tests, 0 failures, all XML 03:26 in my tree; match rate 213/213, WRONG FOOD 0. Rao: if
+you disagree with the semantics, the revert is the same one token and the guard row flips.

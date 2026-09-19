@@ -13,8 +13,8 @@
 #                 the match and quantity reasons. Blank means no extra penalty.
 #
 key,display_name,fdc_id,source,food_class,aliases_roman,aliases_native,band_reason,note
-rice_raw,"Rice, white, raw (unenriched)",169756,USDA_SR_LEGACY,GRAIN_RAW,"raw rice|white rice|biyyam|uncooked rice","",,"Unenriched deliberately. 168877 is enriched at Fe 4.31 and would attribute US fortification to Indian rice."
-rice_cooked,"Rice, white, cooked (unenriched)",169757,USDA_SR_LEGACY,GRAIN_COOKED,"cooked rice|annam|bhaat|chawal|rice|saddi annam","అన్నం|चावल",,"Unenriched twin of 169757. Default meal staple."
+rice_raw,"Rice, white, raw (unenriched)",169756,USDA_SR_LEGACY,GRAIN_RAW,"raw rice|biyyam|uncooked rice","",,"Unenriched deliberately. 168877 is enriched at Fe 4.31 and would attribute US fortification to Indian rice."
+rice_cooked,"Rice, white, cooked (unenriched)",169757,USDA_SR_LEGACY,GRAIN_COOKED,"cooked rice|annam|bhaat|chawal|rice|saddi annam|white rice","అన్నం|चावल",,"Unenriched twin of 169757. Default meal staple."
 atta,"Wheat flour, whole-grain",168893,USDA_SR_LEGACY,GRAIN_RAW,"atta|wheat flour|gehu ka atta|godhuma pindi","गेहूं का आटा|గోధుమ పిండి",,"Roti and chapati resolve through this plus a recipe."
 toor_dal_raw,"Pigeon peas (red gram), raw",172436,USDA_SR_LEGACY,PULSE_RAW,"toor dal|tur dal|arhar|kandi pappu|red gram|toovar","కంది పప్పు|अरहर दाल",,""
 toor_dal_cooked,"Pigeon peas (red gram), cooked",172437,USDA_SR_LEGACY,PULSE_COOKED,"plain boiled toor dal|boiled pappu","",,"Plain 'dal' resolves here by default; a named dal overrides it."
