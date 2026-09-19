@@ -19,6 +19,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import io.github.vedant7007.katori.ml.llm.LlamaCppRuntime
 import io.github.vedant7007.katori.ml.llm.LlamaCppLlmEngine
 import io.github.vedant7007.katori.ml.llm.ExtractionRequest
+import io.github.vedant7007.katori.ml.llm.Prompts
 import io.github.vedant7007.katori.domain.model.Outcome
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -225,6 +226,113 @@ class HardwareProbeTest {
         assertTrue("the runtime produced no timings at all", t != null && t.evalTokens > 0)
     }
 
+    // --- 2b. does it still extract CORRECTLY --------------------------------------------------
+
+    /**
+     * The extraction cases, run against the real model on the real device.
+     *
+     * WHY THIS EXISTS. The prompt was shortened to buy latency, and a faster prompt that extracts
+     * worse is not an improvement. Timing alone cannot tell the two apart, so the properties the
+     * prompt is supposed to defend are checked here and reported next to the speed.
+     *
+     * PROPERTIES, NOT STRINGS. Nothing here asserts an exact JSON body. Greedy sampling is
+     * deterministic for a fixed binary and not across binaries: enabling the vectorised kernels
+     * moved an argmax and changed one field. See docs/decisions/0011. Asserting the exact answer
+     * would turn the next toolchain change into a fake regression.
+     *
+     * THE ONE THAT MATTERS IS `quantityStated = false`. An invented quantity is the failure spec
+     * 13.4 forbids, and it is the field a model is most tempted to fill in helpfully.
+     */
+    @Test
+    fun b2_extractionStillCorrect() {
+        heading("extraction correctness, shortened prompt")
+
+        val runtime = llmRuntime ?: LlamaCppRuntime.load(File(modelsDir, LLM_FILE), 2048, THREADS)
+            .also { llmRuntime = it }
+        val engine = LlamaCppLlmEngine(runtime)
+
+        var failures = 0
+        for (case in CASES) {
+            val outcome = runBlocking {
+                engine.extract(
+                    ExtractionRequest(transcript = case.transcript, languageTag = case.lang, maxReasks = 2)
+                )
+            }
+            say("")
+            say("transcript   \"${case.transcript}\"")
+            when (outcome) {
+                is Outcome.Ok -> {
+                    val items = outcome.value.items
+                    say("  items      " + items.joinToString { "${it.name}=${it.quantity ?: "null"} ${it.unit ?: ""}".trim() })
+
+                    val names = items.joinToString(" ") { it.name.lowercase() }
+                    val missing = case.expectFoods.filterNot { names.contains(it) }
+                    if (missing.isNotEmpty()) { say("  MISS       did not name: $missing"); failures++ }
+
+                    // The safety property. An unstated quantity must stay null, never become a 1.
+                    val invented = items.filter { it.quantity != null }
+                        .map { it.name.lowercase() }
+                        .filter { n -> case.unquantified.any { n.contains(it) } }
+                    if (invented.isNotEmpty()) {
+                        say("  INVENTED   a quantity for $invented, which spec 13.4 forbids"); failures++
+                    }
+
+                    // A stated quantity must come back, and come back as the number they said.
+                    // "two rotis" arriving as 1 is a wrong figure, not a rounding difference.
+                    val wrong = case.quantified.filterNot { pair ->
+                        items.any {
+                            it.name.lowercase().contains(pair.first) &&
+                                it.quantity != null && kotlin.math.abs(it.quantity!! - pair.second) < 0.001
+                        }
+                    }
+                    if (wrong.isNotEmpty()) {
+                        say("  QUANTITY   stated but not captured as said: " +
+                            wrong.joinToString { "${it.first}=${it.second}" })
+                        failures++
+                    }
+
+                    if (missing.isEmpty() && invented.isEmpty() && wrong.isEmpty()) say("  OK")
+                }
+                is Outcome.Unavailable -> {
+                    say("  REFUSED    ${outcome.reason} ${outcome.detail}")
+                    // "empty response" says the strict reader got nothing; it does not say what
+                    // the model emitted. Ask the runtime again with NO stop sequences and print
+                    // the raw bytes, because a completion that ends at its first stop and a
+                    // completion the model never started look identical from up here.
+                    val raw = runtime.generate(
+                        Prompts.extraction(case.transcript, case.lang), 96, emptyList()
+                    )
+                    say("  RAW,nostop \"" + raw.take(200)
+                        .replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") + "\"")
+                    say("  RAW length ${raw.length}")
+                    failures++
+                }
+                is Outcome.NotImplemented -> { say("  NOT BUILT  ${outcome.component}"); failures++ }
+            }
+        }
+
+        say("")
+        say("cases            ${CASES.size}")
+        say("failures         $failures   <- an invented quantity counts here")
+        assertTrue("$failures extraction case(s) failed; see the lines above", failures == 0)
+    }
+
+    /**
+     * One extraction case.
+     *
+     * @param expectFoods substrings that must appear among the extracted names
+     * @param unquantified foods the speaker gave NO quantity for; these must come back null
+     * @param quantified foods the speaker DID quantify; these must come back with a number
+     */
+    private data class Case(
+        val transcript: String,
+        val lang: String,
+        val expectFoods: List<String>,
+        val unquantified: List<String> = emptyList(),
+        /** food substring to the number the speaker actually said. */
+        val quantified: List<Pair<String, Double>> = emptyList(),
+    )
+
     // --- 3. co-residency, the stage-1 item -----------------------------------------------------
 
     /**
@@ -375,6 +483,49 @@ class HardwareProbeTest {
         private const val TTS_FILE = "piper-te-model.onnx"
 
         private const val TRANSCRIPT = "I had two rotis and a katori of dal with some curd"
+
+        /**
+         * Deliberately small and deliberately awkward. Every case carries at least one food the
+         * speaker did NOT quantify, because that is the field the prompt's shortened quantity
+         * rule has to keep holding.
+         */
+        private val CASES = listOf(
+            Case(
+                transcript = "I had two rotis and a katori of dal with some curd",
+                lang = "en-IN",
+                expectFoods = listOf("roti", "dal", "curd"),
+                unquantified = listOf("curd"),
+                quantified = listOf("roti" to 2.0),
+            ),
+            // No quantity anywhere. Nothing may come back with a number.
+            Case(
+                transcript = "I ate idli and sambar",
+                lang = "en-IN",
+                expectFoods = listOf("idli", "sambar"),
+                unquantified = listOf("idli", "sambar"),
+            ),
+            // Code-mixed, which is the normal case in Hyderabad rather than the edge case.
+            Case(
+                transcript = "maine do roti aur thoda chawal khaya",
+                lang = "hi-IN",
+                expectFoods = listOf("roti"),
+                unquantified = listOf("chawal", "rice"),
+            ),
+            // Telugu script. The name must survive as the person said it.
+            Case(
+                transcript = "నేను పప్పు మరియు అన్నం తిన్నాను",
+                lang = "te-IN",
+                expectFoods = emptyList(),
+                unquantified = listOf("పప్పు", "అన్నం", "pappu", "annam", "dal", "rice"),
+            ),
+            // A stated quantity with an explicit unit, which must be captured rather than dropped.
+            Case(
+                transcript = "I drank 200 ml of milk and ate one boiled egg",
+                lang = "en-IN",
+                expectFoods = listOf("milk", "egg"),
+                quantified = listOf("milk" to 200.0, "egg" to 1.0),
+            ),
+        )
 
         private var llmRuntime: LlamaCppRuntime? = null
         private var coResidencyFits: Boolean? = null

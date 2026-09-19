@@ -23,6 +23,7 @@
 #include <vector>
 #include <mutex>
 #include <chrono>
+#include <cctype>
 
 #include "llama.h"
 
@@ -79,6 +80,14 @@ private:
 void throwIllegalState(JNIEnv * env, const char * message) {
     jclass cls = env->FindClass("java/lang/IllegalStateException");
     if (cls != nullptr) env->ThrowNew(cls, message);
+}
+
+// True when `text` holds nothing but whitespace, so there is no answer to end yet.
+bool blank(const std::string & text) {
+    for (const unsigned char c : text) {
+        if (!std::isspace(c)) return false;
+    }
+    return true;
 }
 
 // True when the tail of `text` ends with any of `stops`.
@@ -249,7 +258,19 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeGenerate(
         out.append(piece, (size_t) n);
         h->last_eval_tokens++;
         h->last_eval_us = now_us() - (t_prompt_done > 0 ? t_prompt_done : t_start);
-        if (endsWithAny(out, stopStrings)) {
+        // A STOP SEQUENCE CANNOT END SOMETHING THAT HAS NOT STARTED.
+        //
+        // A stop matched against an answer that is still empty ends generation before the model
+        // has said anything, and the trim then leaves an empty string. Above this seam that is
+        // indistinguishable from a model that stayed silent: the strict reader refuses "empty
+        // response", the engine re-asks, and three full prompt evaluations buy nothing.
+        //
+        // This guard covers the leading-whitespace case. It did NOT fix the failure that led to
+        // it being written, which was an opening ``` fence, and ``` is not whitespace. That one
+        // is fixed where it belongs, in the stop list in LlamaCppLlmEngine. The guard stays
+        // because a leading blank line is the same shape of bug and Qwen renders one as a single
+        // token.
+        if (!blank(out) && endsWithAny(out, stopStrings)) {
             // Trim the stop sequence itself; the caller asked for what came before it.
             for (const auto & s : stopStrings) {
                 if (out.size() >= s.size() && out.compare(out.size() - s.size(), s.size(), s) == 0) {

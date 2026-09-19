@@ -118,7 +118,25 @@ class LlamaCppLlmEngine(
         /** A hard ceiling on re-asks whatever the caller passes. Each one costs a model round trip. */
         const val MAX_REASK_CEILING = 3
 
-        val EXTRACTION_STOPS = listOf("\n\n", "```", "</s>", "<|im_end|>")
+        /**
+         * "```" IS DELIBERATELY NOT A STOP HERE, AND MUST NOT BE ADDED BACK.
+         *
+         * It used to be, and it made [ExtractionJson]'s fence handling unreachable. When the
+         * model chose to wrap its answer in a markdown fence, the very first thing it emitted
+         * was "```", which matched the stop, was trimmed off as the stop, and left an empty
+         * string. The strict reader then refused "empty response", the engine re-asked, and
+         * extraction failed after three full prompt evaluations against a model that had in fact
+         * produced perfectly good JSON on the first attempt.
+         *
+         * [ExtractionJson.parse] already strips a fence that wraps the whole response, on the
+         * stated grounds that removing an envelope is not guessing at contents, and there is a
+         * test for it. Stopping at the fence guaranteed that code never ran.
+         *
+         * Whether the model fences is a property of the prompt wording, not of the schema, so it
+         * is not something the stop list should be enforcing. The prompt asks for no markdown;
+         * if it gets markdown anyway, the reader copes.
+         */
+        val EXTRACTION_STOPS = listOf("\n\n", "</s>", "<|im_end|>")
         val PHRASING_STOPS = listOf("\n\n", "</s>", "<|im_end|>")
 
     }

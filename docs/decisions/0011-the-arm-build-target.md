@@ -78,6 +78,27 @@ It built the libraries into the llama.cpp build tree and listed them. The four `
 
 The script now stages all four and fails loudly if any is absent after the build.
 
+## EXTRACTION OUTPUT IS NOT REPRODUCIBLE ACROSS BUILDS
+
+Found while measuring this change, and it outlives it.
+
+`0010` chose greedy sampling so that extraction is reproducible and the schema tests mean
+something. Greedy sampling makes the model deterministic **for a fixed binary**. It does not make
+it deterministic across binaries. Enabling the vectorised kernels changed floating-point
+accumulation order enough to move an argmax: on the same prompt and the same model file, the
+baseline build extracted `"curd"` with `quantity: 1` and the `+dotprod+fp16` build extracted it
+with `quantity: null`.
+
+The new answer is the better one, because "some curd" states no quantity. That is not the point.
+The point is that the output moved because the toolchain moved.
+
+**So no test may assert an exact extraction string, an exact JSON body, or an exact token count.**
+Such a test passes until someone changes a compiler flag, an NDK version or a llama.cpp revision,
+and then fails in a way that reads like a model regression and sends the next person hunting
+through prompt wording. Assert the properties instead: that the JSON parses under the strict
+reader, that the items are the expected foods, that a stated quantity is captured and an unstated
+one stays null. Those hold across builds; the byte-for-byte answer does not.
+
 ## What this does not claim
 
 The rebuild's effect on the round trip is a measurement, recorded in `STATUS.md` against the

@@ -46,11 +46,28 @@ so ggml used scalar fallbacks. `0011` has the detail. Same device, same prompt, 
 Prompt processing 3.4x, generation 1.4x, round trip **2.4x**. Thread count barely matters once
 the build is right: 3% between 4 and 8.
 
-**THE BUDGET IS STILL MISSED.** Beat 1 allows 3.5 s for the whole voice round trip. The best
-measured figure is 10.6 s for LLM extraction ALONE, with ASR and TTS not yet written and not in
-that number. That is three times over, and what remains are product decisions rather than
-optimisations: a smaller model, a shorter prompt, or a longer round trip with a visible progress
-state. Not a call for one person to make alone.
+### Extraction correctness, measured alongside the speed
+
+Five transcripts run against the real model on the device, checking properties rather than exact
+strings: every named food present, a stated quantity captured as the number they said, and an
+UNSTATED quantity left null. **4 of 5 pass.** The failure is "I drank 200 ml of milk and ate one
+boiled egg", where the model returns the milk and drops the egg. It fails the same way with a
+longer and a shorter prompt, so it is a model-capability finding rather than a prompt one.
+
+### The budget was a guess and the measurement replaced it. `0014`
+
+Spec 10.5's 3.5 s was written before anything had run. Extraction alone measures **10.7 s**, with
+ASR and TTS neither written nor included. The prompt was shortened from 207 to 162 tokens to buy
+that back; it bought nothing and cost a food, because **generated tokens cost about five times
+what prompt tokens cost on this device** (38-52 tok/s in, 9-10 tok/s out). A cheaper prompt that
+makes the model emit a fenced, pretty-printed answer is a net loss. The shortening was reverted.
+
+The remaining lever is the ANSWER, not the prompt: the model emits
+`"quantity":null,"unit":null,"method":null` on every item, and the strict reader already accepts
+those fields as absent. Untried, and measured against the correctness cases before it is believed.
+
+**The UI carries the budget.** Ten seconds of silence reads as a hang; ten seconds of visible
+progress reads as work. Recording meter, acknowledgement at endpoint, progress through extraction.
 
 Still unverified on hardware: ASR accuracy, TTS quality, camera capture, the Room database, and
 every pipeline above the engines, because none of them is implemented.
