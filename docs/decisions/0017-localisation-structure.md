@@ -78,6 +78,28 @@ symbol names encode the package and that rename is deferred until after the hack
   figures render in Telugu numerals is a product question nobody has asked yet; the string table
   uses `%1$s`-style positional placeholders so that either answer is possible without a refactor.
 
+## The demo-build rule for unconfirmed Telugu
+
+Ruled by Vedant, 20 September 2026, as a RULE so that nobody decides it under pressure:
+
+**If the health sentences (`trigger_*`, items 1 to 9 on the sheet) are not confirmed by a fluent
+speaker before the demo build is cut, `values-te` comes out of that build.** The mechanism is one
+line in `app/build.gradle.kts`: `localeFilters += listOf("en", "te", "hi")` becomes
+`listOf("en", "hi")`, which drops the Telugu table from the APK; every screen falls back to
+the default table. The rule, the line and the reason are here so the cut is a lookup.
+
+That is the contingency, not the plan. The health sentences are what beat 4 displays, and
+losing Telugu guts the demo's strongest moment. The plan is a ten-minute read by a fluent
+speaker, which Vedant is chasing.
+
+**A middle option, recorded and NOT built:** the health templates and the UI strings are
+separate keys. If the review comes back partial, a build could keep the confirmed strings and
+fall back to English only for the unconfirmed health text, by stripping the `REVIEW`-marked
+`trigger_*` entries from `values-te` at build time (a small Gradle step reading the same marker
+`StringResourcesTest` and the importer read). Worse-looking than all-or-nothing, better than
+shipping unreviewed health text and better than losing the language. It is not built because
+it should not need to be; it is written down so that if it is needed it is a known shape.
+
 ## Evidence
 
 `logs/nila-scope-build.log`: `testDemoDebugUnitTest`, `assembleDemoDebug` and

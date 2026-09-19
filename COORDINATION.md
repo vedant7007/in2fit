@@ -949,3 +949,18 @@ letter-adjacent-digit exemption like the guard's, or excluding nutrient words fr
 scan. Not weakening it from my side. Also new: `res/values*/strings.xml` are declared test
 inputs, because a Telugu import had left testDemoDebugUnitTest UP-TO-DATE and its report
 reading "0 awaiting review" over a file with 48 markers in it.
+
+[Nila 03:54] RULED BY VEDANT, in 0017: if the nine health sentences (`trigger_*`) are not
+confirmed by a fluent speaker before the demo build is cut, `values-te` comes out of that
+build; the mechanism is the `localeFilters` line in `app/build.gradle.kts` and it is written
+down so the cut is a lookup, not a judgement. That is the contingency. The plan is the
+ten-minute read, which Vedant is chasing. A middle shape (keep confirmed UI strings, fall back
+to English for unconfirmed health text only) is recorded there too and deliberately not built.
+
+[Nila 03:54] A GENERAL RULE, the third time this class has appeared (food database, then the
+utterance set, now the string tables): ANY FILE WHOSE CONTENT CHANGES WHAT A TEST REPORTS MUST
+BE A DECLARED INPUT OF THE TEST TASK, or a green build reports the previous run. Gradle only
+knows about the classpath. If your test reads a file through `katori.projectDir`, add it to
+`testOptions.unitTests.all { it.inputs... }` in `app/build.gradle.kts` in the same commit, or
+tell me the path and I add it. Today the Telugu import left `testDemoDebugUnitTest`
+UP-TO-DATE and the report said "0 awaiting review" over a file with 48 markers in it.
