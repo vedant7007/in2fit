@@ -1,6 +1,6 @@
 # IN2FIT: Telugu strings for review
 
-Generated 20 September 2026 from the app's English string table. 48 strings to write, 0 to check.
+Generated 20 September 2026 from the app's English string table. 58 strings to write, 0 to check.
 
 Reviewer's name: ______________________
 
@@ -411,5 +411,77 @@ A developer screen listing what is built. It will be replaced before the demo. L
 48. `pipeline_exercise_form`
 
    English: Exercise form check
+
+   Telugu:
+
+
+### UNPLACED: ask Vedant where this appears
+
+49. `context_figure`
+
+   English: %1$s: %2$s %3$s
+
+   Telugu:
+
+
+50. `context_figure_partial`
+
+   English: %1$s: at least %2$s %3$s (no value for %4$s)
+
+   Telugu:
+
+
+51. `context_figure_none`
+
+   English: %1$s: not known
+
+   Telugu:
+
+
+52. `context_meal`
+
+   English: %1$s: %2$s. %3$s
+
+   Telugu:
+
+
+53. `context_lab`
+
+   English: %1$s: %2$s %3$s (report dated %4$s)
+
+   Telugu:
+
+
+54. `context_lab_with_range`
+
+   English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
+
+   Telugu:
+
+
+55. `context_never_suggest_vegetarian`
+
+   English: meat, fish or eggs (vegetarian)
+
+   Telugu:
+
+
+56. `context_never_suggest_vegan`
+
+   English: meat, fish, eggs, milk or any dairy (vegan)
+
+   Telugu:
+
+
+57. `context_never_suggest_eggetarian`
+
+   English: meat or fish (eggetarian)
+
+   Telugu:
+
+
+58. `context_never_suggest_jain`
+
+   English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
 
    Telugu:

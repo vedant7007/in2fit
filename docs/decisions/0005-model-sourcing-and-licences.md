@@ -142,7 +142,34 @@ September 2026, so it is recorded here rather than left for an audit to find.
 | --- | --- | --- | --- | --- |
 | espeak-ng (the phonemiser Piper voices use through sherpa-onnx) | `COPYING`: "GNU GENERAL PUBLIC LICENSE / Version 3, 29 June 2007"; `README.md`: "eSpeak NG Text-to-Speech is released under the GPL version 3 or later license" (both read from `github.com/espeak-ng/espeak-ng`, master, 20 Sep 2026; no licence file travels in the data tarball or in the AAR) | 20 Sep 2026 | its data, 244 files / 1,067,073 B, as `assets/espeak-ng-data`; its code, inside `libsherpa-onnx-jni.so` in the sherpa-onnx static AAR | `0019` |
 
-What an audit would need to know: GPL-3.0-or-later is compatible with a non-commercial student
-project whose source is public, which this is. It is copyleft, not a use restriction: the
-obligation is that the app's own source be available under compatible terms, and it is. Going
-commercial or closing the source means replacing the phonemiser, which means replacing Piper.
+**What copyleft obliges, concretely.** This is a different kind of obligation from the
+non-commercial register above: it does not restrict use, it attaches DUTIES TO DISTRIBUTION,
+and Vedant's non-commercial ruling does not lift them. Handing the APK to a judge, a friend or
+a store is "conveying" under GPL-3 §6, and espeak-ng's code is inside `libsherpa-onnx-jni.so`
+in that APK. Recorded here as the duties a reader of this file would otherwise have to
+reconstruct from the licence text; this is a reading of GPL-3 §§4–6, not legal advice, and the
+first three are the ones that would be checked.
+
+1. **A licence on this repository.** There is none: no `LICENSE`, no `COPYING`, nothing in a
+   header. An unlicensed repository is all-rights-reserved by default, which is NOT compatible
+   with conveying a GPL-3 combined work. The repository needs a GPL-3-compatible licence before
+   the APK is handed to anyone: GPL-3.0-or-later itself, or a permissive one GPL-3 accepts
+   (Apache-2.0, MIT). Which one is Vedant's decision and is on the coordination log, 20 Sep.
+2. **Corresponding source for what is actually shipped.** The binary in the APK is whatever
+   sherpa-onnx 1.13.8 compiled, from its own pinned espeak-ng fork (via piper-phonemize), not
+   upstream master. The duty is to be able to point at that exact source: the sherpa-onnx
+   v1.13.8 tag and the espeak-ng commit its build pins. Recording that pointer in `0019` or
+   here, once read from sherpa-onnx's build files, discharges it; "it is on GitHub somewhere"
+   does not.
+3. **Notice to the person receiving the app.** The APK must carry the GPL-3 licence text and a
+   notice that it includes espeak-ng under GPL-3.0-or-later, with where to get the source
+   (§4, §5(a), §6). In practice: an "open-source licences" entry reachable from the About or
+   disclosure screen `0002` already calls for. Not built; the string keys do not exist yet.
+4. **No further restriction** on what the recipient may do with the espeak-ng part (§10). A
+   hackathon "no redistribution" line, or an app-store EULA, must not contradict this.
+5. **The Piper voices are separate.** CC-BY-4.0 (Telugu) needs attribution in the same notice;
+   CC-BY-NC-SA-4.0 (Hindi) is the register entry above and is a use restriction, not copyleft
+   on the app.
+
+Going commercial or closing the source does not change these duties; it makes 1 impossible,
+which is why the note above says that path means replacing the phonemiser and therefore Piper.

@@ -774,3 +774,46 @@ finding, for whoever binds a classifier later: fed Google's 2,023 labels, `resol
 containment rule maps 135 of them and most to the WRONG food (`Fried chicken` -> raw chicken,
 `Palak paneer` -> palakura leaves, `Dal makhani` -> toor_dal_tadka, `Roti jala` -> chapati). A
 classifier label must hit an alias EXACTLY, never by containment, never fuzzily. Rule is in 0019.
+[Nila 03:20] RULED BY VEDANT, BINDING FROM NOW. Two rules.
+
+ONE WORKTREE PER SESSION. Nobody builds in C:\CODING\IQOOOOO any more. From the main tree,
+once:
+    powershell -File tools\new-worktree.ps1 -Name <your name, lowercase>
+You get C:\CODING\IQOOOOO-<name> on branch <name>, with local.properties, jniLibs and the
+sherpa AAR copied in and data-sources shared by junction. Work, build, test and commit THERE.
+Your logs\ is your own, your app\build is your own. To land on master, from inside your tree:
+    powershell -File tools\land.ps1
+which rebases you onto master and fast-forwards master in the main tree. It refuses rather
+than improvises: a rebase conflict stops with git's message; a dirty file in the main tree
+that your commits touch refuses the fast-forward, which means someone is still editing there,
+so say so here. To pick up what others landed: `git rebase master` in your tree. No merge
+commits; history stays one line, authored as before. `apk-size.ps1` writes to the MAIN tree's
+`logs\apk-size.log` whichever tree built, so the APK ledger stays one file. COORDINATION.md is
+`merge=union` in .gitattributes, so six appenders on six branches do not conflict at the tail;
+that driver is for this file only. Proof it works: my tree built and tested at 03:13-03:17,
+249 tests 0 failures, APK 66,889,466 B at `c8bfeef` CLEAN, the first APK row without a dirty
+flag. Sessions with uncommitted work in the main tree: commit it there first (last time), then
+make your worktree; `git worktree add` starts from master and does not carry a dirty tree.
+
+A TEST COUNT IS VALID ONLY IF EVERY XML UNDER app\build\test-results WAS WRITTEN BY YOUR OWN
+RUN. Same minute, same log. At 02:57 today a second session's run cleared that directory under
+mine and it held 13 tests where 245 had run; a count read then would have been someone else's.
+The worktree rule makes this hard to break; the check makes it impossible to miss.
+
+[Nila 03:20] TO VEDANT, A DECISION ONLY YOU CAN MAKE: this repository has no LICENSE file. It
+did not matter until today. espeak-ng (GPL-3.0-or-later, inside the sherpa-onnx AAR and as the
+espeak-ng-data asset, both shipped in the demo APK) attaches duties to DISTRIBUTING the APK,
+and handing it to a judge is distributing. 0005 now lists them concretely. The first is a
+GPL-3-compatible licence on this repository: GPL-3.0-or-later itself, or Apache-2.0 or MIT,
+which GPL-3 accepts. Your choice, and it is not mine to make; say which and I add the file.
+The others (a pointer to the exact espeak-ng source sherpa-onnx 1.13.8 built, and a licence
+notice reachable in the app) are recorded and will get done; neither blocks the build.
+
+[Nila 03:20] TO PRIYA: your `context_*` keys (12) are on the sheet under UNPLACED. One line
+saying where a reviewer would meet them (are they shown, or read by the model as the person's
+own data in their language before it answers?) and they get a section and a place. 58 keys
+now on the sheet.
+
+[Nila 03:20] TO MEERA: the corresponding-source duty in 0005 item 2 needs the espeak-ng commit
+sherpa-onnx v1.13.8 pins (piper-phonemize's fork). If you already read it while stamping the
+voice, one line here with the commit and I record it; otherwise it is on my list.

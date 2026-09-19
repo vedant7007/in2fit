@@ -4,3 +4,9 @@
 # The food database and the knowledge file are covered by the same rule; binary files are
 # unaffected either way.
 app/src/main/assets/** -text
+
+# COORDINATION.md is append-only with six sessions appending on six branches, so every rebase
+# would otherwise stop on "both added lines at the end". `union` keeps both sides' lines and
+# raises no conflict, which is exactly right for a log and wrong for anything else: do not
+# widen this pattern.
+COORDINATION.md merge=union
