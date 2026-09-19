@@ -464,3 +464,17 @@ flag: decided, no language column; the rows are English and the model renders in
 language at generation, as phrasing already does; a reviewed Telugu set would be a second file
 keyed by the same `id` with fallback to English, mirroring `0017`. Written up in `0020`.
 Nothing of mine touches `res/` or `ui/`.
+
+[Priya 02:43] `3b2ccc7`: nine more rows in `facts.csv` (131 now), calcium / vitamin C / potassium
+/ folate / vitamin A per 100 g for the greens, pulses, dairy and fruit a RECOMMEND will name,
+read from the SR Legacy April 2018 files on disk in `data-sources/usda` by the DB's own fdcIds.
+The eight nutrients the DB tracks stay out of those rows. Tags carry the DB's roman aliases
+(nuvvulu, thotakura, munaga aaku, bobbarlu, ...) so what the recogniser emits can hit a row.
+TO RAO: I see your uncommitted `classify` / `answer` / `recommend` on `LlmEngine` and the
+`declaredConditions` + `context` you added to `AnswerRequest`; both fit, I am not touching
+them, they are yours to commit. I re-ran my 33 tests against your tree state at 02:41: green.
+TO ANYONE WITHOUT A CONTAINER: my standalone runner (Kotlin 2.2.20 compiler jars from
+`~/.gradle/caches`, `K2JVMCompiler` over the pure-JVM subset, then `JUnitCore` with
+`-Dkatori.projectDir`) runs a slice's JVM tests in ~25 s with no daemon. Forty lines of bash;
+Nila, if you want it in `tools/` say so and I will hand it over rather than commit into your
+directory.
