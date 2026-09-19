@@ -52,7 +52,35 @@ class HardwareProbeTest {
 
     private val ctx = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val modelsDir: File get() = File(ctx.externalMediaDirs.first(), "models")
+    /**
+     * Where the weights are staged, internal storage first.
+     *
+     * NOT THE EXTERNAL MEDIA DIRECTORY, IF IT CAN BE HELPED. /sdcard is a FUSE mount on this
+     * device (df reports /dev/fuse), and the GGUF is memory-mapped, so every weight the first
+     * forward pass touches is a page fault serviced by a userspace daemon. The first measured
+     * run spent 18,987 ms on a 207-token prompt that way, which is slower than a two-core
+     * desktop VM managed on the same prompt.
+     *
+     * The external directory is still accepted so a run staged the old way still works, but
+     * [storageKind] reports which one was used, because a number from one is not comparable
+     * with a number from the other.
+     */
+    private val modelsDir: File
+        get() = File(ctx.filesDir, "models")
+            // NON-EMPTY, not merely present. A failed staging attempt leaves a zero-byte file
+            // behind, because the shell creates the output of `cat >> dest` before it discovers
+            // it cannot read the input. An isFile check accepts that and the probe then reports
+            // a 0.0 MB model and a load failure that looks like a runtime bug.
+            .takeIf { File(it, LLM_FILE).length() > 0L }
+            ?: File(ctx.externalMediaDirs.first(), "models")
+
+    /** Real filesystem, or the FUSE-backed emulated storage. The difference is the whole point. */
+    private fun storageKind(f: File): String =
+        if (f.absolutePath.startsWith(ctx.filesDir.absolutePath)) {
+            "internal storage, real filesystem"
+        } else {
+            "external media on /sdcard, FUSE: mmap faults are serviced in userspace"
+        }
 
     private fun say(line: String) {
         Log.i(TAG, line)
@@ -108,55 +136,92 @@ class HardwareProbeTest {
         heading("llama.cpp on device")
         val model = File(modelsDir, LLM_FILE)
         assertTrue(
-            "the model was not pushed. Expected it at ${model.absolutePath}",
+            "the model was not staged. Expected it at ${model.absolutePath}",
             model.isFile,
         )
         say("model file       ${model.name}  ${mb(model.length())}")
+        say("staged on        ${storageKind(model)}")
 
-        val before = processPssBytes()
-        val loadStart = System.nanoTime()
-        val runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = THREADS)
-        val loadMillis = (System.nanoTime() - loadStart) / 1_000_000.0
-        llmRuntime = runtime
+        var openRuntime: LlamaCppRuntime? = null
+        var anyTimings: LlamaCppRuntime.Timings? = null
+        var extractionReported = false
 
-        val afterLoad = processPssBytes()
-        say("load time        ${"%.0f".format(loadMillis)} ms with $THREADS threads")
-        say("PSS before load  ${mb(before)}")
-        say("PSS after load   ${mb(afterLoad)}   delta ${mb(afterLoad - before)}")
+        // THREAD COUNT IS MEASURED, NOT ASSUMED. This is a big.LITTLE phone: handing llama.cpp
+        // every core can be slower than handing it only the big ones, because the fast cores
+        // then wait on the slow ones at each layer boundary. Both are run and both are printed.
+        //
+        // The first thread count pays the cold cost for the whole file, since the page cache is
+        // per file and not per context. So compare the WARM rows across thread counts; the one
+        // cold row is the cold-start figure and belongs to whichever ran first.
+        for (threads in THREAD_COUNTS) {
+            openRuntime?.close()
 
-        // The REAL extraction prompt, not a toy one. A model that completes "the capital of France"
-        // tells us nothing about whether it can do the job this app asks of it.
-        val engine = LlamaCppLlmEngine(runtime)
-        val outcome = runBlocking {
-            engine.extract(ExtractionRequest(transcript = TRANSCRIPT, languageTag = "en-IN", maxReasks = 2))
-        }
+            val before = processPssBytes()
+            val loadStart = System.nanoTime()
+            val runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = threads)
+            val loadMillis = (System.nanoTime() - loadStart) / 1_000_000.0
+            val afterLoad = processPssBytes()
+            openRuntime = runtime
+            llmRuntime = runtime
 
-        val t = runtime.lastTimings()
-        if (t != null) {
-            say("prompt           ${t.promptTokens} tokens in ${"%.0f".format(t.promptMillis)} ms" +
-                "  (${"%.2f".format(t.promptTokensPerSecond)} tok/s)")
-            say("generation       ${t.evalTokens} tokens in ${"%.0f".format(t.evalMillis)} ms" +
-                "  (${"%.2f".format(t.evalTokensPerSecond)} tok/s)")
-        }
-        say("peak PSS         ${mb(processPssBytes())}")
-        say("native heap      ${mb(Debug.getNativeHeapAllocatedSize())}")
+            say("")
+            say("--- $threads threads ---")
+            say("load time        ${"%.0f".format(loadMillis)} ms")
+            if (!extractionReported) {
+                say("PSS before load  ${mb(before)}")
+                say("PSS after load   ${mb(afterLoad)}   delta ${mb(afterLoad - before)}")
+            }
 
-        say("transcript       \"$TRANSCRIPT\"")
-        when (outcome) {
-            is Outcome.Ok -> {
-                say("extraction       OK, schema-valid on the first accepted attempt")
-                say("raw JSON         ${outcome.value.rawJson}")
-                outcome.value.items.forEach {
-                    say("  item           name=${it.name} quantity=${it.quantity} unit=${it.unit}")
+            // The REAL extraction prompt, not a toy one. A model that completes "the capital of
+            // France" tells us nothing about whether it can do the job this app asks of it.
+            val engine = LlamaCppLlmEngine(runtime)
+
+            for (pass in 1..PASSES_PER_THREAD_COUNT) {
+                val wallStart = System.nanoTime()
+                val outcome = runBlocking {
+                    engine.extract(
+                        ExtractionRequest(transcript = TRANSCRIPT, languageTag = "en-IN", maxReasks = 2)
+                    )
+                }
+                val wallMillis = (System.nanoTime() - wallStart) / 1_000_000.0
+                val t = runtime.lastTimings()
+                if (t != null) anyTimings = t
+
+                val label = if (pass == 1) "pass $pass" else "pass $pass (warm)"
+                if (t != null) {
+                    say("$label prompt     ${t.promptTokens} tok in ${"%.0f".format(t.promptMillis)} ms" +
+                        "  (${"%.2f".format(t.promptTokensPerSecond)} tok/s)")
+                    say("$label generate   ${t.evalTokens} tok in ${"%.0f".format(t.evalMillis)} ms" +
+                        "  (${"%.2f".format(t.evalTokensPerSecond)} tok/s)")
+                }
+                say("$label ROUND TRIP ${"%.0f".format(wallMillis)} ms" +
+                    "   <- beat 1 budget is 3500 ms, and ASR and TTS are not in this figure")
+
+                if (!extractionReported) {
+                    say("transcript       \"$TRANSCRIPT\"")
+                    when (outcome) {
+                        is Outcome.Ok -> {
+                            say("extraction       OK, schema-valid on the first accepted attempt")
+                            say("raw JSON         ${outcome.value.rawJson}")
+                            outcome.value.items.forEach {
+                                say("  item           name=${it.name} quantity=${it.quantity} unit=${it.unit}")
+                            }
+                        }
+                        is Outcome.Unavailable -> say("extraction       REFUSED: ${outcome.reason} ${outcome.detail}")
+                        is Outcome.NotImplemented -> say("extraction       not implemented: ${outcome.component}")
+                    }
+                    extractionReported = true
                 }
             }
-            is Outcome.Unavailable -> say("extraction       REFUSED: ${outcome.reason} ${outcome.detail}")
-            is Outcome.NotImplemented -> say("extraction       not implemented: ${outcome.component}")
+            say("peak PSS         ${mb(processPssBytes())}")
         }
+
+        say("native heap      ${mb(Debug.getNativeHeapAllocatedSize())}")
 
         // The model loading and running is the claim under test. Whether it produced schema-valid
         // JSON is reported above and asserted separately, so a schema miss does not hide a load
         // failure or the other way round.
+        val t = anyTimings
         assertTrue("the runtime produced no timings at all", t != null && t.evalTokens > 0)
     }
 
@@ -295,7 +360,15 @@ class HardwareProbeTest {
 
     companion object {
         private const val TAG = "katori-probe"
-        private const val THREADS = 4
+
+        /** Kept for the co-residency test, which only needs A runtime, not a fast one. */
+        private const val THREADS = 8
+
+        /** Measured, not assumed. See the comment in [b_llamaLoadsAndRunsOnThisPhone]. */
+        private val THREAD_COUNTS = listOf(4, 8)
+
+        /** Twice per thread count: the first pays the page faults, the second is the real rate. */
+        private const val PASSES_PER_THREAD_COUNT = 2
 
         private const val LLM_FILE = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
         private const val ASR_FILE = "asr-te-model.int8.onnx"
