@@ -150,11 +150,17 @@ in that APK. Recorded here as the duties a reader of this file would otherwise h
 reconstruct from the licence text; this is a reading of GPL-3 §§4–6, not legal advice, and the
 first three are the ones that would be checked.
 
-1. **A licence on this repository.** There is none: no `LICENSE`, no `COPYING`, nothing in a
-   header. An unlicensed repository is all-rights-reserved by default, which is NOT compatible
-   with conveying a GPL-3 combined work. The repository needs a GPL-3-compatible licence before
-   the APK is handed to anyone: GPL-3.0-or-later itself, or a permissive one GPL-3 accepts
-   (Apache-2.0, MIT). Which one is Vedant's decision and is on the coordination log, 20 Sep.
+1. **A licence on this repository. DONE, 20 Sep 2026: Apache-2.0, ruled by Vedant.** Until
+   then there was none, and an unlicensed repository is all-rights-reserved by default, which
+   is not compatible with conveying a GPL-3 combined work. `LICENSE` at the root is the
+   canonical text from `apache.org/licenses/LICENSE-2.0.txt`, 11,358 bytes, sha256
+   `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`, copyright holder
+   Vedant Manmath Idlgave. His reasoning, for the record: it matches the licences of the major
+   dependencies (Qwen, IndicConformer, Google `food_V1`); it leaves the commercial question
+   open; and Apache-2.0 is GPL-3-compatible in the direction that matters. If espeak-ng ships,
+   the combined APK is conveyed under GPL-3 terms with the corresponding-source pointer, while
+   the project's own code stays Apache-2.0. That is the standard resolution and it does not
+   require GPL-licensing his future work.
 2. **Corresponding source for what is actually shipped.** The binary in the APK is whatever
    sherpa-onnx 1.13.8 compiled, from its own pinned espeak-ng fork (via piper-phonemize), not
    upstream master. The duty is to be able to point at that exact source: the sherpa-onnx
@@ -173,3 +179,15 @@ first three are the ones that would be checked.
 
 Going commercial or closing the source does not change these duties; it makes 1 impossible,
 which is why the note above says that path means replacing the phonemiser and therefore Piper.
+
+**When the duties attach, and when they do not.** They attach on CONVEYING a copy: giving the
+APK to someone, publishing it, putting it in a store. Demoing on a device the team holds is
+not conveying, so **none of this blocks the event.** It attaches on publication. Both halves
+of that matter: nobody should panic at the wrong moment, and nobody should relax at the wrong
+one. Handing a judge an APK file is publication; showing them the phone is not.
+
+**The question is SEPARABLE and may resolve itself.** espeak-ng exists in this app for one
+reason: Piper's phonemiser. If Rao's `TtsVoiceProbeTest` finds that the phone carries an
+offline Google Telugu voice, Piper drops out, espeak-ng drops out with it, and so do items 2
+to 4 above. Ruled by Vedant: the corresponding-source work (item 2) is NOT done until that
+probe reports. The list stays; the work waits on the measurement.

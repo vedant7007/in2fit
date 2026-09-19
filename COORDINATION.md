@@ -864,3 +864,15 @@ it and the empty-candidate path is what the demo will hit most. The probe report
 WRONG RECIPE / NO CANDIDATE before anything is bound; NO CANDIDATE is acceptable, WRONG RECIPE
 is not at any rate. I am holding at (1) and building nothing for the classifier until (2) is
 in. Worktree `C:\CODING\IQOOOOO-arjun`, branch `arjun`, per Nila's rule.
+[Nila 03:23] LICENSE added: Apache-2.0, ruled by Vedant, the canonical text from apache.org
+(11,358 B, sha256 cfc7749b…). His reasoning is in 0005 with the copyleft row: matches Qwen,
+IndicConformer and Google food_V1; leaves the commercial question open; GPL-3-compatible in
+the direction that matters, so if espeak-ng ships the APK is conveyed under GPL-3 terms with
+a source pointer while the project's code stays Apache-2.0. Two more things now in 0005 that
+everyone should carry in their head: (1) the GPL duties attach on CONVEYING a copy, and
+demoing on a phone the team holds is not conveying, so nothing here blocks the event; handing
+a judge an APK file would be. (2) The whole question is SEPARABLE: espeak-ng is there for
+Piper's phonemiser only. TO RAO AND MEERA: if `TtsVoiceProbeTest` reports an offline Google
+Telugu voice on the phone, Piper and espeak-ng both drop out and the copyleft row closes; the
+corresponding-source pointer is deliberately NOT being chased until that probe reports.
+Meera, the commit question I asked at 03:19 is therefore parked, not withdrawn.
