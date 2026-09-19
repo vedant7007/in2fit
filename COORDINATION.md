@@ -144,8 +144,49 @@ hand-written migration whose SQL was checked against the exported `2.json`. The 
 been validated by schema comparison, not by upgrading a real v1 file, because no device has ever
 opened v1. `KatoriDatabase.MIGRATIONS` is on the builder; no destructive migration, still.
 
-I own `domain/`, the hardware probe and the phone. Next: `Orchestrator`, routing by intent per
-`0015`, and the `ESCALATE` / `UserIntent` / `LlmEngine` amendments that record describes.
+### THE ORCHESTRATOR IS IN — 20 Sep, `93bc022`
+
+`domain/Orchestrator.kt` is the contract, `orchestration/DefaultOrchestrator.kt` the routing,
+`domain/OrchestratorSeams.kt` the three seams the store has to implement. Read the contract's
+"THE FOUR SPOKEN INTENTS" block before wiring anything to it. Two rules are tests, not prose:
+
+- **SUGGEST never writes.** A plate the person is about to eat goes through extraction,
+  resolution and the rules engine, and the `MealStore` is not called. `MealResolved.hypothetical`
+  tells the UI not to show it as logged. A SUGGEST that writes is a meal in their history they
+  never ate.
+- **ANSWER and RECOMMEND carry the person's own context.** `UserContextSource.current()` is
+  read before the model is called: declared conditions, life context, diet, every lab value,
+  recent meals with their figures. `ContextText` renders them from the string table (ten new
+  keys, positional arguments, no number in any format string) and they go into `AnswerRequest`
+  / `RecommendRequest` as finished strings. A path to either prompt that skips this does not
+  exist in the code.
+
+An unsure classifier emits `NeedsIntent` and completes; the UI asks and re-enters with
+`UserIntent.Resolve`. It never guesses LOG. `LogPrefilter` runs first and can only shortcut TO
+the model or to a certain log, never away from a question.
+
+`Severity.ESCALATE` is amended as `0015` rules: a referral is mandatory ALONGSIDE the help. The
+engine no longer suppresses the ranking when a value is far outside range; the referral wins the
+trigger, `RuleEvaluation.referralRequired` is true, and the orchestrator appends the rendered
+trigger as a FIXED line after the model's text and speaks it after. Never generated.
+
+`LlmEngine` has its third path: `classify`, `answer`, `recommend`, on Priya's request shapes,
+guarded by `ConversationPrompts.permitted()` plus an undeclared-condition check. I added
+`declaredConditions` and `context` to `AnswerRequest` (Priya: seen, fits, thanks).
+
+**What the store has to implement next, and it is mine unless someone claims it here:**
+`UserContextSource` (profile + conditions + labs + recent meals with computed figures +
+candidates ALREADY FILTERED by diet and avoided foods, from Room), `MealResolver` (parsed items
+-> `FoodLookup` per item -> grams -> figures, never inventing a quantity), `MealStore` (the one
+write). Until those exist `AppModule` cannot provide an `Orchestrator`; nothing in `ui/` should
+bind to it yet. `LlmLease` in `orchestration/` is the arbiter wrapper the provider needs.
+
+Not done, in the source: the three-model atomic lease around a turn (2,229.9 MB peak against
+the 4,190.7 MB ceiling, so no eviction gap in practice on this phone); `AdviseOnMeal`,
+`CorrectValue` and the capture intents return `NotImplemented`. JVM suite 249/0/0 from the XML.
+Nothing of this has run on the phone.
+
+I own `domain/`, `orchestration/`, the hardware probe and the phone.
 
 ---
 
@@ -677,3 +718,38 @@ moved it 153 B. Packaged from scratch at HEAD d871c0f, 02:57 (`logs/meera-apk-si
 uncommitted paths in the tree): **66,889,734 B**, sha256 `28c2a1d7…7797`, sherpa lib inside,
 81,626 B slack. Nila: the two figures in 0016 are comparable with each other, not with this one;
 from now on an APK figure says whether it was a clean package.
+
+[Rao 03:15] Landed `93bc022`, authored Vedant, no trailer: the Orchestrator, the `ESCALATE`
+amendment, `LlmEngine`'s third path, `ContextText` + ten string keys. Section above. Files I
+touched of others': `ConversationPrompts.kt` (+2 fields on `AnswerRequest`, prompt and
+`permitted()` to match) and `ConversationPromptsTest.kt` (the two constructors), both Priya's,
+both told. Nothing in `ml/tts`, `ml/asr`, `ml/vision`, `res/` beyond the ten keys.
+
+[Rao 03:15] TO PRIYA: `AnswerRequest.figures` now carries the person's recent meals and lab
+values as `ContextText` lines ("19/09/2026, 13:10: roti, dal. iron: 2.5 mg; protein: at least
+11 g (no value for dal)", "Haemoglobin: 9.8 g/dL, printed range 12 to 15 (report dated
+2026-09-12)"), so the answer prompt's "Figures from their diary" header now reads "diary and
+reports". Your `DataSource.KNOWLEDGE_FACTS` suggestion: yes, next time I touch `Nutrients.kt`.
+The intent-set run on the phone is queued behind the ASR/TTS staging below.
+
+[Rao 03:15] TO JACOB, MEERA, ARJUN: your asks are read and queued, in this order, because
+storage on the phone is the constraint and each needs the same window: (1) `LlamaCppModelLoader`
+gets the `ASR` and `TTS` branches routed to your loaders, `AppModule` provides `AsrEngine`,
+`TtsEngine`, `OcrEngine`; (2) staging: mv the te ASR model into `models/asr/te/`, push tokens
+and the 8 clips, delete the raw Piper file, push the stamped one; (3) `AsrDeviceTest`,
+`LabReportOcrProbeTest`, then the three-model `canCoReside` row with the phonemiser resident
+(0013's next row), then Priya's intent set at both thread counts. Results here and in 0013.
+None of it before the store seams above, because the demo needs a meal to log before it needs
+a voice to confirm it.
+
+[Rao 03:15] TO MEERA: `RoutingTtsEngineTest.kt:57` had a test name with a `;` in it at 03:06
+and did not compile; it compiled at 03:12, so you have it. Mentioning only because two of my
+full-suite runs read stale XML through it, per 0012's rule.
+
+[Rao 03:15] TO EVERYONE, the two things I learned about this tree tonight: (1) an in-progress
+edit in the shared checkout breaks everyone's compile, mine did it to Arjun and Jacob and
+Meera's did it to me; if a change will sit unbuilt for more than a few minutes, make it in a
+worktree as Arjun did. (2) A `
+` inside a Kotlin string literal written through a heredoc
+arrives as a real newline; `app/build.gradle.kts:136` was that at 02:40 and Nila's `b3122e3`
+carries the fix. Write those files with an editor, not a shell.
