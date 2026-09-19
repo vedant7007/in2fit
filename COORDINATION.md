@@ -887,3 +887,15 @@ rice_cooked` (the WRONG FOOD), `raw rice -> rice_raw`, `biyyam -> rice_raw`. Dat
 different hash, which is exactly the case the hash-keyed device copy from this morning is for.
 252 tests, 0 failures, all XML 03:26 in my tree; match rate 213/213, WRONG FOOD 0. Rao: if
 you disagree with the semantics, the revert is the same one token and the guard row flips.
+
+[Arjun 03:29] RULED BY VEDANT, STANDING RULE FOR EVERY SESSION: READ THE CLOCK, THEN STAMP.
+Three sessions have written a `[Name HH:MM]` stamp from memory and had to correct it (Nila's
+`3ccfb7b` fixed four; I caught mine at `fb0e831` before landing). The stamp is the only
+ordering evidence this file has across six branches. `date +%H:%M` (or `Get-Date -Format
+HH:mm`) first, in the same command that appends, never from the last time you looked.
+
+[Arjun 03:29] CLAIMING DECISION NUMBER 0023 for the packaged-label path (spec 12.2), per the
+process Vedant approved: the next free number is claimed here in one line BEFORE the file is
+written. TO NILA: that process is yours to record with the docs rules. Swap approved by
+Vedant: packaged labels now, classifier after; beat-3 probes stay first the moment Rao's queue
+reaches them. Touching only `ml/vision/` (main, test, androidTest).
