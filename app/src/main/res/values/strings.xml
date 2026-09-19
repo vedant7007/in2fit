@@ -1,7 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  THE DEFAULT STRING TABLE. Every user-visible string in the app is a key here, and nowhere else.
+
+  HOW LOCALISATION WORKS IN THIS PROJECT (docs/decisions/0017)
+  - This file is the fallback. It must be complete: a key that is not here does not exist.
+  - values-te/, values-hi/ and values-en/ hold the same keys in Telugu, Hindi and English. A key
+    missing from a locale file falls back to the text here AT RUNTIME, visibly, on the phone.
+    That fallback is the honest state of an untranslated string. Never fill a locale file with
+    placeholder text or a machine translation to make it look complete.
+  - No Telugu string ships without review by a fluent speaker. See values-te/strings.xml.
+  - Nothing is hardcoded in a composable: StringResourcesTest fails the build on a literal
+    passed to Text(...) or a text parameter in ui/.
+  - The rules engine's sentences (domain/RuleTemplates.kt) are not here yet. They are built in
+    English inside the pure engine; localising them means the engine emits a template id and
+    arguments and the UI renders the sentence from this table. That change is the integrator's.
+
+  Writing a string here: say what the data says, offer what someone might consider, hand the
+  decision back (spec 15.2). Never a number the database did not produce. Never a condition the
+  user did not declare.
+-->
 <resources>
-    <string name="app_name">Katori</string>
+    <!-- The product name. Not translated: it is a name, and JNI symbol names still encode the
+         old package, so only DISPLAY strings carry the new name. -->
+    <string name="app_name" translatable="false">IN2FIT</string>
 
     <!-- Spec 15.3: persistent and non-dismissible on every advice screen. -->
     <string name="safety_not_medical_advice">This is information, not medical advice.</string>
+
+    <!-- Language picker (spec 10.2: the user chooses; the app never detects). Each language is
+         named in its own script, as every phone's settings screen does, so a person who cannot
+         read the current language can still find their own. Endonyms, not translations, so not
+         translatable; the Telugu and Hindi spellings are on the review list all the same. -->
+    <string name="language_telugu" translatable="false">తెలుగు</string>
+    <string name="language_hindi" translatable="false">हिन्दी</string>
+    <string name="language_english" translatable="false">English</string>
+    <string name="language_picker_title">Language</string>
+
+    <!-- The build-status screen. It shows what is and is not built, and no figures. -->
+    <string name="status_screen_subtitle">Phase 1B scaffold. Contracts are defined; no pipeline is built yet.</string>
+    <!-- Pipeline name, then its state. -->
+    <string name="status_line">%1$s: %2$s</string>
+    <string name="state_not_implemented">Not implemented</string>
+    <string name="pipeline_voice_logging">Voice logging (ASR, LLM extract, TTS)</string>
+    <string name="pipeline_nutrition_lookup">Nutrition lookup</string>
+    <string name="pipeline_timeline_query">Timeline and voice query</string>
+    <string name="pipeline_lab_report_scan">Lab report scan</string>
+    <string name="pipeline_adaptive_suggestions">Adaptive suggestions</string>
+    <string name="pipeline_dish_first_guess">Camera dish first guess</string>
+    <string name="pipeline_exercise_form">Exercise form check</string>
+
+    <!-- Confidence bands, spec 15.1.1. Shown inline with every figure, never as a percentage. -->
+    <string name="confidence_band_good">Good</string>
+    <string name="confidence_band_approximate">Approximate</string>
+    <string name="confidence_band_rough">Rough</string>
+
+    <!-- One sentence per ConfidenceReason, shown on tap (spec 15.3). Confidence.kt says a reason
+         with no sentence here is a bug, so adding a reason there means adding a line here. Keys
+         are the enum constant, lowercased. -->
+    <string name="confidence_reason_exact_food_match">Matched exactly to a food in the database.</string>
+    <string name="confidence_reason_fuzzy_food_match">Matched to the closest name in the database; check it is the food you meant.</string>
+    <string name="confidence_reason_category_level_match">Matched only to a food category, not a specific food.</string>
+    <string name="confidence_reason_quantity_stated">You gave the quantity in a unit we can convert.</string>
+    <string name="confidence_reason_household_unit_default">A household measure was converted with a standard weight. Tap to correct the grams.</string>
+    <string name="confidence_reason_quantity_inferred">You did not say how much, so this quantity is a guess. Tap to correct it.</string>
+    <string name="confidence_reason_authored_reference_recipe">Based on a reference recipe. Edit it to match how you cook.</string>
+    <string name="confidence_reason_user_edited_recipe">Based on the recipe as you edited it.</string>
+    <string name="confidence_reason_weak_source_record">The source record for this food rests on few samples or on a label.</string>
+    <string name="confidence_reason_substitute_food_record">The nearest record is a similar food, not this one.</string>
+    <string name="confidence_reason_low_asr_confidence">Speech recognition was unsure of what it heard. Check the words.</string>
+    <string name="confidence_reason_uncorrected_camera_guess">A camera guess that has not been confirmed by you.</string>
 </resources>

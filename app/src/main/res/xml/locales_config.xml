@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The languages the app offers, declared to the system (Android 13+ reads this for the per-app
+  language setting). Spec 5.11: Telugu, Hindi, English. Keep in step with localeFilters in
+  app/build.gradle.kts and with the values-<tag>/ directories. docs/decisions/0017.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="te" />
+    <locale android:name="hi" />
+    <locale android:name="en" />
+</locale-config>

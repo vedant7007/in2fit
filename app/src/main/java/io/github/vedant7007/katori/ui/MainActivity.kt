@@ -14,7 +14,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.vedant7007.katori.R
 
 /**
  * Scaffold screen.
@@ -39,20 +41,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private data class PipelineStatus(val name: String, val state: String)
-
 @Composable
 private fun BuildStatusScreen() {
     // Contracts exist; no implementation does. Nothing here is a placeholder for a real value.
+    // Every string is a resource key: see res/values/strings.xml for the localisation rules.
     val pipelines = listOf(
-        PipelineStatus("Voice logging (ASR, LLM extract, TTS)", "Not implemented"),
-        PipelineStatus("Nutrition lookup", "Not implemented"),
-        PipelineStatus("Timeline and voice query", "Not implemented"),
-        PipelineStatus("Lab report scan", "Not implemented"),
-        PipelineStatus("Adaptive suggestions", "Not implemented"),
-        PipelineStatus("Camera dish first guess", "Not implemented"),
-        PipelineStatus("Exercise form check", "Not implemented"),
+        R.string.pipeline_voice_logging,
+        R.string.pipeline_nutrition_lookup,
+        R.string.pipeline_timeline_query,
+        R.string.pipeline_lab_report_scan,
+        R.string.pipeline_adaptive_suggestions,
+        R.string.pipeline_dish_first_guess,
+        R.string.pipeline_exercise_form,
     )
+    val notImplemented = stringResource(R.string.state_not_implemented)
 
     Column(
         modifier = Modifier
@@ -61,13 +63,16 @@ private fun BuildStatusScreen() {
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Katori", style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Phase 1B scaffold. Contracts are defined; no pipeline is built yet.",
+            stringResource(R.string.status_screen_subtitle),
             style = MaterialTheme.typography.bodyMedium,
         )
         pipelines.forEach {
-            Text("${it.name}: ${it.state}", style = MaterialTheme.typography.bodySmall)
+            Text(
+                stringResource(R.string.status_line, stringResource(it), notImplemented),
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }

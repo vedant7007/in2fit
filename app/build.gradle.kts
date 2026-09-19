@@ -80,6 +80,15 @@ android {
         compose = true
     }
 
+    androidResources {
+        // The three languages the app is localised into (spec 5.11), and no others. Library
+        // translations for every other locale are dropped from the APK, and a device set to a
+        // fourth language falls back to the default string table rather than to whichever
+        // library happens to ship that locale. Adding a language is a values-<tag>/ directory
+        // plus an entry here and in res/xml/locales_config.xml. docs/decisions/0017.
+        localeFilters += listOf("en", "te", "hi")
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -136,8 +145,11 @@ dependencies {
     implementation(libs.mlkit.text.recognition)
     implementation(libs.mlkit.barcode.scanning)
 
-    // Loaded on the hardware probe path only, to MEASURE the resident cost of the ASR and TTS
-    // models rather than estimate it. sherpa-onnx brings the same runtime when slice F lands.
+    // The hardware probe, and NOTHING SHIPPED, loads ONNX sessions: it does so to MEASURE the
+    // resident cost of the ASR and TTS models rather than estimate it. As `implementation` this
+    // put a 33 MB libonnxruntime.so into the demo APK that no shipped code called, and it would
+    // collide with the copy sherpa-onnx bundles when the ASR and TTS slices land. Test scope
+    // until then. docs/decisions/0016.
     implementation(libs.onnxruntime.android)
 
     testImplementation(libs.junit)

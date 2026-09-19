@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TELUGU. The demo language. Every key in values/strings.xml belongs here in Telugu.
+
+  RULES, and they are not negotiable (docs/decisions/0017):
+  1. A Telugu string is written or reviewed by a FLUENT SPEAKER before it ships. Vedant does not
+     read Telugu well enough to catch a wrong word, and a wrong word on a health screen is read by
+     a judge who does.
+  2. No machine translation, no guessed text, no placeholder. A key that is not here falls back to
+     the default table at runtime, visibly. That is the honest state of an untranslated string.
+  3. An entry that has been written but NOT yet reviewed carries the comment REVIEW on the line
+     above it, with the author's name. StringResourcesTest lists every unreviewed and every
+     missing key in its output, so the review queue is a test report rather than a memory.
+  4. Meaning follows spec 15.2: what the data says, what someone might consider, the decision
+     handed back. Numbers come from the database. A translation that adds a claim is wrong even
+     if the Telugu is perfect.
+
+  Empty on 20 September 2026: nobody who writes Telugu has written a line yet.
+-->
+<resources>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ENGLISH. Deliberately empty: the default table in values/strings.xml is written in English, so
+  every key already resolves in English by fallback. This file exists so that the three languages
+  the app offers are three files, and so that an English wording that should differ from the
+  default (none should, today) has one place to go. docs/decisions/0017.
+-->
+<resources>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  HINDI. Same rules as values-te/strings.xml: written or reviewed by a fluent speaker, never
+  machine-translated, never a placeholder. A missing key falls back to the default table at
+  runtime, which is the honest state until somebody fills it. docs/decisions/0017.
+
+  Empty on 20 September 2026. Telugu is filled first, as the demo language.
+-->
+<resources>
+</resources>
