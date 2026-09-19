@@ -920,3 +920,32 @@ paste its terms here verbatim; it unblocks or excludes pocket-tts, `te_IN-maya` 
 (2) the SYSPIN Telugu dataset's licence line from `syspin.iisc.ac.in`. The natural Telugu
 sentence from your listeners is still the input that decides this; when it arrives every
 surviving candidate gets re-rendered on it, the platform voice included once Rao's probe has run.
+[Nila 03:42] TO VEDANT: the 48 Telugu lines are in the app, ALL MARKED FOR REVIEW, none stamped
+as written by anyone. The reply came in under your name and you cannot verify Telugu, so the
+importer's new `--unreviewed` mode stamped each entry "REVIEW: received via Vedant, 20 Sep
+2026, author not confirmed". Two questions, in order: (1) who actually wrote these? If a
+friend did, they get the credit and they are the reviewer; if it is machine output, it needs a
+fluent speaker before the event. (2) Send `docs/localisation/telugu-review-check.md` to that
+person. The question is at its top ("tell me any number where the Telugu is under the wrong
+English"); items 1 to 9 are the health sentences and deserve the closest read; the file also
+asks them to confirm that items 2 and 3 being identical is deliberate (the English is identical
+too: "well outside the printed range" serves both directions). A blank answer under an item
+confirms it; the marker drops per item. Evidence: reply saved verbatim at
+`docs/localisation/replies/telugu-2026-09-20-via-vedant.md`; 48 written, 0 refused,
+`logs/telugu-import.log` in my tree; build green with the Telugu resources (aapt2 accepted all
+slot forms such as `%4$sగా`); StringResourcesTest reports values-te 48/58 present, 48 awaiting
+review, 10 missing; 252 tests, 0 failures, XML 03:41. APK 67,075,004 B at c963538-dirty,
+sha256 b9669d6a…, row in the ledger. Item 7 was checked against the renderer: it passes a bare
+integer and the English appends the word "percent", so Telugu "%3$s శాతం" does not double.
+
+[Nila 03:42] TO RAO, a finding from item 16, "విటమిన్ B12", against your digit test in
+db099ca: it does NOT fail the build, and the reason is worth knowing. The test renders
+TriggerText.ENGLISH only, and its MEAL_COMPOSITION sample uses CARBOHYDRATE, so "vitamin B12"
+is never rendered, in any language. If the sample used VITAMIN_B12 the ENGLISH would fail it
+today: the regex `\d+(?:\.\d+)?` reads the 12 in B12 as a cited figure. DefaultNumericGuard
+already has the precedent that B12 does not licence a bare 12, and the test's own docstring
+says a locale file needs the same check against its own wording. Yours to decide how: a
+letter-adjacent-digit exemption like the guard's, or excluding nutrient words from the digit
+scan. Not weakening it from my side. Also new: `res/values*/strings.xml` are declared test
+inputs, because a Telugu import had left testDemoDebugUnitTest UP-TO-DATE and its report
+reading "0 awaiting review" over a file with 48 markers in it.

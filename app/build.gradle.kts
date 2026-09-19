@@ -116,6 +116,11 @@ android {
                 .withPropertyName("knowledgeFacts")
             it.inputs.file(rootProject.file("data-authoring/intent-test-set.csv"))
                 .withPropertyName("intentTestSet")
+            // And the string tables: StringResourcesTest reads res/values*/strings.xml directly,
+            // and without this a Telugu import left the test task UP-TO-DATE and its report
+            // reading "0 awaiting review" over a file with 48 REVIEW markers in it.
+            it.inputs.files(fileTree("src/main/res") { include("values*/strings.xml") })
+                .withPropertyName("stringTables")
         }
     }
 }

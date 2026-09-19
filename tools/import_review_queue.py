@@ -3,17 +3,27 @@ what landed, in sheet order, so the speaker can check the mapping without readin
 
     python tools/import_review_queue.py te --reply reply.txt --reviewer "Name"
     python tools/import_review_queue.py te --sheet filled-sheet.md
+    python tools/import_review_queue.py te --sheet reply.md --reviewer "Name" --unreviewed
 
 Two input shapes, because people reply the way they reply:
   --reply    a text file holding a chat reply: one line per item, starting with the item's
-             number in the sheet, e.g. "7. ...". Continuation lines without a number join the
-             item above. The sheet the numbers refer to is --sheet (default: the committed one).
-  --sheet    the sheet itself with the `Telugu:` lines filled in. The reviewer's name is read
-             from the "Reviewer's name:" line unless --reviewer is given.
+             number in the committed sheet, e.g. "7. ...". Continuation lines without a number
+             join the item above.
+  --sheet    a file in the sheet's own shape: "N. `key`" headers with `Telugu:` lines filled in.
+             The committed sheet edited in place, or a copy, or a reply that kept the headers.
+             Answers are matched BY KEY, and each item's number is cross-checked against the
+             committed sheet: a number that names a different key there means the reply was
+             written against another version of the sheet, and the whole import is refused.
 
-A reviewer's name is REQUIRED. It is the evidence that a fluent speaker wrote the line, and it
-goes into the XML as a comment above each entry. Without it the rule in values-te/strings.xml
-("no Telugu ships unreviewed") has nothing to point at, so the script refuses.
+A name is REQUIRED: who wrote the lines, or who handed them in. Two stamps, and the difference
+is the whole point:
+  written by <name>, <date>                 a fluent speaker wrote or checked these lines
+  REVIEW: received via <name>, <date>, author not confirmed     (--unreviewed)
+The second is for lines whose author cannot be confirmed yet: they land in the XML so the
+check file can be produced and the phone shows them, but every entry carries the REVIEW
+marker, StringResourcesTest lists them as awaiting review, and the queue keeps them until a
+fluent speaker confirms each one through a check sheet. Never stamp "written by" on lines the
+named person cannot read.
 
 THE CHECK. A mis-ordered paste puts the wrong sentence under the wrong key and nothing about the
 XML would show it. So after writing, the script re-reads the XML FROM DISK and writes
@@ -37,7 +47,7 @@ RES = ROOT / "app" / "src" / "main" / "res"
 DOCS = ROOT / "docs" / "localisation"
 LANGUAGES = {"te": "Telugu", "hi": "Hindi"}
 
-ITEM = re.compile(r"^(\d+)\. `([a-z0-9_]+)`\s*$")
+ITEM = re.compile(r"^\s*(\d+)\. `([a-z0-9_]+)`\s*$")
 ANSWER = re.compile(r"^\s*(?:Correct )?(?P<lang>Telugu|Hindi)(?: \([^)]*\))?:\s*(?P<text>.*)$")
 CURRENT = re.compile(r"^\s*(?:Telugu|Hindi), as written, unreviewed:\s*(?P<text>.*)$")
 ENGLISH = re.compile(r"^\s*English:\s*(?P<text>.*)$")
@@ -152,23 +162,31 @@ def slot_problem(english: str, answer: str):
 # --- main -----------------------------------------------------------------------------------
 
 def main(argv=None) -> int:
+    # The check is echoed to the console, and a Windows console defaults to a code page that
+    # cannot carry Telugu; without this the print crashes AFTER the files are written.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("tag", choices=sorted(LANGUAGES))
     ap.add_argument("--sheet", type=Path, help="the review sheet; filled in, or the one a --reply refers to")
     ap.add_argument("--reply", type=Path, help="a chat reply: numbered lines")
     ap.add_argument("--reviewer", help="the fluent speaker's name; read from the sheet if absent")
+    ap.add_argument("--unreviewed", action="store_true",
+                    help="the author cannot be confirmed: stamp REVIEW instead of 'written by'")
     a = ap.parse_args(argv)
 
     language = LANGUAGES[a.tag]
-    sheet = a.sheet or DOCS / f"{language.lower()}-review-queue.md"
-    if not sheet.is_file():
-        print(f"no sheet at {sheet}; run make_review_queue.py {a.tag} first")
+    canonical = DOCS / f"{language.lower()}-review-queue.md"
+    if not canonical.is_file():
+        print(f"no sheet at {canonical}; run make_review_queue.py {a.tag} first")
         return 2
-    items, sheet_reviewer = parse_sheet(sheet)
+    items, _ = parse_sheet(canonical)          # numbering, order and English come from here
+    source = a.sheet or canonical
+    filled, sheet_reviewer = parse_sheet(source) if not a.reply else ([], "")
     reviewer = (a.reviewer or sheet_reviewer or "").strip()
     if not reviewer:
-        print("REFUSED: no reviewer name. Put it on the sheet's \"Reviewer's name:\" line or pass --reviewer. "
-              "It is the evidence that a fluent speaker wrote these lines.")
+        print("REFUSED: no name. Put it on the sheet's \"Reviewer's name:\" line or pass --reviewer: "
+              "who wrote these lines, or with --unreviewed, who handed them in.")
         return 2
 
     answers = {}
@@ -177,14 +195,23 @@ def main(argv=None) -> int:
         numbers = {n for n, *_ in items}
         stray = sorted(set(by_number) - numbers)
         if stray:
-            print(f"REFUSED: reply numbers {stray} are not on the sheet {sheet.name}. Wrong sheet, or a "
+            print(f"REFUSED: reply numbers {stray} are not on the sheet {canonical.name}. Wrong sheet, or a "
                   "line that starts with a number. Nothing written.")
             return 2
         for n, key, *_ in items:
             if n in by_number:
                 answers[key] = by_number[n]
     else:
-        for n, key, en, current, answer in items:
+        number_of = {key: n for n, key, *_ in items}
+        wrong = [(n, key, number_of.get(key)) for n, key, *_ in filled if number_of.get(key) != n]
+        if wrong:
+            print("REFUSED: these items are numbered differently on the committed sheet, so the reply was "
+                  "written against another version of it. Nothing written.")
+            for n, key, want in wrong:
+                print(f"  {n}. `{key}` is item {want} on {canonical.name}" if want
+                      else f"  {n}. `{key}` is not on {canonical.name}")
+            return 2
+        for n, key, en, current, answer in filled:
             if answer:
                 answers[key] = answer
             elif current is not None:
@@ -196,7 +223,8 @@ def main(argv=None) -> int:
     english = {key: en for _, key, en, _, _ in items}
 
     problems, written = [], []
-    stamp = f"written by {reviewer}, {date.today():%d %b %Y}"
+    stamp = (f"REVIEW: received via {reviewer}, {date.today():%d %b %Y}, author not confirmed"
+             if a.unreviewed else f"written by {reviewer}, {date.today():%d %b %Y}")
     for key, text in answers.items():
         if key not in default:
             problems.append((key, "not a key in the default table"))
@@ -221,16 +249,35 @@ def main(argv=None) -> int:
 
     # THE CHECK: read back from disk, in sheet order, for the reviewer's eyes.
     landed = read_entries(target)
-    # The question travels with the file, so it does not depend on anyone remembering to ask it.
     check = [f"# IN2FIT: what landed in the app, {language}", "",
              f"**Tell me any number where the {language} is under the wrong English.**", "",
              f"Each number is the item on the sheet you had, with the English it belongs to and the "
              f"{language} now in the app under that English. Nobody else on the team can read the "
-             f"{language}, so a line that landed under the wrong key is invisible unless you say so.", "",
-             f"Reviewer: {reviewer}. Generated {date.today():%d %B %Y}.", ""]
+             f"{language}, so a line that landed under the wrong key is invisible unless you say so. "
+             f"The health sentences deserve the closest read: they are the ones a person acts on.", "",
+             (f"Received via {reviewer}, author not yet confirmed; every line below is marked for review "
+              f"until a fluent speaker confirms it." if a.unreviewed else f"Reviewer: {reviewer}.")
+             + f" Generated {date.today():%d %B %Y}.", ""]
+    from make_review_queue import place_of
+    last = None
     for n, key, en, _, _ in items:
+        _, section, _ = place_of(key)
+        if section != last:
+            check += [f"## {section}", ""]
+            last = section
         status = unescape(landed[key][0]) if key in landed else "(nothing yet)"
         check += [f"{n}. `{key}`", "", f"   English: {en}", "", f"   {language}: {status}", "", ""]
+    # Same text under two keys: the importer checks slots, not bodies, so this is for the reviewer.
+    by_text = {}
+    for n, key, *_ in items:
+        if key in landed:
+            by_text.setdefault(landed[key][0], []).append(f"{n}. `{key}`")
+    dups = [v for v in by_text.values() if len(v) > 1]
+    if dups:
+        check += ["## Same text under more than one key: confirm this is deliberate", ""]
+        for group in dups:
+            check += ["- " + " and ".join(group)]
+        check.append("")
     if problems:
         check += ["## Not taken, needs a second look", ""]
         for key, why in problems:

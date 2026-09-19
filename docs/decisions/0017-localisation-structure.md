@@ -118,9 +118,19 @@ way the script writes `values-te/strings.xml` in default-table order, with a
 `written by <name>, <date>` comment above each entry, escapes for Android, and refuses per item
 anything whose `%N$s` slots do not match the English or that carries a bare `%`.
 
-A reviewer's name is required; without it the script refuses. A blank answer under a
-`REVIEW`-marked entry confirms it and drops the marker. A number that is not on the sheet
-refuses the whole reply, because it means the wrong sheet.
+A name is required; without it the script refuses. Two stamps, and the difference is the
+whole point: `written by <name>` means a fluent speaker wrote or checked the line;
+`REVIEW: received via <name>, author not confirmed` (`--unreviewed`) means the lines arrived
+through someone who cannot verify them. **The first Telugu reply, 20 September, is the second
+case**: 48 lines came back under Vedant's name, and Vedant does not read Telugu well enough to
+have written or checked them. They were imported unreviewed, every entry carries the marker,
+the test reports "48 awaiting review", the queue keeps them, and the check file went back with
+the question at the top. Nothing is stamped as reviewed until a fluent speaker confirms it
+through a check sheet, one entry at a time; a blank answer under a `REVIEW`-marked entry is
+that confirmation and drops the marker. A number that is not on the sheet, or an item whose
+number names a different key on the committed sheet, refuses the whole reply, because it means
+the wrong sheet. Identical text under two keys is listed for the reviewer to confirm, since the
+importer checks slots, not bodies (the two escalate sentences are identical in English too).
 
 **The check, which is the point.** A mis-ordered paste puts the wrong sentence under the wrong
 key, and nothing about the XML would show it to anyone who cannot read Telugu. After writing,
