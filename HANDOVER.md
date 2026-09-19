@@ -8,6 +8,22 @@ files, the authoring CSVs and the logs on disk.
 **Read this before `STATUS.md`.** `STATUS.md` is largely accurate but it is out of date on the one
 question it cares most about: whether anything has run on a phone. Something has. See §4.
 
+> **Addendum, 20 September 2026.** This report is a snapshot and is not rewritten. What has
+> changed since it was written, with the file that proves it:
+> - §7 bug 1 (no copy step in `build-llama-android.ps1`) was fixed in `d23cc53`; the script now
+>   stages the four libraries and fails if one is missing (`logs/llama-android-build.log:96-101`).
+> - §7 bugs 2 and 3 (stale food-database copy; millilitres at density 1.0 reaching GOOD) were
+>   fixed in `6aea21e`, with tests.
+> - §4C item 1: the model was pushed and the whole llama.cpp path has now run on the phone.
+>   `COORDINATION.md` and `STATUS.md` carry the measured figures; `0011`–`0014` the findings.
+> - §3: `ModelArbiter` is implemented (`0c20de3`, `DefaultModelArbiter.kt`, 19 tests).
+> - §6 rule 7 (commit authorship): resolved by Vedant. Commits are authored solely by him, with
+>   no `Co-Authored-By` trailer and no attribution line. Every commit since follows this.
+> - §7 "Documentation that disagrees with the code": every row in that table is reconciled as of
+>   this date; see the commit that added this addendum.
+> - The product is now IN2FIT (`0015`). Display strings only; the package stays `katori`.
+> - `onnxruntime-android` is now `androidTestImplementation` (`0016`).
+
 There is no README at the repo root and **no copy of the spec anywhere in the repository**, yet 30
 distinct spec sections (`spec 2.3` through `spec 18.3`) are cited as the authority across the code
 and the decision records. Everything those citations justify has had to be reconstructed from the

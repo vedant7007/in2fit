@@ -56,11 +56,16 @@ PARTIAL and names the ingredients responsible.
 The alias bugs in `0006` were all found by running the whole set, never by reading the data.
 Recipes have the same property and worse: a plausible total hides a wrong composition.
 
-Twelve assertions now run at import and delete the database if any fails. Six were written for
-this layer: every ingredient row inserted, sum plus water change equals the stated yield, every
-ingredient is a real food and not a no-data item, no name means both a food and a dish, the oil
-share sits in a band for its method, and the yield is not absurd against the ingredient weight.
-Sixteen JVM tests then exercise all 50 dishes through the shipped database.
+Seventeen assertions run at import and delete the database if any fails. That is the count the
+build itself prints: `logs/food-db-build.log` carries seventeen `ok` lines, four `RULE` from
+`0002`, two `ALIAS` from `0006`, one `NO-DATA`, and ten `RECIPE` written for this layer: every
+ingredient row inserted, sum plus water change equals the stated yield, every ingredient is a real
+food, no ingredient is a no-data item, absorbed oil matches its documented figure, no name means
+both a food and a dish, no dish name collides with a no-data item, the oil share sits in a band for
+its method, the yield is not absurd against the ingredient weight, and the moisture check
+described below. (This record originally said "twelve", a count made while the layer was being
+written; the log is the authority.) Sixteen JVM tests then exercise all 50 dishes through the
+shipped database.
 
 **What that missed, and the assertion that now catches it.** Every one of those checks takes
 `yield_g` as given. Assertion 2 proves the arithmetic is self-consistent, so a wrong water figure
@@ -96,4 +101,4 @@ and it holds harder here.
 - A reviewer can challenge any absorbed fraction from the CSV alone, without reverse-engineering
   it from a total.
 - Adding a dish means adding rows and rerunning the importer. If the composition is wrong in a
-  way that shows, twelve assertions and sixteen tests say so before it ships.
+  way that shows, seventeen assertions and sixteen tests say so before it ships.

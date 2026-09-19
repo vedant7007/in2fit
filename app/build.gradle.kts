@@ -150,7 +150,7 @@ dependencies {
     // put a 33 MB libonnxruntime.so into the demo APK that no shipped code called, and it would
     // collide with the copy sherpa-onnx bundles when the ASR and TTS slices land. Test scope
     // until then. docs/decisions/0016.
-    implementation(libs.onnxruntime.android)
+    androidTestImplementation(libs.onnxruntime.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.sqlite.jdbc)

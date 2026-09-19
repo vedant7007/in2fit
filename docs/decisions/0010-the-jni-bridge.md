@@ -4,6 +4,11 @@ Date: 19 September 2026. Status: accepted for the code, NOT for any behaviour cl
 
 ## The claim boundary, first
 
+> **Superseded on this point, 19–20 September 2026.** The path has since run on the phone;
+> `0011` to `0014` and `STATUS.md` carry the measured figures. The rest of this record, on what
+> the bridge is and why it is narrow, stands. The staging step into `jniLibs` described below
+> was missing from the script until `d23cc53`; it is there now (`logs/llama-android-build.log`).
+
 **Nothing on this path has run on a phone.** The shim compiles, links against the four llama.cpp
 libraries, and its three JNI symbols export under the exact names the Kotlin class expects. That
 is the whole of what is known.

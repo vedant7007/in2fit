@@ -1,6 +1,9 @@
 # 0002 - USDA FoodData Central import rules
 
-Status: accepted. Not yet implemented; the bundled database build does not exist.
+Status: accepted. Implemented by `tools/build_food_db.py`, which enforces and asserts all four
+rules below at import and deletes the database if any fails (`logs/food-db-build.log`, lines
+`RULE 1 ok` to `RULE 4 ok`). The "not yet implemented" line that stood here until 20 September
+2026 was stale from the day the importer landed.
 
 The ingredient base is USDA FoodData Central. Public domain, CC0 1.0. Attribution is
 requested rather than required, and we give it anyway with the snapshot release date,

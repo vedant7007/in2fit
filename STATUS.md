@@ -1,20 +1,24 @@
-# Katori status
+# IN2FIT status
 
-Updated 19 Sep 2026, 15:55.
+Updated 20 Sep 2026, 01:30. The product was renamed from Katori on 20 September (`0015`);
+display strings carry the new name, the package and `applicationId` keep `katori` until after
+the hackathon because the JNI symbol names encode it.
 
 ---
 
 ## BLOCKED ON VEDANT
 
-**Nothing.**
+**A fluent Telugu speaker.** The string tables exist (`0017`) and every one of the 27
+translatable keys is missing in Telugu, because nobody who writes Telugu has written a line and
+the rule is that no Telugu ships unreviewed. The list is printed by `StringResourcesTest` on
+every run. Same for Hindi, at lower priority.
 
-Laptop control is no longer on the critical path. It expired again, and terminals are now
-click-only so a command cannot be typed into PowerShell at all. Rather than keep paying that
-cost, the whole test-and-build loop moved into the cloud container: SDK, platform 37, build
-tools, Gradle. Tests and the APK build now run there in about twenty seconds. The laptop stays
-the source of truth for the repo. `docs/decisions/0009`.
+**The domain question from `HANDOVER.md`.** If a domain is still coming, the package rename gets
+more expensive with every commit that touches JNI. Deferred until after the hackathon by ruling,
+so this is a question for later, not now.
 
-Desktop control is still needed for the phone over USB, which is the entire hardware list below.
+The cloud container (`0009`) is still the fast path for JVM tests; the laptop builds everything
+native and is the source of truth. The phone is Rao's, and only Rao's (`COORDINATION.md`).
 
 ---
 
@@ -87,9 +91,11 @@ try: `{"rotis": 2, "dal": "a katori"}`.
 **Nobody may quote 9.89 tok/s as a Katori number.** Two desktop cores are not a phone. It means
 the runtime and this model file work together, and nothing else.
 
-**libllama.so cross-compiles for arm64-v8a** against NDK 28.2.13676358 at minSdk 26, 39.7 MB,
-plus the three ggml libraries. So the native build path works. Those libraries have never been
-loaded and the JNI bridge is not written.
+**libllama.so cross-compiles for arm64-v8a** against NDK 28.2.13676358 at minSdk 26, plus the
+three ggml libraries, and `tools/build-llama-android.ps1` now stages all four into `jniLibs` and
+fails if one is missing (`logs/llama-android-build.log:96-101`; the copy step was absent until
+`d23cc53`). The paragraph that stood here saying the libraries had never been loaded is
+superseded by the hardware section above.
 
 ---
 
@@ -101,15 +107,23 @@ Nothing. Not built.
 
 ## COMPILE AND UNIT TEST ONLY
 
-Read out of `logs/container-test3.log` and `logs/container-assemble.log`.
+**132 tests, 0 failures, 0 errors**, summed from the per-class JUnit XML under
+`app/build/test-results/testDemoDebugUnitTest/` (written 20 Sep 01:20, run logged in
+`logs/nila-scope-build.log`). Per class: NumericGuard 18, LlmEngine 19, SqliteFoodLookup 21,
+ModelArbiter 19, RecipeLayer 16, RulesEngine 16, FoodTextMatching 11, AndroidFoodDbSource 5,
+StringResources 4, NetworkIsolation 2, MatchRate 1. The earlier "103 tests" figure was a count of
+`@Test` methods in source, not a number read from a log; the Gradle logs it cited print no count.
 
-**103 tests, 0 failures.** APK 46 MB, `lib/arm64-v8a` only. Demo manifest permissions asserted
-against a whitelist as exactly CAMERA, RECORD_AUDIO and the platform receiver permission, and
-`aapt2 dump permissions` on the built APK agrees. No INTERNET permission survives the merge.
+**Demo APK 76,661,867 bytes**, `lib/arm64-v8a` only, `logs/nila-ort-final.log`. The "46 MB"
+that stood here was a container build with no NDK and no `jniLibs`, and is not comparable.
+ONNX Runtime is now test scope (`0016`); with it in the app the APK measures 109,661,661 bytes.
 
-The JNI shim compiles and links: `libkatori_llama.so` is in the APK alongside the four llama.cpp
-libraries, and its three symbols export under the names the Kotlin class expects. **That is the
-entire claim.** Nothing on that path has executed. `docs/decisions/0010`.
+Demo manifest permissions asserted against a whitelist as exactly CAMERA, RECORD_AUDIO and the
+platform receiver permission on every `assembleDemo*`; `logs/merged-manifest-demoDebug.xml` is
+the merged result. No INTERNET permission survives the merge.
+
+The JNI shim compiles, links, and has run on the phone: see the hardware section. The claim
+boundary in `docs/decisions/0010` is superseded on that point.
 
 ### Measured match rate, the spec 13.5 replacement
 
@@ -213,14 +227,30 @@ red one.
   exists. `0006`
 - Matcher containment is one-directional and word-bounded; the no-data list is never
   fuzzy-matched. `0006`
-- No nutrient preference means no suggestions at all. `0006`, and it is why beat 4 is provable
+- No nutrient preference means no suggestions at all. `0006`, and it is why beat 4 is provable.
+  **Amended by `0015`:** this survives for UNPROMPTED suggestion only; an explicit SUGGEST or
+  RECOMMEND is answered from declared conditions and the knowledge file, and says what it is
+  working from.
+- Speech routes to LOG, ANSWER, SUGGEST or RECOMMEND; the safety line is drawn around numbers
+  and diagnosis rather than a fixed sentence catalogue. Ruled by Vedant. `0015`
+- The model arbiter's ceiling is measured on the device at first run, not keyed off a device
+  name, and every measurement is an appended row. `0c20de3`
+- ONNX Runtime is test scope until shipped code opens a session; it cost 33 MB of the demo APK
+  and nothing called it. `0016`
+- Three string tables, English default, Telugu and Hindi filled only by a fluent speaker, a
+  missing key falls back visibly rather than to a placeholder. `0017`
+- The food database copy on the device is keyed by the asset's hash, not a version constant that
+  never changed. `6aea21e`
+- Millilitres convert at density 1.0 and are flagged as the default they are, so a volume of oil
+  cannot reach GOOD. `6aea21e`
 
 ---
 
 ## THE LLM PATH
 
 Spec 11.5 says the model extracts and explains and never computes a number. The enforcement is
-now written and tested, all of it without a phone:
+written and tested on the JVM, and the extraction path has since run on the phone (hardware
+section above; `0011`, `0014`):
 
 - **NumericGuard** rejects any number in generated prose that was not in the input. It compares
   parsed values, so "12g" matches "12 g" and Telugu numerals match the figure they denote, because
@@ -243,8 +273,16 @@ figure at Rough and forces the UI to show it as correctable.
 
 ## NEXT
 
-F: AsrEngine via sherpa-onnx. Then G: the UI screens.
+Six sessions from 20 September, per `COORDINATION.md`: Rao on `domain/` and the phone (the
+orchestrator, after the arbiter), Priya on conversation and the knowledge file, Jacob on ASR,
+Meera on TTS, Arjun on vision, Nila on tools, docs, build and strings.
 
-The moment a phone is attached, before anything else: load the model, run the real extraction
-prompt, read the result out of logcat. Everything on the LLM path is written and nothing on it has
-executed.
+Open on the build and documentation side:
+
+- Telugu strings, by a fluent speaker. 27 keys. See BLOCKED.
+- The rules engine's eight sentences are built in English inside `domain/RuleTemplates.kt`.
+  Localising them needs the engine to emit a template id plus arguments; that is Rao's.
+- When sherpa-onnx lands it brings its own ONNX Runtime, and the test-scope dependency in
+  `app/build.gradle.kts` goes away rather than moving back. `0016`
+- The first probe run after `0016` is on a different build tag; its co-residency row is a new
+  row in `0013`, not a confirmation.

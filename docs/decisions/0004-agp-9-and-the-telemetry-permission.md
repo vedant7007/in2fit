@@ -69,10 +69,16 @@ Removing the permission is the guarantee. A library with no INTERNET permission 
 reach the network whatever its code attempts, so the telemetry uploader being linked in is
 harmless in the demo build.
 
-RESIDUAL RISK, not yet tested: ML Kit's OCR has not been run on hardware. If ML Kit's
-initialiser hard-fails when its telemetry transport cannot resolve a network, that will
-appear when beat 3 is built, not before. Flagging it now so it is not mistaken for an OCR
-bug later.
+RESIDUAL RISK, RESOLVED 19 September 2026. When this record was written ML Kit's OCR had
+not been run on hardware, and the open question was whether its initialiser hard-fails
+when the telemetry transport cannot resolve a network. It does not. `HardwareProbeTest`
+rendered `"Haemoglobin 9.8 g/dL"` to a bitmap on the realme RMX3780 in the demo build,
+with the merged manifest holding exactly CAMERA, RECORD_AUDIO and the platform receiver
+permission, and ML Kit recognised `"Haemoglobin 9.8g/dL"`, one block, figure and label
+both read, `OCR USABLE true` (`logs/hw-report-run3.txt`, section "ML Kit OCR, demo build,
+no INTERNET permission"; first seen in `logs/utf8-hw-probe-logcat.log`). Stripping the
+transport's permission does not break recognition. Beat 3's camera path is safe on this
+count.
 
 WHY THE CHECK READS THE MERGED MANIFEST: this is the whole reason. A permission can enter
 from a dependency without appearing anywhere in our own source, and only the merged result

@@ -1,6 +1,10 @@
 # Authored reference recipes
 
-Not started. Waiting on the Phase 2 schema review, then the USDA ingredient base.
+Shipped: 50 recipes over 434 ingredient rows, in `recipes.csv` and `recipe-ingredients.csv`,
+landed in commit `07b41fc` and written up in `docs/decisions/0008`. The importer
+(`tools/build_food_db.py`) asserts the layer at build time; `logs/food-db-build.log` is the
+evidence. (This file said "Not started" until 20 September 2026; it was never updated when the
+layer landed.)
 
 ## What goes here
 
