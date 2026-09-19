@@ -90,3 +90,19 @@ locale filter in place. Test counts are in the JUnit XML under
 
 Twenty-seven is the number of translatable keys on this date, and every one of them is missing in
 every language. That is the true state, and it is the number a fluent speaker starts from.
+
+## The review sheet
+
+A reviewer does not need the repo. `python tools/make_review_queue.py te` writes
+`docs/localisation/telugu-review-queue.md`: every key still missing from `values-te/`, with its
+English, a sentence saying where it appears in the app, a note where the English uses a term of
+art, and a blank line to write on. Entries present but marked `REVIEW` are listed with their
+current text for checking. Keys are ordered by where they matter, so the temporary build-status
+screen comes last and is marked as skippable. A key with a prefix the script does not know lands
+in an "UNPLACED" section, so a new group of strings cannot be handed out without someone saying
+where it is shown. The sheet comes back, the text is pasted into `values-te/strings.xml` unchanged
+under the reviewer's name, the script is re-run and the count drops. `hi` works the same way.
+
+The eight sentences in `domain/RuleTemplates.kt` are not on the sheet, because they are not keys.
+They are the sentences that most need a fluent reviewer. The request to make them keys is with the
+integrator (`COORDINATION.md`, 01:50).

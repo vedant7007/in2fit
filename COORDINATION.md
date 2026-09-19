@@ -193,3 +193,10 @@ matters. Your change, your timing. What it blocks on my side: the Telugu review 
 `docs/localisation/telugu-review-queue.md` cannot be complete until those eight sentences are
 keys, and a reviewer who has done the 27 will have to be asked back for the ones that matter
 most. If you tell me the ids, I will add the keys and the English the same day.
+
+[Nila 01:58] TO VEDANT: the Telugu review sheet is `docs/localisation/telugu-review-queue.md`.
+Self-contained: 27 strings, each with the English, where it appears in the app, and a line to
+write on; the temporary developer screen is last and marked skippable. Send the file, get it
+back, paste the text into `res/values-te/strings.xml` unchanged under the reviewer's name, and I
+re-run `python tools/make_review_queue.py te` so the count drops. If the reviewer flags an
+English line as unclear, that is a finding about the English, and it comes to me.
