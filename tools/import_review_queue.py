@@ -221,9 +221,12 @@ def main(argv=None) -> int:
 
     # THE CHECK: read back from disk, in sheet order, for the reviewer's eyes.
     landed = read_entries(target)
+    # The question travels with the file, so it does not depend on anyone remembering to ask it.
     check = [f"# IN2FIT: what landed in the app, {language}", "",
-             f"Read this against your reply. Each number is the item on the sheet you had. If any "
-             f"{language} line sits under the wrong English, say which numbers.", "",
+             f"**Tell me any number where the {language} is under the wrong English.**", "",
+             f"Each number is the item on the sheet you had, with the English it belongs to and the "
+             f"{language} now in the app under that English. Nobody else on the team can read the "
+             f"{language}, so a line that landed under the wrong key is invisible unless you say so.", "",
              f"Reviewer: {reviewer}. Generated {date.today():%d %B %Y}.", ""]
     for n, key, en, _, _ in items:
         status = unescape(landed[key][0]) if key in landed else "(nothing yet)"

@@ -125,7 +125,9 @@ refuses the whole reply, because it means the wrong sheet.
 **The check, which is the point.** A mis-ordered paste puts the wrong sentence under the wrong
 key, and nothing about the XML would show it to anyone who cannot read Telugu. After writing,
 the script re-reads the XML from disk and writes `docs/localisation/telugu-review-check.md`:
-every item in sheet order, its number, the English, and what is now in the app. That file goes
+every item in sheet order, its number, the English, and what is now in the app, headed by the one
+question it exists to ask: "tell me any number where the Telugu is under the wrong English." The
+question is in the file so it does not depend on anyone remembering to ask it. That file goes
 back to the reviewer, who is the only person who can see a wrong mapping. Exercised on a
 temporary copy of `res/` with stand-in text before any of it touched the repo: reply and sheet
 paths, a deliberate mis-order showing up under the number given, slot mismatch refused, missing

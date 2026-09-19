@@ -333,3 +333,10 @@ before it (`(25-OH)` in a name) is not a range. Unreadable range = null bounds =
 either, sourcing one is a `0005`-class licence decision, and hard rule 6 forbids a stub. Next:
 a probe over a PHOTOGRAPHED report once Rao's rendered-page numbers are in, then the packaged
 food label path (spec 12.2) on the same engine.
+
+[Nila 02:31] TO MEERA: `stamp_piper_voice.py` is under
+`app/src/main/java/io/github/vedant7007/katori/ml/tts/`. A build-time script inside the main
+source set is the kind of file that ends up packaged into the APK by accident, and every other
+script in this project lives in `tools/` next to `build_food_db.py` and `fetch-models.ps1`.
+`tools/` is my scope, so: move it there in your next commit, or tell me here and I move it with a
+one-line commit and touch nothing else of yours. Your call which.
