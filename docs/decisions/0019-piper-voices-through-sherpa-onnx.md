@@ -152,9 +152,11 @@ different cores. Piper's real-time factor on the device is unmeasured.
    directory is `EspeakData.install(context, File(context.filesDir, "espeak-ng-data"))`, called
    once where the arbiter is built.
 3. `AppModule`: provide `TtsEngine` as
-   `RoutingTtsEngine(listOf(PiperTtsEngine(arbiter, AudioTrackSink(context)), AndroidTtsEngine(context)))`.
-   It meets the bar the module's comment sets only once step 1 is on the phone; until then a
-   `speak` returns MODEL_LOAD_FAILED naming the missing file, which is the honest state.
+   `RoutingTtsEngine(listOf(AndroidTtsEngine(context), PiperTtsEngine(arbiter, AudioTrackSink(context))))`
+   — platform engine FIRST since the addendum below, Piper the fallback for a language this
+   phone has no offline voice for. It meets the bar the module's comment sets only once step 1
+   is on the phone; until then a Telugu `speak` on a phone without a platform Telugu voice
+   returns MODEL_LOAD_FAILED naming the missing file, which is the honest state.
 4. Add the co-residency row. `canCoReside(listOf(asr, llm, PiperVoices.TELUGU))` through the
    arbiter is the number `0013` has been waiting for: the first one with the phonemiser and
    espeak-ng resident rather than a raw session.
@@ -177,3 +179,73 @@ configuration changes; assets are packaged as they are. `EspeakData` reads that 
   is the file size, which is the only manifest figure there is; the arbiter measures the rest.
 - **`hi_IN-pratham` versus `hi_IN-priyamvada`** is a listening preference; both are the same
   licence, size and trainer. Pratham was taken because it is listed first in `0005`.
+
+---
+
+## Addendum, 20 September 2026, 03:10: the listeners' verdict, and what is in front of them next
+
+**Vedant's native Telugu listeners heard the two WAVs above. Verdict: completely robotic, not like
+a person at all.** That is the right people answering the right question, and it is treated as
+decisive, not as tuning noise. Two things about the test itself are stated so nobody over-reads
+it: the input was two food names, which no voice reads as speech; and this record still holds no
+Telugu sentence, because nobody on the slice writes Telugu. A sentence from the listeners is the
+next input.
+
+### What changed in the code
+
+- `AndroidTtsEngine` now claims all three languages and answers PER DEVICE: `prepare` is
+  MODEL_NOT_LOADED for a language with no installed offline voice. Voice choice is the same
+  language code only, Indian regional voice first, then the platform's own quality rating.
+- `RoutingTtsEngine` tries the engines in order and falls through on MODEL_NOT_LOADED only; any
+  other answer is final. So the wiring becomes platform engine first, Piper second, and a phone
+  with an offline Google Telugu voice never reaches Piper while a phone without one still speaks.
+  `RoutingTtsEngineTest` covers both orders and the never-another-language rule. 25 tests in
+  `ml.tts`, 0 failures, read from the JUnit XML.
+- `TtsVoiceProbeTest` (androidTest, compiled, NEVER RUN) lists every voice on the phone with its
+  locale, quality, latency, network flag and features, states what the engine would pick per
+  language, and writes `platform-<lang>-<voice>-A/B.wav` with the same texts as the candidates
+  below. Only Rao runs it; the answer is a device fact and this record does not guess it.
+
+### The candidates, `logs/tts-candidates/` on the laptop, same two texts each
+
+| candidate | licence | on-phone cost | status |
+| --- | --- | --- | --- |
+| Google / OEM platform voice for `te-IN` | none to record | none: no file, no arbiter | UNKNOWN until the probe runs. May be the whole answer, and removes nothing from the register (the NC entry is Hindi) |
+| Piper `padmavathi`, six parameter variants: `noise_scale` 0.667/0.5/0.333, `noise_w` 0.8/0.5, `length_scale` 1.0/1.15/1.3 | CC-BY-4.0 | 63.5 MB, measured to load on desktop | generated. The trimming test in this record ran at noise 0, which is NOT how the voice is shipped; the shipped default is 0.667/0.8/1.0 |
+| Piper `venkatesh`, default and 0.5/0.8/1.15 | CC-BY-4.0, sha256 `dfaa5b7833cd48d946f3fe18c9c934aaa4e8590aac6922fddf34783a694c3c87` | same as padmavathi | generated, stamped the same way |
+| facebook MMS `tel` (`willwade/mms-tts-multilingual-models-onnx`) | **CC-BY-NC-4.0**; goes in 0005's register the day it ships | 114 MB, 16 kHz, character frontend, no espeak; its frontend skips punctuation | generated |
+| `prasadvittaldev/pocket-tts-telugu-female-syspin` (Kyutai pocket-tts, 110M params, 24 kHz) | claimed MIT; base MIT; SYSPIN data CC-BY-4.0 | 86 MB int4; LM-based, "5.5x real-time on desktop x86", unmeasured on a 2xA76; ONNX present but NOT in sherpa-onnx's Pocket layout | the author's own 74 s sample copied as-is; NOT our text |
+
+### Surveyed and not made into candidates, with the reason
+
+- `SYSPIN/tts_vits_coquiai_TeluguMale` and `TeluguFemale`: **CC-BY-4.0**, Coqui VITS on 30 h of
+  studio Telugu. Coqui does export VITS to ONNX and sherpa-onnx runs Coqui VITS (`vits-coqui-*`
+  in its zoo, character tokens, no espeak). The checkpoint is a `.pt` with a `jit_infer.py`, so
+  the export needs the Coqui TTS package and a Python that still runs it. This is the strongest
+  permissively-licensed lead if Piper and the platform both fail the ear, and it is an evening
+  of toolchain work with a real chance of a recorded retreat. Not attempted tonight.
+- `multilingual-tts/VITS-OpenBible-Telugu`: CC-BY-SA-4.0, Bible readings, Coqui `.pth`. Same
+  conversion cost, narrower data. Behind SYSPIN.
+- AI4Bharat Indic Parler-TTS and IndicF5: permissive, and 0.9B / large; not phone models.
+- `te_IN-maya-medium`: licence PDF still unreachable, per `0005`.
+
+### The honest ceiling
+
+Offline TTS at 60-100 MB is behind cloud TTS and no parameter pass closes that. If the platform
+voice is absent from this phone and none of the candidates passes the ear, the decision is a
+product one, not an engineering one: whether the app speaks full sentences at all, or shows text
+and speaks only short confirmations. That decision is Vedant's, on the listeners' word, and this
+record will carry whichever way it goes.
+
+### The APK figure, closed
+
+The 76,662,020-byte APK sized earlier carried 10,491,272 bytes of dead space between entries:
+AGP packages incrementally and leaves holes where replaced entries were, so the on-disk size of
+an incrementally packaged APK is build history, not content. That is why adding a 24 MB library
+moved it by 153 bytes, and it means the two figures in `0016` are comparable with each other
+(same session, same holes) but not with this one. Packaged from scratch (APK deleted, then
+`assembleDemoDebug`, `logs/meera-apk-size.log`), at HEAD `d871c0f` with 22 uncommitted paths in
+the shared tree, 02:57: **66,889,734 bytes**, sha256
+`28c2a1d7fb15ed825ad935334c1103db082cdc6d065c0c25c854b86807221797`, 813 entries, 81,626 bytes of
+slack, `lib/arm64-v8a/libsherpa-onnx-jni.so` 24,169,352 stored. Any APK figure quoted from now
+on says whether it was a clean package.

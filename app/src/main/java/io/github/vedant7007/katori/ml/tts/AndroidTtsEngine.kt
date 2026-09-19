@@ -17,11 +17,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
 /**
- * [TtsEngine] for English on the platform's own `TextToSpeech`.
+ * [TtsEngine] on the platform's own `TextToSpeech`, for whichever of the three languages THIS
+ * device has an offline voice for.
  *
- * On-device, ships with the OS, no licence question, no model file: the cheapest correct answer
- * for English (`0005`). Nothing is downloaded and nothing goes through the arbiter, because
- * there is no model of ours to admit.
+ * On-device, ships with the OS, no licence question, no model file, nothing through the
+ * arbiter because there is no model of ours to admit. It claims all three languages and answers
+ * per device: [prepare] is MODEL_NOT_LOADED for a language with no installed offline voice, and
+ * [RoutingTtsEngine] then falls through to the Piper voice for that language. Telugu listeners
+ * called the Piper voice robotic (`0019`), and the platform's voices are the cheapest thing to
+ * put in front of them next; whether this phone has one is a device fact, not a spec-sheet fact.
  *
  * OFFLINE IS CHECKED, NOT ASSUMED. The system engine can offer voices that synthesise on a
  * server. Only a voice whose `isNetworkConnectionRequired` is false and whose features do not
@@ -30,27 +34,27 @@ import kotlin.coroutines.resume
  * with its own, so this check is what keeps the claim honest.
  *
  * WRITTEN, NOT RUN. `TextToSpeech` cannot exist on the JVM; the sentence splitting below is the
- * only part with a test. The first evidence that this speaks is a device run.
+ * only part with a test. `TtsVoiceProbeTest` in androidTest is what answers the device question.
  */
 class AndroidTtsEngine(private val context: Context) : TtsEngine {
 
-    override val supportedLanguages: Set<SpeechLanguage> = setOf(SpeechLanguage.ENGLISH_INDIA)
+    override val supportedLanguages: Set<SpeechLanguage> = SpeechLanguage.entries.toSet()
 
     private val audioManager: AudioManager = context.getSystemService(AudioManager::class.java)
     private val initLock = Mutex()
     private var engine: TextToSpeech? = null
 
     override suspend fun prepare(language: SpeechLanguage): Outcome<Unit> {
-        if (language !in supportedLanguages) {
-            return Outcome.Unavailable(UnavailableReason.MODEL_NOT_LOADED, "AndroidTtsEngine speaks English only, not $language")
-        }
         val tts = when (val e = engine()) {
             is Outcome.Ok -> e.value
             is Outcome.Unavailable -> return e
             is Outcome.NotImplemented -> return e
         }
-        val voice = offlineEnglishVoice(tts)
-            ?: return Outcome.Unavailable(UnavailableReason.MODEL_NOT_LOADED, "no installed offline English voice in the system engine")
+        val voice = offlineVoiceFor(tts, language)
+            ?: return Outcome.Unavailable(
+                UnavailableReason.MODEL_NOT_LOADED,
+                "no installed offline ${language.tag} voice in the system engine (${tts.defaultEngine})",
+            )
         if (tts.setVoice(voice) != TextToSpeech.SUCCESS) {
             return Outcome.Unavailable(UnavailableReason.MODEL_NOT_LOADED, "system engine refused voice ${voice.name}")
         }
@@ -118,16 +122,32 @@ class AndroidTtsEngine(private val context: Context) : TtsEngine {
         Outcome.Ok(tts)
     }
 
-    private fun offlineEnglishVoice(tts: TextToSpeech): Voice? {
-        val voices = runCatching { tts.voices }.getOrNull().orEmpty()
-        return voices
-            .filter { it.locale.language == Locale.ENGLISH.language }
-            .filter { !it.isNetworkConnectionRequired }
-            .filter { TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features }
-            // en-IN first; any other installed English voice is still English, and better than
-            // silence. Never another language's voice: that rule is the contract's, and this
-            // engine only ever sees English.
-            .minByOrNull { if (it.locale.country == "IN") 0 else 1 }
+    companion object {
+        /** The locale asked of the platform for each of our languages. */
+        fun locale(language: SpeechLanguage): Locale = when (language) {
+            SpeechLanguage.TELUGU -> Locale("te", "IN")
+            SpeechLanguage.HINDI -> Locale("hi", "IN")
+            SpeechLanguage.ENGLISH_INDIA -> Locale("en", "IN")
+        }
+
+        /**
+         * The installed, offline voice this device has for [language], or null.
+         *
+         * Same language code only, never a neighbour's: the contract forbids reading Telugu with
+         * another language's phonology. Within the language, the Indian regional voice first,
+         * then the platform's own quality rating, highest first. Shared with `TtsVoiceProbeTest`
+         * so what the probe records is what the engine would pick.
+         */
+        fun offlineVoiceFor(tts: TextToSpeech, language: SpeechLanguage): Voice? {
+            val wanted = locale(language)
+            val voices = runCatching { tts.voices }.getOrNull().orEmpty()
+            return voices
+                .filter { it.locale.language == wanted.language }
+                .filter { !it.isNetworkConnectionRequired }
+                .filter { TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features }
+                .sortedWith(compareBy<Voice> { if (it.locale.country == wanted.country) 0 else 1 }.thenByDescending { it.quality })
+                .firstOrNull()
+        }
     }
 }
 

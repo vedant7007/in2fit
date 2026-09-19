@@ -638,3 +638,42 @@ files, args are the test classes, `katori.projectDir` is set for you. It compile
 core (domain/model, rules engine, LlmEngine/Prompts/guard, FoodTextMatching) plus the slice
 with the Kotlin 2.2.20 jars from `~/.gradle/caches`, no daemon, ~25 s. Verified from that path
 just now: `OK (40 tests)`. Yours to place, rename and own; I will not commit into `tools/`.
+
+[Meera 03:10] THE LISTENERS SAID ROBOTIC. Vedant's native Telugu listeners heard the two Piper
+WAVs: "completely robotic, not like a person at all". Decisive, and 0019 now carries it as such.
+What changed: `AndroidTtsEngine` claims all three languages and answers per device (no installed
+offline voice for a language = MODEL_NOT_LOADED); `RoutingTtsEngine` falls through on
+MODEL_NOT_LOADED only, so the wiring becomes platform engine FIRST, Piper the fallback. 25 tests
+in `ml.tts`, 0 failures, read from the XML. NEW `androidTest/.../ml/tts/TtsVoiceProbeTest.kt`,
+compiled, never run. Candidates for the listeners are in `logs/tts-candidates/` with a README:
+padmavathi at six noise/length settings, venkatesh (CC-BY-4.0, stamped), facebook MMS Telugu
+(CC-BY-NC-4.0, sherpa layout, 16 kHz), and the author's own sample of a Telugu pocket-tts
+fine-tune (claimed MIT, 110M params, not in sherpa's layout). Same two texts throughout: the two
+words they heard, and five food names. No Telugu sentence exists in this repo and I wrote none.
+
+[Meera 03:10] TO RAO, ONE PROBE, BEFORE ANY OTHER TTS STEP: `TtsVoiceProbeTest`, `am instrument`,
+screen awake, command in its header. Test a lists every voice the phone has for te/hi/en with
+locale, quality, latency, network flag and features, and says what the engine would pick. Test b
+writes `platform-<lang>-<voice>-A/B.wav` beside a report in
+`/sdcard/Android/media/<pkg>/tts-probe/`; `adb pull` that directory to `logs/tts-probe`. Paste
+the "would use" lines here. If the phone has an offline Google Telugu voice, that is likely the
+whole answer, costs no memory from the arbiter and no licence; if it does not, the Piper staging
+steps in 0019 stand and the listeners choose among the candidates. The `AppModule` order in 0019
+step 3 is now platform first.
+
+[Meera 03:10] TO VEDANT: `logs/tts-candidates/` on this laptop, 19 WAVs and a README saying what
+each is. The A files are the same two words your listeners heard, so they compare like with like.
+Two asks: (1) one Telugu sentence written by the listeners, a sentence a person would actually say
+about a meal, to use as the next test input for every candidate — two food names is not a fair
+test of any voice and I will not write Telugu; (2) their ranking, even a rough one, of the
+candidates, and separately of the phone's own voice once Rao's probe produces it. The honest
+ceiling is in 0019: if nothing passes their ear, whether the app speaks full sentences or shows
+text with short spoken confirmations is your product call, not a tuning problem.
+
+[Meera 03:10] FOUND, CLOSES MY 02:30 (a): the 76,662,020 B APK carried 10,491,272 B of dead
+space between entries. AGP packages incrementally and leaves holes where replaced entries were,
+so an incrementally packaged APK's size on disk is build history, not content; that is how 24 MB
+moved it 153 B. Packaged from scratch at HEAD d871c0f, 02:57 (`logs/meera-apk-size.log`, 22
+uncommitted paths in the tree): **66,889,734 B**, sha256 `28c2a1d7…7797`, sherpa lib inside,
+81,626 B slack. Nila: the two figures in 0016 are comparable with each other, not with this one;
+from now on an APK figure says whether it was a clean package.
