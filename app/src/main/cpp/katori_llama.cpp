@@ -166,8 +166,15 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeGenerate(
         stopStrings.reserve((size_t) n);
         for (jsize i = 0; i < n; i++) {
             auto s = (jstring) env->GetObjectArrayElement(stops, i);
-            JavaString borrowed(env, s);
-            if (borrowed.ok()) stopStrings.emplace_back(borrowed.c_str());
+            // The borrow MUST be released before the local reference is deleted. Without the
+            // inner scope, ~JavaString runs after DeleteLocalRef and calls ReleaseStringUTFChars
+            // against a reference that has already been popped, which CheckJNI turns into a
+            // SIGABRT on the first generate call. Found on the device; it aborts every time,
+            // because both stop lists are non-empty.
+            {
+                JavaString borrowed(env, s);
+                if (borrowed.ok()) stopStrings.emplace_back(borrowed.c_str());
+            }
             env->DeleteLocalRef(s);
         }
     }
