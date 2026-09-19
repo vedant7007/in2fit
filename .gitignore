@@ -20,3 +20,6 @@ local.properties
 *.gguf
 *.onnx
 *.task
+
+# Downloaded source data and model weights. Never committed.
+/data-sources/
