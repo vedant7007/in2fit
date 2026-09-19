@@ -1,0 +1,13 @@
+# Items we deliberately have NO data for. They resolve to a named "no data" result, never to a
+# substitute. The app names the item, says it has no nutrition data, and moves on.
+#
+# This file exists so the absence is a deliberate, reviewed decision rather than a gap nobody
+# noticed. See docs/decisions/0002-usda-import-rules.md.
+key,display_name,aliases_roman,reason
+curry_leaves,"Curry leaves","curry leaves|kadi patta|karivepaku","Absent from USDA. Contribution to a meal's macros is immaterial, so no-data is honest and harmless."
+asafoetida,"Asafoetida (hing)","hing|asafoetida|inguva","Absent from USDA. Used in fractions of a gram."
+ajwain,"Ajwain","ajwain|carom seeds|vaamu","Absent from USDA."
+amchur,"Amchur","amchur|dry mango powder","Absent from USDA."
+ragi,"Ragi (finger millet)","ragi|finger millet|nachni|chodi","BLOCKING. USDA's generic Millet record tags NCBI taxon 4479, which is the whole grass family Poaceae, so the species is unidentified. Ragi carries roughly 300-350 mg calcium per 100 g against single digits for proso millet. Substituting would put a wrong number on a nutrient people track deliberately. Stays no-data until NIN responds or a licensed source appears."
+bajra,"Bajra (pearl millet)","bajra|pearl millet|sajja|kambu","BLOCKING. Same unidentified-species problem as ragi."
+jaggery,"Jaggery","jaggery|gur|bellam","BLOCKING. No USDA record. Brown sugar loses the mineral content that is the whole reason people distinguish jaggery from sugar, so it is not a substitute."

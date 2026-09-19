@@ -63,6 +63,16 @@ enum class UnavailableReason {
     /** Nothing in the food database matched, above the match threshold. */
     NO_MATCH,
 
+    /**
+     * The item was recognised, and we deliberately hold no nutrition data for it.
+     *
+     * Distinct from [NO_MATCH] on purpose. "I do not know what you said" and "I know exactly what
+     * you said and I am not going to make up a number for it" are different statements, and the
+     * second one is the honest answer for ragi, bajra, jaggery, curry leaves and asafoetida.
+     * The UI names the item and says it has no data. It never substitutes a similar food.
+     */
+    KNOWN_ITEM_NO_DATA,
+
     /** A match exists but is too weak to present. The system asks rather than guesses (spec 10.7). */
     BELOW_CONFIDENCE_THRESHOLD,
 

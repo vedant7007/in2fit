@@ -16,6 +16,7 @@ val probeVersions by tasks.registering {
 
     val targets = listOf(
         "com.android.tools.build:gradle",
+        "org.xerial:sqlite-jdbc",
         "com.google.devtools.ksp:symbol-processing-gradle-plugin",
         "com.google.dagger:hilt-android",
         "com.google.dagger:hilt-android-compiler",

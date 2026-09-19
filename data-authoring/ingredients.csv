@@ -1,0 +1,49 @@
+# Authored ingredient mapping: spoken name -> USDA FoodData Central record.
+#
+# Every fdc_id here was chosen deliberately per docs/decisions/0002-usda-import-rules.md.
+# Rule 4 in that record is why several of these are the "unenriched" or "raw" variant rather
+# than the obvious default: US fortification does not apply in India.
+#
+# aliases_roman : how people actually say it, including code-mixed speech. This is the column
+#                 that matters most, because that is what the recogniser emits in practice.
+# aliases_native: Telugu and Devanagari script. LEFT EMPTY where I am not confident. An empty
+#                 cell is honest; a wrong one silently mismatches a food. Needs a native-speaker
+#                 review pass before the event. Tracked in STATUS.md.
+# band_reason   : extra confidence reason applied to every figure from this record, on top of
+#                 the match and quantity reasons. Blank means no extra penalty.
+#
+key,display_name,fdc_id,source,food_class,aliases_roman,aliases_native,band_reason,note
+rice_raw,"Rice, white, raw (unenriched)",169756,USDA_SR_LEGACY,GRAIN_RAW,"rice|chawal|biyyam|raw rice|white rice","",,"Unenriched deliberately. 168877 is enriched at Fe 4.31 and would attribute US fortification to Indian rice."
+rice_cooked,"Rice, white, cooked (unenriched)",169757,USDA_SR_LEGACY,GRAIN_COOKED,"cooked rice|annam|bhaat|chawal|rice|saddi annam","అన్నం|चावल",,"Unenriched twin of 169757. Default meal staple."
+atta,"Wheat flour, whole-grain",168893,USDA_SR_LEGACY,GRAIN_RAW,"atta|wheat flour|gehu ka atta|godhuma pindi","गेहूं का आटा|గోధుమ పిండి",,"Roti and chapati resolve through this plus a recipe."
+toor_dal_raw,"Pigeon peas (red gram), raw",172436,USDA_SR_LEGACY,PULSE_RAW,"toor dal|tur dal|arhar|kandi pappu|red gram|toovar","కంది పప్పు|अरहर दाल",,""
+toor_dal_cooked,"Pigeon peas (red gram), cooked",172437,USDA_SR_LEGACY,PULSE_COOKED,"cooked toor dal|pappu|dal|daal|kandi pappu","పప్పు|दाल",,"Plain 'dal' resolves here by default; a named dal overrides it."
+chana_dal,"Chickpeas (bengal gram), raw",173756,USDA_SR_LEGACY,PULSE_RAW,"chana dal|bengal gram|senaga pappu|chana","శనగ పప్పు|चना दाल",,"USDA's own description says bengal gram."
+chana_dal_cooked,"Chickpeas (bengal gram), cooked",173757,USDA_SR_LEGACY,PULSE_COOKED,"cooked chana dal|chana|chhole","छोले",,""
+besan,"Chickpea flour (besan)",174288,USDA_SR_LEGACY,GRAIN_RAW,"besan|gram flour|senaga pindi|chickpea flour","बेसन|శనగ పిండి",,""
+urad_dal,"Mungo beans (urad), raw",174259,USDA_SR_LEGACY,PULSE_RAW,"urad dal|urad|minapa pappu|black gram|uddina bele","మినప పప్పు|उड़द दाल",,"Filed under 'Mungo beans' in USDA. Vigna mungo. Easy to miss."
+urad_dal_cooked,"Mungo beans (urad), cooked",172427,USDA_SR_LEGACY,PULSE_COOKED,"cooked urad dal|minapa pappu","",,""
+moong_dal,"Mung beans, raw",174256,USDA_SR_LEGACY,PULSE_RAW,"moong dal|mung|pesara pappu|green gram","పెసర పప్పు|मूंग दाल",,""
+moong_dal_cooked,"Mung beans, cooked",174257,USDA_SR_LEGACY,PULSE_COOKED,"cooked moong dal|pesara pappu","",,""
+masoor_dal,"Lentils, pink or red, raw",174284,USDA_SR_LEGACY,PULSE_RAW,"masoor dal|red lentil|masoor|misur pappu","मसूर दाल",,""
+ghee,"Butter, clarified (ghee)",171314,USDA_SR_LEGACY,FAT_OIL,"ghee|nei|neyyi|clarified butter|tuppa","నెయ్యి|घी",WEAK_SOURCE_RECORD,"15 of 18 values back-calculated from a retail label, no Mg, Zn or B12. Near pure fat, so energy is sound, which is what ghee contributes."
+groundnut_oil,"Oil, peanut",171410,USDA_SR_LEGACY,FAT_OIL,"groundnut oil|peanut oil|palli nune|moongphali tel|oil|cooking oil|tel|nune","వేరుశెనగ నూనె",,"SR record, not Foundation 1750348 which carries no energy, fat or protein at all. Also the default for an unqualified 'oil'."
+sunflower_oil,"Oil, sunflower",171025,USDA_SR_LEGACY,FAT_OIL,"sunflower oil|surya mukhi|poddu tirugudu nune","सूरजमुखी तेल",,"SR record, not Foundation 1750349, same defect."
+mustard_oil,"Oil, mustard",172337,USDA_SR_LEGACY,FAT_OIL,"mustard oil|sarson ka tel|avaalu nune","सरसों का तेल",,""
+milk_whole,"Milk, whole",171265,USDA_SR_LEGACY,DAIRY,"milk|doodh|paalu|whole milk","పాలు|दूध",,"US record is vitamin-D fortified; Indian milk is not. Disclosed in the about screen."
+curd,"Yogurt, plain",170886,USDA_SR_LEGACY,DAIRY,"curd|dahi|perugu|yoghurt|yogurt|majjiga thick","పెరుగు|दही",,"SR, never Foundation 2259793 which has no B12 row at all and reports iron as 0.0."
+coconut_fresh,"Coconut meat, raw",170169,USDA_SR_LEGACY,VEGETABLE,"coconut|nariyal|kobbari|fresh coconut","కొబ్బరి|नारियल",,"132 analytical samples, the best-sampled record in this set."
+coconut_dried,"Coconut meat, dried, unsweetened",170170,USDA_SR_LEGACY,VEGETABLE,"dry coconut|copra|endu kobbari","",,"Unsweetened variant deliberately."
+okra,"Okra, raw",169260,USDA_SR_LEGACY,VEGETABLE,"okra|bhindi|bendakaya|lady finger|ladies finger","బెండకాయ|भिंडी",,""
+brinjal,"Eggplant, raw",169228,USDA_SR_LEGACY,VEGETABLE,"brinjal|baingan|vankaya|eggplant|aubergine","వంకాయ|बैंगन",,"'brinjal' is absent from USDA as a term; eggplant is the same plant."
+bitter_gourd,"Balsam-pear (bitter gourd), raw",168393,USDA_SR_LEGACY,VEGETABLE,"bitter gourd|karela|kakarakaya|bitter melon","కాకరకాయ|करेला",,"USDA's description says bitter gourd."
+bottle_gourd,"Gourd, white-flowered (calabash), raw",169232,USDA_SR_LEGACY,VEGETABLE,"bottle gourd|lauki|sorakaya|dudhi|calabash","సొరకాయ|लौकी",,"Lagenaria siceraria, exactly lauki. Only 2 analytical samples."
+ridge_gourd,"Gourd, dishcloth (towelgourd), raw",168414,USDA_SR_LEGACY,VEGETABLE,"ridge gourd|turai|beerakaya|torai","బీరకాయ|तुरई",SUBSTITUTE_FOOD_RECORD,"Luffa aegyptiaca, a sister species to ridge gourd Luffa acutangula. Not the same plant. Disclosed."
+drumstick_pod,"Drumstick pods, raw",170483,USDA_SR_LEGACY,VEGETABLE,"drumstick|munaga|sahjan|moringa pod","మునగకాయ",WEAK_SOURCE_RECORD,"One analytical sample."
+drumstick_leaves,"Drumstick leaves, raw",168416,USDA_SR_LEGACY,VEGETABLE,"drumstick leaves|munaga aaku|moringa leaves|sahjan patta","",WEAK_SOURCE_RECORD,"Three analytical samples."
+coriander_leaves,"Coriander (cilantro) leaves, raw",169997,USDA_SR_LEGACY,VEGETABLE,"coriander|cilantro|dhania|kothimeera|coriander leaves","కొత్తిమీర|धनिया",,""
+tamarind,"Tamarinds, raw",167763,USDA_SR_LEGACY,FRUIT,"tamarind|imli|chintapandu","చింతపండు|इमली",SUBSTITUTE_FOOD_RECORD,"USDA record is the raw whole fruit, not the concentrated pulp Indian cooking uses. Disclosed."
+mustard_seed,"Spices, mustard seed, ground",170929,USDA_SR_LEGACY,SPICE,"mustard seeds|rai|avalu|sarson","ఆవాలు|राई",,"Ground, not whole."
+cumin,"Spices, cumin seed",170923,USDA_SR_LEGACY,SPICE,"cumin|jeera|jilakarra|zeera","జీలకర్ర|जीरा",,"Iron 66.36 mg/100g from 48 samples. Spice iron is flagged separately in the pipeline."
+turmeric,"Spices, turmeric, ground",172231,USDA_SR_LEGACY,SPICE,"turmeric|haldi|pasupu","పసుపు|हल्दी",WEAK_SOURCE_RECORD,"Iron 55 mg/100g from only 3 samples. Spice iron is flagged separately."
+jowar,"Sorghum, whole grain, white",2710842,USDA_FOUNDATION,GRAIN_RAW,"jowar|sorghum|jonna|cholam","జొన్న|ज्वार",,"Foundation record, species confirmed Sorghum bicolor in USDA's own taxonomy. One of the few Foundation records used."

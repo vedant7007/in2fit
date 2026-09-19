@@ -1,0 +1,31 @@
+# Household unit to grams, per food class. Spec 13.4.
+#
+# These are DEFAULTS. Every figure that uses one carries HOUSEHOLD_UNIT_DEFAULT, which caps it at
+# Approximate, and the UI shows the assumed grams so the user can correct it. Quantity is never
+# guessed: if the user gives no quantity at all, the system asks. This table only converts a
+# quantity the user DID give.
+#
+# A katori of dal and a katori of rice are different weights, which is why food_class is part of
+# the key rather than a single global table.
+unit,food_class,grams,note
+katori,PULSE_COOKED,150,"Standard small steel bowl, cooked dal."
+katori,GRAIN_COOKED,150,"Cooked rice in the same bowl."
+katori,VEGETABLE,100,"Cooked sabzi."
+katori,DAIRY,150,"Curd."
+bowl,PULSE_COOKED,200,"Larger than a katori."
+bowl,GRAIN_COOKED,200,""
+bowl,VEGETABLE,150,""
+bowl,DAIRY,200,""
+plate,GRAIN_COOKED,200,"A plate of rice."
+plate,COMPOSED_DISH,350,"A full plate meal."
+glass,DAIRY,200,"A glass of milk."
+glass,BEVERAGE,200,""
+cup,GRAIN_RAW,180,"Uncooked rice or flour by volume."
+cup,PULSE_RAW,200,""
+cup,DAIRY,240,""
+spoon,FAT_OIL,10,"A serving spoon of oil, not a teaspoon. This is the one that decides a meal's fat."
+tablespoon,FAT_OIL,14,""
+teaspoon,FAT_OIL,5,""
+teaspoon,SPICE,2,""
+tablespoon,SPICE,6,""
+piece,COMPOSED_DISH,50,"One roti, one idli, one vada. Overridden per dish by a recipe where one exists."
