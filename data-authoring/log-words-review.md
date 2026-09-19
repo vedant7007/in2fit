@@ -79,5 +79,26 @@ reporting a meal: write it here.
 
 ______________________________________________________________________________
 
-Send it back to Vedant. The lists live in `LogPrefilter.kt`, and a test keeps this sheet and
-those lists in step, so a word you flag is changed in one place.
+## Second list: words about medicine, illness and diagnosis
+
+Separate rule, same kind of question. When a person's sentence contains one of these, the app
+adds a line saying a doctor should judge it; and when the app's own reply contains one of the
+phrases, the reply is thrown away. A wrong word here costs one extra sentence or one lost reply,
+never a wrong meal, so this list matters less than the first. Still: is any of these a common
+everyday word that means something else?
+
+Hindi: `dawai dawa goli goliyan bimari bimar khatra khatarnak ilaj`; phrases `hai kya`, `kya hai`,
+`kya mujhe`, `mujhe kya hua`. Replies thrown away if they contain: `aapko ... hai` / `tumhe ...
+hai` with an illness word, and `goli lo`, `dawai lo`, `goli roz lo`, `dawai lena`.
+
+Telugu: `mandu mandulu matra jabbu rogam pramadam pramadakaram vaidyam`; phrases `unda`,
+`vachinda`, `tagginda`, `perigindha`. Replies thrown away if they contain: `meeku ... undi` /
+`neeku ... undi` with an illness word, and `mandu veskondi`, `matra veyandi`, `tablets
+thesukondi`.
+
+Any of these wrong, or a common form missing: write it here.
+
+______________________________________________________________________________
+
+Send it back to Vedant. The lists live in `LogPrefilter.kt` and `SafetyLine.kt`, and a test
+keeps this sheet and the log-word list in step, so a word you flag is changed in one place.
