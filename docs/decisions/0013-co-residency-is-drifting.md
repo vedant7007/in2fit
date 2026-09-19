@@ -11,8 +11,19 @@ Same device, same three model files, same probe, one build change between them.
 | baseline ARMv8.0 | 1,209.0 MB | 1,469.2 MB | 1,456.7 MB | 1,452.2 MB | 2,357.5 MB |
 | baseline ARMv8.0, later run | 1,287.0 MB | 1,451.5 MB | 1,482.5 MB | 1,482.5 MB | 2,327.2 MB |
 | `+dotprod+fp16` | 1,986.4 MB | 2,209.1 MB | 2,229.9 MB | **2,229.9 MB** | **1,579.8 MB** |
+| `+dotprod+fp16`, via `DefaultModelArbiter`, LLM only, 20 Sep | 1,887.6 MB | — | — | 1,887.6 MB | 2,303.0 MB against the CALIBRATED ceiling |
 
-Ceiling is the provisional one the probe uses: half of the device's 7,619.4 MB, so 3,809.7 MB.
+Ceiling in the first three rows is the provisional one the probe printed: half of the device's
+7,619.4 MB, so 3,809.7 MB. The fourth row is against the ceiling the arbiter calibrates for
+itself (`DefaultModelArbiter`, `0c20de3`): **4,190.7 MB on this device**, the 55% cap being the
+binding term because this OEM's low-memory threshold is small. That figure and the LLM-only peak
+are the first two rows in the on-device measurement log, `katori-memory-measurements.tsv`, which
+is append-only and is where every subsequent row goes.
+
+The fourth row is not directly comparable with the third: it is one model through the arbiter's
+loader, not three through raw ONNX sessions. The ASR and TTS families have no runtime bound yet,
+so the arbiter cannot measure the three together until sherpa-onnx lands. When it can, that row
+goes here and the comparison with 2,229.9 MB is the one to watch.
 
 **It still fits.** `FITS true` on every run, and 1,579.8 MB of headroom is not tight.
 

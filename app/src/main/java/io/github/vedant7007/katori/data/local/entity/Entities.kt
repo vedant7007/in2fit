@@ -209,6 +209,43 @@ data class ContextFoodOverrideEntity(
 )
 
 /**
+ * THIS HOUSEHOLD'S version of a bundled reference recipe. USER OVERRIDES ONLY, same split as the
+ * two tables above, and for the same reason: a bundled data refresh must not destroy how someone
+ * told us they make their sambar, and their sambar must outlive a refresh.
+ *
+ * `0015`: ask once how they make a dish, store it as theirs, use it forever. Eating out gets the
+ * generic bundled recipe and a lower band; eating at home gets this. Keyed by the bundled
+ * recipe's key, so a variant is always a variant OF something the app can fall back to.
+ *
+ * The header carries what the household changes about the whole dish; the ingredient rows carry
+ * the rest. Two tables rather than one denormalised one because yield and servings belong to the
+ * dish, not to each of its forty ingredient rows.
+ */
+@Entity(tableName = "household_recipes")
+data class HouseholdRecipeEntity(
+    @PrimaryKey val recipe_key: String,
+    val yield_g: Double,
+    val servings: Double,
+    val updated_at_epoch_ms: Long,
+)
+
+/**
+ * One ingredient in a household's version of a dish, in grams of the RAW ingredient as bought,
+ * matching the bundled `recipe_ingredients` table so `DefaultRecipeCalculator` runs the same
+ * arithmetic on both.
+ */
+@Entity(tableName = "household_recipe_ingredients", primaryKeys = ["recipe_key", "food_key"])
+data class HouseholdRecipeIngredientEntity(
+    val recipe_key: String,
+    val food_key: String,
+    /** DataSource name, stored by NAME. See KatoriConverters for why never by ordinal. */
+    val food_source: String,
+    val grams: Double,
+    /** MAIN, TEMPER, ABSORBED_FAT, SHALLOW_FRY_RETAINED: the same roles the bundled data uses. */
+    val role: String,
+)
+
+/**
  * Every utterance the matcher failed on.
  *
  * Required by spec 13.5. This is how coverage gaps get closed against what people actually say,

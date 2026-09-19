@@ -4,9 +4,12 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import io.github.vedant7007.katori.data.local.dao.ActivityDao
 import io.github.vedant7007.katori.data.local.dao.ConditionDao
 import io.github.vedant7007.katori.data.local.dao.ExerciseSessionDao
+import io.github.vedant7007.katori.data.local.dao.HouseholdRecipeDao
 import io.github.vedant7007.katori.data.local.dao.LabValueDao
 import io.github.vedant7007.katori.data.local.dao.MealDao
 import io.github.vedant7007.katori.data.local.dao.OverridesDao
@@ -17,6 +20,8 @@ import io.github.vedant7007.katori.data.local.entity.ActivityEntity
 import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ContextFoodOverrideEntity
 import io.github.vedant7007.katori.data.local.entity.ExerciseSessionEntity
+import io.github.vedant7007.katori.data.local.entity.HouseholdRecipeEntity
+import io.github.vedant7007.katori.data.local.entity.HouseholdRecipeIngredientEntity
 import io.github.vedant7007.katori.data.local.entity.LabValueEntity
 import io.github.vedant7007.katori.data.local.entity.MealEntity
 import io.github.vedant7007.katori.data.local.entity.MealItemEntity
@@ -53,8 +58,10 @@ import io.github.vedant7007.katori.domain.model.ConfidenceBand
         UnitConversionOverrideEntity::class,
         ContextFoodOverrideEntity::class,
         UnmatchedUtteranceEntity::class,
+        HouseholdRecipeEntity::class,
+        HouseholdRecipeIngredientEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 @TypeConverters(KatoriConverters::class)
@@ -68,9 +75,41 @@ abstract class KatoriDatabase : RoomDatabase() {
     abstract fun suggestionDao(): SuggestionDao
     abstract fun overridesDao(): OverridesDao
     abstract fun unmatchedUtteranceDao(): UnmatchedUtteranceDao
+    abstract fun householdRecipeDao(): HouseholdRecipeDao
 
     companion object {
         const val NAME = "katori-user.db"
+
+        /**
+         * Version 1 to 2: the per-household recipe tables from `0015`.
+         *
+         * Hand-written CREATE statements, matching what Room generates for the entities exactly,
+         * because Room validates the migrated schema against the entities when the database opens
+         * and refuses to run on a mismatch. That refusal is the point: it is what stops a wrong
+         * migration from quietly corrupting a person's health history. The exported
+         * `schemas/.../2.json` is the reference the SQL below was checked against.
+         *
+         * No `fallbackToDestructiveMigration` here or anywhere. See the class comment.
+         */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `household_recipes` (" +
+                        "`recipe_key` TEXT NOT NULL, `yield_g` REAL NOT NULL, " +
+                        "`servings` REAL NOT NULL, `updated_at_epoch_ms` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`recipe_key`))"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `household_recipe_ingredients` (" +
+                        "`recipe_key` TEXT NOT NULL, `food_key` TEXT NOT NULL, " +
+                        "`food_source` TEXT NOT NULL, `grams` REAL NOT NULL, `role` TEXT NOT NULL, " +
+                        "PRIMARY KEY(`recipe_key`, `food_key`))"
+                )
+            }
+        }
+
+        /** Every migration, in order. AppModule passes this to the builder. */
+        val MIGRATIONS = arrayOf<Migration>(MIGRATION_1_2)
     }
 }
 

@@ -10,6 +10,8 @@ import io.github.vedant7007.katori.data.local.entity.ActivityEntity
 import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ContextFoodOverrideEntity
 import io.github.vedant7007.katori.data.local.entity.ExerciseSessionEntity
+import io.github.vedant7007.katori.data.local.entity.HouseholdRecipeEntity
+import io.github.vedant7007.katori.data.local.entity.HouseholdRecipeIngredientEntity
 import io.github.vedant7007.katori.data.local.entity.LabValueEntity
 import io.github.vedant7007.katori.data.local.entity.MealEntity
 import io.github.vedant7007.katori.data.local.entity.MealItemEntity
@@ -199,6 +201,49 @@ interface OverridesDao {
 
     @Query("SELECT * FROM context_foods WHERE life_context = :context")
     suspend fun contextFoods(context: String): List<ContextFoodOverrideEntity>
+}
+
+@Dao
+interface HouseholdRecipeDao {
+
+    @Query("SELECT * FROM household_recipes WHERE recipe_key = :recipeKey")
+    fun observe(recipeKey: String): Flow<HouseholdRecipeEntity?>
+
+    @Query("SELECT * FROM household_recipe_ingredients WHERE recipe_key = :recipeKey")
+    suspend fun ingredients(recipeKey: String): List<HouseholdRecipeIngredientEntity>
+
+    @Upsert
+    suspend fun upsertHeader(recipe: HouseholdRecipeEntity)
+
+    @Upsert
+    suspend fun upsertIngredients(rows: List<HouseholdRecipeIngredientEntity>)
+
+    @Query("DELETE FROM household_recipe_ingredients WHERE recipe_key = :recipeKey")
+    suspend fun deleteIngredients(recipeKey: String)
+
+    @Query("DELETE FROM household_recipes WHERE recipe_key = :recipeKey")
+    suspend fun deleteHeader(recipeKey: String)
+
+    /**
+     * Replace this household's version of a dish, whole.
+     *
+     * Ingredient rows are deleted and rewritten rather than upserted over, because an ingredient
+     * the household REMOVED must go, and an upsert cannot express absence. One transaction, so a
+     * reader never sees the header for a new version with the rows of the old one.
+     */
+    @Transaction
+    suspend fun replace(recipe: HouseholdRecipeEntity, rows: List<HouseholdRecipeIngredientEntity>) {
+        deleteIngredients(recipe.recipe_key)
+        upsertHeader(recipe)
+        upsertIngredients(rows)
+    }
+
+    /** Back to the bundled reference recipe. */
+    @Transaction
+    suspend fun revert(recipeKey: String) {
+        deleteIngredients(recipeKey)
+        deleteHeader(recipeKey)
+    }
 }
 
 @Dao

@@ -99,16 +99,32 @@ supersedes, and flags five places where the new design conflicts with contracts 
 `Severity.ESCALATE`, `UserIntent`, or the two-path rule on `LlmEngine`, read `0015` first — the
 conflict is already identified and the resolution is written down.
 
-### WHERE I AM GOING NEXT
+### `ModelArbiter` IS IMPLEMENTED AND CALIBRATED ON THE PHONE — 20 Sep
 
-`ModelArbiter`, per the handover's recommended order. It is a contract with nothing behind it and
-both the memory story and the voice round trip rest on it. The ceiling it admits against will be
-derived from the measured co-residency figures above rather than the provisional half-of-RAM
-formula the probe currently prints.
+`DefaultModelArbiter` (`0c20de3`) is provided by `AppModule`. Inject `ModelArbiter`; never load a
+model any other way. `AsrEngine`'s contract already forbids a private loading path.
 
-I own `domain/`, the hardware probe and the phone. If your work needs a model loaded, it needs the
-arbiter, so talk to me before writing your own loading path — `AsrEngine`'s contract already
-forbids one.
+Calibrated on the device: **ceiling 4,190.7 MB**, 55% of RAM, the cap being the binding term.
+The LLM alone peaks at 1,887.6 MB through the arbiter, leaving 2,303 MB. Every measurement is a
+row in `/sdcard/Android/media/<pkg>/katori-memory-measurements.tsv`, append-only, with a build
+tag; `0013` explains why it is a trajectory and not a number.
+
+**Only the LLM family has a runtime bound.** `LlamaCppModelLoader` refuses ASR and TTS with
+`MODEL_LOAD_FAILED` and a message naming the gap. When sherpa-onnx lands, its families go into
+that one file, one branch each, and nothing above it changes. Do not bind a placeholder.
+
+Deliberately incomplete and stated in the source: the tier is classified on RAM alone, which
+over-rates this phone (HIGH, on a 2+6 big.LITTLE part); and one mutex is held across a model
+load, so a second caller waits rather than failing fast.
+
+**Per-household dish variants have a table.** `household_recipes` + `household_recipe_ingredients`,
+user overrides only, `HouseholdRecipeDao.replace()` / `revert()`. Room is at **version 2** with a
+hand-written migration whose SQL was checked against the exported `2.json`. The migration has
+been validated by schema comparison, not by upgrading a real v1 file, because no device has ever
+opened v1. `KatoriDatabase.MIGRATIONS` is on the builder; no destructive migration, still.
+
+I own `domain/`, the hardware probe and the phone. Next: `Orchestrator`, routing by intent per
+`0015`, and the `ESCALATE` / `UserIntent` / `LlmEngine` amendments that record describes.
 
 ---
 

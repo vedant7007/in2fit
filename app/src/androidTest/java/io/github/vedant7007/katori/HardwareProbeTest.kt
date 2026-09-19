@@ -467,6 +467,69 @@ class HardwareProbeTest {
         }
     }
 
+    // --- 5. the arbiter, calibrating itself on this phone ---------------------------------------
+
+    /**
+     * The FIRST ceiling this device has calibrated for itself, and the first co-residency row
+     * written by the arbiter rather than by this probe's own arithmetic.
+     *
+     * Only the LLM goes through the arbiter here, because only the LLM has a runtime bound. The
+     * three-model figure above (test c) is still measured with raw ONNX sessions and stays the
+     * reference for co-residency until sherpa-onnx lands and binds the other two families.
+     *
+     * The probe's own LLM is closed first so the arbiter measures ONE resident model, not two.
+     */
+    @Test
+    fun f_arbiterCalibratesOnThisPhone() {
+        heading("ModelArbiter, calibrated on this device")
+
+        llmRuntime?.close()
+        llmRuntime = null
+
+        val memory = io.github.vedant7007.katori.data.local.AndroidDeviceMemory(ctx)
+        val log = io.github.vedant7007.katori.data.local.FileMeasurementLog(ctx)
+        val rowsBefore = log.rows().size
+        val arbiter = io.github.vedant7007.katori.domain.DefaultModelArbiter(
+            memory = memory,
+            loader = io.github.vedant7007.katori.ml.llm.LlamaCppModelLoader(modelsDir, threads = THREADS),
+            log = log,
+            buildTag = "probe",
+        )
+
+        val total = memory.totalBytes()
+        val ceiling = arbiter.memoryCeilingBytes()
+        say("total RAM        ${mb(total)}")
+        say("low-memory at    ${mb(memory.lowMemoryThresholdBytes())}")
+        say("baseline PSS     ${mb(memory.processPssBytes())}")
+        say("CEILING          ${mb(ceiling)}   <- calibrated by the arbiter, ${"%.1f".format(ceiling * 100.0 / total)}% of RAM")
+        say("provisional was  ${mb(total / 2)}   <- the half-of-RAM the probe used to print")
+
+        val llm = io.github.vedant7007.katori.domain.ModelHandle(
+            id = "llm.qwen2.5-1.5b-q4km",
+            family = io.github.vedant7007.katori.domain.ModelFamily.LLM,
+            relativePath = LLM_FILE,
+            estimatedResidentBytes = File(modelsDir, LLM_FILE).length(),
+            minimumTier = io.github.vedant7007.katori.domain.DeviceTier.LOW,
+        )
+        val report = runBlocking { arbiter.canCoReside(listOf(llm)) }
+        when (report) {
+            is Outcome.Ok -> {
+                val r = report.value
+                say("LLM via arbiter  peak ${mb(r.measuredPeakBytes)}, fits=${r.fits}, headroom ${mb(r.ceilingBytes - r.measuredPeakBytes)}")
+            }
+            is Outcome.Unavailable -> say("LLM via arbiter  FAILED: ${report.reason} ${report.detail}")
+            is Outcome.NotImplemented -> say("LLM via arbiter  not built: ${report.component}")
+        }
+
+        say("")
+        say("measurement log  ${log.rows().size - rowsBefore} new row(s), ${log.rows().size} total")
+        log.rows().takeLast(3).forEach { say("  " + it.toLine()) }
+        say("tier             ${arbiter.residency.value.tier}   <- RAM only; the throughput half of the contract is not written")
+
+        assertTrue("the arbiter must produce a positive ceiling on this device", ceiling > 0)
+        assertTrue("the LLM must fit through the arbiter on this device", (report as? Outcome.Ok)?.value?.fits == true)
+    }
+
     @Test
     fun e_summary() {
         heading("summary")
