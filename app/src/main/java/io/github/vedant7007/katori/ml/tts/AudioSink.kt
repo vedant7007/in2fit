@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.domain.model.UnavailableReason
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -89,39 +90,50 @@ class AudioTrackSink(context: Context) : AudioSink {
         return audioManager.withTransientFocus(
             onLoss = { done.complete(Outcome.Unavailable(UnavailableReason.CANCELLED, "audio focus lost")) },
         ) {
-            val track = AudioTrack.Builder()
-                .setAudioAttributes(speechAttributes)
-                .setAudioFormat(
-                    AudioFormat.Builder()
-                        .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
-                        .setSampleRate(sampleRateHz)
-                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                        .build()
-                )
-                .setTransferMode(AudioTrack.MODE_STATIC)
-                .setBufferSizeInBytes(pcm.size * Float.SIZE_BYTES)
-                .build()
-            current = Playback(track, done)
             try {
-                val written = track.write(pcm, 0, pcm.size, AudioTrack.WRITE_BLOCKING)
-                if (written != pcm.size) {
-                    return@withTransientFocus Outcome.Unavailable(
-                        UnavailableReason.INTERNAL_ERROR, "AudioTrack took $written of ${pcm.size} samples",
-                    )
-                }
-                track.setNotificationMarkerPosition(pcm.size)
-                track.setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
-                    override fun onMarkerReached(t: AudioTrack) { done.complete(Outcome.Ok(Unit)) }
-                    override fun onPeriodicNotification(t: AudioTrack) = Unit
-                }, Handler(Looper.getMainLooper()))
-                track.play()
-                val lengthMs = pcm.size * 1000L / sampleRateHz
-                withTimeoutOrNull(lengthMs + 1_000) { done.await() } ?: Outcome.Ok(Unit)
-            } finally {
-                current = null
-                runCatching { track.pause() }
-                track.release()
+                playOnce(pcm, sampleRateHz, done)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: RuntimeException) {
+                // An AudioTrack the HAL refuses to build, or a write it rejects, is a condition
+                // the caller can show, not a bug to crash on: the contract says every engine
+                // answers with an Outcome.
+                Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "AudioTrack: ${e::class.java.simpleName}: ${e.message}")
             }
+        }
+    }
+
+    private suspend fun playOnce(pcm: FloatArray, sampleRateHz: Int, done: CompletableDeferred<Outcome<Unit>>): Outcome<Unit> {
+        val track = AudioTrack.Builder()
+            .setAudioAttributes(speechAttributes)
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                    .setSampleRate(sampleRateHz)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                    .build()
+            )
+            .setTransferMode(AudioTrack.MODE_STATIC)
+            .setBufferSizeInBytes(pcm.size * Float.SIZE_BYTES)
+            .build()
+        current = Playback(track, done)
+        try {
+            val written = track.write(pcm, 0, pcm.size, AudioTrack.WRITE_BLOCKING)
+            if (written != pcm.size) {
+                return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "AudioTrack took $written of ${pcm.size} samples")
+            }
+            track.setNotificationMarkerPosition(pcm.size)
+            track.setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
+                override fun onMarkerReached(t: AudioTrack) { done.complete(Outcome.Ok(Unit)) }
+                override fun onPeriodicNotification(t: AudioTrack) = Unit
+            }, Handler(Looper.getMainLooper()))
+            track.play()
+            val lengthMs = pcm.size * 1000L / sampleRateHz
+            return withTimeoutOrNull(lengthMs + 1_000) { done.await() } ?: Outcome.Ok(Unit)
+        } finally {
+            current = null
+            runCatching { track.pause() }
+            track.release()
         }
     }
 
