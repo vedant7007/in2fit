@@ -23,3 +23,9 @@ local.properties
 
 # Downloaded source data and model weights. Never committed.
 /data-sources/
+
+# Prebuilt llama.cpp libraries. Produced by tools/5-build-llama-android.ps1 from the vendored
+# llama.cpp tree, ~53 MB, so they are not committed. A fresh clone runs that script before
+# assembling. The headers beside them in app/src/main/cpp/include ARE committed, because the JNI
+# shim will not compile without them and they are small.
+app/src/main/jniLibs/

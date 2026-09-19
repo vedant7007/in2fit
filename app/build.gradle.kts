@@ -38,6 +38,15 @@ android {
     // Pinned so a different machine cannot silently build against a different NDK.
     ndkVersion = "28.2.13676358"
 
+    // The JNI shim only. llama.cpp itself is prebuilt into app/src/main/jniLibs by
+    // tools/5-build-llama-android.ps1; see app/src/main/cpp/CMakeLists.txt for why.
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
     flavorDimensions += "delivery"
     productFlavors {
         create("demo") {
