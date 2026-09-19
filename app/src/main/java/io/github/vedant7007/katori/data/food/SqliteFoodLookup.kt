@@ -103,8 +103,15 @@ class SqliteFoodLookup(
         val u = FoodTextMatching.normalise(unit)
         if (u.isEmpty()) return Outcome.Unavailable(UnavailableReason.INPUT_NOT_USABLE)
 
-        // Grams and millilitres are not household units and need no table.
+        // Grams are the unit the database is in, so there is nothing to convert.
         GRAM_SYNONYMS[u]?.let { return Outcome.Ok(GramWeight(it, false, DataSource.USER_PROVIDED)) }
+
+        // Millilitres are converted at a density of 1.0, which is a SHIPPED DEFAULT and is
+        // flagged as one: oil is about 0.92 g/ml, so a spoken volume of oil taken as grams is
+        // ~8% off, and a figure that far off must not reach GOOD. The flag attaches
+        // HOUSEHOLD_UNIT_DEFAULT downstream, capping it at APPROXIMATE and showing the assumed
+        // grams for correction. A per-class density would need a sourced table; there is none.
+        VOLUME_SYNONYMS[u]?.let { return Outcome.Ok(GramWeight(it, true, DataSource.USER_PROVIDED)) }
 
         val row = db.query(
             "SELECT grams FROM unit_conversions WHERE unit = ? AND food_class = ?",
@@ -357,8 +364,12 @@ class SqliteFoodLookup(
 
         val GRAM_SYNONYMS = mapOf(
             "g" to 1.0, "gram" to 1.0, "grams" to 1.0, "gm" to 1.0,
-            "ml" to 1.0, "millilitre" to 1.0, "milliliter" to 1.0,
             "kg" to 1000.0, "kilo" to 1000.0, "kilogram" to 1000.0,
+        )
+
+        /** Grams per unit AT DENSITY 1.0. See resolveUnit for why this is a default. */
+        val VOLUME_SYNONYMS = mapOf(
+            "ml" to 1.0, "millilitre" to 1.0, "milliliter" to 1.0,
             "l" to 1000.0, "litre" to 1000.0, "liter" to 1000.0,
         )
     }

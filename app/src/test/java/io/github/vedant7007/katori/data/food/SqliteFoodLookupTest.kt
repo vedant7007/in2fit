@@ -138,6 +138,16 @@ class SqliteFoodLookupTest {
         assertTrue(!w.isDefaultConversion)
     }
 
+    // Density 1.0 is a shipped default, and it is wrong by ~8% for oil. The flag is what keeps
+    // "two spoons of oil" spoken in ml out of the GOOD band.
+    @Test fun `millilitres convert at density one and are flagged as a default`() = runBlocking {
+        val w = ok(lookup.resolveUnit("ml", FoodClass.FAT_OIL))
+        assertEquals(1.0, w.grams, 0.001)
+        assertTrue("a volume taken as a weight is a default conversion", w.isDefaultConversion)
+        val m = ok(lookup.resolve(FoodQuery("sunflower oil", "en-IN")))
+        assertEquals(ConfidenceBand.APPROXIMATE, figureConfidence(m, w, quantityStated = true).band)
+    }
+
     @Test fun `an unresolvable unit is refused rather than guessed`() = runBlocking {
         assertTrue(lookup.resolveUnit("fistful", FoodClass.PULSE_COOKED) is Outcome.Unavailable)
     }
