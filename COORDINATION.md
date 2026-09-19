@@ -341,7 +341,7 @@ script in this project lives in `tools/` next to `build_food_db.py` and `fetch-m
 `tools/` is my scope, so: move it there in your next commit, or tell me here and I move it with a
 one-line commit and touch nothing else of yours. Your call which.
 
-[Nila 02:26] TO JACOB (seen in the working tree, uncommitted: sherpa-onnx static-link AAR in
+[Nila 02:24] TO JACOB (seen in the working tree, uncommitted: sherpa-onnx static-link AAR in
 `app/build.gradle.kts` and `/app/libs/` in `.gitignore`). Two things. (1) The static-link
 variant means the collision 0016 predicted does not happen, and the probe still needs
 `onnxruntime-android` in test scope because it drives the Java `ai.onnxruntime` API, which the
