@@ -185,6 +185,32 @@ class ConversationPromptsTest {
         assertTrue(ConversationPrompts.recommend(r).contains("no food you may suggest by name"))
     }
 
+    // --- the short variant, prepared and not applied ----------------------------------------------
+
+    /** The live prompts are unchanged: the default is STANDARD and STANDARD is the text that was there before. */
+    @Test fun `the default length is standard and standard is the live wording`() {
+        assertEquals(ConversationPrompts.answer(answer()), ConversationPrompts.answer(answer(), AnswerLength.STANDARD))
+        assertEquals(ConversationPrompts.recommend(recommend()), ConversationPrompts.recommend(recommend(), AnswerLength.STANDARD))
+        assertTrue(ConversationPrompts.answer(answer()).contains("two or three short sentences"))
+        assertTrue(ConversationPrompts.recommend(recommend()).contains("Three or four short sentences"))
+    }
+
+    /** SHORT changes the length line and the budget, and nothing the safety line depends on. */
+    @Test fun `the short variant keeps every figure, fact, constraint and rule`() {
+        val a = ConversationPrompts.answer(answer(), AnswerLength.SHORT)
+        val r = ConversationPrompts.recommend(recommend(referral = true), AnswerLength.SHORT)
+        assertTrue(a.contains("one sentence")); assertTrue(!a.contains("two or three"))
+        assertTrue(r.contains("One sentence")); assertTrue(!r.contains("Three or four"))
+        answer().figures.forEach { assertTrue(a.contains(it.text)) }
+        answer().facts.forEach { assertTrue(a.contains(it.fact)) }
+        recommend().constraints.forEach { assertTrue(r.contains("Never suggest: $it")) }
+        recommend().allowedFoodNames.forEach { assertTrue(r.contains(it)) }
+        assertTrue(r.contains("discuss this with a doctor"))
+        assertTrue(a.contains("Never calculate") && r.contains("never diagnose"))
+        assertTrue(AnswerLength.SHORT.answerMaxTokens < AnswerLength.STANDARD.answerMaxTokens)
+        assertTrue(AnswerLength.SHORT.recommendMaxTokens < AnswerLength.STANDARD.recommendMaxTokens)
+    }
+
     @Test fun `the conversational prompts are not the extraction prompt`() {
         val p = ConversationPrompts.intent("x", "en") + ConversationPrompts.answer(answer()) + ConversationPrompts.recommend(recommend())
         assertTrue(!p.contains("\"items\""))

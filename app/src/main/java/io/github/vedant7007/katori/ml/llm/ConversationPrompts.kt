@@ -84,14 +84,14 @@ internal object ConversationPrompts {
      * logged and what their last report said, not from a generic paragraph. The condition rule is
      * the same as RECOMMEND's: only what they told us, in their words.
      */
-    fun answer(request: AnswerRequest): String {
+    fun answer(request: AnswerRequest, length: AnswerLength = AnswerLength.STANDARD): String {
         val system = """
             You answer a person's question about their food diary or about nutrition. Use only what is listed below.
 
             Rules:
             - Use ONLY the figures and facts given, with numbers exactly as written. Never calculate, total, convert or estimate. If the answer needs a figure that is not listed, say you do not have that figure.
             - Say what the data shows. You may mention only the conditions they have told us about, in their words. Never suggest they have any other condition, never diagnose, never tell them to take, stop or change any medicine or supplement.
-            - Plain words, two or three short sentences. No greeting, no sign-off, no markdown, no list.
+            - Plain words, ${length.answerRule} No greeting, no sign-off, no markdown, no list.
         """.trimIndent()
 
         val user = buildString {
@@ -139,7 +139,7 @@ internal object ConversationPrompts {
      * food to land on. The model picks from the list and explains; it does not invent a food
      * (spec 4.3), and the UI renders suggestions from the list, not from the prose.
      */
-    fun recommend(request: RecommendRequest): String {
+    fun recommend(request: RecommendRequest, length: AnswerLength = AnswerLength.STANDARD): String {
         val system = """
             You help a person choose what to eat, using only the facts and foods listed below.
 
@@ -148,7 +148,7 @@ internal object ConversationPrompts {
             - Suggest only foods from the allowed list. Explain briefly why, from the facts.
             - You may mention only the conditions they have told us about, in their words. Never suggest they have any other condition, never diagnose, never tell them to take, stop or change a medicine or supplement. If a report line is given, repeat it only as written.
             - Respect every "never suggest" line without exception.
-            - Be encouraging and practical. Three or four short sentences. No greeting, no sign-off, no markdown, no list.
+            - Be encouraging and practical. ${length.recommendRule} No greeting, no sign-off, no markdown, no list.
         """.trimIndent()
 
         val user = buildString {
@@ -223,10 +223,38 @@ internal object ConversationPrompts {
     const val INTENT_MAX_TOKENS = 4
     val INTENT_STOPS = listOf("\n", "</s>", "<|im_end|>")
 
-    /** Generation budgets for [answer] and [recommend]. Three or four sentences; the prompt asks for fewer. */
+    /** Generation budgets for [answer] and [recommend] at [AnswerLength.STANDARD]. Three or four sentences; the prompt asks for fewer. */
     const val ANSWER_MAX_TOKENS = 120
     const val RECOMMEND_MAX_TOKENS = 160
     val CONVERSATION_STOPS = listOf("\n\n", "</s>", "<|im_end|>")
+}
+
+/**
+ * How long an ANSWER or RECOMMEND may be. PREPARED, NOT APPLIED: every caller defaults to
+ * [STANDARD] and the standard prompt text is unchanged. [SHORT] exists so that when the first
+ * measured conversational turn lands (nothing conversational has been timed; extraction's 55
+ * generated tokens cost 6 s at 9 tok/s, `0014`, and a 200-token answer would be about 22 s of
+ * generation before the prompt) the response is running `AnswerScorerTest`'s cases against the
+ * short prompt on the phone, not opening a design discussion. Switching is one argument at the
+ * call site, and the scorer's criteria are the correctness cases the short answer must still
+ * meet: the figure quoted, the allowed food named, the person's context used, nothing judged.
+ */
+enum class AnswerLength(
+    /** The length line of the ANSWER prompt. */
+    val answerRule: String,
+    /** The length line of the RECOMMEND prompt. */
+    val recommendRule: String,
+    val answerMaxTokens: Int,
+    val recommendMaxTokens: Int,
+) {
+    STANDARD("two or three short sentences.", "Three or four short sentences.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
+
+    /**
+     * One sentence, one figure or one food. The prompt asks for the single most useful thing;
+     * the token cap is the backstop, set so a runaway answer is cut at roughly the length of one
+     * long sentence rather than three.
+     */
+    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twenty words: the one food to add and why.", 48, 56),
 }
 
 /** The four conversational intents of `0015`. Capture-shaped intents (scan, correct) are not spoken and are not routed here. */
