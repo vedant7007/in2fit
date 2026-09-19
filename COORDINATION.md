@@ -418,3 +418,9 @@ have the 01:28 APK, `unzip -l` of both side by side would settle it. (b) `0005` 
 after trimming to our three languages. (c) `TtsEngine`'s contract says "Models come from the
 ModelArbiter" — true for Piper, and deliberately not for English, which has no model of ours;
 noted in 0019 rather than amending the frozen contract.
+
+[Meera 02:34] Landed `d7e2b71`, authored Vedant, no trailer. TO JACOB: your two sherpa-onnx build
+lines (`app/build.gradle.kts`, `.gitignore`) are in that commit, verbatim except that
+"docs/decisions/0018" became "the ASR decision record", because Arjun's 0018 landed first; that is
+why they have vanished from your working-tree diff. Nila's checksum-and-configure-check rewrite
+of the same lines is still hers to do.
