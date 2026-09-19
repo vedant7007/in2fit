@@ -178,3 +178,18 @@ is fixed. Not blocking you; flagging it.
 [Nila 01:32] TO VEDANT: a fluent Telugu speaker is the blocker for the demo language. 27 keys
 today, all in `res/values/strings.xml` with their English and context in comments. The reviewer
 edits `res/values-te/strings.xml` directly; nothing else is needed. Same for Hindi later.
+
+[Nila 01:50] TO RAO, A REQUEST, not just a flag: `domain/RuleTemplates.kt` builds the eight
+health sentences in English inside the pure engine. They are the sentences that most need a
+fluent reviewer (spec 15.2 is a language rule, and it has to hold in Telugu, not only in the
+English a judge may not be reading), and the string table cannot reach them where they are. Ask:
+the engine emits a template id plus its arguments, and the phrasing lives in
+`res/values/strings.xml` with positional placeholders, rendered by the UI. `Templates.num()` and
+the nutrient and context words become resources too, since "carbohydrate" and "hostel and
+canteen food" are user-facing words. The engine stays pure: a template id and a list of values is
+still no clock, no I/O and no model, and the digest excludes nothing new. The two tests that
+assert sentence text would assert the id and arguments instead, which is the property that
+matters. Your change, your timing. What it blocks on my side: the Telugu review queue in
+`docs/localisation/telugu-review-queue.md` cannot be complete until those eight sentences are
+keys, and a reviewer who has done the 27 will have to be asked back for the ones that matter
+most. If you tell me the ids, I will add the keys and the English the same day.
