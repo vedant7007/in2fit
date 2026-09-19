@@ -249,3 +249,81 @@ the shared tree, 02:57: **66,889,734 bytes**, sha256
 `28c2a1d7fb15ed825ad935334c1103db082cdc6d065c0c25c854b86807221797`, 813 entries, 81,626 bytes of
 slack, `lib/arm64-v8a/libsherpa-onnx-jni.so` 24,169,352 stored. Any APK figure quoted from now
 on says whether it was a clean package.
+
+---
+
+## Addendum 2, 20 September 2026, 03:40: Vedant's pick, and what it survives
+
+Vedant listened and picked `te-pocket-tts-syspin_female-int4` on the author's own passage. Treated
+as a direction, not a verdict: that WAV is the author's curated demo, not our pipeline, and it is a
+passage where every other candidate was a food-name list. Three checks were run in the order
+that costs least. The platform-voice probe (Rao's run) is still first in importance and still
+not run.
+
+### The licence chain, to `0005`'s standard: it does not hold from here
+
+| link | what it says | verified? |
+| --- | --- | --- |
+| Kyutai `pocket-tts` (architecture, codec, recipe) | MIT | yes, GitHub licence field `MIT` |
+| `prasadvittaldev/pocket-tts-telugu-female-syspin` weights | "MIT, matching upstream pocket-tts. The training corpora carry their own licences — check the dataset pages above before commercial use." | the claim is the author's own, and the author defers on the data |
+| training corpus 1, `SPRINGLab/IndicTTS_Telugu` (IIT Madras Indic TTS) | "subject to the original Indic TTS license terms … `https://www.iitm.ac.in/donlab/indictts/downloads/license.pdf`" | **NO.** The PDF returns nothing from here (http 000, and a 302 to nothing over http), exactly the block that excluded `te_IN-maya` and `hi_IN-rohan` in `0005`. A third party's paper calls it "CC-BY-4.0 or similar"; hearsay, not the text |
+| training corpus 2, `arpit-tiwari/syspin-telugu-tts` (a re-upload of SYSPIN, IISc) | no licence field, no README text | **NO.** SYSPIN's own site is script-rendered and unreadable from here; SYSPIN's HF org lists only LIMMITS few-shot samples, CC-BY-4.0, which is not this corpus |
+
+The student was distilled on the SYSPIN speaker alone, but its teacher was trained on both corpora,
+so both are in the chain. `0005`'s rule is verbatim or it does not ship, and there is no verbatim
+text for either corpus. What would close it: Vedant opening the IITM PDF from an Indian
+connection and pasting its terms (which would also settle `maya` and `rohan`), and the SYSPIN
+dataset page's licence line. If IndicTTS turns out non-commercial, the register takes it; if it
+stays unreadable, this voice does not ship, whatever it sounds like.
+
+### Reproducibility: our text through the model, on the laptop
+
+Kyutai's `pocket_tts` 3.1.0 runtime, the 4-bit weights unpacked to fp16 as the card instructs,
+`--quantize` (int8 dynamic), CPU:
+
+| text | audio | synthesis | desktop RTF |
+| --- | ---: | ---: | ---: |
+| A, the two words the listeners heard | 1.68 s | 1.5 s | 0.91 |
+| B, five food names | 4.32 s | 3.5 s | 0.81 |
+| the card's own example sentence | 5.92 s | 4.9 s | 0.83 |
+
+So the voice reproduces on text it was not demoed on, and those three files
+(`logs/tts-candidates/te-pocket-tts-syspin_female-int4-OURS-*.wav`) are what the listeners
+should judge, not the demo passage. RTF 0.8-0.9 on an x86 laptop against the card's claimed 0.18
+is not a phone number, but it is the wrong side of real time before the phone's two A76 cores are
+in the picture: an LM-based 110M-parameter model synthesising a four-second confirmation could
+take longer than the confirmation itself, on top of `0014`'s 10.7 s extraction.
+
+### The Android path does not work as-is
+
+sherpa-onnx 1.13.8 has a Pocket TTS runtime, and the fine-tune ships ONNX graphs with the same
+five roles (`flow_lm_flow`, `flow_lm_main`, `mimi_encoder`, `mimi_decoder`, `text_conditioner`)
+plus a SentencePiece model that sherpa's `convert_tokenizer.py` turns into `vocab.json` and
+`token_scores.json`. It loads (`validate` true, 24 kHz, one speaker; sherpa also warns the
+tokenizer lacks byte-fallback tokens) and needs the voice prompt as `reference_audio`. The output
+is wrong: 8.43 s of audio for the two-word text with 2.55 s voiced, 15.11 s for text B, at desktop
+RTF 5.4-5.7. Measured, not listened to; the files are in `not-for-listening/` as evidence.
+Whether that is the int4 `MatMulNBits` graphs, the fine-tune's `bos_before_voice` convention, or
+sherpa's stop criterion is not established and is not guessed here. Shipping this voice therefore
+means either fixing that path (open, uncertain) or a second native runtime on the phone, which
+is a cost this project has refused twice.
+
+### Where that leaves the choice
+
+1. The platform voice, if the phone has one offline: no file, no licence, no runtime. Still the
+   first answer to get.
+2. Piper (`padmavathi` / `venkatesh`): licence clean, runtime shipped, phone cost known to be
+   small; the listeners' verdict on it stands until they hear a real sentence.
+3. pocket-tts Telugu: the voice the listener preferred, reproducible on the desktop, with an
+   unverifiable licence chain and no working Android path today.
+
+The next input that moves any of this is the natural Telugu sentence from the listeners; every
+surviving candidate, including the platform voice from the probe, gets re-rendered on it and the
+set goes back for ranking.
+
+### Rao's loader change
+
+`FamilyModelLoader` (`domain/ModelArbiterSeams.kt`) replaces the "one branch in
+`LlamaCppModelLoader`" instruction in step 2 above: the TTS entry is
+`ModelFamily.TTS to PiperVoiceLoader(modelsDir, espeakDataDir)` in that map. Nothing in `ml/tts`
+changes for it.

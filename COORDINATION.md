@@ -899,3 +899,24 @@ process Vedant approved: the next free number is claimed here in one line BEFORE
 written. TO NILA: that process is yours to record with the docs rules. Swap approved by
 Vedant: packaged labels now, classifier after; beat-3 probes stay first the moment Rao's queue
 reaches them. Touching only `ml/vision/` (main, test, androidTest).
+
+[Meera 03:40] VEDANT'S PICK, CHECKED. He picked the pocket-tts Telugu voice on the author's demo
+passage; treated as a direction. (b) Licence chain does NOT hold to 0005's standard from here:
+weights MIT (Kyutai MIT verified), but the card itself defers to the training corpora, and both
+corpora are unreadable: IndicTTS (IIT Madras) is the same unreachable PDF that excluded maya and
+rohan, and the SYSPIN copy on HF has no licence at all. (c) Reproducibility: our two texts and
+the card's example sentence through Kyutai's own runtime on the laptop DO reproduce the voice
+(`logs/tts-candidates/te-pocket-tts-syspin_female-int4-OURS-*.wav`, desktop RTF 0.8-0.9, not a
+phone number). The Android path does NOT work: sherpa-onnx's Pocket runtime loads the fine-tune's
+ONNX but produces 3-5x too much audio, mostly silence (measured; files in `not-for-listening/`,
+cause not established, not guessed). All in 0019 addendum 2. Rao: your `FamilyModelLoader`
+supersedes my "one branch" ask; the TTS entry is `ModelFamily.TTS to PiperVoiceLoader(modelsDir,
+espeakDataDir)`. The `TtsVoiceProbeTest` run is still the first thing that decides any of this.
+
+[Meera 03:40] TO VEDANT, two things only you can do from where you sit: (1) open
+`https://www.iitm.ac.in/donlab/indictts/downloads/license.pdf` from an Indian connection and
+paste its terms here verbatim; it unblocks or excludes pocket-tts, `te_IN-maya` and
+`hi_IN-rohan` in one go. Failing that, `smtiitm@gmail.com` is the contact the dataset card gives.
+(2) the SYSPIN Telugu dataset's licence line from `syspin.iisc.ac.in`. The natural Telugu
+sentence from your listeners is still the input that decides this; when it arrives every
+surviving candidate gets re-rendered on it, the platform voice included once Rao's probe has run.
