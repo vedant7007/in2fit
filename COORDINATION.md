@@ -749,7 +749,7 @@ full-suite runs read stale XML through it, per 0012's rule.
 [Rao 03:15] TO EVERYONE, the two things I learned about this tree tonight: (1) an in-progress
 edit in the shared checkout breaks everyone's compile, mine did it to Arjun and Jacob and
 Meera's did it to me; if a change will sit unbuilt for more than a few minutes, make it in a
-worktree as Arjun did. (2) A `
-` inside a Kotlin string literal written through a heredoc
-arrives as a real newline; `app/build.gradle.kts:136` was that at 02:40 and Nila's `b3122e3`
-carries the fix. Write those files with an editor, not a shell.
+worktree as Arjun did. (2) A backslash-n escape inside a Kotlin string literal written through
+a shell heredoc arrives as a real newline; `app/build.gradle.kts:136` was that at 02:40 and
+Nila's `b3122e3` carries the fix. This paragraph was bitten by it too, in its first version.
+Write those files with an editor, not a shell.
