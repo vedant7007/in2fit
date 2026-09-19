@@ -15,10 +15,18 @@ Same device, same three model files, same probe, one build change between them.
 
 Ceiling in the first three rows is the provisional one the probe printed: half of the device's
 7,619.4 MB, so 3,809.7 MB. The fourth row is against the ceiling the arbiter calibrates for
-itself (`DefaultModelArbiter`, `0c20de3`): **4,190.7 MB on this device**, the 55% cap being the
-binding term because this OEM's low-memory threshold is small. That figure and the LLM-only peak
-are the first two rows in the on-device measurement log, `katori-memory-measurements.tsv`, which
-is append-only and is where every subsequent row goes.
+itself (`DefaultModelArbiter`, `0c20de3`): **4,190.7 MB on this device**. That figure and the
+LLM-only peak are the first two rows in the on-device measurement log,
+`katori-memory-measurements.tsv`, which is append-only and is where every subsequent row goes.
+
+**What that calibration did and did not validate, precisely.** The ceiling is
+`min(total − 3·threshold − baseline, 0.55·total)`. On this phone the derived term is about
+6,206 MB and the cap is 4,190.7 MB, so **the cap was the binding term and the cap is what the
+device exercised.** The derived term — the low-memory-threshold arithmetic that is the actual
+measured part of the formula — produced a number, but that number was never the ceiling and
+nothing depended on it. It is unexercised on this hardware. A device with a larger threshold
+relative to its RAM would be the first to exercise it, and until one does, "the formula was
+validated" is not a sentence this record supports.
 
 The fourth row is not directly comparable with the third: it is one model through the arbiter's
 loader, not three through raw ONNX sessions. The ASR and TTS families have no runtime bound yet,

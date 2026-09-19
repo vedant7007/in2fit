@@ -279,9 +279,44 @@ data class RankedCandidate(
  */
 data class TriggerStatement(
     val ruleId: RuleId,
-    val text: String,
+    /** WHICH sentence. The words live in the string table, in the user's language, not here. */
+    val template: TriggerTemplate,
+    /** The arguments. Every number and date the sentence cites comes from this and nowhere else. */
     val evidence: Evidence,
 )
+
+/**
+ * The eight sentences the rules engine can ask for, by identity rather than by wording.
+ *
+ * WHY AN ENUM AND NOT A STRING. The engine is pure and knows no locale, and the sentences it
+ * chooses are the health sentences, the ones that most need a fluent Telugu reviewer. English
+ * inside the engine could never be localised at all. So the engine says which sentence and hands
+ * over the evidence; [TriggerText] puts the words around it from the string table.
+ *
+ * One string-table key per constant, `trigger_<name lowercased>`, the same rule `0017` applies to
+ * [io.github.vedant7007.katori.domain.model.ConfidenceReason]. A constant with no key is a bug.
+ *
+ * Changing what a template MEANS is a health-safety change and goes through review. The wording
+ * in each language is reviewed by a speaker of that language; this list is reviewed here.
+ */
+enum class TriggerTemplate {
+    /** Far outside the printed range, above it. Referral is mandatory alongside whatever else. */
+    ESCALATE_ABOVE_RANGE,
+    /** Far outside the printed range, below it. */
+    ESCALATE_BELOW_RANGE,
+    /** Above the printed range; ranking adjusted. */
+    LAB_ABOVE_RANGE,
+    /** Below the printed range; ranking adjusted. */
+    LAB_BELOW_RANGE,
+    /** The user declared a condition themselves, so it may be named back to them. */
+    DECLARED_CONDITION,
+    /** One item dominates a nutrient in this meal. */
+    MEAL_COMPOSITION,
+    /** Suggestions limited by what this life context can obtain and cook. */
+    LIFE_CONTEXT,
+    /** A pattern across days. */
+    TIMELINE,
+}
 
 // --- supporting value types -------------------------------------------------------------------
 

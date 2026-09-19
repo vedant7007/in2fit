@@ -16,6 +16,16 @@ import java.time.LocalDate
  */
 class RulesEngineTest {
 
+    /**
+     * The engine emits a template id and evidence, never words. These tests check the WORDS,
+     * because the safety rules (no undeclared disease named, the printed range cited, the referral
+     * present) are properties of the sentence a person reads, so they are asserted on the rendered
+     * English defaults. A locale file is reviewed by a speaker; this is what it is reviewed against.
+     */
+    private val words = TriggerText(TriggerText.ENGLISH)
+    private fun RuleEvaluation.triggerText(): String? = trigger?.let { words.render(it) }
+
+
     private val engine = DefaultRulesEngine()
 
     private fun candidate(code: String, vararg n: Pair<Nutrient, Double>) = CandidateFood(
@@ -96,7 +106,8 @@ class RulesEngineTest {
         assertTrue(r.firedRules.all { it.severity == Severity.ESCALATE })
         assertTrue("escalation must not carry swaps", r.rankedCandidates.isEmpty())
         assertTrue("escalation must not carry constraints", r.constraints.isEmpty())
-        assertTrue(r.trigger!!.text.contains("worth showing to a doctor"))
+        assertEquals(TriggerTemplate.ESCALATE_ABOVE_RANGE, r.trigger!!.template)
+        assertTrue(r.triggerText()!!.contains("worth showing to a doctor"))
     }
 
     @Test
@@ -108,7 +119,7 @@ class RulesEngineTest {
             engine.evaluate(input(labs = listOf(glucoseAbove(260.0)))),
             engine.evaluate(input(labs = listOf(LabValue("Haemoglobin", 9.0, "g/dL", 13.0, 17.0, LocalDate.parse("2026-09-12"))))),
             engine.evaluate(input(labs = listOf(LabValue("Vitamin B12", 140.0, "pg/mL", 200.0, 900.0, LocalDate.parse("2026-09-12"))))),
-        ).mapNotNull { it.trigger?.text }
+        ).mapNotNull { it.triggerText() }
 
         assertTrue("expected some trigger sentences to check", outputs.isNotEmpty())
         outputs.forEach { text ->
@@ -121,7 +132,8 @@ class RulesEngineTest {
     @Test
     fun `a declared condition may be named back to the user because they said it`() {
         val r = engine.evaluate(input(conditions = listOf(DeclaredCondition("Diabetes", ConditionSource.USER_DECLARED))))
-        assertTrue(r.trigger!!.text.contains("you told us", ignoreCase = true))
+        assertEquals(TriggerTemplate.DECLARED_CONDITION, r.trigger!!.template)
+        assertTrue(r.triggerText()!!.contains("you told us", ignoreCase = true))
     }
 
     @Test
@@ -198,7 +210,8 @@ class RulesEngineTest {
             "ranking must reflect the fired constraint, got \$order",
             order.indexOf("sprouts") < order.indexOf("white_rice"),
         )
-        val t = after.trigger!!.text
+        assertEquals(TriggerTemplate.LAB_ABOVE_RANGE, after.trigger!!.template)
+        val t = after.triggerText()!!
         assertTrue("the trigger must cite the report date", t.contains("2026-09-12"))
         assertTrue("the trigger must cite the printed range", t.contains("100"))
         assertTrue("the trigger must cite the value", t.contains("142"))
@@ -246,4 +259,56 @@ class RulesEngineTest {
         assertTrue(r.rankedCandidates.isEmpty())
         assertTrue(r.firedRules.all { it.severity == Severity.ESCALATE })
     }
+
+    // --- the rendered sentences ---------------------------------------------------------------
+
+    /**
+     * Every template renders, and no rendered sentence carries a digit the evidence did not
+     * supply. The second half is the property NumericGuard relies on when the sentence is handed
+     * to the model as a permitted source of figures: a template that smuggled in a number of its
+     * own would licence that number in generated prose. This runs against the English defaults;
+     * a locale file needs the same check against its own wording.
+     */
+    @Test
+    fun `every template renders and cites only the evidence's own numbers`() {
+        val lab = Evidence.LabValueOutsideRange("Glucose", 142.0, "mg/dL", 70.0, 100.0, LocalDate.parse("2026-09-12"))
+        val low = Evidence.LabValueOutsideRange("Haemoglobin", 9.8, "g/dL", 12.0, 15.0, LocalDate.parse("2026-09-12"))
+        val samples = mapOf(
+            TriggerTemplate.ESCALATE_ABOVE_RANGE to lab,
+            TriggerTemplate.ESCALATE_BELOW_RANGE to low,
+            TriggerTemplate.LAB_ABOVE_RANGE to lab,
+            TriggerTemplate.LAB_BELOW_RANGE to low,
+            TriggerTemplate.DECLARED_CONDITION to Evidence.UserDeclaredCondition(DeclaredCondition("Diabetes", ConditionSource.USER_DECLARED)),
+            TriggerTemplate.MEAL_COMPOSITION to Evidence.MealComposition(nutrient = Nutrient.CARBOHYDRATE, shareOfMeal = 0.62, dominantItem = "white rice"),
+            TriggerTemplate.LIFE_CONTEXT to Evidence.ProfileContext(LifeContext.HOSTEL_STUDENT),
+            TriggerTemplate.TIMELINE to Evidence.TimelinePattern(description = "iron has been low on most days", daysObserved = 7),
+        )
+        assertEquals("every template needs a sample here", TriggerTemplate.values().toSet(), samples.keys)
+
+        val digits = Regex("""\d+(?:\.\d+)?""")
+        samples.forEach { (template, evidence) ->
+            val text = words.render(TriggerStatement(RuleIds.LAB_ABOVE_RANGE, template, evidence))
+            assertTrue("$template rendered empty", text.isNotBlank())
+            val supplied = evidenceNumbers(evidence)
+            digits.findAll(text).map { it.value }.forEach { n ->
+                assertTrue(
+                    "$template cites '$n', which is not in the evidence $supplied: $text",
+                    n in supplied,
+                )
+            }
+        }
+    }
+
+    /** Every number the evidence could legitimately put in a sentence, as the renderer formats it. */
+    private fun evidenceNumbers(e: Evidence): Set<String> = when (e) {
+        is Evidence.LabValueOutsideRange -> setOfNotNull(
+            e.value, e.referenceLow, e.referenceHigh,
+        ).flatMap { v -> listOf(v.toString(), v.toLong().toString(), String.format("%.1f", v)) }.toSet() +
+            e.reportDate.toString().split("-").toSet() + e.reportDate.toString()
+        is Evidence.MealComposition -> setOf((e.shareOfMeal * 100).toInt().toString())
+        is Evidence.TimelinePattern -> setOf(e.daysObserved.toString()) +
+            Regex("""\d+""").findAll(e.description).map { it.value }.toSet()
+        is Evidence.UserDeclaredCondition, is Evidence.ProfileContext -> emptySet()
+    }
+
 }

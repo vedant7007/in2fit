@@ -1,11 +1,16 @@
 package io.github.vedant7007.katori.ml.llm
 
 /**
- * The two prompts, and there are only two.
+ * The two prompts of the two-path contract: extraction and phrasing.
  *
  * SEPARATE ON PURPOSE (spec 11.6). One prompt doing both extraction and explanation degrades
  * both: the extraction half starts writing prose and the explanation half starts emitting JSON.
  * They share nothing here but the chat template.
+ *
+ * `docs/decisions/0015` adds a third path, composed from knowledge rows rather than from an
+ * already-decided result. Its prompts (intent routing, ANSWER, RECOMMEND) live in
+ * [ConversationPrompts] and share only [chat] with this file, for the same reason: the shapes
+ * must not bleed into each other.
  *
  * WHAT THE PHRASING PROMPT IS NOT ALLOWED TO CONTAIN. No typed numbers. Figures arrive as finished
  * display strings and go into the prompt as those strings. There is nothing numeric in the
@@ -20,7 +25,8 @@ internal object Prompts {
     private const val IM_START = "<|im_start|>"
     private const val IM_END = "<|im_end|>"
 
-    private fun chat(system: String, user: String): String = buildString {
+    /** The Qwen 2.5 chat envelope. Internal so [ConversationPrompts] reuses the markers rather than copying them. */
+    internal fun chat(system: String, user: String): String = buildString {
         append(IM_START).append("system\n").append(system).append(IM_END).append('\n')
         append(IM_START).append("user\n").append(user).append(IM_END).append('\n')
         append(IM_START).append("assistant\n")
@@ -134,8 +140,8 @@ internal object Prompts {
                 request.figures.forEach { append("- ").append(it.text).append('\n') }
                 append('\n')
             }
-            request.evaluation.trigger?.let {
-                append("What changed and why:\n").append(it.text).append("\n\n")
+            request.triggerText?.let {
+                append("What changed and why:\n").append(it).append("\n\n")
             }
             if (request.allowedFoodNames.isNotEmpty()) {
                 append("Foods you may suggest, and no others:\n")

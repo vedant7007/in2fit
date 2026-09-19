@@ -84,6 +84,13 @@ data class ExtractedItem(
 
 data class PhrasingRequest(
     val evaluation: RuleEvaluation,
+    /**
+     * The trigger sentence, ALREADY RENDERED in the user's language by `TriggerText` from the
+     * string table. The engine emits a template id and evidence, not words, so the caller renders
+     * before phrasing. Null when nothing fired. Every number in it came from the evidence, which
+     * is why the numeric guard is allowed to permit exactly its figures.
+     */
+    val triggerText: String?,
     /** Figures as strings, already formatted with units. The model cannot do arithmetic on these. */
     val figures: List<DisplayFigure>,
     val languageTag: String,

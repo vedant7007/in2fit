@@ -4,6 +4,7 @@ import io.github.vedant7007.katori.domain.RuleEvaluation
 import io.github.vedant7007.katori.domain.RuleId
 import io.github.vedant7007.katori.domain.RuleIds
 import io.github.vedant7007.katori.domain.TriggerStatement
+import io.github.vedant7007.katori.domain.TriggerTemplate
 import io.github.vedant7007.katori.domain.Evidence
 import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.domain.model.UnavailableReason
@@ -149,7 +150,7 @@ class LlmEngineTest {
 
     private val trigger = TriggerStatement(
         ruleId = RuleIds.LAB_BELOW_RANGE,
-        text = "Your report from 12 September shows haemoglobin at 9.8 g/dL, below the 12.0 printed on it.",
+        template = TriggerTemplate.LAB_BELOW_RANGE,
         evidence = Evidence.LabValueOutsideRange(
             testName = "Haemoglobin", value = 9.8, unit = "g/dL",
             referenceLow = 12.0, referenceHigh = 15.0, reportDate = LocalDate.of(2026, 9, 12),
@@ -164,6 +165,9 @@ class LlmEngineTest {
             trigger = trigger,
             inputDigest = "test",
         ),
+        // Rendered by the caller, in the user's language, before phrasing. The figures in it are
+        // the ones the numeric guard is then allowed to permit.
+        triggerText = "Your report from 12 September shows haemoglobin at 9.8 g/dL, below the 12.0 printed on it.",
         figures = listOf(DisplayFigure("about 320 kcal"), DisplayFigure("2.5 mg iron")),
         languageTag = "te-IN",
         allowedFoodNames = listOf("palak", "thotakura"),

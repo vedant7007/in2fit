@@ -86,7 +86,7 @@ class LlamaCppLlmEngine(
         // because it legitimately carries lab figures the prose may repeat, e.g. "142 mg/dL".
         val permitted = buildList {
             request.figures.forEach { add(it.text) }
-            request.evaluation.trigger?.let { add(it.text) }
+            request.triggerText?.let { add(it) }
             addAll(request.allowedFoodNames)
         }
 

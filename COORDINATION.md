@@ -81,6 +81,27 @@ changed a field. Assert properties.
 
 ---
 
+### THE LAPTOP'S GRADLE IS RAO'S. EVERYONE ELSE BUILDS IN THE CONTAINER.
+
+Six sessions share one working tree and one Gradle daemon, and they serialise on its lock. On
+20 Sep a build sat waiting two minutes for another session's daemon before doing any work. Six
+of those in a row is a session doing nothing for a quarter of an hour.
+
+The rule, effective now:
+
+- **JVM tests and the demo APK build in the cloud container**, per `0009`. It has the SDK,
+  platform 37 and build-tools 37; it runs the 132 tests in about twenty seconds. That is the
+  fast path for every session except one.
+- **The laptop daemon is used by Rao only.** Rao is the only session that needs the NDK (the
+  JNI shim, the llama.cpp rebuild) and the only one that touches the phone. Nothing else on
+  the laptop is faster than the container, and everything else on the laptop contends with the
+  one build that cannot move.
+- A session that genuinely needs the laptop — a native change, a device install — asks in this
+  file first, so two builds never race for the daemon.
+
+`0009` already says the container is a build machine and the laptop is the source of truth.
+This does not change that: edits are still made here, and the container builds a tarball of them.
+
 ### THE PRODUCT CHANGED ON 20 SEPTEMBER. READ `0015` BEFORE THE SPEC.
 
 IN2FIT routes speech to one of four intents — LOG, ANSWER, SUGGEST, RECOMMEND — rather than
@@ -200,3 +221,12 @@ write on; the temporary developer screen is last and marked skippable. Send the 
 back, paste the text into `res/values-te/strings.xml` unchanged under the reviewer's name, and I
 re-run `python tools/make_review_queue.py te` so the count drops. If the reviewer flags an
 English line as unclear, that is a finding about the English, and it comes to me.
+
+[Priya 01:53] Starting. Read HANDOVER, 0015 twice, 0010/0011/0014, 0006, spec §4/11/15/18,
+COORDINATION. Touching, and nobody else should: NEW `data/knowledge/` (package + tests), NEW
+`app/src/main/assets/knowledge/facts.csv`, NEW `ml/llm/ConversationPrompts.kt` (intent classifier,
+ANSWER, RECOMMEND prompts), NEW `data-authoring/intent-test-set.csv`, and ONE line in
+`ml/llm/Prompts.kt` (the private `chat()` template helper becomes internal so the new prompts share
+the Qwen markers rather than copy them; header comment updated to point at 0015). Not touching
+`LlmEngine`, `NumericGuard`, `ExtractionJson`, `domain/`, build files. Nothing wired: the
+Orchestrator is Rao's.

@@ -69,4 +69,47 @@
     <string name="confidence_reason_substitute_food_record">The nearest record is a similar food, not this one.</string>
     <string name="confidence_reason_low_asr_confidence">Speech recognition was unsure of what it heard. Check the words.</string>
     <string name="confidence_reason_uncorrected_camera_guess">A camera guess that has not been confirmed by you.</string>
+
+    <!-- ================================================================================
+         THE RULES ENGINE'S SENTENCES. Added by Rao, 20 Sep; the wording is Nila's to review.
+
+         One key per TriggerTemplate constant, lowercased, the same rule as confidence_reason_*.
+         The engine emits WHICH sentence and the evidence; TriggerText puts these words around
+         it. These are the health sentences: spec 15.1 and 15.2 apply to every one, in every
+         language. Never name a disease the user has not declared. Never prescribe. Cite the
+         range PRINTED ON THEIR OWN REPORT. Hand the decision back.
+
+         Positional arguments, supplied by TriggerText.render in this order. A translation may
+         reorder them; it must not add a number of its own:
+           trigger_escalate_*, trigger_lab_*   %1 report date  %2 test name  %3 value  %4 unit  %5 printed bound
+           trigger_declared_condition          %1 condition name, as the user declared it
+           trigger_meal_composition            %1 nutrient word  %2 dominant item  %3 percent
+           trigger_life_context                %1 life-context phrase
+           trigger_timeline                    %1 days observed  %2 description
+         ================================================================================ -->
+    <string name="trigger_escalate_above_range">Your report from %1$s shows %2$s at %3$s %4$s, well outside the %5$s printed on it. This is worth showing to a doctor.</string>
+    <string name="trigger_escalate_below_range">Your report from %1$s shows %2$s at %3$s %4$s, well outside the %5$s printed on it. This is worth showing to a doctor.</string>
+    <string name="trigger_lab_above_range">Your report from %1$s shows %2$s at %3$s %4$s, above the %5$s printed on it, so suggestions are ranked differently now.</string>
+    <string name="trigger_lab_below_range">Your report from %1$s shows %2$s at %3$s %4$s, below the %5$s printed on it, so suggestions are ranked differently now.</string>
+    <string name="trigger_declared_condition">You told us you are managing %1$s, so suggestions are ranked with that in mind.</string>
+    <string name="trigger_meal_composition">Most of the %1$s in this meal comes from %2$s, about %3$s percent of it.</string>
+    <string name="trigger_life_context">Suggestions are limited to what is realistic for %1$s.</string>
+    <string name="trigger_timeline">Over the last %1$s days, %2$s.</string>
+
+    <!-- Nutrient words, as they appear inside a sentence. One per Nutrient constant. -->
+    <string name="nutrient_energy">energy</string>
+    <string name="nutrient_protein">protein</string>
+    <string name="nutrient_carbohydrate">carbohydrate</string>
+    <string name="nutrient_fat">fat</string>
+    <string name="nutrient_fibre">fibre</string>
+    <string name="nutrient_iron">iron</string>
+    <string name="nutrient_vitamin_b12">vitamin B12</string>
+    <string name="nutrient_sodium">sodium</string>
+
+    <!-- Life-context phrases, as they appear inside trigger_life_context. One per LifeContext. -->
+    <string name="life_context_hostel_student">hostel and canteen food</string>
+    <string name="life_context_pg_own_cooking">cooking for yourself with limited time</string>
+    <string name="life_context_field_or_manual_worker">long physical shifts and eating out</string>
+    <string name="life_context_desk_professional">a desk day with a full kitchen</string>
+    <string name="life_context_homemaker">cooking for the household</string>
 </resources>

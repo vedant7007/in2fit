@@ -86,7 +86,13 @@ class DefaultRulesEngine : RulesEngine {
                 rankedCandidates = emptyList(),
                 trigger = TriggerStatement(
                     ruleId = first.id,
-                    text = Templates.escalate(first.evidence as Evidence.LabValueOutsideRange),
+                    template = (first.evidence as Evidence.LabValueOutsideRange).let { e ->
+                        if (e.referenceHigh != null && e.value > e.referenceHigh) {
+                            TriggerTemplate.ESCALATE_ABOVE_RANGE
+                        } else {
+                            TriggerTemplate.ESCALATE_BELOW_RANGE
+                        }
+                    },
                     evidence = first.evidence,
                 ),
                 inputDigest = digest(input),
@@ -226,14 +232,18 @@ class DefaultRulesEngine : RulesEngine {
             RuleIds.DECLARED_CONDITION, RuleIds.MEAL_NUTRIENT_DOMINANT, RuleIds.LIFE_CONTEXT,
         )
         val chosen = order.firstNotNullOfOrNull { id -> fired.firstOrNull { it.id == id } } ?: return null
-        val text = when (val e = chosen.evidence) {
-            is Evidence.LabValueOutsideRange -> Templates.labOutsideRange(e)
-            is Evidence.UserDeclaredCondition -> Templates.declaredCondition(e)
-            is Evidence.MealComposition -> Templates.mealComposition(e)
-            is Evidence.ProfileContext -> Templates.lifeContext(e)
-            is Evidence.TimelinePattern -> Templates.timeline(e)
+        // WHICH sentence, never the sentence. The engine is pure and knows no locale; the words
+        // come from the string table through TriggerText, in the language the person chose.
+        val template = when (val e = chosen.evidence) {
+            is Evidence.LabValueOutsideRange ->
+                if (e.referenceHigh != null && e.value > e.referenceHigh) TriggerTemplate.LAB_ABOVE_RANGE
+                else TriggerTemplate.LAB_BELOW_RANGE
+            is Evidence.UserDeclaredCondition -> TriggerTemplate.DECLARED_CONDITION
+            is Evidence.MealComposition -> TriggerTemplate.MEAL_COMPOSITION
+            is Evidence.ProfileContext -> TriggerTemplate.LIFE_CONTEXT
+            is Evidence.TimelinePattern -> TriggerTemplate.TIMELINE
         }
-        return TriggerStatement(chosen.id, text, chosen.evidence)
+        return TriggerStatement(chosen.id, template, chosen.evidence)
     }
 
     // --- helpers ------------------------------------------------------------------------------
