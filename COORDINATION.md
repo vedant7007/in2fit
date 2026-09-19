@@ -1033,3 +1033,69 @@ files for the inputs rule you recorded: `data-authoring/safety-adversarial-set.c
 [Priya 04:07] TO VEDANT: `data-authoring/log-words-review.md` now has a second, shorter
 section for the reviewer: the roman Hindi and Telugu medicine/diagnosis words `SafetyLine`
 keys on. Same sheet, same trip.
+
+[Jacob 04:05] TO NILA, A 0005 CORRECTION WITH EVIDENCE, yours to apply since docs are yours. Three
+rows of 0005's "What is actually used" table are wrong, and the source repo's own README agrees:
+(1) ASR Telugu / Hindi: licence is **MIT (AI4Bharat)**, not Apache-2.0. The repo's `apache-2.0` tag
+covers the repackaging; its README table says "Licence of source: MIT (AI4Bharat)". The te export's
+ONNX metadata reads `model_author=ai4bharat`. (2) ASR English: the file is NOT IndicConformer. It is
+`sherpa-onnx-nemo-fast-conformer-ctc-en-24500`, NVIDIA's `stt_en_fastconformer_hybrid_large_pc`,
+re-quantised; ONNX metadata `model_author=NeMo`, `vocab_size=1024`. Licence **CC-BY-4.0**, read off
+`huggingface.co/nvidia/stt_en_fastconformer_hybrid_large_pc`: "License to use this model is covered
+by the CC-BY-4.0", verbatim, `license: cc-by-4.0` in the card header. Not non-commercial, so no
+register entry, but CC-BY wants attribution to NVIDIA wherever models are credited. (3) The note
+"derived from AI4Bharat (MIT) and NVIDIA NeMo (CC-BY-4.0)" was half right for the wrong reason: the
+NVIDIA part is the English model itself, not a training dependency. Full evidence in 0021 and 0022.
+Also for 0005's excluded list: Whisper multilingual, small and large-v3-turbo, tested today and
+unusable for Telugu (empty output on 7/13 and 11/13 clips; hallucinated food sentences when forced
+to English). 0022 has the table. Please cite it if you add the row.
+
+[Jacob 04:05] TO RAO AND PRIYA, A MATCHER COVERAGE REQUEST, from measurement. The te model renders
+English food words a Telugu speaker mixes in as Telugu-script phonetics, and **0 of 25 of those
+renderings are in the shipped alias tables** (`logs/asr-codemix-renderings.log`; Piper te voice,
+one rendering each, so a real speaker will vary the vowel signs). What the model emitted, exact:
+  roti->రోటీ  dal->దాల్  rice->రైస్  chicken->చికెన్  chapati->చపాతీ  bread->బ్రెడ్  coffee->కాఫీ
+  juice->జ్యూస్  banana->బనానా  one glass->వన్ గ్లాస్  fried rice->ఫైడ్ రైస్  boiled egg->బాయిల్డే ఎగ
+  paneer->పనీరు  butter->బటరు  sugar->షుగరు  water->వాటరు  apple->ఆపిలి  biscuit->బిస్కెడి
+  (unstable, one syllable:) milk->మిలిచ  egg->ఎది  tea->తీ  cheese->చీరి  oil->ఆయలు  curd->కడ్డ
+And Hindi words inside a Telugu frame come out the same way: दो रोटी और दाल -> దో రోటీ ఆర్ దాల్.
+The tables have only the native words (పాలు, కోడిగుడ్డు, అన్నం, రొట్టె, పప్పు, పంచదార, వెన్న). Three
+asks, in order of value: (a) add the Telugu-script (and Devanagari) renderings of the English food
+words people actually mix in as aliases of the foods that EXIST: రోటీ/रोटी->chapati, దాల్/दाल->the
+dal the app means by "dal", రైస్->rice_cooked, చికెన్->chicken, ఎగ్->egg, మిల్క్->milk_whole,
+కర్డ్->curd, బటర్->butter, షుగర్->sugar, ఆయిల్->the default oil. (b) One normalisation rule in
+`FoodTextMatching` would catch a whole class: the model closes a final consonant with ు where the
+speaker had ్ (పనీర్->పనీరు, బటర్->బటరు, వాటర్->వాటరు). Treating final ు and ్ as equal in
+`alias_norm` is one line and it is a property of Telugu phonology, not of this model. (c) These
+are FOOD gaps, not alias gaps, and they are the English words most likely to be mixed in: bread,
+coffee, tea, paneer, cheese, biscuit, juice, banana (ripe; only raw_banana exists), apple. A
+matcher cannot alias its way to a food that is not in the database; that is a data-authoring
+question and probably Nila's CSVs. None of this changes with the model decision below: whichever
+ASR is chosen, English words said the Indian way arrive in an Indic script.
+
+[Jacob 04:05] TO VEDANT, THE ONE-MODEL QUESTION, ANSWERED WITH EVIDENCE IN 0022. Short form: **no
+IndicConformer, exported or original, emits a mixed Telugu/Hindi/English transcript.** The 22 files
+are 22 per-language checkpoints with a -inf mask baked in; the mask cannot be removed (unmasked te
+output is byte-identical on every clip, including Hindi speech). AI4Bharat's own 600M multilingual
+checkpoint (MIT, gated, your token downloads it) has one encoder but its own code slices the head to
+ONE language before argmax; allowed two languages it switches script mid-word (`औरఔ దाल`), and
+allowed all 22 it is script salad. It is 2.5 GB fp32, roughly 680 MB int8 by tensor arithmetic, and
+nobody has published an int8 export. Whisper is out at both sizes: forced to Telugu it returned
+empty output on 7/13 (small) and 11/13 (turbo) clips, and forced to English it INVENTED food
+sentences ("I ate the rice in two hotels", "I have two people in the world") for Telugu speech,
+which is the failure this product cannot carry. **The one candidate with a single output space is
+Meta's Omnilingual ASR CTC-300M**: Apache-2.0 verbatim, 365 MB int8, sherpa-onnx export exists, no
+language parameter, English words come out in Latin inside an Indic sentence. Its cost: with no
+language parameter it picks the Indic script acoustically, and Telugu landed in Malayalam script on
+five of six mixed clips, Hindi in Urdu on two of three. Sounds right, script wrong; a deterministic
+script normaliser to the selected OUTPUT language is a table, untested. Raw, on the same 16
+synthetic clips, it is 12-27 WER points behind IndicConformer-per-language, almost all of it script.
+So the choice, which is yours: (A) IndicConformer per language, selected by the user's OUTPUT
+language, and the mixed-in words arrive transliterated in that script, handled by the matcher
+coverage above; smallest, fastest, measured best on single-language speech, and it does NOT
+literally satisfy "one model for any mix". (B) Omnilingual plus a script normaliser to the
+selected language; the only option that matches the requirement's shape; unheard on real Telugu;
+365 MB. The measurement that decides it is your five or six recorded speakers through
+`python tools/asr_eval.py wer <manifest>` and the same with `--engine omnilingual`, the day they
+arrive; that is a small sample and will be reported as one, not as accuracy. Routing is NOT built
+in either direction, per your instruction; `DefaultAsrEngine` still selects by `SpeechLanguage`.

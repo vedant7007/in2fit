@@ -2,10 +2,16 @@
 Word and character error rate of the shipped ASR models, on the desktop, through the real runtime.
 
     python asr_eval.py synth <out-dir>            write the SYNTHETIC clips and their manifest
+    python asr_eval.py synth-mixed <out-dir>      write the SYNTHETIC code-mixed clips of 0022 (needs the Hindi voice)
     python asr_eval.py wer   <manifest.csv> ...   transcribe every clip in the manifest(s), print WER/CER
+    python asr_eval.py wer --engine omnilingual <manifest.csv> ...
+                                                  same, through Meta Omnilingual ASR CTC-300M (0022): one
+                                                  model for every row, and the language column is then a label
 
 Needs: pip install sherpa-onnx soundfile numpy   (plus piper-tts for `synth`; Windows for its English voices)
-Models: data-sources/models/asr/indicconformer/, as tools/fetch-models.ps1 lays them out.
+Models: data-sources/models/asr/indicconformer/, as tools/fetch-models.ps1 lays them out, and for
+--engine omnilingual data-sources/models/asr/candidates/omnilingual-300m-ctc-int8/{model.int8.onnx,tokens.txt}
+(csukuangfj/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12, Apache-2.0; 0022).
 
 THE MANIFEST is one CSV per test set, one row per clip:
 
@@ -67,9 +73,17 @@ def edit_distance(a: list, b: list) -> int:
     return prev[-1]
 
 
-def recognizer(lang: str, threads: int = 4):
+def recognizer(lang: str, threads: int = 4, engine: str = "indicconformer"):
     import sherpa_onnx  # imported late so `synth` works without it
 
+    if engine == "omnilingual":
+        d = REPO / "data-sources" / "models" / "asr" / "candidates" / "omnilingual-300m-ctc-int8"
+        for f in (d / "model.int8.onnx", d / "tokens.txt"):
+            if not f.is_file():
+                sys.exit(f"missing {f}; see docs/decisions/0022 for the source")
+        return sherpa_onnx.OfflineRecognizer.from_omnilingual_asr_ctc(
+            model=str(d / "model.int8.onnx"), tokens=str(d / "tokens.txt"), num_threads=threads,
+        )
     model = MODELS / lang / "model.int8.onnx"
     tokens = MODELS / ("en/tokens.txt" if lang == "en" else "tokens.txt")
     for f in (model, tokens):
@@ -94,7 +108,7 @@ def transcribe(rec, wav: Path) -> tuple[str, list[str], float, float]:
     return stream.result.text, list(stream.result.tokens), (time.perf_counter() - t) * 1000, len(samples) / sr
 
 
-def cmd_wer(manifests: list[Path]) -> None:
+def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
     rows = []
     for m in manifests:
         with open(m, encoding="utf-8", newline="") as f:
@@ -104,18 +118,19 @@ def cmd_wer(manifests: list[Path]) -> None:
     if not rows:
         sys.exit("no rows")
 
-    print(f"machine: {platform.processor() or platform.machine()}, {platform.system()}; sherpa-onnx desktop, 4 threads")
+    print(f"machine: {platform.processor() or platform.machine()}, {platform.system()}; sherpa-onnx desktop, 4 threads; engine: {engine}")
     print("DESKTOP TIMINGS. Not phone numbers. See the module docstring about free RAM.\n")
 
     per_lang = defaultdict(lambda: {"w_err": 0, "w_ref": 0, "c_err": 0, "c_ref": 0, "n": 0, "ms": 0.0, "audio": 0.0, "pieces": 0, "sources": set()})
     recs = {}
     for r in rows:
         lang = r["language"]
-        if lang not in recs:
+        key = lang if engine == "indicconformer" else engine
+        if key not in recs:
             t = time.perf_counter()
-            recs[lang] = recognizer(lang)
-            print(f"[{lang}] recognizer created in {time.perf_counter() - t:.2f}s")
-        hyp, tokens, ms, secs = transcribe(recs[lang], r["path"])
+            recs[key] = recognizer(lang, engine=engine)
+            print(f"[{key}] recognizer created in {time.perf_counter() - t:.2f}s")
+        hyp, tokens, ms, secs = transcribe(recs[key], r["path"])
         ref_w, hyp_w = normalise(r["reference"]), normalise(hyp)
         ref_c, hyp_c = list("".join(ref_w)), list("".join(hyp_w))
         w_err, c_err = edit_distance(ref_w, hyp_w), edit_distance(ref_c, hyp_c)
@@ -183,10 +198,86 @@ def cmd_synth(out: Path) -> None:
     print(f"wrote {len(rows)} clips and manifest.csv to {out}")
 
 
+def cmd_synth_mixed(out: Path) -> None:
+    """The spliced code-mixed clips of 0022: Piper te for Telugu, Piper hi for Hindi, a Windows voice for
+    English, joined with 250 ms gaps. A speaker change mid-sentence is NOT how a person code-mixes, and
+    the English parts have no Indian accent; the manifest says synthetic-mixed and 0022 says why they
+    overstate the English problem. They exist so the tables in 0022 can be regenerated."""
+    import io
+    import subprocess
+    import wave
+
+    import numpy as np
+    from piper import PiperVoice
+
+    out.mkdir(parents=True, exist_ok=True)
+    voices = REPO / "data-sources/models/tts/piper"
+    te = PiperVoice.load(str(voices / "te_IN-padmavathi-medium.onnx"))
+    hi = PiperVoice.load(str(voices / "hi_IN-pratham-medium.onnx"))  # CC-BY-NC-SA-4.0, test audio only, 0005 register
+
+    def resample(x, a, b):
+        return x if a == b else np.interp(np.linspace(0, len(x) - 1, int(len(x) * b / a)), np.arange(len(x)), x).astype(np.float32)
+
+    def piper(voice, text):
+        buf = io.BytesIO()
+        with wave.open(buf, "wb") as w:
+            voice.synthesize_wav(text, w)
+        buf.seek(0)
+        with wave.open(buf, "rb") as w:
+            sr = w.getframerate()
+            x = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
+        return resample(x, sr, 16000)
+
+    def sapi(text, voice="Microsoft Zira Desktop"):
+        p = out / "_tmp_en.wav"
+        ps = ("Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+              "$fmt=New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(16000,[System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen,[System.Speech.AudioFormat.AudioChannel]::Mono); "
+              f"$s.SelectVoice('{voice}'); $s.SetOutputToWaveFile('{p}',$fmt); $s.Speak('{text}'); $s.SetOutputToNull()")
+        subprocess.run(["powershell", "-NoProfile", "-Command", ps], check=True)
+        with wave.open(str(p), "rb") as w:
+            x = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
+        p.unlink()
+        return x
+
+    gap = np.zeros(4000, np.float32)
+    clips = [
+        ("hi_pratham_roti_dal", "hi", [piper(hi, "मैंने दो रोटी और दाल खाई")], "मैंने दो रोटी और दाल खाई", "roti;dal"),
+        ("hi_pratham_idli_sambar", "hi", [piper(hi, "सुबह तीन इडली और सांबर खाया")], "सुबह तीन इडली और सांबर खाया", "idli;sambar"),
+        ("hi_pratham_hinglish", "hi", [piper(hi, "टू रोटी एंड दाल खाई")], "टू रोटी एंड दाल खाई", "roti;dal"),
+        ("mix_te_frame_hi_words", "te", [piper(te, "నేను ఉదయం"), piper(hi, "दो रोटी और दाल"), piper(te, "తిన్నాను")], "నేను ఉదయం दो रोटी और दाल తిన్నాను", "roti;dal"),
+        ("mix_hi_frame_te_words", "hi", [piper(hi, "मैंने सुबह"), piper(te, "రెండు ఇడ్లీ సాంబార్"), piper(hi, "खाया")], "मैंने सुबह రెండు ఇడ్లీ సాంబార్ खाया", "idli;sambar"),
+        ("mix_te_frame_en_words", "te", [piper(te, "నేను"), sapi("two rotis and dal"), piper(te, "తిన్నాను")], "నేను two rotis and dal తిన్నాను", "roti;dal"),
+        ("mix_hi_frame_en_words", "hi", [piper(hi, "मैंने"), sapi("one glass of milk"), piper(hi, "पिया")], "मैंने one glass of milk पिया", "milk"),
+        ("mix_en_frame_te_words", "en", [sapi("for lunch I had"), piper(te, "పప్పు మరియు అన్నం")], "for lunch I had పప్పు మరియు అన్నం", "dal;rice"),
+    ]
+    rows = []
+    for name, lang, parts, ref, foods in clips:
+        x = np.concatenate(sum([[p, gap] for p in parts], [])[:-1])
+        with wave.open(str(out / f"{name}.wav"), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(16000)
+            w.writeframes((np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes())
+        rows.append((f"{name}.wav", lang, "synthetic-mixed", ref, foods))
+    with open(out / "manifest.csv", "w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["path", "language", "source", "reference", "expected_foods"])
+        w.writerows(rows)
+    print(f"wrote {len(rows)} clips and manifest.csv to {out}")
+
+
 if __name__ == "__main__":
-    if len(sys.argv) >= 3 and sys.argv[1] == "synth":
-        cmd_synth(Path(sys.argv[2]))
-    elif len(sys.argv) >= 3 and sys.argv[1] == "wer":
-        cmd_wer([Path(p) for p in sys.argv[2:]])
+    args = sys.argv[1:]
+    engine = "indicconformer"
+    if "--engine" in args:
+        i = args.index("--engine")
+        engine = args[i + 1]
+        del args[i:i + 2]
+    if len(args) >= 2 and args[0] == "synth":
+        cmd_synth(Path(args[1]))
+    elif len(args) >= 2 and args[0] == "synth-mixed":
+        cmd_synth_mixed(Path(args[1]))
+    elif len(args) >= 2 and args[0] == "wer":
+        cmd_wer([Path(p) for p in args[1:]], engine=engine)
     else:
         sys.exit(__doc__)
