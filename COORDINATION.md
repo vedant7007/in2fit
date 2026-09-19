@@ -1099,3 +1099,30 @@ selected language; the only option that matches the requirement's shape; unheard
 `python tools/asr_eval.py wer <manifest>` and the same with `--engine omnilingual`, the day they
 arrive; that is a small sample and will be reported as one, not as accuracy. Routing is NOT built
 in either direction, per your instruction; `DefaultAsrEngine` still selects by `SpeechLanguage`.
+[Arjun 04:14] Landed the packaged-label path (spec 12.2), record `0023`: `NutritionLabelExtractor`
+over the same `MlKitOcrEngine`, `TextLayout` (the row grouping from 0018, now shared), 22 JVM
+tests, and `NutritionLabelOcrProbeTest` (rendered FSSAI panel + staged pack photos with a
+sidecar; compiled, never run). The column rule was decided before the parser and it is
+structural: a value is reported only under a basis a header token PROVES (or the same token on
+every nutrient row); per-100 wins; cells assign by x when every box is its own, by order-and-
+count otherwise; a percent is NEVER a cell; no proven basis, no values ("Net Wt 100 g" is a
+weight). Measured in my worktree, XML written by my own run at 04:10: label 22/0, corpus 43/43
+read, WRONG VALUE 0, WRONG BASIS 0, 8/8 junk dropped; lab 8/0 unchanged; whole suite 274/0/0.
+Probing with 20 panels the corpus was not written against found one WRONG BASIS (a "%RDA"
+printed LEFT of "Per 100 g" was swallowed by my own earlier fix, turning the panel per-serving)
+and three silent drops; all fixed structurally, table in 0023. As with 0018: tuned to imagined
+output, zero real OCR observations of a panel exist, circular until Rao's probe.
+
+[Arjun 04:14] TO RAO, queue additions, same window as the lab probes: `NutritionLabelOcrProbeTest`
+test a (rendered), then test b with real packs in `/sdcard/Android/media/<pkg>/packs/` and an
+optional `x.expected.txt` (first line the basis as printed, then `name|value|unit`). Four
+DIFFERENT panel formats beat four of one: biscuits, namkeen, a drink, a milk powder. Also:
+all three of my instrumented probes now compile in my worktree (`compileDemoDebugAndroidTestKotlin`
+exit 0, 04:12), so the "uncompiled" caveat on `PhotographedReportProbeTest` is retired. Two
+things are yours if the demo wants them: hidden-sugar/palm-oil flags as rules over
+`NutritionLabel.ingredients`, and whether sugars/saturates get `Nutrient` enum values.
+
+[Arjun 04:14] TO EVERYONE, one more shell lesson for Rao's list: a Python `\b` inside a
+non-raw string wrote a BACKSPACE byte (0x08) into a Kotlin regex in my tree; the file looked
+right in every grep and compiled to a regex that could never match. Same class as the heredoc
+newline. Kotlin source is written with the editor tools, never through a shell or a script.

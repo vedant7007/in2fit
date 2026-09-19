@@ -38,12 +38,9 @@ data class LabReport(
  * Turns recognised lines into [LabField]s. Layout and regex only; no model, no lookup table of
  * tests, no reference ranges of its own (spec 12.1, `OcrEngine` contract).
  *
- * HOW A ROW IS FOUND. ML Kit returns one line per run of text on a shared baseline, and a printed
- * table row is usually two to four such lines because the column gaps break them. Lines whose
- * vertical centres fall within half a typical line height of each other are one row, read left
- * to right. That is the whole layout model, and it holds for a photograph taken square to the
- * page. ponytail: axis-aligned row grouping; a page skewed by more than a few degrees drifts rows
- * into each other. Upgrade path is deskewing from ML Kit's corner points before grouping.
+ * HOW A ROW IS FOUND. [TextLayout.rows]: lines whose vertical centres fall within half a typical
+ * line height of each other are one row, read left to right. That is the whole layout model, and
+ * it holds for a photograph taken square to the page.
  *
  * HOW A ROW IS READ. Dates are masked first (they are numbers too). Every reference-range shape
  * on the row is found next (`13.0 - 17.0`, `< 200`, `up to 5.6`) and masked, so a bound cannot
@@ -72,31 +69,10 @@ data class LabReport(
 object LabReportExtractor {
 
     fun extract(text: RecognisedText): LabReport {
-        val rows = rows(text.blocks).map { row -> row.joinToString(" ") { it.text.trim() } }
+        val rows = TextLayout.rows(text.blocks).map { row -> row.joinToString(" ") { it.text.trim() } }
         val fields = rows.mapNotNull(::parseRow)
         return LabReport(fields, reportDate(rows))
     }
-
-    // --- layout ----------------------------------------------------------------------------------
-
-    private fun rows(lines: List<TextBlock>): List<List<TextBlock>> {
-        if (lines.isEmpty()) return emptyList()
-        val heights = lines.map { it.bottom - it.top }.sorted()
-        val tolerance = heights[heights.size / 2].coerceAtLeast(1) * 0.5
-        val out = mutableListOf<MutableList<TextBlock>>()
-        var anchor = Double.NEGATIVE_INFINITY
-        for (line in lines.sortedBy { it.centreY }) {
-            if (line.centreY - anchor > tolerance) {
-                out += mutableListOf(line)
-                anchor = line.centreY
-            } else {
-                out.last() += line
-            }
-        }
-        return out.map { row -> row.sortedBy { it.left } }
-    }
-
-    private val TextBlock.centreY get() = (top + bottom) / 2.0
 
     // --- one row ---------------------------------------------------------------------------------
 

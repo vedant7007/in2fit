@@ -19,11 +19,9 @@ import java.io.File
  * THE MEASUREMENT THAT MATTERS for beat 3: photographs of REAL lab reports, taken with a phone,
  * through the real recogniser, [MlKitOcrEngine] and [LabReportExtractor].
  *
- * WRITTEN BY ARJUN, NEVER RUN BY ARJUN, AND NOT YET COMPILED BY ARJUN EITHER: the laptop's
- * Gradle is Rao's (COORDINATION.md) and this session has no handle on the container. It is
- * written against the same APIs as `LabReportOcrProbeTest`, which did compile, plus
- * `BitmapFactory` and `android.media.ExifInterface`. If it does not compile, delete it and say
- * so; the rendered-page probe is the one that must run first.
+ * WRITTEN BY ARJUN, NEVER RUN BY ARJUN. Compiled in Arjun's worktree (`compileDemoDebugAndroidTestKotlin`,
+ * exit 0, 20 Sep 04:12). Only Rao drives the phone; the rendered-page probe is the one that must
+ * run first.
  *
  * WHY THIS EXISTS. Every row the extractor was tuned on is authored. The single real OCR
  * observation this project has is `9.8g/dL` from one rendered line (`0004`). Until this test has

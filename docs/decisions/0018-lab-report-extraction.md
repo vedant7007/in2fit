@@ -79,8 +79,8 @@ NOT measured, and not claimed:
   `PhotographedReportProbeTest` reads JPEGs staged in `/sdcard/Android/media/<pkg>/reports/`,
   applies the camera's EXIF orientation, times the recogniser, prints every field beside the row
   it came from, and scores a photo only where a person has written `x.expected.txt` from the
-  paper. It has NOT been compiled: the laptop's Gradle is Rao's and this session has no handle
-  on the container. It compiles with Rao's next test-APK build or it is deleted.
+  paper. Compiled in Arjun's worktree (`compileDemoDebugAndroidTestKotlin`, exit 0, 04:12)
+  once the one-worktree-per-session rule made that possible; never run.
 - **The rotation convention.** `FrameStore` carries CameraX's `rotationDegrees` through to ML Kit
   unchanged, on the reading that both mean "clockwise rotation that makes the image upright".
   Test `b_rotatedCaptureReadsTheSame` fails loudly if that reading is wrong.
