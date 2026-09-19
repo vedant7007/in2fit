@@ -32,3 +32,7 @@ app/src/main/jniLibs/
 
 # Python bytecode from tools/ scripts
 __pycache__/
+
+# The sherpa-onnx Android AAR (39 MB). Not on Maven Central; downloaded from the GitHub release
+# named, with its sha256, in the ASR decision record.
+/app/libs/

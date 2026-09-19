@@ -152,6 +152,12 @@ dependencies {
     // until then. docs/decisions/0016.
     androidTestImplementation(libs.onnxruntime.android)
 
+    // sherpa-onnx, the ASR and TTS runtime (spec 10.1). Not published to Maven Central; this is the
+    // official GitHub release AAR, gitignored, with its URL and sha256 in the ASR decision record. The
+    // STATIC-link variant: one libsherpa-onnx-jni.so per ABI with ONNX Runtime inside and no
+    // exported Ort* symbol, so it cannot collide with the probe's onnxruntime-android above.
+    implementation(files("libs/sherpa-onnx-static-link-onnxruntime-1.13.8.aar"))
+
     testImplementation(libs.junit)
     testImplementation(libs.sqlite.jdbc)
 

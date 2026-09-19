@@ -353,3 +353,68 @@ of the script to run. `tools/fetch-models.ps1` is mine; give me the release URL 
 read them from 0018 when it lands, and I add the download with a checksum check plus a
 configure-time check in `build.gradle.kts` that names the script. Say if you would rather do it
 in your commit; either way it should not ship as a bare `files()` line.
+
+[Meera 02:30] TTS LANDED ON THE JVM; NOTHING HAS RUN ON THE PHONE. In `ml/tts/`: `PiperTtsEngine`
+(Telugu + Hindi Piper voices through sherpa-onnx, leased from the arbiter per utterance),
+`AndroidTtsEngine` (English on the platform engine, offline voice checked not assumed),
+`RoutingTtsEngine` (one engine to inject; a language nobody claims is MODEL_NOT_LOADED, never
+another language's voice), `PiperVoiceLoader` (the `ModelFamily.TTS` loader branch, same shape as
+Jacob's ASR one), `SherpaPiperVoice`/`PiperVoice`/`AudioSink` (JNI and AudioTrack behind seams),
+`EspeakData` (asset copy keyed on the APK's lastUpdateTime), `PiperModelFile` (reads ONNX
+metadata so a raw download is refused with a sentence: sherpa-onnx `_Exit(-1)`s on missing
+metadata, which on Android is the process gone). 23 tests in `ml.tts`, 0 failures, read from
+the JUnit XML; whole suite 188/0/0 in the shared checkout; `assembleDemoDebug` exit 0 with
+`[verify] demoDebug: permissions are exactly [CAMERA, RECORD_AUDIO, DYNAMIC_RECEIVER_...]` and
+`libsherpa-onnx-jni.so` in the APK. Record `0019` (0018 was taken by Arjun while Jacob's note was
+in flight; Jacob, yours is 0020 unless you already wrote it). Hindi voice `hi_IN-pratham-medium`,
+CC-BY-NC-SA-4.0 verbatim from its MODEL_CARD, is in 0005's non-commercial register as of now.
+
+[Meera 02:30] THE PIPER PREREQUISITES ARE DONE AND MEASURED, not described. The raw download
+reads `custom_metadata_map {}` through onnxruntime (0005's claim, now a measurement).
+`tools/stamp_piper_voice.py` (moved to `tools/` in my commit as Nila asked; stdlib only, same
+keys and tokens format as sherpa's `add_meta_data.py`) stamped both voices; read back through
+onnxruntime they carry all nine keys. espeak-ng-data: upstream 18 MB / 355 files, trimmed to
+en+te+hi = 1,067,073 B / 244 files, and with noise scales at 0 the full and trimmed directories
+produce BYTE-IDENTICAL audio on three inputs. Desktop sherpa-onnx 1.13.8 synthesised Telugu
+(`ఇడ్లీ సాంబార్`, from the utterance set) and Hindi (`रोटी दाल`, from recipes.csv): audio out at
+22,050 Hz, peaks 0.41 / 0.73. WAVs in `logs/tts-smoke-te-trimmed.wav` and `-hi-`. I did not judge
+them and cannot; they exist for a fluent listener.
+
+[Meera 02:30] TO RAO, in order, all in 0019 §"What Rao needs to do": (1) stage
+`models/tts/te_IN-padmavathi-medium/{model.onnx,tokens.txt}` from
+`data-sources/models/tts/sherpa/te_IN-padmavathi-medium/` (and `hi_IN-pratham-medium` if storage
+allows). The STAMPED model, 63,516,206 B; the `piper-te-model.onnx` the probe pushed is the raw
+one and will not load through sherpa. Delete it first, storage is full. (2) `LlamaCppModelLoader`:
+`ModelFamily.TTS -> ttsLoader.load(handle)` and `unload` routed the same way, with
+`PiperVoiceLoader(modelsDir, espeakDataDir)`; `espeakDataDir = EspeakData.install(context,
+File(context.filesDir, "espeak-ng-data"))`, once, where the arbiter is built. (3) `AppModule`:
+`TtsEngine` = `RoutingTtsEngine(listOf(PiperTtsEngine(arbiter, AudioTrackSink(context)),
+AndroidTtsEngine(context)))`. Until (1) is on the phone a speak() returns MODEL_LOAD_FAILED naming
+the missing file, which is the honest state. (4) The co-residency row 0013 is waiting for:
+`canCoReside(listOf(asr, llm, PiperVoices.TELUGU))` is the first with the phonemiser resident.
+`AudioTrackSink` and `AndroidTtsEngine` are WRITTEN, NEVER RUN; whatever they do on the phone is
+yours to report and mine to fix.
+
+[Meera 02:30] TO NILA: (1) `stamp_piper_voice.py` is in `tools/` in my commit; nothing else of
+yours touched. (2) One asset, no build config: copy `data-sources/espeak-ng-data-trimmed/` to
+`app/src/main/assets/espeak-ng-data/` and commit it (244 files, 1.07 MB, same class as the food
+db). `EspeakData` reads exactly that asset path and, until it exists, copies nothing and the
+loader reports the missing files by name. To regenerate:
+`python tools/stamp_piper_voice.py espeak <unpacked espeak-ng-data> data-sources/espeak-ng-data-trimmed en,te,hi`.
+The tarball is `https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/espeak-ng-data.tar.bz2`,
+7,252,012 B, sha256 `4135ccf82e1f40613491c0874d4945ae9e9c7840933d8e25a6f9e003d9ebf533`, if you
+want it in `fetch-models.ps1` beside the AAR. (3) For the same script, the Hindi voice:
+`hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx` + `.onnx.json` from `rhasspy/piper-voices`,
+onnx sha256 `169964b0871667f6793416d4b35e97357a68ba1ad01df8580c28048989ee7693`. Both voices
+then need `python tools/stamp_piper_voice.py stamp <voice.onnx> data-sources/models/tts/sherpa/<voice>`
+before staging. (4) Your ORT-stays reading matches mine: with the static AAR the demo APK has
+one `libsherpa-onnx-jni.so` and no `libonnxruntime.so`, and the probe compiles as is.
+
+[Meera 02:30] FOUND: (a) the demo APK after adding the 24 MB sherpa lib is 76,662,020 B, within
+153 B of the 76,661,867 B recorded in 0016 for the build WITHOUT it. Both are read off real
+builds; I have no explanation and am not inventing one (0013 discipline). Nila, if you still
+have the 01:28 APK, `unzip -l` of both side by side would settle it. (b) `0005` says
+"espeak-ng-data (about 7 MB)": that is the compressed tarball; it is 18 MB unpacked and 1.07 MB
+after trimming to our three languages. (c) `TtsEngine`'s contract says "Models come from the
+ModelArbiter" — true for Piper, and deliberately not for English, which has no model of ours;
+noted in 0019 rather than amending the frozen contract.

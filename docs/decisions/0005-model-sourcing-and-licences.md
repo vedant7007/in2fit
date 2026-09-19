@@ -99,12 +99,25 @@ which contradicts the offline requirement outright. The app may use it when
 `isLanguageAvailable` reports a usable Telugu voice and `Voice.isNetworkConnectionRequired()`
 is false, and otherwise falls through to the bundled ONNX.
 
+*20 Sep 2026, `0019`:* the prerequisites above are done and measured (the download reads
+`custom_metadata_map {}` through onnxruntime; `tools/stamp_piper_voice.py` stamps it; the
+shipped espeak-ng-data is trimmed to 1.07 MB with byte-identical output). For ENGLISH the
+built-in engine is the only path, deliberately, with the offline check above applied to the
+voice it picks. Hindi TTS is now sourced; see the register below.
+
 ## NON-COMMERCIAL DEPENDENCY REGISTER
 
-**This list is currently EMPTY. Nothing in the build carries a non-commercial licence.**
+**One entry, added 20 September 2026, the day the voice was added.** Everything else shipped
+is Apache-2.0, CC-BY-4.0, MIT or public domain.
 
-Everything shipped is Apache-2.0, CC-BY-4.0, MIT or public domain. The scope ruling allowed
-non-commercial dependencies and, as it turned out, none was needed.
+| Dependency | Licence, verbatim from its MODEL_CARD | Added | Used for | Record |
+| --- | --- | --- | --- | --- |
+| `rhasspy/piper-voices` `hi/hi_IN/pratham/medium` (`hi_IN-pratham-medium.onnx`, 63,516,050 B, sha256 `169964b0871667f6793416d4b35e97357a68ba1ad01df8580c28048989ee7693`) | `* License: http://creativecommons.org/licenses/by-nc-sa/4.0/` (stated under "Dataset"; dataset given as `https://github.com/AI4Bharat/indicnlp_corpus`, trained by `https://github.com/PravalX`) | 20 Sep 2026 | Hindi spoken output. Not on the demo path; the demo is Telugu | `0019` |
+
+What an audit would need to know: the NC-SA term is on the training data, the model card
+carries it forward, and there is no other Hindi Piper voice with a readable permissive licence
+(`rohan` is the IITM PDF that returns empty, `priyamvada` is the same NC-SA). Going commercial
+means replacing this voice or dropping Hindi speech to on-screen text.
 
 Evaluated and rejected on other grounds, recorded here so a future audit does not have to
 rediscover them:
@@ -113,7 +126,7 @@ rediscover them:
 | --- | --- | --- |
 | `willwade/mms-tts-multilingual-models-onnx` `tel/` | CC-BY-NC-4.0 | Would have been the only NC item. Piper is CC-BY-4.0, 79% smaller and higher sample rate, so NC was not needed |
 | `facebook/mms-tts-tel` | CC-BY-NC-4.0 | Upstream of the above, PyTorch only |
-| piper `hi_IN-pratham`, `hi_IN-priyamvada` | CC-BY-NC-SA-4.0 | Hindi TTS is not on the demo path |
+| piper `hi_IN-priyamvada` | CC-BY-NC-SA-4.0 | Same licence, size and trainer as `pratham`, which is the one used; a listening preference, not a licence difference |
 
 **Rule for anything added later:** a dependency whose licence is non-commercial, unclear, or
 a link to an unreachable document goes in this table the day it is added. If it cannot be
