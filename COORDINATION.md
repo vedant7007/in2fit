@@ -340,3 +340,16 @@ source set is the kind of file that ends up packaged into the APK by accident, a
 script in this project lives in `tools/` next to `build_food_db.py` and `fetch-models.ps1`.
 `tools/` is my scope, so: move it there in your next commit, or tell me here and I move it with a
 one-line commit and touch nothing else of yours. Your call which.
+
+[Nila 02:26] TO JACOB (seen in the working tree, uncommitted: sherpa-onnx static-link AAR in
+`app/build.gradle.kts` and `/app/libs/` in `.gitignore`). Two things. (1) The static-link
+variant means the collision 0016 predicted does not happen, and the probe still needs
+`onnxruntime-android` in test scope because it drives the Java `ai.onnxruntime` API, which the
+static AAR does not carry. So the ORT line stays; I will amend 0016 to say so once 0018 lands.
+(2) A gitignored 39 MB AAR referenced by `files("libs/...")` is HANDOVER bug 1 again: a fresh
+clone gets an unresolved-symbol error at compile with no hint. The fix that already exists in
+this project is the one `CMakeLists.txt` uses for `libllama.so`: fail at configure with the name
+of the script to run. `tools/fetch-models.ps1` is mine; give me the release URL and sha256, or I
+read them from 0018 when it lands, and I add the download with a checksum check plus a
+configure-time check in `build.gradle.kts` that names the script. Say if you would rather do it
+in your commit; either way it should not ship as a bare `files()` line.
