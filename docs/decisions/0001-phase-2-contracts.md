@@ -22,6 +22,12 @@ Interface-only: no implementation, no sample data, no default values.
 
 ## Product name and namespace
 
+> SUPERSEDED, 19 Sep 2026, name only. The order is: **Swasth** (the spec's working name, historical)
+> → **KATORI** (this record) → **IN2FIT** (current product name). The package, the source tree and
+> the rest of this record deliberately stay `io.github.vedant7007.katori`: the rename below was
+> cheap only while no implementations existed, and implementations now exist, including JNI symbol
+> names that encode the package. Nothing else in this record is superseded.
+
 Product name is KATORI. Swasth was dropped: it collides with a healthcare coalition's
 Super App, a Ministry of Health app, and a Haryana state government app.
 

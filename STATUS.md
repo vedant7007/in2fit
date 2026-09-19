@@ -20,10 +20,40 @@ Desktop control is still needed for the phone over USB, which is the entire hard
 
 ## VERIFIED ON HARDWARE
 
-**Nothing. Still not one line.** No phone connected, nothing installed on a device.
+**realme RMX3780, MediaTek MT6835, Android 15 (API 35), 2x Cortex-A76 + 6x Cortex-A55,
+7,619.4 MB RAM.** Probe run 19 Sep 2026, `HardwareProbeTest`, 5 tests, 0 failures.
+Report in `logs/hw-report-run3.txt`.
 
-Unverified and unverifiable until the Realme 11: model load on a phone, inference speed on a
-phone, ASR accuracy, ASR/LLM/TTS co-residency, camera, OCR, every latency number.
+The app builds, installs, launches without a crash, and **llama.cpp loads and runs Qwen 2.5 1.5B
+Q4_K_M on the phone**, returning schema-valid JSON on the first attempt from the real extraction
+prompt. **ML Kit OCR reads text in the demo build with the INTERNET permission removed**, which
+closes the residual risk in `0004`. **ASR, LLM and TTS are co-resident** at a measured peak of
+2,229.9 MB against a provisional ceiling of half of device RAM, so spoken confirmation survives
+and the stage-1 co-residency question from `0001` is answered.
+
+### Extraction latency, before and after the ARM misbuild was fixed
+
+`libllama.so` had been built as baseline ARMv8.0 on a CPU advertising `asimddp` and `asimdhp`,
+so ggml used scalar fallbacks. `0011` has the detail. Same device, same prompt, warm pass:
+
+| | prompt tok/s | generation tok/s | round trip |
+| --- | ---: | ---: | ---: |
+| baseline ARMv8.0, 4 threads | 11.11 | 7.08 | 26,568 ms |
+| baseline ARMv8.0, 8 threads | 14.34 | 5.18 | 25,215 ms |
+| **+dotprod+fp16, 4 threads** | **39.82** | **9.73** | **10,977 ms** |
+| **+dotprod+fp16, 8 threads** | **48.07** | **8.98** | **10,632 ms** |
+
+Prompt processing 3.4x, generation 1.4x, round trip **2.4x**. Thread count barely matters once
+the build is right: 3% between 4 and 8.
+
+**THE BUDGET IS STILL MISSED.** Beat 1 allows 3.5 s for the whole voice round trip. The best
+measured figure is 10.6 s for LLM extraction ALONE, with ASR and TTS not yet written and not in
+that number. That is three times over, and what remains are product decisions rather than
+optimisations: a smaller model, a shorter prompt, or a longer round trip with a visible progress
+state. Not a call for one person to make alone.
+
+Still unverified on hardware: ASR accuracy, TTS quality, camera capture, the Room database, and
+every pipeline above the engines, because none of them is implemented.
 
 ---
 
