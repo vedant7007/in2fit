@@ -327,3 +327,53 @@ set goes back for ranking.
 `LlamaCppModelLoader`" instruction in step 2 above: the TTS entry is
 `ModelFamily.TTS to PiperVoiceLoader(modelsDir, espeakDataDir)` in that map. Nothing in `ml/tts`
 changes for it.
+
+---
+
+## Addendum 3, 20 September 2026, 04:05: speed is now a pass/fail column, and the licence gate
+
+### Why speed matters more than it did yesterday
+
+Rao's Orchestrator now has ANSWER and RECOMMEND paths whose model output is prose, not a 55-token
+JSON object. Nobody has measured a conversational turn, but `0014` measured generation at about
+five times the cost of prompt processing, at 9-10 tok/s, so a spoken answer can be twenty
+seconds of generation before a single word is synthesised. A voice slower than real time on top
+of that makes a spoken answer unusable however it sounds. Every candidate therefore has three
+columns: licence, ear, and real-time factor ON THE PHONE. A candidate fails on any one.
+
+### The table, as it stands
+
+| candidate | licence | ear (listeners) | RTF, desktop, this laptop, 2 threads, text B | RTF, phone |
+| --- | --- | --- | --- | --- |
+| platform voice (`te-IN`, offline) | none to record | not heard yet | n/a | **unmeasured**; `TtsVoiceProbeTest` now prints it per sample (synthesis ms / WAV seconds) |
+| Piper `padmavathi` | CC-BY-4.0, clean | robotic, on two words | 0.75 / 0.84 / 1.33 (three warm runs) | unmeasured |
+| Piper `venkatesh` | CC-BY-4.0, clean | not heard yet | 0.53 / 0.67 / 0.71 | unmeasured |
+| MMS `tel` | CC-BY-NC-4.0, register if chosen | not heard yet | 2.88 / 4.20 / 4.65 | unmeasured, and the desktop figure already fails |
+| pocket-tts Telugu | **gated on the IITM licence text** (`0005`) | preferred, on the author's demo; OURS files not yet ranked | 0.81 / 0.91 (Kyutai runtime, int8 dynamic); sherpa path broken | no working runtime on the phone |
+
+The desktop column was measured with **954 MB free of 16 GB** on this laptop (the RAM-starved
+condition Jacob flagged), which is why `padmavathi` reads 0.75-1.33 tonight against 0.23 earlier
+in the night on the same file. The column orders the candidates; it does not predict the phone.
+Only the last column decides, and every cell in it is empty.
+
+### What follows for the code
+
+If Piper stays, streaming playback (`generateWithCallback` into a streaming `AudioTrack`) stops
+being an optimisation and becomes how a spoken answer starts inside a second rather than after
+the whole synthesis: the first sentence plays while the rest is made. The seam is shaped for it
+and it is not written until a phone RTF says it is needed; the number that triggers it is a
+device RTF above roughly 0.5, where a five-sentence answer would otherwise wait several seconds
+in silence after twenty seconds of generation.
+
+### The listeners' next message
+
+Approved, and cheaper than the sentence: the three `te-pocket-tts-syspin_female-int4-OURS-*.wav`
+files ranked against `te-padmavathi-default-*` and `te-venkatesh-default-*` on the same texts. It
+answers whether the preference survives the author's curation before any sentence exists.
+
+### The licence gate, restated
+
+The IITM document is now known to exist and to be readable from India; it is not readable from
+this laptop and it is not in the repository. `0005` records the reported summary as a summary and
+keeps the gate closed until the text is here. That one document rules on `maya`, `rohan` and
+pocket-tts together.

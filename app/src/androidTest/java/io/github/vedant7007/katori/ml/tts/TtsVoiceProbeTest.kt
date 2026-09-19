@@ -119,11 +119,39 @@ class TtsVoiceProbeTest {
                     "synthesizeToFile returned $queued"
                 }
                 val ms = SystemClock.elapsedRealtime() - t0
-                say("   $key: $result in $ms ms, ${out.length()} B  ${out.name}")
+                // The platform writes 16-bit PCM WAV; the audio length falls out of the file size,
+                // and synthesis time over audio length is the real-time factor the choice of voice
+                // now hinges on (0019 addendum 3). A 44-byte header is the platform's; if a vendor
+                // engine writes another container the seconds read as nonsense and say so.
+                val seconds = wavSeconds(out)
+                val rtf = if (seconds > 0) "%.2f".format(ms / 1000.0 / seconds) else "n/a"
+                say("   $key: $result in $ms ms for ${"%.2f".format(seconds)} s of audio, RTF $rtf, ${out.length()} B  ${out.name}")
             }
         }
         tts.shutdown()
         say("pull with: adb pull ${outDir.absolutePath} logs/tts-probe")
+    }
+
+    /** Seconds of audio in a canonical 44-byte-header PCM WAV, or 0 if it is not one. */
+    private fun wavSeconds(f: File): Double {
+        if (f.length() < 44) return 0.0
+        val h = ByteArray(44)
+        f.inputStream().use { input ->
+            var n = 0
+            while (n < 44) {
+                val r = input.read(h, n, 44 - n)
+                if (r < 0) break
+                n += r
+            }
+        }
+        if (String(h, 0, 4) != "RIFF" || String(h, 8, 4) != "WAVE") return 0.0
+        fun u16(i: Int) = (h[i].toInt() and 0xFF) or ((h[i + 1].toInt() and 0xFF) shl 8)
+        fun u32(i: Int) = u16(i).toLong() or (u16(i + 2).toLong() shl 16)
+        val channels = u16(22)
+        val rate = u32(24)
+        val bitsPerSample = u16(34)
+        val bytesPerSecond = rate * channels * bitsPerSample / 8
+        return if (bytesPerSecond > 0) (f.length() - 44).toDouble() / bytesPerSecond else 0.0
     }
 
     private companion object {

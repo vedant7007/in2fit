@@ -105,6 +105,44 @@ shipped espeak-ng-data is trimmed to 1.07 MB with byte-identical output). For EN
 built-in engine is the only path, deliberately, with the offline check above applied to the
 voice it picks. Hindi TTS is now sourced; see the register below.
 
+## The IIT Madras Indic TTS licence: one document, three voices, NOT YET READ VERBATIM
+
+*Added 20 Sep 2026, 04:05, Meera.*
+
+`https://www.iitm.ac.in/donlab/indictts/downloads/license.pdf` is the licence the SPRINGLab
+dataset cards point at ("subject to the original Indic TTS license terms"). It gates, together:
+
+- `te_IN-maya-medium` and `hi_IN-rohan-medium` (Piper voices trained on Indic TTS data; excluded
+  above because this document could not be read),
+- `prasadvittaldev/pocket-tts-telugu-female-syspin` (its teacher was trained partly on
+  `SPRINGLab/IndicTTS_Telugu`; `0019` addendum 2).
+
+**Status of the text: not in this repository.** From the laptop this project runs on, the host
+resolves (103.158.42.45), `http://` answers with a 302 to `https://`, and `https://` times out
+on every route tried on 20 Sep: curl with four TLS settings, PowerShell's HTTP stack, and the
+fetch service. Vedant reached it the same night from elsewhere. So the document exists and is
+readable; this project has not yet read it.
+
+**What the document is reported to say**, from Vedant's fetch, 20 Sep 2026. THIS IS A SUMMARY,
+NOT THE TEXT, and `0005`'s rule stands until the text is here: royalty-free; derivative works may
+be created and freely distributed; commercial use permitted; governed by Indian law; the TTS
+Consortium and IIT Madras copyright notice must be retained; and one clause with teeth:
+recipients of a derivative work must be told it contains open-source components and shall not
+further sell, lease, sub-license, decompile or reverse-engineer it. If that clause binds, it is a
+downstream restriction on whatever this app ships, not a formality, and it has to be read in
+its own words before anything under it ships.
+
+**The open question, recorded and not resolved:** whether model weights are a derivative work
+of the audio they were trained on is unsettled law. The pocket-tts card claims MIT for its
+weights while deferring to the corpora's terms; Piper's cards carry the dataset licence forward
+as the voice's licence. Both positions are recorded here as claims. This project does not pick
+one; it ships only what is clear under either reading.
+
+**To close this:** the PDF committed under `docs/licences/` (Nila's directory; a few kilobytes)
+or its text pasted into this record verbatim, then the three voices re-ruled here on the same
+day. Until then: `maya` and `rohan` stay excluded, pocket-tts stays out of the register and off
+the phone.
+
 ## NON-COMMERCIAL DEPENDENCY REGISTER
 
 **One entry, added 20 September 2026, the day the voice was added.** Everything else shipped

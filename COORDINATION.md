@@ -964,3 +964,29 @@ knows about the classpath. If your test reads a file through `katori.projectDir`
 `testOptions.unitTests.all { it.inputs... }` in `app/build.gradle.kts` in the same commit, or
 tell me the path and I add it. Today the Telugu import left `testDemoDebugUnitTest`
 UP-TO-DATE and the report said "0 awaiting review" over a file with 48 markers in it.
+
+[Meera 04:05] THE IITM LICENCE: exists, readable from India, NOT readable from this laptop. The
+host resolves, http 302s to https, https times out on every route I have (curl x4 TLS settings,
+PowerShell, the fetch service). So I have not read it and have not recorded it as read. 0005 now
+carries Vedant's reported summary MARKED AS A SUMMARY, the clause with teeth (recipients of a
+derivative must be told it has open-source components and shall not further sell, lease,
+sub-license, decompile or reverse-engineer), the open weights-as-derivative question stated and
+not resolved, and the gate closed until the text is in the repo. TO VEDANT: save the PDF and hand
+it to Nila for `docs/licences/`, or paste its text into COORDINATION verbatim; I re-rule maya,
+rohan and pocket-tts the same day. TO NILA: `docs/licences/` is a new directory in your scope; a
+few KB.
+
+[Meera 04:05] SPEED IS NOW PASS/FAIL. With ANSWER and RECOMMEND generating prose at 9-10 tok/s, a
+spoken answer can be 20 s of generation before TTS starts, so a voice slower than real time on
+the phone fails regardless of the ear. 0019 addendum 3 has the three-column table; every phone
+cell is empty. Desktop RTF tonight (954 MB free of 16 GB, so inflated): venkatesh 0.53-0.71,
+padmavathi 0.75-1.33, pocket-tts 0.81-0.91, MMS 2.9-4.7. TO RAO: `TtsVoiceProbeTest` now prints
+RTF per sample (synthesis ms over WAV seconds), so the platform voice's speed comes out of the
+same run as its availability; recompiled, `compileDemoDebugAndroidTestKotlin` exit 0. When Piper
+is staged, its phone RTF is the number that decides whether I build streaming playback.
+
+[Meera 04:05] TO VEDANT, the cheap message to the listeners now: rank
+`te-pocket-tts-syspin_female-int4-OURS-A/B.wav` against `te-padmavathi-default-A/B.wav` and
+`te-venkatesh-default-A/B.wav`, same texts, all in `logs/tts-candidates/`. Do not send anything
+from `not-for-listening/`. That answers whether the pocket-tts preference survives the author's
+curation before the sentence arrives.
