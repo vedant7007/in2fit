@@ -60,11 +60,12 @@ symbol names encode the package and that rename is deferred until after the hack
 
 ## What this record does not cover, and who owns it
 
-- **The rules engine's sentences.** `domain/RuleTemplates.kt` builds its eight sentences in
-  English inside the pure engine. Localising them means the engine emits a template id plus
-  arguments and the UI renders the sentence from the string table with positional placeholders.
-  That is a change to `domain/`, which is the integrator's, and it is noted in `COORDINATION.md`.
-  Until it lands, those sentences are English in every language.
+- **The rules engine's sentences.** Were English literals inside the pure engine, out of the
+  string table's reach. **Resolved in `db099ca`**: the engine emits a `TriggerTemplate` and the
+  evidence, `TriggerText` renders from `trigger_*` keys with positional slots, and a test renders
+  every template to assert no digit appears that the evidence did not supply. The nutrient words
+  and life-context phrases are keys too. One free-text field remains: `TimelinePattern.description`
+  has no producer yet; when one exists it has to come from the table the same way.
 - **The picker itself.** Spec 10.2: the user chooses the language; the app never detects it. The
   keys for the picker exist. The screen does not, and neither does the call that applies the
   choice. On API 33+ that is `LocaleManager.setApplicationLocales`; on 26–32 it needs either
@@ -103,6 +104,29 @@ in an "UNPLACED" section, so a new group of strings cannot be handed out without
 where it is shown. The sheet comes back, the text is pasted into `values-te/strings.xml` unchanged
 under the reviewer's name, the script is re-run and the count drops. `hi` works the same way.
 
-The eight sentences in `domain/RuleTemplates.kt` are not on the sheet, because they are not keys.
-They are the sentences that most need a fluent reviewer. The request to make them keys is with the
-integrator (`COORDINATION.md`, 01:50).
+After `db099ca` the sheet has 48 keys, and the eight health sentences are items 2 to 9, right
+after the safety line, with a note per item saying what each slot holds.
+
+## The way back, and the check
+
+The reply will come as a WhatsApp message or a photo, because that is how people reply, and
+Vedant cannot read what he would be pasting into XML. So the XML is never edited by hand:
+`python tools/import_review_queue.py te --reply reply.txt --reviewer "Name"` takes a chat reply
+(one line per item, starting with the item's number on the sheet; the sheet tells the reviewer
+to number them) and `--sheet filled.md` takes the sheet itself with the lines filled in. Either
+way the script writes `values-te/strings.xml` in default-table order, with a
+`written by <name>, <date>` comment above each entry, escapes for Android, and refuses per item
+anything whose `%N$s` slots do not match the English or that carries a bare `%`.
+
+A reviewer's name is required; without it the script refuses. A blank answer under a
+`REVIEW`-marked entry confirms it and drops the marker. A number that is not on the sheet
+refuses the whole reply, because it means the wrong sheet.
+
+**The check, which is the point.** A mis-ordered paste puts the wrong sentence under the wrong
+key, and nothing about the XML would show it to anyone who cannot read Telugu. After writing,
+the script re-reads the XML from disk and writes `docs/localisation/telugu-review-check.md`:
+every item in sheet order, its number, the English, and what is now in the app. That file goes
+back to the reviewer, who is the only person who can see a wrong mapping. Exercised on a
+temporary copy of `res/` with stand-in text before any of it touched the repo: reply and sheet
+paths, a deliberate mis-order showing up under the number given, slot mismatch refused, missing
+name refused, stray number refused, apostrophe escaping round-tripped, `REVIEW` confirmation.

@@ -8,12 +8,13 @@ the hackathon because the JNI symbol names encode it.
 
 ## BLOCKED ON VEDANT
 
-**A fluent Telugu speaker, for twenty minutes.** Hand them
-`docs/localisation/telugu-review-queue.md`: 27 strings, each with its English and where it
-appears, no repo needed. It comes back, the text goes into `res/values-te/strings.xml` unchanged
-under their name. The rule is that no Telugu ships unreviewed (`0017`). Same sheet for Hindi via
-`python tools/make_review_queue.py hi`, at lower priority. The eight rules-engine sentences are
-not on the sheet yet; that is waiting on Rao (`COORDINATION.md`, 01:50).
+**A fluent Telugu speaker, for half an hour.** Hand them
+`docs/localisation/telugu-review-queue.md`: 48 strings, each with its English and where it
+appears, the eight health sentences first, no repo needed. They reply in the file or as a
+numbered chat message. The reply goes in through `python tools/import_review_queue.py te`, never
+by editing XML by hand, and the check file it writes goes back to the speaker so they can see
+each item next to what landed. The rule is that no Telugu ships unreviewed (`0017`). Same for
+Hindi via `hi`, at lower priority.
 
 **The domain question from `HANDOVER.md`.** If a domain is still coming, the package rename gets
 more expensive with every commit that touches JNI. Deferred until after the hackathon by ruling,

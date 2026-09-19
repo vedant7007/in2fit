@@ -11,9 +11,12 @@
   - No Telugu string ships without review by a fluent speaker. See values-te/strings.xml.
   - Nothing is hardcoded in a composable: StringResourcesTest fails the build on a literal
     passed to Text(...) or a text parameter in ui/.
-  - The rules engine's sentences (domain/RuleTemplates.kt) are not here yet. They are built in
-    English inside the pure engine; localising them means the engine emits a template id and
-    arguments and the UI renders the sentence from this table. That change is the integrator's.
+  - The rules engine's sentences are the trigger_* keys below (db099ca). The engine emits a
+    template id and the evidence; TriggerText renders the words from this table. A translation
+    may reorder the slots; it must never add a number, and a test renders every template to
+    check that no digit appears that the evidence did not supply.
+  - A fluent speaker's reply comes in through tools/import_review_queue.py, never by editing
+    a locale file by hand, and the check file it writes goes back to the speaker.
 
   Writing a string here: say what the data says, offer what someone might consider, hand the
   decision back (spec 15.2). Never a number the database did not produce. Never a condition the

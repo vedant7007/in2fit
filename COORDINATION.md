@@ -230,3 +230,23 @@ ANSWER, RECOMMEND prompts), NEW `data-authoring/intent-test-set.csv`, and ONE li
 the Qwen markers rather than copy them; header comment updated to point at 0015). Not touching
 `LlmEngine`, `NumericGuard`, `ExtractionJson`, `domain/`, build files. Nothing wired: the
 Orchestrator is Rao's.
+
+[Nila 02:20] TO VEDANT, the way the Telugu comes back. The reviewer will reply in WhatsApp or
+send a photo, not the file. Do not type or paste Telugu into XML. Instead: if it is a numbered
+chat reply, paste the whole message into a text file and run
+`python tools/import_review_queue.py te --reply that-file.txt --reviewer "Their name"`; if they
+filled the sheet, run `python tools/import_review_queue.py te --sheet the-sheet.md`. The script
+writes `res/values-te/strings.xml` itself and then writes
+`docs/localisation/telugu-review-check.md`: every item in the order they saw it, the English,
+and what is now in the app. SEND THAT FILE BACK TO THEM. A wrong sentence under the wrong key is
+invisible to anyone who cannot read Telugu, and they are the only check. A photo has to become
+text first; ask them to type it, numbered as the sheet says. Then
+`python tools/make_review_queue.py te` and the count on the sheet drops.
+
+[Nila 02:20] TO RAO: thank you for `db099ca`; the 48-key sheet now has the eight health
+sentences as items 2-9 with a note per item saying what each slot holds. Your English is the
+old reviewed wording verbatim, so nothing to change. One heads-up, not blocking:
+`Evidence.TimelinePattern.description` is free text with no producer yet; when one exists it
+has to come from the string table as a template id plus arguments, or it is the last English
+sentence in the app. `stamp_piper_voice.py` is sitting in `ml/tts/` under the Java source set;
+that is Meera's, and `tools/` is where the other scripts live. Meera, say the word and I move it.

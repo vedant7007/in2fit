@@ -27,6 +27,18 @@ LANGUAGES = {"te": "Telugu", "hi": "Hindi"}
 PLACES = [
     ("safety_", "Advice screens",
      "A line at the bottom of every screen that gives advice. Always visible, cannot be closed."),
+    ("trigger_", "The health sentences",
+     "One of these is shown when something in the person's data changes what the app suggests: "
+     "a lab report value, a condition they told the app about, what dominates a meal, their "
+     "living situation, or a pattern over days. THESE MATTER MOST. Each must say only what the "
+     "data says, never that the person has an illness, never what to take. The slots (%1$s and "
+     "so on) are filled by the app with names and numbers; what each slot holds is in the note."),
+    ("nutrient_", "Nutrient words",
+     "Single words dropped into the sentences above and shown next to figures, so they should "
+     "read naturally mid-sentence."),
+    ("life_context_", "Living-situation phrases",
+     "Dropped into the sentence 'Suggestions are limited to what is realistic for ...' in place "
+     "of the slot, so each phrase should complete that sentence."),
     ("language_picker", "Language choice",
      "The heading of the screen where the person picks Telugu, Hindi or English."),
     ("confidence_band_", "The confidence label",
@@ -51,6 +63,24 @@ NOTES = {
         "the person can edit to match their kitchen.",
     "confidence_reason_low_asr_confidence":
         "'Speech recognition' is the part that turns what the person said into words.",
+    "trigger_escalate_above_range":
+        "%1$s the report's date, %2$s the test's name as printed, %3$s the value, %4$s its unit, "
+        "%5$s the upper limit printed on the report. Shown when the value is far above it.",
+    "trigger_escalate_below_range":
+        "Same slots. Shown when the value is far below the lower limit printed on the report.",
+    "trigger_lab_above_range":
+        "Same slots as above; %5$s is the upper limit printed on the report.",
+    "trigger_lab_below_range":
+        "Same slots; %5$s is the lower limit printed on the report.",
+    "trigger_declared_condition":
+        "%1$s is the condition in the person's own words, exactly as they told the app.",
+    "trigger_meal_composition":
+        "%1$s a nutrient word (from the list below), %2$s the name of a food or dish, %3$s a "
+        "whole number, the percentage.",
+    "trigger_life_context":
+        "%1$s is one of the living-situation phrases below.",
+    "trigger_timeline":
+        "%1$s a number of days, %2$s a short description the app supplies.",
     "status_line":
         "A format only. %1$s is the name of a feature and %2$s is its state, so the Telugu is "
         "just those two slots in the right order with whatever goes between them.",
@@ -61,7 +91,8 @@ def read_table(path: Path) -> dict:
     """key -> (text, translatable, needs_review), in file order, comments respected."""
     if not path.is_file():
         return {}
-    src = path.read_text(encoding="utf-8")
+    # From <resources> on: the header comment above it is the rules, and mentions REVIEW.
+    src = path.read_text(encoding="utf-8").split("<resources>", 1)[-1]
     out, pending = {}, False
     for m in re.finditer(r"<!--(.*?)-->|<string\s+([^>]*)>(.*?)</string>", src, re.S):
         if m.group(1) is not None:
@@ -115,15 +146,21 @@ def main(tag: str) -> int:
             f"it in the {language} sentence, wherever {language} needs it.",
             "4. If an English line is unclear or makes no sense to you, write that instead of guessing. "
             "A note beats a wrong string.",
-            "5. Put your name at the top. Because you wrote it, it counts as reviewed.", "",
-            "Send the file back to Vedant. Your text is pasted into the app unchanged.", ""]
+            "5. Put your name at the top. Because you wrote it, it counts as reviewed.",
+            "6. Replying in a chat instead of in this file is fine: send your name, then one line per "
+            "item starting with its number here, like `7. ...`. The numbers are how your words reach "
+            "the right place, so keep them.", "",
+            "Send it back to Vedant. Your text goes into the app unchanged, and you will get a list "
+            "back showing each item next to what landed, so you can check nothing slipped.", ""]
+
+    n = 0  # continuous across sections: a numbered chat reply must be unambiguous
 
     def emit(section_keys, heading, show_current):
-        nonlocal out
+        nonlocal out, n
         if not section_keys:
             return
         out += [f"## {heading}", ""]
-        n, last_section = 0, None
+        last_section = None
         for k in section_keys:
             _, section, where = place_of(k)
             if section != last_section:
