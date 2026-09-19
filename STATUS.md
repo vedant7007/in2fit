@@ -1,6 +1,6 @@
 # Katori status
 
-Updated 19 Sep 2026, 11:45.
+Updated 19 Sep 2026, 15:10.
 
 ---
 
@@ -8,8 +8,13 @@ Updated 19 Sep 2026, 11:45.
 
 **Nothing.**
 
-Laptop control timed out once more (30 minutes idle) and I re-requested it immediately, as
-agreed. Cost this time was minutes, not an hour, because I switched to work that needs no run.
+Laptop control is no longer on the critical path. It expired again, and terminals are now
+click-only so a command cannot be typed into PowerShell at all. Rather than keep paying that
+cost, the whole test-and-build loop moved into the cloud container: SDK, platform 37, build
+tools, Gradle. Tests and the APK build now run there in about twenty seconds. The laptop stays
+the source of truth for the repo. `docs/decisions/0009`.
+
+Desktop control is still needed for the phone over USB, which is the entire hardware list below.
 
 ---
 
@@ -45,21 +50,25 @@ Nothing. Not built.
 
 ## COMPILE AND UNIT TEST ONLY
 
-**48 tests, 0 failures.** APK 34.17 MB, arm64-v8a only. Demo manifest permissions asserted as
-exactly CAMERA and RECORD_AUDIO against a whitelist.
+Read out of `logs/container-test3.log` and `logs/container-assemble.log`.
+
+**66 tests, 0 failures.** APK 36.23 MB, `lib/arm64-v8a` only. Demo manifest permissions asserted
+against a whitelist as exactly CAMERA, RECORD_AUDIO and the platform receiver permission, and
+`aapt2 dump permissions` on the built APK agrees. No INTERNET permission survives the merge.
 
 ### Measured match rate, the spec 13.5 replacement
 
-    ingredient utterances    144    resolved correctly  144  (100.0 %)
+    ingredient utterances    210    resolved correctly  210  (100.0 %)
     no-data utterances        22    refused correctly    22  (100.0 %)
-    expected-miss             10    correctly missed     10
     WRONG FOOD                 0    <- the number that matters
 
 > **THIS 100% IS CIRCULAR AND MUST NOT BE QUOTED TO JUDGES.**
 >
 > The utterance set was written by the same people who wrote the aliases, so it can only
 > contain phrasings somebody already thought of. It cannot contain the phrasing nobody
-> anticipated, which is exactly the case that will come up on stage.
+> anticipated, which is exactly the case that will come up on stage. The dish rows added with
+> the recipe layer are worse: the dish names and the recipes they point at were written by the
+> same hand on the same day.
 >
 > What the number IS: a regression guard. If a change breaks a phrasing that used to work,
 > or resolves something to the wrong food, the build fails.
@@ -69,37 +78,61 @@ exactly CAMERA and RECORD_AUDIO against a whitelist.
 > replace the authored set. Saying "100% accurate" on a slide would be false.
 
 The match rate is not the number to watch. WRONG FOOD is. A miss is honest and the user gets
-asked; a wrong food silently puts a wrong number in a health app. The test fails the build on
-either a wrong food or a rate regression.
-
-The utterance set is **authored, not recorded**, which is what makes the number circular. It gets replaced by Abhinav's real transcripts
-when they exist.
+asked; a wrong food silently puts a wrong number in a health app.
 
 ### Corpus
 
-81 foods, 513 aliases in roman, Telugu and Devanagari, 13 deliberate no-data items.
+81 foods, 503 aliases in roman, Telugu and Devanagari, 13 deliberate no-data items,
+**50 authored reference recipes over 434 ingredient rows**.
 
 **Gongura is in USDA**, as "Roselle, raw". An earlier sweep had reported it absent from every
 source. Same species, no caveat needed.
 
 ---
 
+## THE RECIPE LAYER
+
+Composed dishes now resolve. `sambar`, `idli`, `biryani`, `pappu`, `vada` and 45 more used to be
+honest misses and are now dishes with a visible, editable composition. Every figure from them is
+capped at Approximate by `AUTHORED_REFERENCE_RECIPE`, however exact the name match, because
+knowing the word is not knowing the plate.
+
+The absorbed oil is recorded as what the dish RETAINS, with its arithmetic and its reasoning in
+the committed CSV, so a reviewer can challenge the fraction without reverse-engineering it from a
+total. Deep-fried dishes land at 248-307 kcal per 100 g. The rejected public dataset read 745 for
+a vada, by counting the whole frying bath; ours reads 294.
+
+Full write-up in `docs/decisions/0008`.
+
+---
+
 ## WHAT MEASURING FOUND, WHICH READING DID NOT
 
-Five wrong answers on the first run, all real:
+The recipe layer, this round:
+
+- **Idli was authored at 227 kcal per 100 g**, within reach of a dry griddle roti at 258. A
+  steamed rice-and-dal cake cannot be that dense. The yield was wrong by nearly a factor of two.
+  Every existing assertion passed it, because they all take the yield as given and only check
+  that the arithmetic is self-consistent.
+  A new assertion derives each dish's moisture from its own macros and compares it to a band for
+  its cooking method. Idli at the old yield implies 45% moisture against 58-80% for a steamed
+  dish, and the build now deletes the database rather than ship it. Corrected from moisture, not
+  from a calorie target: 172.4 g of solids at 68% moisture is a 539 g yield, ten idlis of 54 g.
+- **`pulihora` pointed at lemon rice.** Bare pulihora is the tamarind one; lemon rice is
+  nimmakaya pulihora.
+- **`dal`, `daal` and Devanagari `दाल` resolved to nothing at all**, orphaned when the alias
+  collision between the pulse and the dish was fixed. They now mean the dish.
+
+Earlier rounds, kept because the shape recurs:
 
 - `biryani` resolved to **bay leaf**, through the alias "biryani aaku"
-- `upma` resolved to **semolina**, through "upma rava"
-- `atta` was refused as **curry leaves**, through "kadi patta"
-- `avalu` was refused as **horse gram**, through "ulavalu"
-- `kandi pappu` resolved to the **cooked** dal when it was authored as raw
+- `upma` resolved to **semolina**, `atta` was refused as **curry leaves**, `avalu` as
+  **horse gram**
+- "rice", "chawal" and "chana" each sat on both a raw and a cooked record
 
 Three of those are a whole dish collapsing onto one of its ingredients, which is the worst shape
-of wrong answer here, because the number that follows looks completely reasonable.
-
-Fixed four ways, and the new importer assertion then found three more nobody had noticed: "rice",
-"chawal" and "chana" each sat on both a raw and a cooked record, and whichever loaded last won
-silently. Full write-up in `docs/decisions/0006`.
+of wrong answer here, because the number that follows looks completely reasonable. Full write-up
+in `docs/decisions/0006`.
 
 **A separate one worth knowing:** Gradle had been marking the test task UP-TO-DATE after the food
 database was rebuilt, so a green build was reporting the previous run's numbers. The database and
@@ -110,15 +143,22 @@ red one.
 
 ## DECIDED WITHOUT ASKING
 
+- Bare dish names mean the dish; the plain ingredient keeps a name that says so. `0008`
+- Dish and ingredient are matched together and the stronger match wins, with ties to the dish. `0008`
+- Absorbed oil is a fraction of the PRE-FRY weight, because a fraction of the finished weight is
+  circular. `0008`
+- Two paths to a dish's nutrition, cross-checked against each other in a test. `0008`
+- Tests and the APK build moved to the cloud container, off the critical path of desktop
+  control. `0009`
 - Smoke-tested the LLM runtime before Hilt, since the spec has been wrong twice about what
-  exists. `docs/decisions/0006`
+  exists. `0006`
 - Matcher containment is one-directional and word-bounded; the no-data list is never
   fuzzy-matched. `0006`
-- Bare food names mean the cooked form, because that is what a person logging a meal means. `0006`
-- No nutrient preference means no suggestions at all. `0006`, and it is why beat 4 is now provable
+- No nutrient preference means no suggestions at all. `0006`, and it is why beat 4 is provable
 
 ---
 
 ## NEXT
 
-D: KSP, Room compiler, Hilt, timeboxed. Then E: the JNI bridge and NumericGuard.
+E: the JNI bridge and NumericGuard, written and ready for the moment a phone is attached.
+Nothing about it gets claimed until it has run on hardware. Then F: AsrEngine. Then G: the UI.

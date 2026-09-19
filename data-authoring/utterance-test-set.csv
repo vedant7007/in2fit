@@ -10,6 +10,12 @@
 #   <food_key>      must resolve to exactly this food
 #   NODATA:<key>    must be refused as a known no-data item, never substituted
 #   MISS            we expect no match today; a miss here is honest, not a bug
+#   <recipe_key>    must resolve to this authored reference recipe, as a composed dish
+#
+# The dish rows below are subject to the SAME circularity caveat as the rest of this
+# file, and more sharply: the dish names and their aliases were written by the same
+# hand, on the same day, as the recipes they point at. They are a REGRESSION GUARD, not
+# a coverage measure, and the resulting percentage is not real-world accuracy.
 utterance,expect,lang,note
 rice,rice_cooked,en,
 cooked rice,rice_cooked,en,
@@ -17,10 +23,10 @@ annam,rice_cooked,te,
 అన్నం,rice_cooked,te,native script
 chawal,rice_cooked,hi,
 plain rice,rice_cooked,en,
-dal,toor_dal_cooked,en,bare dal defaults to toor
-daal,toor_dal_cooked,en,spelling variant
-pappu,toor_dal_cooked,te,
-పప్పు,toor_dal_cooked,te,native script
+dal,toor_dal_tadka,en,bare dal means the tempered dal people actually eat, not plain boiled pulse
+daal,toor_dal_tadka,en,spelling variant
+pappu,toor_dal_tadka,te,
+పప్పు,toor_dal_tadka,te,native script; bare pappu is the tempered dal people actually eat
 kandi pappu,toor_dal_raw,te,
 toor dal,toor_dal_raw,en,
 arhar dal,toor_dal_raw,hi,
@@ -146,8 +152,8 @@ panchadara,sugar,te,
 sooji,sooji,en,
 rava,sooji,en,
 upma rava,sooji,en,
-poha,poha,en,
-atukulu,poha,te,
+poha,poha_upma,en,bare poha means the tempered dish; the flattened rice is an ingredient
+atukulu,poha_upma,te,
 rice flour,rice_flour,en,
 biyyam pindi,rice_flour,te,
 butter,butter,en,
@@ -177,13 +183,83 @@ methi leaves,NODATA:methi_leaves,en,
 menthi kura,NODATA:methi_leaves,te,
 ulavalu,NODATA:horse_gram,te,
 semiya,NODATA:vermicelli,te,
-sambar,MISS,en,composed dish; needs the recipe layer
-biryani,MISS,en,composed dish
-pulihora,MISS,te,composed dish
-pesarattu,MISS,te,composed dish
-idli,MISS,en,composed dish
-dosa,MISS,en,composed dish
-vada,MISS,en,composed dish
-upma,MISS,en,composed dish
-roti,MISS,en,composed dish; atta plus a recipe
-chapati,MISS,en,composed dish
+#
+# --- composed dishes, resolved by the authored reference recipe layer -------------------
+#
+# These ten were MISS until the recipe layer landed. They are kept in place rather than
+# rewritten from scratch so the change of behaviour is visible in the file's history.
+sambar,sambar,en,was MISS before the recipe layer
+biryani,veg_biryani,en,bare biryani means the vegetable one; the meat ones are named
+pulihora,tamarind_rice,te,bare pulihora is the tamarind one; lemon rice is nimmakaya pulihora
+pesarattu,pesarattu,te,
+idli,idli,en,
+dosa,plain_dosa,en,bare dosa is the plain one; masala dosa is named
+vada,plain_vada,en,
+upma,upma,en,
+roti,chapati,en,
+chapati,chapati,en,
+#
+# Dish names in Telugu script.
+సాంబార్,sambar,te,native script
+ఇడ్లీ,idli,te,native script
+దోస,plain_dosa,te,native script
+గారెలు,plain_vada,te,native script
+ఉప్మా,upma,te,native script
+రొట్టె,chapati,te,native script
+బిర్యానీ,veg_biryani,te,native script
+పెరుగన్నం,curd_rice,te,native script
+పూరీ,poori,te,native script
+కోడి కూర,chicken_curry,te,native script
+#
+# THE DISCRIMINATION ROWS. These are the ones that matter. Each pair contains a dish name and
+# an ingredient name that overlap, and the matcher has to tell them apart. The failure they
+# guard against is a whole dish collapsing onto one of its ingredients, which is how a plate
+# of biryani once read as a bay leaf.
+dal tadka,toor_dal_tadka,en,dish, not the plain boiled dal
+plain boiled toor dal,toor_dal_cooked,en,the cooked pulse on its own
+masala dosa,masala_dosa,en,named dosa beats the plain one
+chicken biryani,chicken_biryani,en,named biryani beats the bare one
+ghee roti,chapati_ghee,en,named roti beats the plain one
+tamata pappu,dosakaya_pappu,te,the dish, not the vegetable
+onion pakoda,pakoda,en,the dish
+kobbari pachadi,coconut_chutney,te,the dish
+perugu annam,curd_rice,te,the dish
+lemon rice,lemon_rice,en,
+tamarind rice,tamarind_rice,en,
+#
+# More dishes across the set, to widen the measurement beyond the demo path.
+rasam,rasam,en,
+charu,rasam,te,
+pongal,pongal,en,
+payasam,rice_kheer,te,
+kheer,rice_kheer,hi,
+samosa,samosa,en,
+pakoda,pakoda,en,
+punugulu,punugulu,te,
+mirchi bajji,mirchi_bajji,te,
+poori,poori,en,
+puri,poori,hi,
+omelette,omelette,en,
+egg curry,egg_curry,en,
+mutton curry,mutton_curry,en,
+fish curry,fish_pulusu,en,
+prawn curry,royyala_iguru,en,
+chana masala,chana_masala,en,
+chhole,chana_masala,hi,
+aloo curry,aloo_curry,en,
+aloo fry,aloo_fry,en,
+bhindi fry,bendakaya_fry,en,
+cabbage curry,cabbage_koora,en,
+bottle gourd curry,sorakaya_koora,en,
+ridge gourd curry,beerakaya_koora,en,
+gutti vankaya,gutti_vankaya,te,
+bagara baingan,bagara_baingan,en,
+palakura pappu,palakura_pappu,te,
+thotakura pappu,thotakura_pappu,te,
+drumstick sambar,munagakaya_sambar,en,
+sambar rice,sambar_rice,en,
+gongura pachadi,gongura_pachadi,te,
+peanut chutney,peanut_chutney,en,
+tomato pachadi,tomato_pachadi,en,
+jowar roti,jowar_roti,en,
+sprouts salad,sprouts_salad,en,

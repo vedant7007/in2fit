@@ -36,12 +36,20 @@ class SqliteFoodLookupTest {
         return (o as Outcome.Ok).value
     }
 
-    @Test fun `plain dal resolves to cooked toor dal`() = runBlocking {
-        assertEquals("toor_dal_cooked", ok(lookup.resolve(FoodQuery("dal", "en-IN"))).code.id)
+    // Bare "dal" and bare "pappu" moved from the plain boiled pulse to the tempered dish when
+    // the recipe layer landed, because that is what the word means when somebody says it about a
+    // meal they ate. The plain pulse is still reachable, by a name that says so.
+    @Test fun `plain dal resolves to the tempered dish people actually eat`() = runBlocking {
+        assertEquals("toor_dal_tadka", ok(lookup.resolve(FoodQuery("dal", "en-IN"))).code.id)
     }
 
     @Test fun `telugu pappu resolves through the native alias`() = runBlocking {
-        assertEquals("toor_dal_cooked", ok(lookup.resolve(FoodQuery("పప్పు", "te"))).code.id)
+        assertEquals("toor_dal_tadka", ok(lookup.resolve(FoodQuery("పప్పు", "te"))).code.id)
+    }
+
+    @Test fun `the plain boiled pulse is still reachable under a name that says so`() = runBlocking {
+        assertEquals("toor_dal_cooked", ok(lookup.resolve(FoodQuery("plain boiled toor dal", "en-IN"))).code.id)
+        assertEquals("toor_dal_raw", ok(lookup.resolve(FoodQuery("kandi pappu", "te"))).code.id)
     }
 
     @Test fun `a code-mixed phrase finds the food inside it`() = runBlocking {
@@ -149,21 +157,28 @@ class SqliteFoodLookupTest {
     }
 
     @Test fun `a household unit drags the figure down to Approximate`() = runBlocking {
-        val m = ok(lookup.resolve(FoodQuery("dal", "en-IN")))
+        val m = ok(lookup.resolve(FoodQuery("plain boiled toor dal", "en-IN")))
+        assertEquals(ConfidenceBand.GOOD, m.confidence.band)
         val w = ok(lookup.resolveUnit("katori", FoodClass.PULSE_COOKED))
         assertEquals(ConfidenceBand.APPROXIMATE, figureConfidence(m, w, quantityStated = true).band)
     }
 
     @Test fun `an inferred quantity drags the figure down to Rough`() = runBlocking {
-        val m = ok(lookup.resolve(FoodQuery("dal", "en-IN")))
+        val m = ok(lookup.resolve(FoodQuery("plain boiled toor dal", "en-IN")))
         val w = ok(lookup.resolveUnit("g", FoodClass.PULSE_COOKED))
         assertEquals(ConfidenceBand.ROUGH, figureConfidence(m, w, quantityStated = false).band)
     }
 
-    // --- not implemented -------------------------------------------------------------------------
+    // --- refusals that are still refusals ---------------------------------------------------------
 
-    @Test fun `recipes report themselves as not implemented rather than improvising`() = runBlocking {
-        val r = lookup.recipe(FoodCode(io.github.vedant7007.katori.domain.model.DataSource.AUTHORED_RECIPE, "sambar"))
-        assertTrue(r is Outcome.NotImplemented)
+    @Test fun `a food code is not a recipe code and is refused rather than improvised`() = runBlocking {
+        val code = ok(lookup.resolve(FoodQuery("cooked rice", "en-IN"))).code
+        val r = lookup.recipe(code)
+        assertTrue("an ingredient must not yield a made-up composition: $r", r is Outcome.Unavailable)
+    }
+
+    @Test fun `an unknown recipe key is refused rather than returning an empty dish`() = runBlocking {
+        val r = lookup.recipe(FoodCode(io.github.vedant7007.katori.domain.model.DataSource.AUTHORED_RECIPE, "no_such_dish"))
+        assertTrue(r is Outcome.Unavailable)
     }
 }

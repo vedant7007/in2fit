@@ -111,6 +111,8 @@ def main():
     ingredients = load_authored("ingredients.csv")
     nodata = load_authored("no-data-items.csv")
     units = load_authored("household-units.csv")
+    recipes = load_authored("recipes.csv")
+    recipe_ings_raw = load_authored("recipe-ingredients.csv")
     log(f"authored: {len(ingredients)} ingredients, {len(nodata)} no-data items, {len(units)} unit rows")
 
     wanted_ids = {int(r["fdc_id"]) for r in ingredients}
@@ -246,6 +248,40 @@ def main():
         unit TEXT NOT NULL, food_class TEXT NOT NULL, grams REAL NOT NULL, note TEXT,
         PRIMARY KEY (unit, food_class)
     );
+    CREATE TABLE recipes (
+        recipe_key TEXT PRIMARY KEY,
+        display_name TEXT NOT NULL,
+        servings REAL NOT NULL,
+        serving_g REAL NOT NULL,
+        yield_g REAL NOT NULL,
+        water_change_g REAL NOT NULL,
+        oil_method TEXT NOT NULL,
+        absorbed_oil_g REAL NOT NULL,
+        absorbed_basis TEXT NOT NULL,
+        absorbed_reason TEXT NOT NULL,
+        moisture_class TEXT NOT NULL,
+        note TEXT
+    );
+    CREATE TABLE recipe_ingredients (
+        recipe_key TEXT NOT NULL,
+        food_key TEXT NOT NULL,
+        grams REAL NOT NULL,
+        role TEXT NOT NULL,
+        note TEXT,
+        PRIMARY KEY (recipe_key, food_key, role)
+    );
+    CREATE TABLE recipe_nutrients (
+        recipe_key TEXT NOT NULL,
+        nutrient TEXT NOT NULL,
+        state TEXT NOT NULL,
+        amount_per_100g REAL,
+        unit TEXT NOT NULL,
+        PRIMARY KEY (recipe_key, nutrient)
+    );
+    CREATE TABLE recipe_aliases (
+        alias TEXT NOT NULL, alias_norm TEXT NOT NULL, script TEXT NOT NULL, recipe_key TEXT NOT NULL
+    );
+    CREATE INDEX idx_recipe_alias_norm ON recipe_aliases(alias_norm);
     CREATE TABLE usda_portions (
         food_key TEXT NOT NULL, label TEXT NOT NULL, grams REAL NOT NULL
     );
@@ -297,6 +333,74 @@ def main():
     for r in units:
         c.execute("INSERT INTO unit_conversions VALUES (?,?,?,?)",
                   (r["unit"], r["food_class"], float(r["grams"]), r["note"] or None))
+
+    # ---- authored reference recipes ------------------------------------------------------
+    # A reference recipe is a stated composition, shown to the user and editable. Every figure
+    # derived from one is capped at Approximate. The assertions below exist because a recipe is
+    # where a wrong number is most likely to look reasonable: a plausible total hides a wrong
+    # composition, and nothing downstream would notice.
+    by_recipe = defaultdict(list)
+    for r in recipe_ings_raw:
+        by_recipe[r["recipe_key"]].append(r)
+
+    recipe_rows_parsed = sum(len(v) for v in by_recipe.values())
+    recipe_rows_inserted = 0
+
+    for r in recipes:
+        key = r["recipe_key"]
+        c.execute("INSERT INTO recipes VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", (
+            key, r["display_name"], float(r["servings"]), float(r["serving_g"]),
+            float(r["yield_g"]), float(r["water_change_g"]), r["oil_method"],
+            float(r["absorbed_oil_g"]), r["absorbed_basis"], r["absorbed_reason"],
+            r["moisture_class"], r["note"] or None))
+        for i in by_recipe.get(key, []):
+            c.execute("INSERT INTO recipe_ingredients VALUES (?,?,?,?,?)",
+                      (key, i["ingredient_key"], float(i["grams"]), i["role"], i["note"] or None))
+            recipe_rows_inserted += 1
+        seen_r = set()
+        for col in ("aliases_roman", "aliases_native"):
+            for a in (r.get(col) or "").split("|"):
+                a = a.strip()
+                if not a:
+                    continue
+                n = norm(a)
+                if not n or n in seen_r:
+                    continue
+                seen_r.add(n)
+                c.execute("INSERT INTO recipe_aliases VALUES (?,?,?,?)",
+                          (a, n, "NATIVE" if is_native(a) else "ROMAN", key))
+        n = norm(r["display_name"])
+        if n and n not in seen_r:
+            c.execute("INSERT INTO recipe_aliases VALUES (?,?,?,?)", (r["display_name"], n, "ROMAN", key))
+
+    # nutrition per 100 g of the finished dish
+    ing_nutrients = {}
+    for row in c.execute("SELECT food_key, nutrient, state, amount FROM food_nutrients").fetchall():
+        ing_nutrients.setdefault(row[0], {})[row[1]] = (row[2], row[3])
+
+    for r in recipes:
+        key = r["recipe_key"]
+        yield_g = float(r["yield_g"])
+        for nk in WANTED:
+            total = 0.0
+            unknown = False
+            for i in by_recipe.get(key, []):
+                st_amt = ing_nutrients.get(i["ingredient_key"], {}).get(nk)
+                if st_amt is None or st_amt[0] == "UNKNOWN":
+                    # One unknown contributor makes the whole recipe figure unknown. Summing the
+                    # rest and presenting it as a total would understate it silently.
+                    unknown = True
+                    break
+                if st_amt[0] == "MEASURED":
+                    total += (float(i["grams"]) / 100.0) * float(st_amt[1])
+            if unknown:
+                c.execute("INSERT INTO recipe_nutrients VALUES (?,?,?,?,?)",
+                          (key, nk, "UNKNOWN", None, WANTED[nk]["unit"]))
+            else:
+                c.execute("INSERT INTO recipe_nutrients VALUES (?,?,?,?,?)",
+                          (key, nk, "MEASURED", total / (yield_g / 100.0), WANTED[nk]["unit"]))
+
+    log(f"recipes: {len(recipes)}  ingredient rows parsed {recipe_rows_parsed} inserted {recipe_rows_inserted}")
 
     for fid, label, grams in all_portions:
         if fid in id_to_key:
@@ -385,6 +489,191 @@ def main():
         failures.append(f"ALIAS COLLISION between a food and a no-data item: {rows}")
     else:
         log("ALIAS ok: no name is both a food and a no-data item")
+
+    # RECIPE ASSERTIONS.
+    #
+    # A recipe is where a wrong number is most likely to look reasonable, which is the same shape
+    # as a dish name collapsing onto one ingredient. These check composition, not plausibility of
+    # the total, because a plausible total is exactly what hides a wrong composition.
+
+    # 1. No ingredient row may be silently dropped.
+    if recipe_rows_parsed != recipe_rows_inserted:
+        failures.append(f"RECIPE: {recipe_rows_parsed - recipe_rows_inserted} ingredient rows were "
+                        f"parsed but not inserted. A dropped ingredient leaves a total that still "
+                        f"looks reasonable.")
+    else:
+        log(f"RECIPE ok: all {recipe_rows_inserted} ingredient rows inserted, none dropped")
+
+    # 2. Ingredient weights plus the stated water change must equal the stated yield, exactly.
+    rows = c.execute("""
+        SELECT r.recipe_key, r.yield_g, r.water_change_g, SUM(i.grams) AS ing_sum
+        FROM recipes r JOIN recipe_ingredients i ON i.recipe_key = r.recipe_key
+        GROUP BY r.recipe_key
+    """).fetchall()
+    off = [(k, y, w, s_, s_ + w - y) for k, y, w, s_ in rows if abs(s_ + w - y) > 0.5]
+    if off:
+        failures.append("RECIPE: ingredients plus water change do not equal the stated yield: " +
+                        "; ".join(f"{k} off by {d:+.0f} g" for k, _, _, _, d in off))
+    else:
+        log(f"RECIPE ok: all {len(rows)} recipes reconcile to their stated yield")
+
+    # 3. Every ingredient must be a real food, never a no-data item and never a typo.
+    rows = c.execute("""
+        SELECT DISTINCT i.recipe_key, i.food_key FROM recipe_ingredients i
+        WHERE i.food_key NOT IN (SELECT food_key FROM foods)
+    """).fetchall()
+    if rows:
+        failures.append(f"RECIPE: ingredients that are not real foods: {rows}")
+    else:
+        log("RECIPE ok: every ingredient resolves to a real food")
+    rows = c.execute("""
+        SELECT DISTINCT i.recipe_key, i.food_key FROM recipe_ingredients i
+        WHERE i.food_key IN (SELECT item_key FROM no_data_items)
+    """).fetchall()
+    if rows:
+        failures.append(f"RECIPE: ingredients that are no-data items: {rows}")
+    else:
+        log("RECIPE ok: no ingredient is a no-data item")
+
+    # 4. The absorbed-fat row must equal the figure the recipe documents.
+    rows = c.execute("""
+        SELECT r.recipe_key, r.absorbed_oil_g,
+               COALESCE((SELECT SUM(grams) FROM recipe_ingredients i
+                         WHERE i.recipe_key = r.recipe_key
+                           AND i.role IN ('ABSORBED_FAT','TEMPER','SHALLOW_FRY_RETAINED')
+                           AND i.food_key IN (SELECT food_key FROM foods WHERE food_class='FAT_OIL')), 0)
+        FROM recipes r WHERE r.oil_method != 'NONE'
+    """).fetchall()
+    off = [(k, doc, actual) for k, doc, actual in rows if abs(doc - actual) > 0.5]
+    if off:
+        failures.append("RECIPE: documented absorbed oil does not match the fat rows: " +
+                        "; ".join(f"{k} documents {d:.0f} g but the rows total {a:.0f} g" for k, d, a in off))
+    else:
+        log(f"RECIPE ok: absorbed oil matches its documented figure in all {len(rows)} recipes with fat")
+
+    # 4b. An alias must not sit on both a food and a dish.
+    #
+    # "annam" was authored on both the cooked-rice ingredient and a steamed-rice recipe, so which
+    # one a person got depended on lookup order. That is the same silent ambiguity the food alias
+    # assertion catches, one table over.
+    rows = c.execute("""
+        SELECT a.alias_norm, a.food_key, ra.recipe_key
+        FROM food_aliases a JOIN recipe_aliases ra ON ra.alias_norm = a.alias_norm
+    """).fetchall()
+    if rows:
+        failures.append("RECIPE: a name means both a food and a dish: " +
+                        "; ".join(f"'{a}' -> food {f} and dish {r}" for a, f, r in rows))
+    else:
+        log("RECIPE ok: no name means both a food and a dish")
+    rows = c.execute("""
+        SELECT ra.alias_norm, ra.recipe_key, n.item_key
+        FROM recipe_aliases ra JOIN no_data_aliases n ON n.alias_norm = ra.alias_norm
+    """).fetchall()
+    if rows:
+        failures.append(f"RECIPE: a dish name collides with a no-data item: {rows}")
+    else:
+        log("RECIPE ok: no dish name collides with a no-data item")
+
+    # 5. The oil share of the finished dish must sit in a defensible band for its method.
+    #
+    # This replaced a cruder rule that said a deep-fried dish cannot gain water. That rule fired
+    # on a correct change and was simply wrong: water_change covers the whole process from raw
+    # ingredients to finished dish, and the hydration steps come first. Dal is soaked before it is
+    # ground, and flour is hydrated into dough, so most fried items gain weight overall even
+    # though the frying step alone drives water off.
+    #
+    # The band below is the guard that actually matters. A vada reading 745 kcal/100 g in the
+    # rejected dataset was an oil share of roughly 50%, which no fried food has. Anything outside
+    # these bands means the absorbed figure or the yield is wrong, whichever way the error runs.
+    OIL_SHARE_BANDS = {"DEEP_FRY": (0.05, 0.25), "SHALLOW_FRY": (0.01, 0.15), "TEMPER": (0.0, 0.12)}
+    rows = c.execute("SELECT recipe_key, oil_method, absorbed_oil_g, yield_g FROM recipes").fetchall()
+    out_of_band = []
+    for k, method, oil, y in rows:
+        band = OIL_SHARE_BANDS.get(method)
+        if not band or y <= 0:
+            continue
+        share = oil / y
+        if not (band[0] <= share <= band[1]):
+            out_of_band.append(f"{k} ({method}) is {share:.1%}, outside {band[0]:.0%}-{band[1]:.0%}")
+    if out_of_band:
+        failures.append("RECIPE: oil share outside a defensible band: " + "; ".join(out_of_band))
+    else:
+        log(f"RECIPE ok: oil share is within band for all {len(rows)} recipes")
+
+    # 6. Mass sanity: a dish cannot lose almost all of its weight, and cannot end up weightless.
+    rows = c.execute("""
+        SELECT r.recipe_key, r.yield_g, SUM(i.grams) FROM recipes r
+        JOIN recipe_ingredients i ON i.recipe_key = r.recipe_key GROUP BY r.recipe_key
+    """).fetchall()
+    silly = [(k, y, s_) for k, y, s_ in rows if y <= 0 or y < 0.2 * s_ or y > 4.0 * s_]
+    if silly:
+        failures.append(f"RECIPE: implausible yield against ingredient weight: {silly}")
+    else:
+        log("RECIPE ok: every yield is plausible against its ingredient weight")
+
+    # 7. Implied moisture must be plausible for how the dish is cooked.
+    #
+    # THIS IS THE ASSERTION THAT MEASURES THE YIELD. Every other recipe check takes yield_g as
+    # given: assertion 2 only proves the arithmetic is self-consistent, and a wrong water figure
+    # passes it happily as long as the sum still matches. Nothing caught that until this.
+    #
+    # It works by deriving the finished dish's moisture-and-ash fraction from its own macros,
+    # as 100 minus protein, carbohydrate and fat per 100 g, and comparing it to a band for the
+    # cooking method stated in recipes.csv. A wrong yield shows up here immediately, because
+    # dividing the same nutrients by a smaller mass makes a wet food look dry.
+    #
+    # WHAT IT FOUND. Idli was authored at a 300 g yield, which put a steamed rice-and-dal cake at
+    # 45% moisture and 227 kcal/100 g, within reach of a dry griddle roti at 258. Steaming cannot
+    # do that. The corrected yield of 539 g puts it at 68%, the moisture of boiled rice.
+    #
+    # WHAT IT IS NOT. The bands are wide on purpose and they are not an accuracy check. They
+    # cannot separate a right figure from a nearly right one, and passing says only that the dish
+    # is not impossible. Narrowing them without weighed plates to narrow them against would be
+    # inventing precision.
+    MOISTURE_BANDS = {
+        "STEAMED":       (58, 80),   # idli: a steamed batter finishes near boiled rice
+        "GRIDDLE_BREAD": (25, 55),   # chapati, dosa: a dry griddle drives water off
+        "DEEP_FRIED":    (28, 60),   # frying replaces water with a little retained oil
+        "SOFT_GRAIN":    (52, 80),   # rice dishes, upma, poha, pongal
+        "MIXED_PLATE":   (50, 80),   # a dry item served with a wet one, e.g. masala dosa
+        "GRAVY":         (58, 93),   # curries, pappu, sambar
+        "DRY_FRY":       (58, 88),   # vepudu: a vegetable dish cooked down but not dried out
+        "CHUTNEY":       (38, 88),   # ranges from coconut to a thin tomato pachadi
+        "THIN_SOUP":     (80, 95),   # rasam
+        "EGG":           (60, 85),
+        "RAW_SALAD":     (78, 95),
+    }
+    rows = c.execute("SELECT recipe_key, display_name, moisture_class FROM recipes").fetchall()
+    bad_class = [k for k, _, m in rows if m not in MOISTURE_BANDS]
+    if bad_class:
+        failures.append(f"RECIPE: unknown moisture_class on {bad_class}")
+    off = []
+    for k, name, mclass in rows:
+        band = MOISTURE_BANDS.get(mclass)
+        if not band:
+            continue
+        macros = 0.0
+        unknown = False
+        for nk in ("PROTEIN", "CARBOHYDRATE", "FAT"):
+            row = c.execute(
+                "SELECT state, amount_per_100g FROM recipe_nutrients "
+                "WHERE recipe_key = ? AND nutrient = ?", (k, nk)).fetchone()
+            if row is None or row[0] != "MEASURED":
+                unknown = True
+                break
+            macros += row[1]
+        if unknown:
+            # Nothing to check against; the dish already reads Unknown for that nutrient.
+            continue
+        moisture = 100.0 - macros
+        if not (band[0] <= moisture <= band[1]):
+            off.append(f"{k} ({name}, {mclass}) implies {moisture:.0f}% moisture, "
+                       f"outside {band[0]}-{band[1]}%")
+    if off:
+        failures.append("RECIPE: implied moisture is not possible for the stated cooking method. "
+                        "The yield is the number to check first:\n  " + "\n  ".join(off))
+    else:
+        log(f"RECIPE ok: implied moisture is plausible for all {len(rows)} recipes")
 
     # No-data items must not have any nutrients.
     rows = c.execute("""

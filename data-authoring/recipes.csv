@@ -1,0 +1,82 @@
+# Authored reference recipes. Spec 13.2.
+#
+# A reference recipe is a STATED COMPOSITION, not a measurement of anyone's cooking. It is shown
+# to the user, it is editable, and every figure derived from one carries the Approximate band via
+# AUTHORED_REFERENCE_RECIPE. It is the opposite of inventing a nutrition number: the composition
+# is visible and correctable.
+#
+# ABSORBED OIL IS THE NUMBER THAT MATTERS HERE.
+# Counting a whole frying bath as consumed is what made a rejected public dataset read
+# 745 kcal/100 g for a plain vada. These columns exist so a reviewer can challenge the fraction
+# directly instead of reverse-engineering it from a calorie total:
+#
+#   oil_method        DEEP_FRY | SHALLOW_FRY | TEMPER | NONE
+#   absorbed_oil_g    grams of fat the finished dish actually retains
+#   absorbed_basis    how that number was arrived at, as arithmetic
+#   absorbed_reason   why that fraction, in words a reviewer can argue with
+#
+# THE TEMPERING DISTINCTION. Tempering oil (tadka, popu) is poured into the dish and eaten in
+# full, so 100% of it counts. Frying-bath oil is not eaten; only what the food retains counts.
+# Treating those two the same is the error being avoided.
+#
+# water_change_g is stated, not inferred: yield_g must equal the sum of ingredient grams plus
+# water_change_g exactly, and the importer fails if it does not. Positive means water absorbed
+# (rice, dal), negative means evaporation (curries reduced on the stove).
+#
+# moisture_class is a BAND CHECK, not an accuracy check. The importer derives each finished
+# dish's moisture-plus-ash fraction as 100 minus protein, carbohydrate and fat per 100 g, and
+# fails if it falls outside the band for this class. It cannot tell a right number from a nearly
+# right one. It catches the order-of-magnitude error, which is the one that reaches the screen
+# looking calm: it is what caught idli reading 227 kcal/100 g, as dense as a dry griddle roti,
+# because its stated yield left a steamed food at 45 % moisture.
+recipe_key,display_name,aliases_roman,aliases_native,servings,serving_g,yield_g,water_change_g,oil_method,absorbed_oil_g,absorbed_basis,absorbed_reason,note,moisture_class
+chapati,Chapati / roti,roti|chapati|phulka|rotte,రొట్టె|रोटी,6,45,270,62,NONE,0,n/a,A dry-griddle phulka uses no fat. The ghee-smeared version is a separate recipe.,Six rotis from 200 g atta.,GRIDDLE_BREAD
+chapati_ghee,Chapati with ghee,ghee roti|ghee chapati|tuppa rotte,,6,48,288,62,SHALLOW_FRY,18,3 g ghee smeared per roti x 6,"Smeared ghee is absorbed into the roti and eaten in full, unlike a frying bath.",,GRIDDLE_BREAD
+poori,Poori,poori|puri,పూరీ|पूरी,6,54,321,90,DEEP_FRY,28,14% of the 203 g pre-fry batter or dough,"deep-fried wheat dough, mid of the usual 10-18% range",Water change set deliberately: dough loses water during frying. Water change: atta is hydrated into dough (+130) then loses water frying (-40).,DEEP_FRIED
+plain_dosa,Plain dosa,dosa|dose|plain dosa|sada dosa,దోస|दोसा,4,90,360,133,SHALLOW_FRY,20,5 g oil per dosa x 4,"A dosa is cooked on a greased griddle, not in a bath. Roughly a teaspoon per dosa is absorbed.",,GRIDDLE_BREAD
+masala_dosa,Masala dosa,masala dosa|masaala dose,,4,180,720,97,SHALLOW_FRY,20,5 g oil per dosa x 4,Same griddle oil as a plain dosa; the potato filling carries its own tempering separately.,,MIXED_PLATE
+idli,Idli,idli|iddli|idly,ఇడ్లీ,10,53.9,539,345,NONE,0,n/a,Idli is steamed. No fat is added at any stage.,"Water change set deliberately: idli batter is ground with water and steamed, so it finishes near the moisture of boiled rice. 172.4 g of solids at 68 % moisture is a 539 g yield, which is ten idlis of about 54 g, not six. The earlier 300 g yield made a steamed food as energy-dense as a dry griddle roti, which is not possible.",STEAMED
+pesarattu,Pesarattu,pesarattu|pesara attu|moong dosa,పెసరట్టు,4,95,380,126,SHALLOW_FRY,20,5 g oil per attu x 4,Griddle-cooked like a dosa.,,GRIDDLE_BREAD
+upma,Upma,upma|uppma|uppittu,ఉప్మా,4,180,720,398,TEMPER,20,all 20 g of tempering oil,Tempering oil goes into the dish and is eaten in full. Nothing is drained.,,SOFT_GRAIN
+pongal,Ven pongal,pongal|ven pongal|khara pongal,పొంగలి,4,180,720,430,TEMPER,25,all 25 g of ghee,Ghee is stirred through and eaten in full.,,SOFT_GRAIN
+poha_upma,Poha,poha|atukulu|aval upma,అటుకులు,3,150,450,147,TEMPER,15,all 15 g of tempering oil,Tempering oil is absorbed by the flattened rice and eaten in full.,,SOFT_GRAIN
+plain_vada,Medu vada,vada|vadai|garelu|minapa garelu|medu vada,గారెలు,6,53,320,80,DEEP_FRY,35,17% of the 205 g pre-fry batter or dough,"ring shape, high surface area, upper half of the 12-20% range for fried urad batter",Water change set deliberately: batter loses water during frying. Water change: urad dal is soaked before grinding (+150) then loses water frying (-70).,DEEP_FRIED
+mirchi_bajji,Mirchi bajji,mirchi bajji|mirapakaya bajji|chilli bajji,మిరపకాయ బజ్జీ,6,56,339,30,DEEP_FRY,45,17% of the 264 g pre-fry batter or dough,besan batter coating on a large chilli; coatings absorb more than dough,Water change: besan batter is hydrated (+110); the chilli loses water frying (-80).,DEEP_FRIED
+punugulu,Punugulu,punugulu|punukulu,పునుగులు,5,54,272,60,DEEP_FRY,31,17% of the 181 g pre-fry batter or dough,"small fritters, high surface to volume","Water change set deliberately: small fritters, proportionally more water lost. Water change: dosa batter is already hydrated (+120) then loses water frying (-60).",DEEP_FRIED
+pakoda,Onion pakoda,pakoda|pakora|onion pakoda|ulli pakodi,పకోడీ,4,59,235,-20,DEEP_FRY,39,18% of the 216 g pre-fry batter or dough,"loose besan strands, the highest surface area of any item here",Water change: besan batter hydrated (+40); onion loses a lot of water frying (-60).,DEEP_FRIED
+samosa,Samosa,samosa|singhara,సమోసా,4,79,317,10,DEEP_FRY,35,13% of the 272 g pre-fry batter or dough,"sealed pastry; the filling inside absorbs nothing, so lower than an open batter",Water change: pastry dough hydrated (+50); the potato filling loses water (-40).,DEEP_FRIED
+sambar,Sambar,sambar|sambhar|saaru with vegetables,సాంబార్,4,200,800,239,TEMPER,15,all 15 g of tempering oil,Tadka is poured in and eaten in full.,,GRAVY
+rasam,Rasam,rasam|chaaru|charu|puli rasam|chintapandu charu,రసం|చారు,4,180,720,465,TEMPER,10,all 10 g of tempering oil,,,THIN_SOUP
+toor_dal_tadka,Dal tadka,dal tadka|pappu|dal|daal|tadka dal|kandi pappu curry,పప్పు|दाल,4,180,720,307,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+sambar_rice,Sambar rice,sambar rice|sambar annam|bisi bele style,,3,250,750,234,TEMPER,15,all 15 g of tempering oil,,,SOFT_GRAIN
+curd_rice,Curd rice,curd rice|perugu annam|daddojanam|thayir sadam,పెరుగన్నం,3,200,600,91,TEMPER,8,all 8 g of tempering oil,,,SOFT_GRAIN
+lemon_rice,Lemon rice,lemon rice|nimmakaya pulihora|chitranna|elumichai sadam,నిమ్మకాయ పులిహోర,4,180,720,425,TEMPER,25,all 25 g of tempering oil,Pulihora carries more tempering than most rice dishes; peanuts are fried in it and eaten.,,SOFT_GRAIN
+tamarind_rice,Tamarind pulihora,tamarind rice|pulihora|chintapandu pulihora|puliyodarai,పులిహోర,4,180,720,387,TEMPER,25,all 25 g of tempering oil,,,SOFT_GRAIN
+veg_biryani,Vegetable biryani,biryani|veg biryani|vegetable biryani|biriyani,బిర్యానీ,4,332,1330,300,TEMPER,40,all 40 g of cooking oil and ghee,Biryani oil is layered through the rice and eaten in full; nothing is drained.,Water change set deliberately: 300 g rice absorbs water; vegetables lose a little.,SOFT_GRAIN
+chicken_biryani,Chicken biryani,chicken biryani|kodi biryani|murgh biryani,కోడి బిర్యానీ,4,372,1488,300,TEMPER,45,all 45 g of cooking oil and ghee,,Water change set deliberately: same as veg biryani; the chicken also releases and reabsorbs.,SOFT_GRAIN
+gongura_pachadi,Gongura pachadi,gongura pachadi|gongura chutney|gongura pacchadi,గోంగూర పచ్చడి,6,40,240,-82,TEMPER,20,all 20 g of tempering oil,"Cooked down, so a large negative water change.",,CHUTNEY
+tomato_pachadi,Tomato pachadi,tomato pachadi|tamata pachadi|tomato chutney,టమాటా పచ్చడి,6,40,240,-112,TEMPER,18,all 18 g of tempering oil,,,CHUTNEY
+coconut_chutney,Coconut chutney,coconut chutney|kobbari pachadi|thengai chutney,కొబ్బరి పచ్చడి,6,40,240,67,TEMPER,10,all 10 g of tempering oil,Water is added when grinding.,,CHUTNEY
+peanut_chutney,Peanut chutney,peanut chutney|palli chutney|palli pachadi,పల్లీ పచ్చడి,6,40,240,72,TEMPER,10,all 10 g of tempering oil,,,CHUTNEY
+bagara_baingan,Bagara baingan,bagara baingan|bagara brinjal|vankaya bagara,బగారా బైంగన్,4,132,526,-60,TEMPER,40,all 40 g of cooking oil,The brinjals are shallow-fried in the same pan and the oil stays in the gravy.,Water change set deliberately: brinjal cooks down and the gravy reduces.,GRAVY
+gutti_vankaya,Gutti vankaya koora,gutti vankaya|stuffed brinjal|gutti vankaya koora,గుత్తి వంకాయ,4,124,498,-50,TEMPER,35,all 35 g of cooking oil,,"Water change set deliberately: stuffed brinjal, reduced gravy.",GRAVY
+bendakaya_fry,Bendakaya vepudu,bendakaya fry|bhindi fry|okra fry|bendakaya vepudu,బెండకాయ వేపుడు,4,100,400,-145,SHALLOW_FRY,30,all 30 g of cooking oil,"Stir-fried in an open pan; the oil is not drained, so all of it is eaten. Heavy water loss from the okra.",,DRY_FRY
+aloo_fry,Aloo vepudu,aloo fry|potato fry|bangaladumpa vepudu,బంగాళాదుంప వేపుడు,4,110,440,-105,SHALLOW_FRY,30,all 30 g of cooking oil,,,DRY_FRY
+cabbage_koora,Cabbage koora,cabbage curry|cabbage koora|patta gobhi sabzi,క్యాబేజీ కూర,4,120,480,-72,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+beerakaya_koora,Beerakaya koora,ridge gourd curry|beerakaya koora|turai sabzi,బీరకాయ కూర,4,130,520,-77,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+sorakaya_koora,Sorakaya koora,bottle gourd curry|lauki sabzi|sorakaya koora,సొరకాయ కూర,4,130,520,-67,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+thotakura_pappu,Thotakura pappu,thotakura pappu|amaranth dal|chaulai dal,తోటకూర పప్పు,4,180,720,237,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+palakura_pappu,Palakura pappu,palakura pappu|palak dal|spinach dal,పాలకూర పప్పు,4,180,720,237,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+dosakaya_pappu,Tomato pappu,tomato pappu|tomato dal|tamata pappu,టమాటా పప్పు,4,180,720,227,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+munagakaya_sambar,Drumstick sambar,drumstick sambar|munagakaya sambar,మునగకాయ సాంబార్,4,200,800,251,TEMPER,15,all 15 g of tempering oil,,,GRAVY
+chicken_curry,Chicken curry,chicken curry|kodi kura|murgh curry|chicken kura,కోడి కూర,4,180,720,-222,TEMPER,45,all 45 g of cooking oil,Oil rises to the top of the gravy and is eaten with it.,,GRAVY
+mutton_curry,Mutton curry,mutton curry|mamsam kura|goat curry,మాంసం కూర,4,180,720,-241,TEMPER,50,all 50 g of cooking oil,,,GRAVY
+egg_curry,Egg curry,egg curry|kodi guddu kura|anda curry,కోడిగుడ్డు కూర,4,145,581,-100,TEMPER,30,all 30 g of cooking oil,,Water change set deliberately: onion and tomato gravy reduces.,GRAVY
+fish_pulusu,Chepala pulusu,fish curry|chepala pulusu|fish pulusu,చేపల పులుసు,4,180,720,-93,TEMPER,35,all 35 g of cooking oil,,,GRAVY
+royyala_iguru,Royyala iguru,prawn curry|royyala iguru|prawn fry,రొయ్యల ఇగురు,4,140,560,-149,SHALLOW_FRY,35,all 35 g of cooking oil,,,GRAVY
+omelette,Omelette,omelette|omlet|gudlu omelette,,1,120,120,-22,SHALLOW_FRY,10,all 10 g of pan oil,Pan oil is absorbed by the egg and eaten in full.,,EGG
+sprouts_salad,Sprouts salad,sprouts salad|molakalu salad|moong salad,,2,100,200,0,NONE,0,n/a,Raw; no cooking and no fat added.,,RAW_SALAD
+jowar_roti,Jonna rotte,jowar roti|jonna rotte|jolada rotti,జొన్న రొట్టె,4,60,240,90,NONE,0,n/a,"Dry-griddle bread, no fat.",,GRIDDLE_BREAD
+aloo_curry,Aloo curry,aloo curry|potato curry|bangaladumpa kura|aloo kura,బంగాళాదుంప కూర,4,152,606,-60,TEMPER,25,all 25 g of cooking oil,Tempering and sauteing oil stays in the gravy and is eaten in full.,,GRAVY
+chana_masala,Chana masala,chana masala|chhole|senagala kura|chole,చోలే,4,160,640,120,TEMPER,25,all 25 g of cooking oil,Chickpeas absorb water while cooking; the gravy reduces afterwards.,,GRAVY
+rice_kheer,Payasam,payasam|kheer|paramannam|rice payasam,పాయసం,4,159,637,90,TEMPER,15,all 15 g of ghee,Ghee is stirred through and eaten in full.,,SOFT_GRAIN
