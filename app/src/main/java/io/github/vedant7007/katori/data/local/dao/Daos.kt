@@ -104,6 +104,34 @@ interface MealDao {
     )
     fun nutrientTotalsForMeal(mealId: Long): Flow<List<NutrientTotalRow>>
 
+    /**
+     * Which items had no value for which nutrient, so a partial total can NAME what is missing
+     * ("at least 11 g; no value for dal") rather than only count it.
+     */
+    @Query(
+        """
+        SELECT n.nutrient AS nutrient, i.spoken_name AS spoken_name
+        FROM meal_item_nutrients n
+        JOIN meal_items i ON i.id = n.meal_item_id
+        WHERE i.meal_id = :mealId AND n.state = 'UNKNOWN'
+        ORDER BY i.id
+        """
+    )
+    suspend fun unknownContributors(mealId: Long): List<UnknownContributorRow>
+
+    /** The same holes, over a time range, for the period totals. */
+    @Query(
+        """
+        SELECT n.nutrient AS nutrient, i.spoken_name AS spoken_name
+        FROM meal_item_nutrients n
+        JOIN meal_items i ON i.id = n.meal_item_id
+        JOIN meals m ON m.id = i.meal_id
+        WHERE m.logged_at_epoch_ms BETWEEN :fromEpochMs AND :toEpochMs AND n.state = 'UNKNOWN'
+        ORDER BY i.id
+        """
+    )
+    suspend fun unknownContributorsInRange(fromEpochMs: Long, toEpochMs: Long): List<UnknownContributorRow>
+
     @Query("DELETE FROM meal_items WHERE id = :itemId")
     suspend fun deleteItem(itemId: Long)
 }
@@ -115,6 +143,12 @@ data class NutrientTotalRow(
     val total: Double,
     val unknown_count: Int,
     val measured_count: Int,
+)
+
+/** One hole in a derived total: this item had no value for this nutrient. */
+data class UnknownContributorRow(
+    val nutrient: String,
+    val spoken_name: String,
 )
 
 @Dao

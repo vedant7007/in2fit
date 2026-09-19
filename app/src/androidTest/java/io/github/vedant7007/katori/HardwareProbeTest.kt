@@ -20,6 +20,28 @@ import io.github.vedant7007.katori.ml.llm.LlamaCppRuntime
 import io.github.vedant7007.katori.ml.llm.LlamaCppLlmEngine
 import io.github.vedant7007.katori.ml.llm.ExtractionRequest
 import io.github.vedant7007.katori.ml.llm.Prompts
+import io.github.vedant7007.katori.ml.llm.AnswerRequest
+import io.github.vedant7007.katori.ml.llm.ConversationPrompts
+import io.github.vedant7007.katori.ml.llm.DisplayFigure
+import io.github.vedant7007.katori.ml.llm.Intent
+import io.github.vedant7007.katori.ml.llm.RecommendRequest
+import io.github.vedant7007.katori.data.knowledge.KnowledgeFacts
+import io.github.vedant7007.katori.domain.ContextText
+import io.github.vedant7007.katori.domain.DietType
+import io.github.vedant7007.katori.domain.LabValue
+import io.github.vedant7007.katori.domain.LifeContext
+import io.github.vedant7007.katori.domain.LoggedMeal
+import io.github.vedant7007.katori.domain.MealItemSnapshot
+import io.github.vedant7007.katori.domain.MealSnapshot
+import io.github.vedant7007.katori.domain.TriggerText
+import io.github.vedant7007.katori.domain.model.Completeness
+import io.github.vedant7007.katori.domain.model.ConfidenceReason
+import io.github.vedant7007.katori.domain.model.ConfidenceRules
+import io.github.vedant7007.katori.domain.model.DataSource
+import io.github.vedant7007.katori.domain.model.Nutrient
+import io.github.vedant7007.katori.domain.model.NutrientTotal
+import io.github.vedant7007.katori.domain.model.NutrientUnit
+import io.github.vedant7007.katori.domain.model.NutritionFigure
 import io.github.vedant7007.katori.domain.model.Outcome
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -423,6 +445,153 @@ class HardwareProbeTest {
      * declares INTERNET, and the demo build removes that permission from the merged manifest. The
      * open question was whether removing it breaks recognition itself or only the telemetry.
      */
+    // --- 2c. the conversational turns: the shape nobody had measured ---------------------------
+
+    /**
+     * ONE ANSWER AND ONE RECOMMEND TURN, prompt and generation reported separately, as `0014`
+     * does for extraction. Every latency figure before this was extraction's (221 prompt tokens,
+     * 55 generated). A conversational turn carries the person's context, retrieved rows and a
+     * prose answer, and could plausibly cost two to three times that; whether it does decides
+     * the answer length and the progressive display, so it is measured before a UI is designed
+     * around a guess.
+     *
+     * The requests are built the way `DefaultOrchestrator` builds them: `ContextText` renders a
+     * fixture person (hostel, vegetarian, "low iron" declared, haemoglobin 9.8 below its printed
+     * range, two logged meals) and `KnowledgeFacts.find` retrieves the rows from the shipped
+     * file, so the token counts are the real ones. Both thread counts, two passes each; the
+     * second pass is the rate.
+     */
+    @Test
+    fun b3_conversationalTurns() {
+        heading("conversational turns: ANSWER and RECOMMEND, the unmeasured shape")
+
+        val facts = KnowledgeFacts.load { ctx.assets.open(KnowledgeFacts.ASSET_PATH) }
+        val text = ContextText(ContextText.ENGLISH, TriggerText.ENGLISH)
+        val words = TriggerText(TriggerText.ENGLISH)
+        val locale = java.util.Locale.forLanguageTag("en-IN")
+
+        val declared = listOf("low iron")
+        val situation = text.lifeContext(LifeContext.HOSTEL_STUDENT)
+        val haemoglobin = LabValue("Haemoglobin", 9.8, "g/dL", 12.0, 15.0, java.time.LocalDate.of(2026, 9, 12))
+        val meals = listOf(
+            LoggedMeal(
+                MealSnapshot(1L, listOf(MealItemSnapshot("roti", "chapati", 90.0, emptyMap()), MealItemSnapshot("dal", "toor_dal_tadka", 180.0, emptyMap())), java.time.Instant.parse("2026-09-19T07:40:00Z")),
+                listOf(fig(Nutrient.ENERGY, 412.0, NutrientUnit.KCAL), fig(Nutrient.PROTEIN, 14.0, NutrientUnit.GRAM), fig(Nutrient.IRON, 2.9, NutrientUnit.MILLIGRAM)),
+            ),
+            LoggedMeal(
+                MealSnapshot(2L, listOf(MealItemSnapshot("rice", "rice_cooked", 200.0, emptyMap()), MealItemSnapshot("sambar", "sambar", 180.0, emptyMap()), MealItemSnapshot("curry leaves", null, null, emptyMap())), java.time.Instant.parse("2026-09-19T13:10:00Z")),
+                listOf(fig(Nutrient.ENERGY, 390.0, NutrientUnit.KCAL, "curry leaves"), fig(Nutrient.PROTEIN, 9.0, NutrientUnit.GRAM, "curry leaves"), fig(Nutrient.IRON, 1.7, NutrientUnit.MILLIGRAM, "curry leaves")),
+            ),
+        )
+        // The rules engine's own sentence for that value, exactly as the orchestrator would render it.
+        val triggerText = words.render(
+            io.github.vedant7007.katori.domain.TriggerStatement(
+                io.github.vedant7007.katori.domain.RuleIds.LAB_BELOW_RANGE,
+                io.github.vedant7007.katori.domain.TriggerTemplate.LAB_BELOW_RANGE,
+                io.github.vedant7007.katori.domain.Evidence.LabValueOutsideRange("Haemoglobin", 9.8, "g/dL", 12.0, 15.0, java.time.LocalDate.of(2026, 9, 12)),
+            )
+        )
+        // As the orchestrator builds it after the first measurement: the store's period totals
+        // first, so the sum the question needs is already computed, and the engine's sentence
+        // about the lab value last, in words rather than as a range to compare.
+        val week = io.github.vedant7007.katori.domain.PeriodTotals(
+            io.github.vedant7007.katori.domain.Period.LAST_SEVEN_DAYS,
+            listOf(fig(Nutrient.ENERGY, 802.0, NutrientUnit.KCAL, "curry leaves"), fig(Nutrient.PROTEIN, 23.0, NutrientUnit.GRAM, "curry leaves"), fig(Nutrient.IRON, 4.6, NutrientUnit.MILLIGRAM, "curry leaves")),
+        )
+        val figures = listOf(DisplayFigure(text.period(week))) +
+            meals.map { DisplayFigure(text.meal(it, locale)) } +
+            DisplayFigure(text.lab(haemoglobin)) + DisplayFigure(triggerText)
+        val allowed = listOf("Amaranth leaves (thotakura)", "Sprouted moong", "Rajma", "Sesame (nuvvulu)", "Spinach (palak)", "Dates")
+
+        val question = "did I get enough iron this week"
+        val answer = AnswerRequest(
+            question = question, languageTag = "en-IN", declaredConditions = declared, context = situation,
+            figures = figures, facts = facts.find("$question low iron"),
+        )
+        val ask = "I have low iron, what should I eat for more iron"
+        val recommend = RecommendRequest(
+            request = ask, languageTag = "en-IN", declaredConditions = declared, context = situation,
+            constraints = listOfNotNull(text.neverSuggest(DietType.VEGETARIAN)), triggerText = triggerText,
+            facts = facts.find("$ask low iron " + allowed.joinToString(" ")), allowedFoodNames = allowed, referralFollows = false,
+        )
+        say("answer request     ${answer.figures.size} figures, ${answer.facts.size} rows, prompt ${ConversationPrompts.answer(answer).length} chars")
+        say("recommend request  ${recommend.facts.size} rows, ${recommend.allowedFoodNames.size} foods, prompt ${ConversationPrompts.recommend(recommend).length} chars")
+
+        val model = File(modelsDir, LLM_FILE)
+        for (threads in THREAD_COUNTS) {
+            llmRuntime?.close(); llmRuntime = null
+            val runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = threads).also { llmRuntime = it }
+            val engine = LlamaCppLlmEngine(runtime)
+            say("")
+            say("--- $threads threads ---")
+            repeat(PASSES_PER_THREAD_COUNT) { pass ->
+                for ((label, call) in listOf<Pair<String, suspend () -> Outcome<io.github.vedant7007.katori.ml.llm.PhrasedText>>>(
+                    "ANSWER" to { engine.answer(answer) },
+                    "RECOMMEND" to { engine.recommend(recommend) },
+                )) {
+                    val t0 = System.nanoTime()
+                    val outcome = runBlocking { call() }
+                    val wall = (System.nanoTime() - t0) / 1_000_000
+                    val t = runtime.lastTimings()
+                    say("$label pass ${pass + 1}   wall ${wall} ms" + if (t == null) "" else
+                        "   prompt ${t.promptTokens} tok / ${"%.0f".format(t.promptMillis)} ms = ${"%.1f".format(t.promptTokensPerSecond)} tok/s" +
+                        "   gen ${t.evalTokens} tok / ${"%.0f".format(t.evalMillis)} ms = ${"%.2f".format(t.evalTokensPerSecond)} tok/s")
+                    when (outcome) {
+                        is Outcome.Ok -> say("  text: ${outcome.value.text.replace('\n', ' ')}")
+                        is Outcome.Unavailable -> say("  REFUSED ${outcome.reason}: ${outcome.detail}")
+                        is Outcome.NotImplemented -> say("  not implemented: ${outcome.component}")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Priya's authored intent set through the classifier prompt, both thread counts, scored as
+     * `Intent.parse(raw) == expect`, with the per-intent confusion. The set is circular (same hand,
+     * same day as the prompt) and the number is a regression guard, not accuracy. The file is
+     * pushed beside the models; a missing file fails, it does not skip.
+     */
+    @Test
+    fun b4_intentSet() {
+        heading("intent classifier on the authored set")
+        val file = File(modelsDir.parentFile, "intent-test-set.csv").takeIf { it.isFile }
+            ?: File(ctx.externalMediaDirs.first(), "intent-test-set.csv")
+        assertTrue("intent set not staged at ${file.absolutePath}", file.isFile)
+        val rows = file.readLines().filter { it.isNotBlank() && !it.startsWith("#") }.drop(1).map { it.split(",") }
+        say("${rows.size} cases from ${file.name}")
+
+        val model = File(modelsDir, LLM_FILE)
+        for (threads in THREAD_COUNTS) {
+            llmRuntime?.close(); llmRuntime = null
+            val runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = threads).also { llmRuntime = it }
+            val engine = LlamaCppLlmEngine(runtime)
+            say("")
+            say("--- $threads threads ---")
+            val confusion = sortedMapOf<String, Int>()
+            var right = 0
+            var promptMs = 0.0; var promptTok = 0L; var wallMs = 0L
+            for (row in rows) {
+                val (utterance, expect, lang) = row
+                val t0 = System.nanoTime()
+                val got = runBlocking { engine.classify(utterance, lang) }
+                wallMs += (System.nanoTime() - t0) / 1_000_000
+                runtime.lastTimings()?.let { promptMs += it.promptMillis; promptTok += it.promptTokens }
+                val label = when (got) { is Outcome.Ok -> got.value.name; is Outcome.Unavailable -> "ASK"; is Outcome.NotImplemented -> "N/A" }
+                if (label == expect) right++ else say("  $expect -> $label   \"$utterance\"" + (row.getOrNull(3)?.takeIf { it.isNotBlank() }?.let { "   [$it]" } ?: ""))
+                confusion.merge("$expect->$label", 1, Int::plus)
+            }
+            say("right $right / ${rows.size}   mean wall ${wallMs / rows.size} ms/case   prompt ${promptTok / rows.size} tok/case at ${"%.1f".format(promptTok * 1000.0 / promptMs)} tok/s")
+            say("confusion " + confusion.entries.joinToString { "${it.key}=${it.value}" })
+        }
+    }
+
+    private fun fig(n: Nutrient, amount: Double, unit: NutrientUnit, vararg unknown: String) = NutritionFigure(
+        NutrientTotal(n, amount, unit, if (unknown.isEmpty()) Completeness.COMPLETE else Completeness.PARTIAL, unknown.toList()),
+        ConfidenceRules.of(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.HOUSEHOLD_UNIT_DEFAULT),
+        listOf(DataSource.USDA_SR_LEGACY),
+    )
+
     @Test
     fun d_mlKitOcrWithoutNetworkPermission() {
         heading("ML Kit OCR, demo build, no INTERNET permission")

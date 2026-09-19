@@ -22,6 +22,41 @@ import io.github.vedant7007.katori.domain.DefaultRulesEngine
 import io.github.vedant7007.katori.domain.ModelArbiter
 import io.github.vedant7007.katori.ml.llm.LlamaCppModelLoader
 import io.github.vedant7007.katori.domain.RulesEngine
+import io.github.vedant7007.katori.data.food.LookupMealResolver
+import io.github.vedant7007.katori.data.knowledge.KnowledgeFacts
+import io.github.vedant7007.katori.data.local.AndroidContextStrings
+import io.github.vedant7007.katori.data.local.AndroidTriggerStrings
+import io.github.vedant7007.katori.data.local.RoomMealStore
+import io.github.vedant7007.katori.data.local.RoomUserContextSource
+import io.github.vedant7007.katori.domain.ContextText
+import io.github.vedant7007.katori.domain.FamilyModelLoader
+import io.github.vedant7007.katori.domain.MealResolver
+import io.github.vedant7007.katori.domain.MealStore
+import io.github.vedant7007.katori.domain.ModelFamily
+import io.github.vedant7007.katori.domain.Orchestrator
+import io.github.vedant7007.katori.domain.TriggerText
+import io.github.vedant7007.katori.domain.UserContextSource
+import io.github.vedant7007.katori.domain.model.Outcome
+import io.github.vedant7007.katori.ml.asr.AndroidAudioSource
+import io.github.vedant7007.katori.ml.asr.AsrEngine
+import io.github.vedant7007.katori.ml.asr.DefaultAsrEngine
+import io.github.vedant7007.katori.ml.asr.SherpaOnnxAsrLoader
+import io.github.vedant7007.katori.ml.llm.LlamaCppLlmEngine
+import io.github.vedant7007.katori.ml.llm.LlamaRuntime
+import io.github.vedant7007.katori.ml.llm.LlmEngine
+import io.github.vedant7007.katori.ml.llm.LlmModels
+import io.github.vedant7007.katori.ml.tts.AndroidTtsEngine
+import io.github.vedant7007.katori.ml.tts.AudioTrackSink
+import io.github.vedant7007.katori.ml.tts.EspeakData
+import io.github.vedant7007.katori.ml.tts.PiperTtsEngine
+import io.github.vedant7007.katori.ml.tts.PiperVoiceLoader
+import io.github.vedant7007.katori.ml.tts.RoutingTtsEngine
+import io.github.vedant7007.katori.ml.tts.TtsEngine
+import io.github.vedant7007.katori.ml.vision.FrameStore
+import io.github.vedant7007.katori.ml.vision.MlKitOcrEngine
+import io.github.vedant7007.katori.ml.vision.OcrEngine
+import io.github.vedant7007.katori.orchestration.DefaultOrchestrator
+import io.github.vedant7007.katori.orchestration.LlmLease
 import javax.inject.Singleton
 
 /**
@@ -95,15 +130,98 @@ object AppModule {
     @Provides
     @Singleton
     fun provideModelArbiter(@ApplicationContext context: Context): ModelArbiter {
-        val modelsDir = java.io.File(
-            context.externalMediaDirs.firstOrNull() ?: context.filesDir, "models",
-        )
+        val modelsDir = modelsDir(context)
         val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
         return DefaultModelArbiter(
             memory = AndroidDeviceMemory(context),
-            loader = LlamaCppModelLoader(modelsDir),
+            loader = FamilyModelLoader(
+                mapOf(
+                    ModelFamily.LLM to LlamaCppModelLoader(modelsDir),
+                    ModelFamily.ASR to SherpaOnnxAsrLoader(modelsDir),
+                    ModelFamily.TTS to PiperVoiceLoader(
+                        modelsDir,
+                        espeakDataDir = EspeakData.install(context, java.io.File(context.filesDir, "espeak-ng-data")),
+                    ),
+                )
+            ),
             log = FileMeasurementLog(context),
             buildTag = "${pkg.versionName}@${pkg.lastUpdateTime}",
         )
     }
+
+    private fun modelsDir(context: Context) = java.io.File(
+        context.externalMediaDirs.firstOrNull() ?: context.filesDir, "models",
+    )
+
+    // --- the engines ---------------------------------------------------------------------------
+
+    @Provides
+    @Singleton
+    fun provideAsrEngine(@ApplicationContext context: Context, arbiter: ModelArbiter): AsrEngine =
+        DefaultAsrEngine(arbiter, AndroidAudioSource(context))
+
+    /**
+     * The platform engine first, Piper as the fallback for a language the phone has no offline
+     * voice for; `RoutingTtsEngine` tries the next engine only on MODEL_NOT_LOADED, so a language
+     * nobody can speak here is reported, never read in another language's voice.
+     */
+    @Provides
+    @Singleton
+    fun provideTtsEngine(@ApplicationContext context: Context, arbiter: ModelArbiter): TtsEngine =
+        RoutingTtsEngine(listOf(AndroidTtsEngine(context), PiperTtsEngine(arbiter, AudioTrackSink(context))))
+
+    @Provides
+    @Singleton
+    fun provideFrameStore(): FrameStore = FrameStore()
+
+    @Provides
+    @Singleton
+    fun provideOcrEngine(frames: FrameStore): OcrEngine = MlKitOcrEngine(frames)
+
+    // --- the orchestrator and what it reads and writes through ---------------------------------
+
+    @Provides
+    @Singleton
+    fun provideKnowledgeFacts(@ApplicationContext context: Context): KnowledgeFacts =
+        KnowledgeFacts.load { context.assets.open(KnowledgeFacts.ASSET_PATH) }
+
+    @Provides
+    @Singleton
+    fun provideTriggerText(@ApplicationContext context: Context): TriggerText =
+        TriggerText(AndroidTriggerStrings(context))
+
+    @Provides
+    @Singleton
+    fun provideContextText(@ApplicationContext context: Context): ContextText =
+        ContextText(AndroidContextStrings(context), AndroidTriggerStrings(context))
+
+    @Provides
+    @Singleton
+    fun provideUserContextSource(db: KatoriDatabase, foods: FoodDbSource): UserContextSource =
+        RoomUserContextSource(db, foods)
+
+    @Provides
+    @Singleton
+    fun provideMealResolver(lookup: FoodLookup): MealResolver = LookupMealResolver(lookup)
+
+    @Provides
+    @Singleton
+    fun provideMealStore(db: KatoriDatabase): MealStore = RoomMealStore(db)
+
+    /** The LLM is leased from the arbiter per call; the engine is built over the admitted runtime. */
+    @Provides
+    @Singleton
+    fun provideLlmLease(arbiter: ModelArbiter): LlmLease = object : LlmLease {
+        override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> =
+            arbiter.withModel(LlmModels.QWEN_2_5_1_5B_Q4_K_M) { loaded ->
+                block(LlamaCppLlmEngine(loaded.native as LlamaRuntime))
+            }
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrchestrator(
+        asr: AsrEngine, llm: LlmLease, tts: TtsEngine, rules: RulesEngine, resolver: MealResolver, store: MealStore,
+        contextSource: UserContextSource, knowledge: KnowledgeFacts, triggerText: TriggerText, contextText: ContextText,
+    ): Orchestrator = DefaultOrchestrator(asr, llm, tts, rules, resolver, store, contextSource, knowledge, triggerText, contextText)
 }

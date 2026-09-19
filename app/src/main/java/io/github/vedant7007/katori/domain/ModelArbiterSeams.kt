@@ -57,6 +57,21 @@ interface ModelLoader {
 }
 
 /**
+ * One [ModelLoader] per family, behind one seam. The arbiter sees a single loader; each runtime
+ * (llama.cpp for the LLM, sherpa-onnx for ASR and the Piper voices) keeps its own file and its
+ * own tests, and adding a family is a map entry, not a branch in someone else's loader. A family
+ * with no loader bound throws, which the arbiter reports as MODEL_LOAD_FAILED naming the gap.
+ */
+class FamilyModelLoader(private val loaders: Map<ModelFamily, ModelLoader>) : ModelLoader {
+    override suspend fun load(handle: ModelHandle): Any =
+        (loaders[handle.family] ?: throw UnsupportedOperationException("${handle.family} has no runtime bound")).load(handle)
+
+    override fun unload(handle: ModelHandle, native: Any) {
+        loaders[handle.family]?.unload(handle, native)
+    }
+}
+
+/**
  * An APPEND-ONLY record of every memory measurement this app has taken on this device.
  *
  * WHY APPEND-ONLY. `0013` records co-residency peak moving from 1,482 MB to 2,230 MB across a

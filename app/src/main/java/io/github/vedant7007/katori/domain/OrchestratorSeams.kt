@@ -1,6 +1,9 @@
 package io.github.vedant7007.katori.domain
 
 import io.github.vedant7007.katori.domain.model.Completeness
+import io.github.vedant7007.katori.domain.model.Confidence
+import io.github.vedant7007.katori.domain.model.DataSource
+import io.github.vedant7007.katori.domain.model.NutrientProfile
 import io.github.vedant7007.katori.domain.model.NutrientUnit
 import io.github.vedant7007.katori.domain.model.NutritionFigure
 import io.github.vedant7007.katori.domain.model.Outcome
@@ -31,12 +34,25 @@ data class UserContext(
     /** Newest first, bounded by the source. Each with its figures as the store computed them. */
     val recentMeals: List<LoggedMeal>,
     /**
+     * Derived totals over today and the last seven days, computed by the store's query, never by
+     * anything downstream. MEASURED ON THE PHONE (`logs/hw-report-conversational.txt`, 20 Sep):
+     * asked "did I get enough iron this week" with only per-meal figures, the model added the
+     * two meals' iron itself, and the numeric guard refused both passes, so the person got no
+     * answer. The sum the question needs has to be in the request, computed in code.
+     */
+    val periodTotals: List<PeriodTotals>,
+    /**
      * The constrained ingredient list for this profile (spec 4.3), ALREADY FILTERED by diet type
      * and by avoided foods. The rules engine ranks what it is given; it does not know what a
      * vegetarian is, and neither does the model, so the filtering is the store's job.
      */
     val candidates: List<CandidateFood>,
 )
+
+/** The store's derived totals over one period. */
+data class PeriodTotals(val period: Period, val figures: List<NutritionFigure>)
+
+enum class Period { TODAY, LAST_SEVEN_DAYS }
 
 /** A meal on the timeline with the figures the store computed for it, completeness and all. */
 data class LoggedMeal(
@@ -61,9 +77,25 @@ interface MealResolver {
 }
 
 data class ResolvedMeal(
+    /** The parse, with each item's matched code and final confidence filled in. */
     val parsed: ParsedMeal,
-    val items: List<MealItemSnapshot>,
+    val items: List<ResolvedItem>,
+    /** Per-nutrient totals across the items, completeness and all. What the UI shows. */
     val figures: List<NutritionFigure>,
+)
+
+/**
+ * One item, resolved. [nutrients] keeps the three-state values the store must write, because a
+ * [MealItemSnapshot] carries only the measured amounts and the rules engine needs no more; a
+ * store that wrote from the snapshot would turn every Unknown into an absent row and, on the
+ * next read, into a zero.
+ */
+data class ResolvedItem(
+    val snapshot: MealItemSnapshot,
+    /** Null for a recognised item the database deliberately holds no figures for. */
+    val source: DataSource?,
+    val nutrients: NutrientProfile,
+    val confidence: Confidence,
 )
 
 /**
@@ -98,6 +130,9 @@ class ContextText(
         fun figureNone(): String
         /** 1 when, 2 items, 3 figures. */
         fun meal(): String
+        /** 1 period name, 2 figures. */
+        fun period(): String
+        fun periodName(period: Period): String
         /** 1 test name, 2 value, 3 unit, 4 report date. */
         fun lab(): String
         /** 1 test name, 2 value, 3 unit, 4 low, 5 high, 6 report date. */
@@ -125,6 +160,9 @@ class ContextText(
         val figures = m.figures.joinToString("; ") { figure(it) }
         return String.format(strings.meal(), at, items, figures)
     }
+
+    fun period(p: PeriodTotals): String =
+        String.format(strings.period(), strings.periodName(p.period), p.figures.joinToString("; ") { figure(it) })
 
     fun lab(l: LabValue): String = if (l.referenceLow != null && l.referenceHigh != null) {
         String.format(
@@ -156,6 +194,11 @@ class ContextText(
             override fun figurePartial() = "%1\$s: at least %2\$s %3\$s (no value for %4\$s)"
             override fun figureNone() = "%1\$s: not known"
             override fun meal() = "%1\$s: %2\$s. %3\$s"
+            override fun period() = "%1\$s: %2\$s"
+            override fun periodName(period: Period): String = when (period) {
+                Period.TODAY -> "Today so far"
+                Period.LAST_SEVEN_DAYS -> "The last seven days"
+            }
             override fun lab() = "%1\$s: %2\$s %3\$s (report dated %4\$s)"
             override fun labWithRange() = "%1\$s: %2\$s %3\$s, printed range %4\$s to %5\$s (report dated %6\$s)"
             override fun neverSuggest(diet: DietType): String? = when (diet) {

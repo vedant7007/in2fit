@@ -65,11 +65,13 @@ interface LlmLease {
  *  - ANSWER and RECOMMEND read [UserContextSource.current] before the model is called and put
  *    the rendered context in the request. There is no code path to either prompt that skips it.
  *
- * ponytail: ASR and TTS acquire their own models and the LLM is leased per call, so the
- * three-model atomic acquisition the contract asks for is not done here. On the test device the
- * three together peak at 2,229.9 MB against a 4,190.7 MB ceiling (`0013`), so nothing is evicted
- * between stages in practice; a `withModels` lease around the whole turn is the upgrade when a
- * device is measured that needs it.
+ * ponytail: DEFERRED, NOT SATISFIED. The contract requires ASR, LLM and TTS to be acquired
+ * atomically for the whole turn; here ASR and TTS acquire their own models and the LLM is
+ * leased per call, which leaves the eviction gaps the contract forbids. It is deferred because
+ * the one device measured has headroom (three models peak at 2,229.9 MB against a 4,190.7 MB
+ * ceiling, `0013`), and that is device-specific reasoning against a requirement written for the
+ * devices not yet tested. The upgrade is a `ModelArbiter.withModels` lease around [turn]; it
+ * becomes due the day a device is measured without that headroom, or earlier if a gap is seen.
  */
 class DefaultOrchestrator(
     private val asr: AsrEngine,
@@ -224,7 +226,7 @@ class DefaultOrchestrator(
             RuleInput(
                 profile = ctx.profile, declaredConditions = ctx.declaredConditions, labValues = ctx.labValues,
                 // 0 is never a Room row id. A hypothetical plate has no id and never gets one.
-                meal = MealSnapshot(mealId = mealId ?: 0L, items = resolved.items, loggedAt = now),
+                meal = MealSnapshot(mealId = mealId ?: 0L, items = resolved.items.map { it.snapshot }, loggedAt = now),
                 candidates = ctx.candidates, evaluatedAt = now,
             )
         )
@@ -263,10 +265,17 @@ class DefaultOrchestrator(
         val declared = ctx.declaredConditions.map { it.name }
         val locale = Locale.forLanguageTag(language.tag)
         val facts = knowledge.find((listOf(text) + declared).joinToString(" "))
+        // MEASURED, 20 Sep (`logs/hw-report-conversational.txt`): with only per-meal figures the
+        // model summed two meals' iron itself and the guard refused it, and it read a below-range
+        // haemoglobin line as "within the normal range". So the period totals go in, computed by
+        // the store, and the rules engine's own sentence about the value goes in with them, in
+        // words the model can repeat rather than a range it has to compare.
         val request = AnswerRequest(
             question = text, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
-            figures = ctx.recentMeals.map { DisplayFigure(contextText.meal(it, locale)) } +
-                ctx.labValues.map { DisplayFigure(contextText.lab(it)) },
+            figures = ctx.periodTotals.map { DisplayFigure(contextText.period(it)) } +
+                ctx.recentMeals.map { DisplayFigure(contextText.meal(it, locale)) } +
+                ctx.labValues.map { DisplayFigure(contextText.lab(it)) } +
+                listOfNotNull(evaluation.trigger?.let { DisplayFigure(triggerText.render(it)) }),
             facts = facts,
         )
 

@@ -18,7 +18,10 @@ import io.github.vedant7007.katori.domain.MealSnapshot
 import io.github.vedant7007.katori.domain.MealStore
 import io.github.vedant7007.katori.domain.OrchestratorEvent
 import io.github.vedant7007.katori.domain.ParsedMeal
+import io.github.vedant7007.katori.domain.Period
+import io.github.vedant7007.katori.domain.PeriodTotals
 import io.github.vedant7007.katori.domain.ProfileSnapshot
+import io.github.vedant7007.katori.domain.ResolvedItem
 import io.github.vedant7007.katori.domain.ResolvedMeal
 import io.github.vedant7007.katori.domain.Sex
 import io.github.vedant7007.katori.domain.SpeechLanguageRef
@@ -32,6 +35,8 @@ import io.github.vedant7007.katori.domain.model.ConfidenceReason
 import io.github.vedant7007.katori.domain.model.ConfidenceRules
 import io.github.vedant7007.katori.domain.model.DataSource
 import io.github.vedant7007.katori.domain.model.Nutrient
+import io.github.vedant7007.katori.domain.model.NutrientProfile
+import io.github.vedant7007.katori.domain.model.NutrientValue
 import io.github.vedant7007.katori.domain.model.NutrientTotal
 import io.github.vedant7007.katori.domain.model.NutrientUnit
 import io.github.vedant7007.katori.domain.model.NutritionFigure
@@ -109,7 +114,14 @@ class DefaultOrchestratorTest {
             outcome ?: Outcome.Ok(
                 ResolvedMeal(
                     parsed = parsed,
-                    items = parsed.items.map { MealItemSnapshot(it.spokenName, "usda:${it.spokenName}", 150.0, mapOf(Nutrient.CARBOHYDRATE to 40.0, Nutrient.IRON to 0.8)) },
+                    items = parsed.items.map {
+                        ResolvedItem(
+                            snapshot = MealItemSnapshot(it.spokenName, it.spokenName, 150.0, mapOf(Nutrient.CARBOHYDRATE to 40.0, Nutrient.IRON to 0.8)),
+                            source = DataSource.USDA_SR_LEGACY,
+                            nutrients = NutrientProfile(mapOf(Nutrient.CARBOHYDRATE to NutrientValue.Measured(40.0, NutrientUnit.GRAM), Nutrient.IRON to NutrientValue.Measured(0.8, NutrientUnit.MILLIGRAM))),
+                            confidence = it.confidence,
+                        )
+                    },
                     figures = listOf(figure(Nutrient.ENERGY, 520.0, NutrientUnit.KCAL), figure(Nutrient.IRON, 1.6, NutrientUnit.MILLIGRAM)),
                 )
             )
@@ -146,6 +158,7 @@ class DefaultOrchestratorTest {
                 listOf(figure(Nutrient.IRON, 2.5, NutrientUnit.MILLIGRAM), partial(Nutrient.PROTEIN, 11.0, NutrientUnit.GRAM, "dal")),
             )
         ),
+        periodTotals = listOf(PeriodTotals(Period.LAST_SEVEN_DAYS, listOf(partial(Nutrient.IRON, 4.6, NutrientUnit.MILLIGRAM, "curry leaves")))),
         candidates = listOf(
             CandidateFood("thotakura", "thotakura", setOf(LifeContext.HOSTEL_STUDENT), mapOf(Nutrient.IRON to 3.9, Nutrient.FIBRE to 2.0, Nutrient.CARBOHYDRATE to 4.0)),
             CandidateFood("sprouts", "sprouts", setOf(LifeContext.HOSTEL_STUDENT), mapOf(Nutrient.IRON to 2.6, Nutrient.FIBRE to 6.0, Nutrient.CARBOHYDRATE to 20.0)),
@@ -266,6 +279,8 @@ class DefaultOrchestratorTest {
         assertTrue("the logged meal must be in the request: $figures", figures.any { it.contains("roti, dal") && it.contains("iron: 2.5 mg") })
         assertTrue("a partial total is worded as a floor: $figures", figures.any { it.contains("protein: at least 11 g (no value for dal)") })
         assertTrue("the lab value must be in the request: $figures", figures.any { it.contains("Haemoglobin: 9.8 g/dL, printed range 12 to 15") })
+        assertTrue("the period total, computed by the store, must be in the request: $figures", figures.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
+        assertTrue("the engine's own sentence about the value must be in the request: $figures", figures.any { it.contains("below") && it.contains("9.8") })
         assertEquals("retrieval ran on the question", listOf("iron.vitc"), request.facts.map { it.id })
 
         val answered = events.filterIsInstance<OrchestratorEvent.Answered>().single()

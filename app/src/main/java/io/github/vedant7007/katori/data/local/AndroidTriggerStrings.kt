@@ -5,6 +5,7 @@ import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.DietType
 import io.github.vedant7007.katori.domain.LifeContext
+import io.github.vedant7007.katori.domain.Period
 import io.github.vedant7007.katori.domain.TriggerTemplate
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.model.Nutrient
@@ -75,6 +76,13 @@ class AndroidContextStrings(context: Context) : ContextText.Strings {
     override fun figurePartial(): String = res.getString(R.string.context_figure_partial)
     override fun figureNone(): String = res.getString(R.string.context_figure_none)
     override fun meal(): String = res.getString(R.string.context_meal)
+    override fun period(): String = res.getString(R.string.context_period)
+    override fun periodName(period: Period): String = res.getString(
+        when (period) {
+            Period.TODAY -> R.string.context_period_today
+            Period.LAST_SEVEN_DAYS -> R.string.context_period_last_seven_days
+        }
+    )
     override fun lab(): String = res.getString(R.string.context_lab)
     override fun labWithRange(): String = res.getString(R.string.context_lab_with_range)
 
