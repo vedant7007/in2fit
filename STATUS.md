@@ -110,16 +110,29 @@ Nothing. Not built.
 
 ## COMPILE AND UNIT TEST ONLY
 
-**132 tests, 0 failures, 0 errors**, summed from the per-class JUnit XML under
-`app/build/test-results/testDemoDebugUnitTest/` (written 20 Sep 01:20, run logged in
-`logs/nila-scope-build.log`). Per class: NumericGuard 18, LlmEngine 19, SqliteFoodLookup 21,
-ModelArbiter 19, RecipeLayer 16, RulesEngine 16, FoodTextMatching 11, AndroidFoodDbSource 5,
-StringResources 4, NetworkIsolation 2, MatchRate 1. The earlier "103 tests" figure was a count of
-`@Test` methods in source, not a number read from a log; the Gradle logs it cited print no count.
+**246 tests in 22 classes, 0 failures, 0 errors**, summed from the per-class JUnit XML under
+`app/build/test-results/testDemoDebugUnitTest/`, every file written at 03:02 on 20 Sep by the
+run in `logs/nila-sherpa-test.log`. That "every file written by the same run" check is now
+necessary: six sessions build in one tree, and a Gradle run started by another session while
+yours is in flight clears and rewrites that directory, so a count read after a collision is a
+count of somebody else's run (it happened at 02:57, and the directory held 13 tests). The
+earlier "103 tests" figure was a count of `@Test` methods in source, not a number read from a
+log; the Gradle logs it cited print no count.
 
-**Demo APK 76,661,867 bytes**, `lib/arm64-v8a` only, `logs/nila-ort-final.log`. The "46 MB"
-that stood here was a container build with no NDK and no `jniLibs`, and is not comparable.
-ONNX Runtime is now test scope (`0016`); with it in the app the APK measures 109,661,661 bytes.
+**Demo APK 66,889,734 bytes**, `lib/arm64-v8a` only, commit `d871c0f` with other sessions'
+uncommitted edits in the tree, sha256 `28c2a1d7…`, row of 03:00:32 in `logs/apk-size.log`. Every
+APK figure from now on is a row in that append-only log, written by `tools/apk-size.ps1` after
+each `tools/3-build.bat`, with the commit and the APK's own hash; a size that is not a row there
+is not a figure. Composition, read from the file: 46,401,680 B of native libraries stored
+uncompressed (sherpa-onnx 24.2 MB, ML Kit OCR 11.1 MB, barcode 4.9 MB, llama.cpp 6.1 MB),
+44,544,336 B of dex deflated to 17,057,717, 3.8 MB of assets, 0.6 MB else.
+
+Two earlier figures do not survive: "46 MB" was a container build with no NDK and no `jniLibs`;
+76,661,867 B (01:28, `logs/nila-ort-final.log`, before sherpa-onnx) is 9.8 MB LARGER than
+today's build although today's carries 26 MB more content, and the listing taken of that APK at
+the time summed to less than the file itself. That APK is gone from disk and the difference is
+NOT explained here; it is recorded so nobody quotes either number as a trend. ONNX Runtime stays
+test scope (`0016`, amended); with it in the app the APK measured 109,661,661 B on 20 Sep 01:23.
 
 Demo manifest permissions asserted against a whitelist as exactly CAMERA, RECORD_AUDIO and the
 platform receiver permission on every `assembleDemo*`; `logs/merged-manifest-demoDebug.xml` is

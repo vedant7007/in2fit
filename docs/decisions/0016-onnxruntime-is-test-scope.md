@@ -68,3 +68,14 @@ confirmation of the old one.**
 
 When shipped code opens an ONNX session. That is the ASR or TTS slice, and at that point the
 runtime arrives with sherpa-onnx, and this line is removed rather than moved back.
+
+**Amended 20 September 2026, after sherpa-onnx landed (`d7e2b71`, `28c4620`).** It did not
+reverse. Jacob chose the STATIC-link AAR (`sherpa-onnx-static-link-onnxruntime-1.13.8.aar`,
+sha256 `b22c3fc1…`): one `libsherpa-onnx-jni.so` per ABI with ONNX Runtime compiled in, 133
+exported symbols all `Java_*`, zero `Ort*`, so the collision reason 2 predicted does not occur.
+And the probe still needs this dependency, because it drives the Java `ai.onnxruntime` API,
+which the static AAR does not carry. So `androidTestImplementation(libs.onnxruntime.android)`
+STAYS. The demo APK has one `libsherpa-onnx-jni.so` (24,169,352 B stored) and no
+`libonnxruntime.so`; the test APK has `libonnxruntime.so` (32,990,472 B) and
+`libonnxruntime4j_jni.so` (83,224 B) and nothing of sherpa. Read off the APKs of 20 Sep 03:00,
+`logs/apk-size.log`.

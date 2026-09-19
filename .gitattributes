@@ -1,0 +1,6 @@
+# Shipped assets are bytes, not text. Never normalise their line endings on checkout: espeak-ng
+# reads its voice and language files with plain file calls, and a Windows clone with
+# core.autocrlf=true (this machine has it) would otherwise check every one of them out with CRLF.
+# The food database and the knowledge file are covered by the same rule; binary files are
+# unaffected either way.
+app/src/main/assets/** -text

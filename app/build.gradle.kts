@@ -111,6 +111,32 @@ android {
                 .withPropertyName("bundledFoodDatabase")
             it.inputs.file(rootProject.file("data-authoring/utterance-test-set.csv"))
                 .withPropertyName("utteranceTestSet")
+            // Same reason, for the knowledge-facts file and the intent test set (0020).
+            it.inputs.file(rootProject.file("app/src/main/assets/knowledge/facts.csv"))
+                .withPropertyName("knowledgeFacts")
+            it.inputs.file(rootProject.file("data-authoring/intent-test-set.csv"))
+                .withPropertyName("intentTestSet")
+        }
+    }
+}
+
+/**
+ * The sherpa-onnx AAR is gitignored (39 MB), so a fresh clone does not have it, and `files()` on
+ * a missing path is silently empty: the failure would surface as unresolved `com.k2fsa` symbols
+ * deep in a compile log. That is HANDOVER §7 bug 1 in another coat. Same remedy as
+ * app/src/main/cpp/CMakeLists.txt uses for libllama.so: fail before anything is built, naming
+ * the script that fetches it.
+ */
+val SHERPA_AAR = "libs/sherpa-onnx-static-link-onnxruntime-1.13.8.aar"
+tasks.named("preBuild") {
+    doFirst {
+        val aar = file(SHERPA_AAR)
+        if (!aar.isFile || aar.length() == 0L) {
+            throw GradleException(
+                "sherpa-onnx AAR missing: ${aar.absolutePath}\n" +
+                    "It is gitignored. Run tools/4-fetch-models.bat (tools/fetch-models.ps1), which " +
+                    "downloads it and checks its sha256. See docs/decisions/0019."
+            )
         }
     }
 }
@@ -147,16 +173,19 @@ dependencies {
 
     // The hardware probe, and NOTHING SHIPPED, loads ONNX sessions: it does so to MEASURE the
     // resident cost of the ASR and TTS models rather than estimate it. As `implementation` this
-    // put a 33 MB libonnxruntime.so into the demo APK that no shipped code called, and it would
-    // collide with the copy sherpa-onnx bundles when the ASR and TTS slices land. Test scope
-    // until then. docs/decisions/0016.
+    // put a 33 MB libonnxruntime.so into the demo APK that no shipped code called. It STAYS in
+    // test scope now that sherpa-onnx is in: the probe drives the Java ai.onnxruntime API, which
+    // the static-link AAR below does not carry, and that AAR exports no Ort* symbol, so the two
+    // do not collide. docs/decisions/0016.
     androidTestImplementation(libs.onnxruntime.android)
 
     // sherpa-onnx, the ASR and TTS runtime (spec 10.1). Not published to Maven Central; this is the
-    // official GitHub release AAR, gitignored, with its URL and sha256 in the ASR decision record. The
-    // STATIC-link variant: one libsherpa-onnx-jni.so per ABI with ONNX Runtime inside and no
-    // exported Ort* symbol, so it cannot collide with the probe's onnxruntime-android above.
-    implementation(files("libs/sherpa-onnx-static-link-onnxruntime-1.13.8.aar"))
+    // official GitHub release AAR, gitignored, fetched with its sha256 checked by
+    // tools/fetch-models.ps1 (URL and hash there and in the ASR decision record). The STATIC-link
+    // variant: one libsherpa-onnx-jni.so per ABI with ONNX Runtime inside and no exported Ort*
+    // symbol, so it cannot collide with the probe's onnxruntime-android above. A missing file
+    // fails preBuild by name; see SHERPA_AAR below.
+    implementation(files(SHERPA_AAR))
 
     testImplementation(libs.junit)
     testImplementation(libs.sqlite.jdbc)

@@ -31,9 +31,8 @@ Log "--- unit tests ---"
 & cmd /c "`"$gw`" :app:testDemoDebugUnitTest --no-daemon" 1> (Join-Path $root 'logs\gradle-test.log') 2>&1
 Log "testDemoDebugUnitTest exit: $LASTEXITCODE"
 
-Log "--- apk on disk ---"
-Get-ChildItem (Join-Path $root 'app\build\outputs\apk') -Recurse -Filter *.apk -ErrorAction SilentlyContinue |
-  ForEach-Object { Log "APK: $($_.FullName) ($([math]::Round($_.Length/1MB,2)) MB)" }
+Log "--- apk on disk, one row per APK appended to logs\apk-size.log with the commit and its sha256 ---"
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'apk-size.ps1') | ForEach-Object { Log $_ }
 
 Log "--- decoding gradle logs to utf8 ---"
 Get-ChildItem (Join-Path $root 'logs') -Filter 'gradle-*.log' | ForEach-Object {

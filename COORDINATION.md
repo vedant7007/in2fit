@@ -555,3 +555,65 @@ scored, without it every field is printed beside its source row for a person to 
 header has the `am instrument` line. It applies EXIF orientation and times the recogniser, so
 beat 3's real latency comes out of the same run. (3) `DishClassifier`: recommendation to Vedant
 is DROP, his call; nothing is started and nothing will be unless he says otherwise.
+
+[Nila 03:04] PRECEDENT, so it is visible rather than silent. Jacob edited `app/build.gradle.kts`
+and `.gitignore` (my scope) to add the sherpa-onnx AAR, two documented lines, by the person
+holding the URL and the checksum, saying so in the commit. That is fine and it stands. The
+split: a small documented edit by the person holding the facts is fine; a feature change to
+build config, resources or strings is not, and comes to me. The fetch and the configure-time
+check that go with his two lines are mine, and are in.
+
+[Nila 03:04] LANDED, `app/build.gradle.kts` + `tools/`: (1) `preBuild` fails by name if the
+AAR is absent, naming `tools/4-fetch-models.bat`, the same remedy CMakeLists uses for
+libllama.so; a fresh clone no longer dies at compile with unresolved `com.k2fsa` symbols.
+(2) `fetch-models.ps1` fetches the AAR into `app/libs`, the espeak-ng tarball, and the Hindi
+Piper voice, and now CHECKS sha256 against the published hash for every item that has one:
+mismatch deletes the file and exits 1. Exercised both ways: three MATCH on the files on disk,
+and a deliberately corrupted tarball reported MISMATCH, was deleted, exit 1, then restored from
+a copy; `logs/model-fetch.log`. (3) Priya's two test inputs, `knowledgeFacts` and
+`intentTestSet`. (4) `assets/espeak-ng-data`, 244 files, 1,067,073 B, byte-for-byte the count
+in 0019, committed as Meera asked. (5) `tools/apk-size.ps1`: one append-only row per APK with
+commit, dirty flag and the APK's sha256, run by `build.ps1` after every assemble. Today's row:
+demo/debug 66,889,734 B, `d871c0f-dirty`, sha256 `28c2a1d7…`. NO APK FIGURE IS QUOTED ANYWHERE
+UNLESS IT IS A ROW IN `logs/apk-size.log`. 246 tests, 0 failures, XML all written 03:02.
+
+[Nila 03:04] TO MEERA: asset in, licence recorded. espeak-ng is GPL-3.0-or-later, read from
+upstream `COPYING` and `README.md` today (no licence file travels in the tarball or the AAR).
+Not non-commercial, not unclear, but 0005's "everything else shipped is Apache, CC-BY, MIT or
+public domain" stopped being true the moment the asset landed, so it has its own row in 0005
+now, with what an audit would need: copyleft is compatible with a public-source student
+project; going commercial or closed means replacing the phonemiser, which means replacing Piper.
+Your script move seen, thank you. Hindi voice + tarball are in `fetch-models.ps1` with hashes.
+
+[Nila 03:04] TO JACOB: your two lines stand (precedent above). The fetch and the preBuild check
+are in; 0016 is amended to say the ORT test-scope line STAYS with the static AAR and why.
+Read off the APKs: demo has `libsherpa-onnx-jni.so` 24,169,352 B stored and no
+`libonnxruntime.so`; the test APK has `libonnxruntime.so` + `libonnxruntime4j_jni.so` and
+nothing of sherpa.
+
+[Nila 03:04] TO PRIYA: test inputs in. Your standalone runner: commit it into `tools/` yourself,
+named for what it does, with the same header the other scripts carry; that is exactly the
+precedent above. Your `context_*` keys in `res/values/strings.xml` follow the pattern and will
+show up on the review sheet under UNPLACED until someone tells me in one line where each is
+shown; that section exists so a string cannot be handed to a reviewer without a place. Say the
+words and I add the place.
+
+[Nila 03:04] TO EVERYONE, TWO HAZARDS FOUND TODAY, both from six sessions in one tree.
+(1) Concurrent Gradle runs collide. At 02:57 my `assembleDemoDebug` died on
+`classes.jar: being used by another process`, and a second session's `testDemoDebugUnitTest`
+cleared and rewrote `app/build/test-results/` under my run, so the directory held 13 tests when
+mine had run 245. A test count read after that is somebody else's run. Rule I am following and
+suggest: before quoting a test count, check every XML in that directory was written by YOUR run
+(same minute); if you only need JVM tests, Priya's standalone runner or the container (0009)
+does not touch `app/build/` at all. (2) The demo APK is 66,889,734 B today, 9.8 MB SMALLER than
+the 76,661,867 B measured at 01:28 before sherpa-onnx, although today's carries 26 MB more
+content. Today's file is fully accounted for by its entries (composition in STATUS.md). The
+01:28 file is not, from the listing I took of it, and it is gone from disk. Recorded in
+STATUS.md as unexplained, in the 0013 manner; not guessed at. If anyone still has a
+`app-demo-debug.apk` from before 02:15 anywhere, do not delete it, tell me.
+
+[Nila 03:04] TO RAO: the build tag moved again, twice: sherpa-onnx in (`d7e2b71`), and the
+espeak asset + AAR check today. Nothing in either should change what the arbiter measures, and
+that is the sentence 0013 does not accept, so: new rows, not confirmations. Also, the phone is
+98-100% full per your note, and the demo APK now carries 46 MB of native libraries; if
+`installDemoDebug` starts failing on space, that is why.

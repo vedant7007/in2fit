@@ -131,3 +131,18 @@ rediscover them:
 **Rule for anything added later:** a dependency whose licence is non-commercial, unclear, or
 a link to an unreachable document goes in this table the day it is added. If it cannot be
 recorded here with a verbatim licence, it does not ship.
+
+## COPYLEFT, recorded the day it was added
+
+Not non-commercial and not unclear, but it makes the sentence at the top of the register
+("everything else shipped is Apache-2.0, CC-BY-4.0, MIT or public domain") false from 20
+September 2026, so it is recorded here rather than left for an audit to find.
+
+| Dependency | Licence, verbatim from upstream | Added | Ships as | Record |
+| --- | --- | --- | --- | --- |
+| espeak-ng (the phonemiser Piper voices use through sherpa-onnx) | `COPYING`: "GNU GENERAL PUBLIC LICENSE / Version 3, 29 June 2007"; `README.md`: "eSpeak NG Text-to-Speech is released under the GPL version 3 or later license" (both read from `github.com/espeak-ng/espeak-ng`, master, 20 Sep 2026; no licence file travels in the data tarball or in the AAR) | 20 Sep 2026 | its data, 244 files / 1,067,073 B, as `assets/espeak-ng-data`; its code, inside `libsherpa-onnx-jni.so` in the sherpa-onnx static AAR | `0019` |
+
+What an audit would need to know: GPL-3.0-or-later is compatible with a non-commercial student
+project whose source is public, which this is. It is copyleft, not a use restriction: the
+obligation is that the app's own source be available under compatible terms, and it is. Going
+commercial or closing the source means replacing the phonemiser, which means replacing Piper.
