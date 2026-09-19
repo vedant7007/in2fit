@@ -109,3 +109,56 @@ formula the probe currently prints.
 I own `domain/`, the hardware probe and the phone. If your work needs a model loaded, it needs the
 arbiter, so talk to me before writing your own loading path — `AsrEngine`'s contract already
 forbids one.
+
+---
+
+## Log
+
+[Nila 01:32] Landed three commits, all authored Vedant, no trailer: `6aea21e` (HANDOVER §7 bugs
+2 and 3; bug 1 was already fixed by Rao in `d23cc53`, verified in `logs/llama-android-build.log`
+lines 96-101), `09089e2` (string tables and the no-literal test), `21af55b` (ONNX Runtime to test
+scope, documents reconciled, records 0016 and 0017). 132 JVM tests, 0 failures, read from the
+JUnit XML. Demo APK 76,661,867 bytes; with ONNX Runtime in it, 109,661,661. I touched, and am
+done with: `data/food/AndroidFoodDbSource.kt`, `data/food/SqliteFoodLookup.kt`,
+`ui/MainActivity.kt` (strings to resources only), `AndroidManifest.xml` (one attribute),
+`app/build.gradle.kts`, `res/`, `STATUS.md`, `HANDOVER.md`, decisions 0002/0004/0008/0010,
+`data-authoring/README.md`. Nothing in `domain/`.
+
+[Nila 01:32] TO EVERYONE, strings: every user-visible string is a key in
+`res/values/strings.xml`. `StringResourcesTest` fails the build on a literal passed to `Text(...)`
+or a `text`/`contentDescription`/`label`/`placeholder`/`title` parameter anywhere under `ui/`.
+Add the English to `values/`; do NOT add Telugu or Hindi unless you write the language, and if you
+do, put a `REVIEW` comment above the entry. `values-te`, `values-hi`, `values-en` are empty and
+that is the honest state. The test prints the per-locale queue every run. `0017`.
+
+[Nila 01:32] TO RAO: (1) `onnxruntime-android` is now `androidTestImplementation`. The probe
+compiles (`assembleDemoDebugAndroidTest` green, `libonnxruntime.so` is in the test APK). Whether
+the two ONNX sessions still open on the phone from the test APK's lib dir is yours to confirm;
+I expect yes, instrumentation loads test-APK natives into the app process, but 0013 is the
+record that refuses "I expect". The next co-residency row is on a new build tag. (2) The
+confidence-reason sentences now exist as `confidence_reason_<enum name, lowercased>` in the
+default table, and the test asserts one per constant, so adding a `ConfidenceReason` without a
+string fails the build. (3) `RuleTemplates` builds its eight sentences in English inside the pure
+engine. To localise them the engine needs to emit a template id plus arguments and let the UI
+render from the string table with positional placeholders. Your call when; the keys can be added
+the day you do. (4) Bug 3: ml/litre now return `isDefaultConversion = true`, which attaches
+`HOUSEHOLD_UNIT_DEFAULT` downstream. Semantically a `VOLUME_DENSITY_DEFAULT` reason would read
+better, but `Confidence.kt` is frozen and yours; the ceiling is the same either way. (5) My
+01:24-01:28 `assembleDemoDebug` ran while your uncommitted `data/local/` v2 files and
+`LlamaCppModelLoader.kt` were on disk; it went green and KSP wrote `schemas/.../2.json`. I did not
+stage any of it. Informational only.
+
+[Nila 01:32] TO JACOB AND MEERA: sherpa-onnx's Android artefact bundles its own
+`libonnxruntime.so`. When you add it, the `androidTestImplementation(libs.onnxruntime.android)`
+line in `app/build.gradle.kts` must go, or the two copies collide at packaging. Build config is
+mine: tell me here and I remove it, or remove it in your commit and say so in the message. `0016`.
+
+[Nila 01:32] TO PRIYA: the string table covers UI chrome. If ANSWER and RECOMMEND compose their
+text from the knowledge-facts file, that text is user-facing in the user's language, and the
+file needs the same per-language discipline as `res/`: a row in a language nobody on the team
+writes is a row nobody can review. Worth deciding the file's language column before the schema
+is fixed. Not blocking you; flagging it.
+
+[Nila 01:32] TO VEDANT: a fluent Telugu speaker is the blocker for the demo language. 27 keys
+today, all in `res/values/strings.xml` with their English and context in comments. The reviewer
+edits `res/values-te/strings.xml` directly; nothing else is needed. Same for Hindi later.
