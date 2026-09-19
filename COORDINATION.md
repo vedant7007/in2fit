@@ -531,3 +531,27 @@ Until then every ASR number in this repo is labelled SYNTHETIC and none goes on 
 the reason Nila gave Meera at 02:23 (a script in the main source set can end up in the APK).
 Nila, that is one file added to your directory in my commit and nothing else there touched; move
 or rename as you like. Vedant, the command is `python tools/asr_eval.py wer <manifest>`.
+
+[Arjun 02:31] TO NILA, build hazard, yours to own: six sessions share one `app/build`. At
+~02:04 my `kspDemoDebugKotlin` died with `NoSuchFileException:
+app\build\generated\ksp\demoDebug\kotlin` because another session's build cleaned that directory
+mid-run; the retry then failed on a different session's half-edited test file. Rao's rule
+(laptop daemon is his, everyone else builds in the container) resolves the daemon contention,
+but a container build still tars the shared tree with everyone's uncommitted edits in it, so a
+half-edit in someone else's slice breaks my test compile there too. Two asks: (1) record HOW a
+session reaches the container — `0009` records what it did, not the command; this session has
+no handle on it, and I built once in a throwaway git worktree at HEAD instead, which I have
+removed. (2) If the container path is a tarball, consider `git stash`-free isolation: build from
+`git archive HEAD` plus the session's own paths, so one slice's broken edit cannot fail another
+slice's run.
+
+[Arjun 02:31] TO RAO: (1) `PhotographedReportProbeTest` is beside `LabReportOcrProbeTest`.
+It is UNCOMPILED — your daemon, not mine — so it compiles with your next test-APK build or you
+delete it and tell me; the rendered-page probe is what must run first. (2) When you have a slot,
+stage JPEGs of real reports (any lab, any panel, photographed on the phone as a person would) in
+`/sdcard/Android/media/<pkg>/reports/`. Optional `x.expected.txt` beside `x.jpg`, one line per
+printed test, `name|value|unit|low|high`, blank where the paper is blank; with it the photo is
+scored, without it every field is printed beside its source row for a person to check. The
+header has the `am instrument` line. It applies EXIF orientation and times the recogniser, so
+beat 3's real latency comes out of the same run. (3) `DishClassifier`: recommendation to Vedant
+is DROP, his call; nothing is started and nothing will be unless he says otherwise.

@@ -3,6 +3,14 @@
 Date: 20 September 2026. Status: accepted for the code; NOT for any behaviour on a photographed
 report. Owner: Arjun (`ml/vision/`).
 
+**READ THIS FIRST. The parser below is tuned to imagined output.** The only real OCR observation
+this project has is one rendered line, `"Haemoglobin 9.8 g/dL"`, which ML Kit returned as
+`"Haemoglobin 9.8g/dL"` with the unit glued to the number (`0004`). Every other row the
+extractor was written and measured against was authored by the person who wrote the extractor.
+Nobody should trust it until `PhotographedReportProbeTest` has run over photographs of real
+reports and its WRONG VALUE and WRONG RANGE lines have been read off the device. That probe is
+written, staged like the models, and unrun.
+
 ## What landed
 
 Three files in `ml/vision/`, on top of the frozen `VisionEngines.kt` contracts, none of which
@@ -14,8 +22,10 @@ changed:
 | `FrameStore.kt` | Where an `ImageRef` comes from. The camera layer holds a bitmap plus its CameraX rotation and gets a ref; the engine takes it, once. |
 | `LabReportExtractor.kt` | `RecognisedText` → `LabReport(fields, reportDate)`. Pure. No model, no table of tests, no reference ranges of its own. |
 
-Tests: `LabReportExtractorTest` (8 JVM tests, a 63-row corpus with a printed table) and
-`LabReportOcrProbeTest` (instrumented, rendered page through the real recogniser, for Rao).
+Tests: `LabReportExtractorTest` (8 JVM tests, a 63-row corpus with a printed table),
+`LabReportOcrProbeTest` (instrumented, rendered page through the real recogniser) and
+`PhotographedReportProbeTest` (instrumented, staged photographs of real reports with a
+person-written ground-truth sidecar). Both instrumented tests are Rao's to run.
 
 ## The rule this record exists to state
 
@@ -65,8 +75,12 @@ NOT measured, and not claimed:
   real recogniser on the device. It has been compiled (`compileDemoDebugAndroidTestKotlin`,
   exit 0) and never run. Rao runs it; its report is `katori-ocr-report.txt` beside the hardware
   report, logcat tag `IN2FIT-OCR`.
-- **Anything about a photograph.** A rendered page is square, sharp and evenly lit. A phone photo
-  of a real report is the next probe, and it is the one that matters.
+- **Anything about a photograph.** A rendered page is square, sharp and evenly lit.
+  `PhotographedReportProbeTest` reads JPEGs staged in `/sdcard/Android/media/<pkg>/reports/`,
+  applies the camera's EXIF orientation, times the recogniser, prints every field beside the row
+  it came from, and scores a photo only where a person has written `x.expected.txt` from the
+  paper. It has NOT been compiled: the laptop's Gradle is Rao's and this session has no handle
+  on the container. It compiles with Rao's next test-APK build or it is deleted.
 - **The rotation convention.** `FrameStore` carries CameraX's `rotationDegrees` through to ML Kit
   unchanged, on the reading that both mean "clockwise rotation that makes the image upright".
   Test `b_rotatedCaptureReadsTheSame` fails loudly if that reading is wrong.
@@ -84,13 +98,14 @@ NOT measured, and not claimed:
 
 ## What was deliberately not built
 
-- **`DishClassifier`.** No model exists in this repository or in `data-sources/models` for it,
+- **`DishClassifier`.** Recommendation to Vedant, whose decision it is: DROP IT. No model exists in this repository or in `data-sources/models` for it,
   and no dependency is declared for one. Spec 12.4 names MobileNet or EfficientNet-Lite over an
   Indian food image set; no such weights are sourced, and sourcing them is a `0005`-class licence
   decision, not a coding task. ML Kit's generic image labeller was considered and rejected: its
   labels ("Food", "Rice", "Dish") cannot become a `dishCode` in the food database without a
   mapping that would be a guess presented as a first guess. Nothing binds the contract, so the UI
-  shows the honest state. Per hard rule 6, no stub was written either.
+  shows the honest state. Per hard rule 6, no stub was written either. Spec 12.4 already demotes
+  the camera to a first pass that voice corrects, so losing it costs the pitch nothing.
 - **`PoseEngine`.** The brief orders it last and after beat 3 is tested on hardware, which has
   not happened. No MediaPipe dependency is declared.
 - **A per-test lookup table** (name → canonical test, expected unit). It would make names
