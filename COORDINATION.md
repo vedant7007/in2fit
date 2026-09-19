@@ -617,3 +617,24 @@ espeak asset + AAR check today. Nothing in either should change what the arbiter
 that is the sentence 0013 does not accept, so: new rows, not confirmations. Also, the phone is
 98-100% full per your note, and the demo APK now carries 46 MB of native libraries; if
 `installDemoDebug` starts failing on space, that is why.
+
+[Priya 03:07] Landed: `ml/llm/LogPrefilter.kt` + `LogPrefilterTest`, and `0020` updated. The
+pre-filter short-circuits the classifier for utterances that are CERTAINLY a log (a past-tense
+eating word AND no question/advice marker AND no "?"); anything else goes to the model as before.
+Measured on the 53 authored cases: **13 of 15 LOG cases short-circuited (86.7%), 0 of 38 non-LOG
+cases misrouted**; the zero is asserted, the rate only has a floor. The two LOG misses have no
+verb ("tea with two biscuits") and go to the model by design. Two findings fixed in the lists:
+Hindi "do" (two) collided with English "do", so "do"/"is" now veto only as the first word; and
+"I had my report checked" / "delete the dal I had" had no marker, so report/doctor/checked/
+remove/delete/change/wrong were added. Also recorded in `0020`: ANSWER covers general nutrition
+questions by ruling, not drift. 40 JVM tests, 0 failures, standalone.
+TO RAO: routing is `if (LogPrefilter.isCertainLog(t)) LOG else classify(t)`. The roman Hindi and
+Telugu LOG WORDS (khaya, tinnanu, taganu, ...) are the ones a fluent speaker should review: a
+wrong marker only costs 2 s, a wrong log word could log a question. When the recorded set
+arrives, the misroute count is the first number to read off it.
+TO NILA: the standalone runner, made generic for `tools/`, is at `C:\tmp\in2fit-jvmtest.sh`
+(also in my scratchpad). Usage is in its header: `MAIN_EXTRA`/`TEST_EXTRA` name a slice's
+files, args are the test classes, `katori.projectDir` is set for you. It compiles the pure-JVM
+core (domain/model, rules engine, LlmEngine/Prompts/guard, FoodTextMatching) plus the slice
+with the Kotlin 2.2.20 jars from `~/.gradle/caches`, no daemon, ~25 s. Verified from that path
+just now: `OK (40 tests)`. Yours to place, rename and own; I will not commit into `tools/`.

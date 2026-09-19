@@ -16,7 +16,8 @@ in this record.
 | The knowledge-facts file, 131 rows, every row cited | `app/src/main/assets/knowledge/facts.csv` |
 | Loader, CSV reader, tag retrieval | `data/knowledge/KnowledgeFacts.kt` |
 | Authored intent case set, labelled circular | `data-authoring/intent-test-set.csv` |
-| 33 JVM tests | `KnowledgeFactsTest` (17), `ConversationPromptsTest` (16) |
+| LOG pre-filter, measured | `ml/llm/LogPrefilter.kt`, `LogPrefilterTest` |
+| 40 JVM tests | `KnowledgeFactsTest` (17), `ConversationPromptsTest` (16), `LogPrefilterTest` (7) |
 
 ## The classifier
 
@@ -31,16 +32,58 @@ the first alphabetic word must be one of the four, allowing a prefix of at least
 so a label cut off by the token budget still parses. Anything else is null, and the caller asks
 rather than guesses (spec 10.7).
 
-ANSWER is defined more widely than the brief's examples: a question about their diary **or a
-general nutrition question**. `0015` lists "answer nutrition questions" among what the model may
-do, and "does tea reduce iron absorption" has no plate and no history, so it needs a route.
-RECOMMEND is "what should *I* eat for a goal or condition".
+**ANSWER IS DEFINED WIDER THAN THE BRIEF'S EXAMPLES, AND THAT IS THE DECISION, NOT A DRIFT.**
+ANSWER is a question about their own diary **or a general nutrition question**. `0015` lists
+"answer nutrition questions" among what the model may do, and "does tea reduce iron absorption"
+has no plate and no history, so without this it has no route and would be forced into RECOMMEND,
+which suggests foods, or LOG, which writes a meal. RECOMMEND is "what should *I* eat for a goal
+or condition". Ruled by Vedant on 20 September; anyone narrowing ANSWER back to diary-only
+questions is undoing a decision, and needs a new record saying where the general questions go.
 
 **Nothing about the classifier's accuracy or latency is known.** The prompt is about 600
 characters; a test caps it at 800 as a proxy for tokens, because a classifier prompt is the
 kind that grows one helpful sentence at a time. The first number it gets is the authored case
 set run on the phone by the integrator, which is when the examples in the label definitions
 become the first thing to try cutting.
+
+## The LOG pre-filter
+
+LOG is the most common turn by a wide margin, and the classifier prompt costs roughly two
+seconds of prompt processing on the test device before extraction's ten. `LogPrefilter` routes
+an utterance to LOG **without a model call** when it is certain, and to the model otherwise. It
+never returns anything but "certain" or "ask".
+
+**The rule is asymmetric on purpose.** It needs positive evidence of a log (a past-tense eating
+or drinking word: ate, had, drank, khaya, tinnanu, ...; or "lunch was ...") AND the absence of
+every question or advice marker it knows (what, how, should, can, did, add, better, help,
+kya, kitna, chahiye, emi, entha, tinali, ...; a question mark; "having", "about to", "ippudu").
+A missed short-circuit costs two seconds; a wrong one writes a meal the person never ate into
+their history. So the marker lists are over-inclusive and the log-word list is short.
+
+**Measured on the authored case set** (`LogPrefilterTest`, 20 September):
+
+    cases                     53
+    LOG cases                 15
+      short-circuited         13  (86.7 %)   <- model calls saved
+      sent to the model        2             "a plate of vegetable biryani and some raita",
+                                             "tea with two biscuits": no verb, no evidence
+    non-LOG cases             38
+      MISROUTED as LOG         0             <- the number that matters, asserted at zero
+
+Two findings from the measurement, both fixed in the lists rather than the rule:
+
+- **"do" is two in Hindi.** As a whole-word marker it sent every "maine do roti khaya" to the
+  model. "do" and "is" ("is subah", this morning) are now markers only as the FIRST word, where
+  they are English question openers.
+- Sentences with a log word that are not about adding a meal ("I had my report checked",
+  "delete the dal I had") had no marker. "report", "doctor", "checked", "remove", "delete",
+  "change", "wrong" and their neighbours were added; rejecting costs nothing.
+
+The set is circular and 86.7% is a regression guard, not accuracy. The roman-script Hindi and
+Telugu entries were written by someone who does not speak either fluently: a wrong MARKER only
+sends a log to the model, which is safe; a wrong LOG WORD could short-circuit a question, so
+those are the words a fluent speaker reviews first. Vedant's recorded transcripts replace the
+set, and the first thing to read off them is the misroute count.
 
 ## The knowledge-facts file
 
@@ -152,7 +195,7 @@ invention; the referral notice appears only when the caller will append the refe
 parser for the classifier's one word. The case set's shape.
 
 Run standalone against the Kotlin compiler in the Gradle cache, because the laptop's daemon is
-the integrator's (`COORDINATION.md`): **33 tests, 0 failures.** Not yet run under Gradle; the
+the integrator's (`COORDINATION.md`): **40 tests, 0 failures.** Not yet run under Gradle; the
 two new test files need the same input declarations the utterance set has, which is a build-file
 change and is asked for in `COORDINATION.md`.
 
