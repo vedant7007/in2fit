@@ -28,6 +28,12 @@ import io.github.vedant7007.katori.data.food.FoodTextMatching
  * MEASURED on the authored case set by [LogPrefilterTest], which asserts zero misroutes and
  * prints the hit rate. The set is circular (same hand, same day) and the number is a regression
  * guard, not accuracy; Vedant's recorded transcripts replace it.
+ *
+ * THE LISTS ARE INTERNAL, NOT PRIVATE, so that two tests can read them: one fails if any word is
+ * in both a log list and a marker list (the shape of the "do" bug, which nothing else prevents
+ * recurring), and one fails if a log word is missing from the reviewer's sheet in
+ * `data-authoring/log-words-review.md`, so the words a fluent speaker checks are always the
+ * words the code uses.
  */
 object LogPrefilter {
 
@@ -50,7 +56,7 @@ object LogPrefilter {
      * Any one of these, as a whole word, sends the utterance to the model. Question words,
      * modals, advice verbs and their common roman-script Hindi and Telugu equivalents.
      */
-    private val MARKERS: Set<String> = setOf(
+    internal val MARKERS: Set<String> = setOf(
         // English question words and modals
         "what", "whats", "which", "how", "why", "when", "where", "who", "whether",
         "should", "shall", "can", "could", "would", "will", "may", "might", "must",
@@ -80,16 +86,16 @@ object LogPrefilter {
      * khaya") and "is" is this ("is subah"). Found by the measurement: the whole-word rule sent
      * every "do roti" log to the model.
      */
-    private val LEADING_MARKERS: Set<String> = setOf("do", "is")
+    internal val LEADING_MARKERS: Set<String> = setOf("do", "is")
 
     /** Multi-word markers, matched as whole-word runs. */
-    private val MULTI_WORD_MARKERS: List<String> = listOf(
+    internal val MULTI_WORD_MARKERS: List<String> = listOf(
         "was there", "is there", "are there", "about to", "going to", "kha raha", "kha rahi", "kha rahe",
         "hai to", "hai toh", "ke liye", "kosam",
     )
 
     /** Past-tense eating and drinking words. Positive evidence of a log. */
-    private val LOG_WORDS: Set<String> = setOf(
+    internal val LOG_WORDS: Set<String> = setOf(
         // English
         "ate", "had", "drank", "eaten", "finished",
         // roman Hindi
@@ -102,7 +108,7 @@ object LogPrefilter {
      * "lunch was ..." is a log when nothing above vetoes it. "for lunch" alone is NOT enough:
      * "ideas for lunch" has no marker this file knows, and a miss there would log a meal.
      */
-    private val MEAL_WAS: List<String> = listOf(
+    internal val MEAL_WAS: List<String> = listOf(
         "breakfast was", "lunch was", "dinner was", "snack was", "tiffin was",
     )
 }

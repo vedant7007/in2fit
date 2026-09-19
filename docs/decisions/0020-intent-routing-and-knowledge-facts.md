@@ -17,7 +17,8 @@ in this record.
 | Loader, CSV reader, tag retrieval | `data/knowledge/KnowledgeFacts.kt` |
 | Authored intent case set, labelled circular | `data-authoring/intent-test-set.csv` |
 | LOG pre-filter, measured | `ml/llm/LogPrefilter.kt`, `LogPrefilterTest` |
-| 40 JVM tests | `KnowledgeFactsTest` (17), `ConversationPromptsTest` (16), `LogPrefilterTest` (7) |
+| Reviewer's sheet for the log words | `data-authoring/log-words-review.md` |
+| 43 JVM tests | `KnowledgeFactsTest` (17), `ConversationPromptsTest` (16), `LogPrefilterTest` (10) |
 
 ## The classifier
 
@@ -82,8 +83,22 @@ Two findings from the measurement, both fixed in the lists rather than the rule:
 The set is circular and 86.7% is a regression guard, not accuracy. The roman-script Hindi and
 Telugu entries were written by someone who does not speak either fluently: a wrong MARKER only
 sends a log to the model, which is safe; a wrong LOG WORD could short-circuit a question, so
-those are the words a fluent speaker reviews first. Vedant's recorded transcripts replace the
-set, and the first thing to read off them is the misroute count.
+those are the words a fluent speaker reviews first. They are on their own sheet,
+`data-authoring/log-words-review.md`, separate from Nila's string sheet because it is a
+different kind of review (yes/no per word: does it mean *ate*, could it mean something else),
+with the one question that matters asked outright. A test fails if a log word is in the code
+and not on the sheet.
+
+**Marker-versus-numeral collision is the general hazard of one Roman-script list serving three
+languages**: every English marker is a candidate Hindi or Telugu word, and it will recur as the
+lists grow. A test now fails if any single-word marker equals a log word or a word inside a
+log phrase, which is the exact shape of the "do" bug and the only thing that stops it
+recurring. (It found "was" shared between the phrases "was there" and "lunch was" on its first
+run; phrases match as whole runs and cannot collide, so the test compares phrases as phrases.)
+
+Vedant's recorded transcripts replace the set, and the first thing to read off them is the
+misroute count. **They will be five or six speakers, not twenty, and the number they give is
+reported as a small sample**, not as the figure that replaces this one for good.
 
 ## The knowledge-facts file
 
@@ -195,7 +210,7 @@ invention; the referral notice appears only when the caller will append the refe
 parser for the classifier's one word. The case set's shape.
 
 Run standalone against the Kotlin compiler in the Gradle cache, because the laptop's daemon is
-the integrator's (`COORDINATION.md`): **40 tests, 0 failures.** Not yet run under Gradle; the
+the integrator's (`COORDINATION.md`): **43 tests, 0 failures.** Not yet run under Gradle; the
 two new test files need the same input declarations the utterance set has, which is a build-file
 change and is asked for in `COORDINATION.md`.
 

@@ -94,6 +94,47 @@ class LogPrefilterTest {
         assertFalse(LogPrefilter.isCertainLog("I had a question"))
     }
 
+    // --- the lists themselves ------------------------------------------------------------------
+
+    /**
+     * The shape of the "do" bug: Hindi "do" (two) sat in the single-word marker list and vetoed
+     * every "maine do roti khaya". A single-word marker that equals a log word, or a word inside
+     * a log phrase ("lunch" against "lunch was"), means that log can never fire, and nothing but
+     * this test stops one being added. Marker PHRASES are compared as phrases: "was there" and
+     * "lunch was" share a word and cannot collide, because each only matches as a whole run.
+     */
+    @Test fun `no single-word marker is a log word or part of a log phrase`() {
+        val markers = LogPrefilter.MARKERS + LogPrefilter.LEADING_MARKERS
+        val logWords = LogPrefilter.LOG_WORDS + LogPrefilter.MEAL_WAS.flatMap { it.split(' ') }
+        val both = markers intersect logWords
+        assertTrue("a marker that vetoes a log word, so that log can never fire: $both", both.isEmpty())
+        val phraseClash = LogPrefilter.MULTI_WORD_MARKERS intersect LogPrefilter.MEAL_WAS.toSet()
+        assertTrue("a phrase in both lists: $phraseClash", phraseClash.isEmpty())
+    }
+
+    /** Every list entry is lower case and has no stray spaces, or the whole-word match silently never hits. */
+    @Test fun `list entries are normalised`() {
+        (LogPrefilter.MARKERS + LogPrefilter.LEADING_MARKERS + LogPrefilter.LOG_WORDS).forEach {
+            assertEquals("'$it' is not a normalised single word", it, it.trim().lowercase())
+            assertFalse("'$it' has a space; put it in the multi-word list", it.contains(' '))
+        }
+        (LogPrefilter.MULTI_WORD_MARKERS + LogPrefilter.MEAL_WAS).forEach {
+            assertEquals("'$it' is not normalised", it, it.trim().lowercase().replace(Regex("\\s+"), " "))
+        }
+    }
+
+    /**
+     * The reviewer's sheet is the only way a fluent speaker sees these words, and a log word
+     * that is in the code but not on the sheet is a word nobody will ever check. The sheet is
+     * hand-written; this keeps it honest.
+     */
+    @Test fun `every log word and phrase is on the reviewer's sheet`() {
+        val dir = System.getProperty("katori.projectDir") ?: error("katori.projectDir not set")
+        val sheet = File(dir, "data-authoring/log-words-review.md").readText()
+        val missing = (LogPrefilter.LOG_WORDS + LogPrefilter.MEAL_WAS).filterNot { sheet.contains("`$it`") }
+        assertTrue("log words the reviewer will never see: $missing", missing.isEmpty())
+    }
+
     @Test fun `a plate in front of them is not a log yet`() {
         assertFalse(LogPrefilter.isCertainLog("having dal and roti now"))
         assertFalse(LogPrefilter.isCertainLog("ippudu annam pappu tintunna"))

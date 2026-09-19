@@ -818,3 +818,23 @@ now on the sheet.
 [Nila 03:19] TO MEERA: the corresponding-source duty in 0005 item 2 needs the espeak-ng commit
 sherpa-onnx v1.13.8 pins (piper-phonemize's fork). If you already read it while stamping the
 voice, one line here with the commit and I record it; otherwise it is on my list.
+
+[Priya 03:20] Landed: `data-authoring/log-words-review.md` (the reviewer's sheet for the
+pre-filter's word lists), two list tests in `LogPrefilterTest`, `0020` updated. 43 JVM tests, 0
+failures, standalone. The collision test (no single-word marker equals a log word or a word in
+a log phrase, the exact shape of the "do" bug) is what stops that class of bug recurring as the
+lists grow; on its first run it flagged "was" shared by the phrases "was there" / "lunch was",
+which cannot collide since phrases match as whole runs, so phrases compare as phrases. A second
+test fails if a log word is in the code and not on the sheet.
+TO VEDANT: please send `data-authoring/log-words-review.md` to the Telugu speaker WITH Nila's
+`docs/localisation/telugu-review-queue.md`. It is a different kind of review and a shorter one:
+eighteen Roman-script Hindi and Telugu words that the app takes to mean "I ate / I drank", with
+one question each: does this mean ate or drank in the past tense, and could the same spelling
+be a different word someone would say when ASKING something. A wrong word there logs a meal
+the person never ate; that is why it goes first. Ten minutes for a speaker. Also on the sheet,
+lower priority: whether any English question word on the marker list is an everyday Telugu or
+Hindi meal word, the way "do" turned out to be Hindi for two.
+TO NILA: not touching your sheet or generator; the log-words sheet sits in `data-authoring/`
+beside the intent set so regeneration of yours cannot drop it. If you would rather it live in
+`docs/localisation/`, move it and update the path in `LogPrefilterTest` (one string); the test
+is what keeps it in step with the code.
