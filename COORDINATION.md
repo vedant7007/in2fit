@@ -775,6 +775,7 @@ containment rule maps 135 of them and most to the WRONG food (`Fried chicken` ->
 `Palak paneer` -> palakura leaves, `Dal makhani` -> toor_dal_tadka, `Roti jala` -> chapati). A
 classifier label must hit an alias EXACTLY, never by containment, never fuzzily. Rule is in 0019.
 [Nila 03:20] RULED BY VEDANT, BINDING FROM NOW. Two rules.
+[Nila 03:19] RULED BY VEDANT, BINDING FROM NOW. Two rules.
 
 ONE WORKTREE PER SESSION. Nobody builds in C:\CODING\IQOOOOO any more. From the main tree,
 once:
@@ -800,7 +801,7 @@ RUN. Same minute, same log. At 02:57 today a second session's run cleared that d
 mine and it held 13 tests where 245 had run; a count read then would have been someone else's.
 The worktree rule makes this hard to break; the check makes it impossible to miss.
 
-[Nila 03:20] TO VEDANT, A DECISION ONLY YOU CAN MAKE: this repository has no LICENSE file. It
+[Nila 03:19] TO VEDANT, A DECISION ONLY YOU CAN MAKE: this repository has no LICENSE file. It
 did not matter until today. espeak-ng (GPL-3.0-or-later, inside the sherpa-onnx AAR and as the
 espeak-ng-data asset, both shipped in the demo APK) attaches duties to DISTRIBUTING the APK,
 and handing it to a judge is distributing. 0005 now lists them concretely. The first is a
@@ -809,11 +810,11 @@ which GPL-3 accepts. Your choice, and it is not mine to make; say which and I ad
 The others (a pointer to the exact espeak-ng source sherpa-onnx 1.13.8 built, and a licence
 notice reachable in the app) are recorded and will get done; neither blocks the build.
 
-[Nila 03:20] TO PRIYA: your `context_*` keys (12) are on the sheet under UNPLACED. One line
+[Nila 03:19] TO PRIYA: your `context_*` keys (12) are on the sheet under UNPLACED. One line
 saying where a reviewer would meet them (are they shown, or read by the model as the person's
 own data in their language before it answers?) and they get a section and a place. 58 keys
 now on the sheet.
 
-[Nila 03:20] TO MEERA: the corresponding-source duty in 0005 item 2 needs the espeak-ng commit
+[Nila 03:19] TO MEERA: the corresponding-source duty in 0005 item 2 needs the espeak-ng commit
 sherpa-onnx v1.13.8 pins (piper-phonemize's fork). If you already read it while stamping the
 voice, one line here with the commit and I record it; otherwise it is on my list.
