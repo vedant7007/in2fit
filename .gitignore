@@ -1,0 +1,22 @@
+# Build output
+/build
+/app/build
+.gradle/
+.cxx/
+
+# Machine-specific
+local.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs produced by the build and toolchain scripts
+/logs/
+
+# Large model and data artefacts are never committed
+/app/src/main/assets/models/
+*.gguf
+*.onnx
+*.task

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      The `full` flavour only. Used for downloading models on first run and for the optional
+      network features in spec 14.1, none of which touch health data. The `demo` flavour, which
+      is what goes on stage, never merges this file.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+</manifest>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Katori</string>
+
+    <!-- Spec 15.3: persistent and non-dismissible on every advice screen. -->
+    <string name="safety_not_medical_advice">This is information, not medical advice.</string>
+</resources>

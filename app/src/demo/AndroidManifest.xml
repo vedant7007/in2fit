@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      The demo flavour strips network permissions that arrive from dependencies.
+
+      WHY THIS FILE EXISTS. Our own manifests declare no INTERNET permission, but the merged
+      manifest had one anyway: com.google.android.datatransport:transport-backend-cct, a Google
+      telemetry uploader pulled in transitively by ML Kit, declares INTERNET and
+      ACCESS_NETWORK_STATE. Nothing in our source would have shown that. It was caught by
+      verifyDemoDebugHasNoInternet reading the MERGED manifest, which is why that check reads the
+      merged result rather than our sources.
+
+      Removing the permission is the guarantee. A library that has no INTERNET permission cannot
+      reach the network whatever it tries to do, so the airplane-mode claim in spec 14.4 holds even
+      with the telemetry code still linked in.
+
+      Do not "fix" a future merge conflict by deleting these lines. If a dependency needs INTERNET,
+      it does not belong in the demo build.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+
+</manifest>
