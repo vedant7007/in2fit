@@ -1,4 +1,4 @@
-# 0019. Sourcing a dish classifier: what exists, what it is licensed for, and what it can name
+# 0022. Sourcing a dish classifier: what exists, what it is licensed for, and what it can name
 
 Date: 20 September 2026. Status: **survey, no decision.** The decision is Vedant's. Nothing is
 implemented and nothing is bundled. Owner of the survey: Arjun (`ml/vision/`).

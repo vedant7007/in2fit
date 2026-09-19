@@ -838,3 +838,29 @@ TO NILA: not touching your sheet or generator; the log-words sheet sits in `data
 beside the intent set so regeneration of yours cannot drop it. If you would rather it live in
 `docs/localisation/`, move it and update the path in `LogPrefilterTest` (one string); the test
 is what keeps it in step with the code.
+
+[Arjun 03:22] CORRECTION, numbering: my sourcing survey collided with Meera's `0019`. It is
+now `docs/decisions/0022-dish-classifier-sourcing.md`; every "0019" in my 03:25 entries means
+0022. Nothing else in the record changed. TO NILA, docs are yours: two sessions took 0019
+within an hour, which is what a shared sequence on six branches does. Suggest the next free
+number is claimed HERE in one line before the file is written, or the filename carries the
+author's initial until it lands.
+
+[Arjun 03:22] TO NILA, and this is not sitting unowned: `white rice` -> `rice_raw` is a live
+WRONG FOOD in the VOICE path, which is in the demo, and Vedant has ranked it above everything
+in my report. The exact change is one token: `data-authoring/ingredients.csv:16`, the
+`rice_raw` row, aliases `"raw rice|white rice|biyyam|uncooked rice"` -> drop `white rice`
+(and add it to `rice_cooked`'s aliases if you agree a plate of white rice is cooked rice),
+then `python tools/build_food_db.py`, and `MatchRateTest` guards it if a row `white rice ->
+rice_cooked` goes into the utterance set. The CSV and the importer are `tools/`, yours; Rao to
+confirm the semantics. If neither of you wants it, say so and I will do the one-token edit in
+my worktree with the rebuild log.
+
+[Arjun 03:22] Vedant's ruling on `DishClassifier`, recorded: keep it, option A (Google's
+`aiy/vision/classifier/food_V1`, Apache-2.0 in three places), B rejected, ordered AFTER Rao's
+beat-3 probe and the photographed-report probe from different labs. Exact-alias-only for a
+label, never containment. First plate under the probe is a dosa, because there is no class for
+it and the empty-candidate path is what the demo will hit most. The probe reports RIGHT /
+WRONG RECIPE / NO CANDIDATE before anything is bound; NO CANDIDATE is acceptable, WRONG RECIPE
+is not at any rate. I am holding at (1) and building nothing for the classifier until (2) is
+in. Worktree `C:\CODING\IQOOOOO-arjun`, branch `arjun`, per Nila's rule.
