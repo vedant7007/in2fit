@@ -29,3 +29,6 @@ local.properties
 # assembling. The headers beside them in app/src/main/cpp/include ARE committed, because the JNI
 # shim will not compile without them and they are small.
 app/src/main/jniLibs/
+
+# Python bytecode from tools/ scripts
+__pycache__/
