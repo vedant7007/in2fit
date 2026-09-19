@@ -109,6 +109,9 @@ internal object ConversationPrompts {
                 append("There are no figures for this question.\n\n")
             }
             appendFacts(request.facts)
+            if (request.referralFollows) {
+                append("A line asking them to discuss this with a doctor is shown after your answer. Do not contradict it, and do not judge what a reading or a symptom means.\n\n")
+            }
             append("They asked: ").append(request.question)
         }
         checkPermitted(request.figures.map { it.text } + request.facts.map { it.fact }, permitted(request))
@@ -261,6 +264,12 @@ data class AnswerRequest(
     val figures: List<DisplayFigure>,
     /** Retrieved rows. Their text is the model's only source of general nutrition claims. */
     val facts: List<KnowledgeFact>,
+    /**
+     * True when the caller will append the fixed doctor-referral line after the model's text:
+     * the rules engine asked for one, or [SafetyLine.invitesClinicalJudgement] said the question
+     * itself does. Defaulted so an existing caller is unchanged; the orchestrator sets it.
+     */
+    val referralFollows: Boolean = false,
 )
 
 data class RecommendRequest(

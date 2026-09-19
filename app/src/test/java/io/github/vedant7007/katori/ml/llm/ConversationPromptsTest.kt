@@ -111,6 +111,12 @@ class ConversationPromptsTest {
         assertTrue("answer must not ask for JSON", !p.contains("JSON"))
     }
 
+    @Test fun `the answer prompt carries the referral notice only when the caller will append the referral`() {
+        val r = answer()
+        assertTrue(!ConversationPrompts.answer(r).contains("discuss this with a doctor"))
+        assertTrue(ConversationPrompts.answer(r.copy(referralFollows = true)).contains("discuss this with a doctor"))
+    }
+
     @Test fun `the answer prompt says when there are no figures rather than leaving a gap`() {
         val p = ConversationPrompts.answer(answer(figures = emptyList(), facts = emptyList()))
         assertTrue(p.contains("no figures"))
