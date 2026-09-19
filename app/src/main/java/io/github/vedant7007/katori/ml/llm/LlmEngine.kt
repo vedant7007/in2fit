@@ -57,6 +57,38 @@ interface LlmEngine {
      * them.
      */
     suspend fun phrase(request: PhrasingRequest): Outcome<PhrasedText>
+
+    // --- the conversational paths, added by `0015` --------------------------------------------
+    //
+    // The contract above said "two paths and nothing else" and that a third goes to the
+    // integrator. It did, and `0015` records the amendment. These three are that amendment.
+    // Their defences are the SAME as [phrase]'s, not weaker: every figure in a response must
+    // appear in the request or the numeric guard fails it; a condition the person did not
+    // declare has no way into a response; and the doctor referral is NEVER generated, it is a
+    // fixed line the orchestrator appends, so a bad sample cannot soften or drop it. The native
+    // surface in `0010` is unchanged. The prompt text and the request shapes live in
+    // [ConversationPrompts], next to the `permitted` list each prompt hands the guard, so the two
+    // cannot drift.
+
+    /**
+     * Which of the four intents an utterance is. One generated word.
+     *
+     * Not confident enough to route on returns BELOW_CONFIDENCE_THRESHOLD, and the orchestrator
+     * asks the person rather than guessing (spec 10.7). Guessing LOG for a question would write a
+     * meal they never ate into their history, which is the pollution `0015` warns against.
+     */
+    suspend fun classify(transcript: String, languageTag: String): Outcome<Intent>
+
+    /** ANSWER: a question about their own diary or about nutrition, from figures and sourced rows. */
+    suspend fun answer(request: AnswerRequest): Outcome<PhrasedText>
+
+    /**
+     * RECOMMEND: what to eat for a goal or a declared condition, from the person's own context,
+     * sourced rows and the allowed food list. The context is not optional: "what should I eat for
+     * iron" from a chatbot is a paragraph; from this app it knows their last haemoglobin, what they
+     * logged this week, what they said they are managing, and where they eat. That is the product.
+     */
+    suspend fun recommend(request: RecommendRequest): Outcome<PhrasedText>
 }
 
 data class ExtractionRequest(

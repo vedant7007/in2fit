@@ -111,9 +111,93 @@ class LlamaCppLlmEngine(
         return Outcome.Ok(PhrasedText(text = text, numericGuardPassed = true))
     }
 
+    // --- the conversational paths ---------------------------------------------------------------
+
+    override suspend fun classify(transcript: String, languageTag: String): Outcome<Intent> {
+        if (transcript.isBlank()) {
+            return Outcome.Unavailable(UnavailableReason.INPUT_NOT_USABLE, "empty transcript")
+        }
+        val prompt = ConversationPrompts.intent(transcript, languageTag)
+        val raw = withContext(dispatcher) {
+            runtime.generate(prompt, ConversationPrompts.INTENT_MAX_TOKENS, ConversationPrompts.INTENT_STOPS)
+        }
+        // Not one of the four is not a guess at the nearest one. It is a question for the person.
+        return Intent.parse(raw)?.let { Outcome.Ok(it) }
+            ?: Outcome.Unavailable(UnavailableReason.BELOW_CONFIDENCE_THRESHOLD, "classifier said '${raw.trim()}'")
+    }
+
+    override suspend fun answer(request: AnswerRequest): Outcome<PhrasedText> {
+        if (request.question.isBlank()) {
+            return Outcome.Unavailable(UnavailableReason.INPUT_NOT_USABLE, "empty question")
+        }
+        val permitted = ConversationPrompts.permitted(request)
+        val prompt = ConversationPrompts.answer(request)
+        return guarded(prompt, ConversationPrompts.ANSWER_MAX_TOKENS, permitted, request.declaredConditions)
+    }
+
+    override suspend fun recommend(request: RecommendRequest): Outcome<PhrasedText> {
+        if (request.request.isBlank()) {
+            return Outcome.Unavailable(UnavailableReason.INPUT_NOT_USABLE, "empty request")
+        }
+        val permitted = ConversationPrompts.permitted(request)
+        val prompt = ConversationPrompts.recommend(request)
+        return guarded(prompt, ConversationPrompts.RECOMMEND_MAX_TOKENS, permitted, request.declaredConditions)
+    }
+
+    /**
+     * Generate, then apply both halves of the `0015` safety line as post-conditions: no number
+     * that was not given, and no condition that was not declared. A response that fails either is
+     * refused whole; the caller falls back to the rules engine's own rendered sentence, which
+     * needs no model.
+     */
+    private suspend fun guarded(
+        prompt: String, maxTokens: Int, permitted: List<String>, declared: List<String>,
+    ): Outcome<PhrasedText> {
+        val raw = withContext(dispatcher) {
+            runtime.generate(prompt, maxTokens, ConversationPrompts.CONVERSATION_STOPS)
+        }
+        val text = raw.trim()
+        if (text.isEmpty()) {
+            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model returned nothing")
+        }
+        guard.firstInventedNumber(text, permitted)?.let { offending ->
+            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model invented the number '$offending'")
+        }
+        undeclaredCondition(text, declared)?.let { named ->
+            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model named '$named', which the person did not declare")
+        }
+        return Outcome.Ok(PhrasedText(text = text, numericGuardPassed = true))
+    }
+
+    /**
+     * A condition word the model must not produce unless the person declared it.
+     *
+     * A short, deliberate list rather than a medical vocabulary: it catches the diagnoses a food
+     * assistant is most tempted to reach for, and it is the same list `RulesEngineTest` bans from
+     * the templates. Each word of a declared condition permits the list words sharing its stem,
+     * so "type 2 diabetes" declared permits "diabetic" and "thyroid" permits "hypothyroid"; a
+     * person who said "low iron" has not said "deficiency", and the model may not either. This
+     * is a structural check on the response, not a substitute for the prompt rule; it is the
+     * second defence, the way the numeric guard is for numbers.
+     */
+    private fun undeclaredCondition(text: String, declared: List<String>): String? {
+        val lower = text.lowercase()
+        val stems = declared.flatMap { it.lowercase().split(NON_LETTERS) }.filter { it.length >= 4 }.map { it.take(5) }
+        return CONDITION_WORDS.firstOrNull { word ->
+            Regex("\\b$word").containsMatchIn(lower) && stems.none { stem -> word.contains(stem) }
+        }
+    }
+
     private companion object {
         const val EXTRACTION_MAX_TOKENS = 256
         const val PHRASING_MAX_TOKENS = 160
+
+        val NON_LETTERS = Regex("[^a-z]+")
+        val CONDITION_WORDS = listOf(
+            "diabetes", "diabetic", "prediabetes", "anaemia", "anemia", "anaemic", "anemic",
+            "hypertension", "hypertensive", "hypothyroid", "hyperthyroid", "disease", "disorder",
+            "syndrome", "deficiency",
+        )
 
         /** A hard ceiling on re-asks whatever the caller passes. Each one costs a model round trip. */
         const val MAX_REASK_CEILING = 3

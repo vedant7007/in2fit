@@ -2,6 +2,8 @@ package io.github.vedant7007.katori.data.local
 
 import android.content.Context
 import io.github.vedant7007.katori.R
+import io.github.vedant7007.katori.domain.ContextText
+import io.github.vedant7007.katori.domain.DietType
 import io.github.vedant7007.katori.domain.LifeContext
 import io.github.vedant7007.katori.domain.TriggerTemplate
 import io.github.vedant7007.katori.domain.TriggerText
@@ -58,4 +60,29 @@ class AndroidTriggerStrings(context: Context) : TriggerText.Strings {
             LifeContext.HOMEMAKER -> R.string.life_context_homemaker
         }
     )
+}
+
+/**
+ * [ContextText.Strings] from the string table: the lines that carry a person's own meals, lab
+ * values and diet into a request. Same rule as above: an explicit `when`, positional arguments,
+ * no number in any format string.
+ */
+class AndroidContextStrings(context: Context) : ContextText.Strings {
+
+    private val res = context.applicationContext.resources
+
+    override fun figure(): String = res.getString(R.string.context_figure)
+    override fun figurePartial(): String = res.getString(R.string.context_figure_partial)
+    override fun figureNone(): String = res.getString(R.string.context_figure_none)
+    override fun meal(): String = res.getString(R.string.context_meal)
+    override fun lab(): String = res.getString(R.string.context_lab)
+    override fun labWithRange(): String = res.getString(R.string.context_lab_with_range)
+
+    override fun neverSuggest(diet: DietType): String? = when (diet) {
+        DietType.VEGETARIAN -> R.string.context_never_suggest_vegetarian
+        DietType.VEGAN -> R.string.context_never_suggest_vegan
+        DietType.EGGETARIAN -> R.string.context_never_suggest_eggetarian
+        DietType.JAIN -> R.string.context_never_suggest_jain
+        DietType.NON_VEGETARIAN -> null
+    }?.let(res::getString)
 }

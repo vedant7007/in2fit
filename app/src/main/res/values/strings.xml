@@ -115,4 +115,16 @@
     <string name="life_context_field_or_manual_worker">long physical shifts and eating out</string>
     <string name="life_context_desk_professional">a desk day with a full kitchen</string>
     <string name="life_context_homemaker">cooking for the household</string>
+    <!-- ContextText: the lines that carry the person's own meals, reports and diet into an ANSWER or RECOMMEND request.
+         Positional arguments in the order ContextText supplies them; no number may be added to any of these. -->
+    <string name="context_figure">%1$s: %2$s %3$s</string>
+    <string name="context_figure_partial">%1$s: at least %2$s %3$s (no value for %4$s)</string>
+    <string name="context_figure_none">%1$s: not known</string>
+    <string name="context_meal">%1$s: %2$s. %3$s</string>
+    <string name="context_lab">%1$s: %2$s %3$s (report dated %4$s)</string>
+    <string name="context_lab_with_range">%1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)</string>
+    <string name="context_never_suggest_vegetarian">meat, fish or eggs (vegetarian)</string>
+    <string name="context_never_suggest_vegan">meat, fish, eggs, milk or any dairy (vegan)</string>
+    <string name="context_never_suggest_eggetarian">meat or fish (eggetarian)</string>
+    <string name="context_never_suggest_jain">meat, fish, eggs, onion, garlic or root vegetables (Jain)</string>
 </resources>

@@ -100,14 +100,22 @@ class RulesEngineTest {
     // --- safety ------------------------------------------------------------------------------
 
     @Test
-    fun `a value far outside its range escalates and emits no dietary suggestion`() {
+    fun `a value far outside its range makes a referral mandatory, alongside the help`() {
+        // 0015: referral ALONGSIDE help, not instead of it. The old rule suppressed every
+        // suggestion the moment a value was far outside range, which made the app useless at
+        // exactly the moment someone needed it most.
         val r = engine.evaluate(input(labs = listOf(glucoseAbove(260.0))))
 
-        assertTrue(r.firedRules.all { it.severity == Severity.ESCALATE })
-        assertTrue("escalation must not carry swaps", r.rankedCandidates.isEmpty())
-        assertTrue("escalation must not carry constraints", r.constraints.isEmpty())
-        assertEquals(TriggerTemplate.ESCALATE_ABOVE_RANGE, r.trigger!!.template)
+        assertTrue("the referral must be flagged as required", r.referralRequired)
+        assertTrue(r.firedRules.any { it.severity == Severity.ESCALATE })
+        assertEquals("the referral sentence wins the trigger", TriggerTemplate.ESCALATE_ABOVE_RANGE, r.trigger!!.template)
         assertTrue(r.triggerText()!!.contains("worth showing to a doctor"))
+
+        // AND the same value still adjusts the ranking, exactly as a milder reading would.
+        assertTrue("a far-above glucose must still fire the ordinary above-range rule",
+            r.firedRules.any { it.id == RuleIds.LAB_ABOVE_RANGE })
+        assertTrue("the help must not be suppressed", r.constraints.isNotEmpty())
+        assertTrue("the help must not be suppressed", r.rankedCandidates.isNotEmpty())
     }
 
     @Test
@@ -249,15 +257,20 @@ class RulesEngineTest {
     }
 
     @Test
-    fun `an escalation never carries suggestions even when other rules would have fired`() {
+    fun `the referral is never dropped when other rules fire too`() {
+        // The failure this guards against is the mirror of the old one: with several rules
+        // competing for the trigger, the referral must still be the sentence shown.
         val r = engine.evaluate(
             input(
                 labs = listOf(glucoseAbove(260.0)),
                 conditions = listOf(DeclaredCondition("Anaemia", ConditionSource.USER_DECLARED)),
             )
         )
-        assertTrue(r.rankedCandidates.isEmpty())
-        assertTrue(r.firedRules.all { it.severity == Severity.ESCALATE })
+        assertTrue(r.referralRequired)
+        assertEquals(TriggerTemplate.ESCALATE_ABOVE_RANGE, r.trigger!!.template)
+        assertTrue("the declared condition still contributes its help",
+            r.firedRules.any { it.id == RuleIds.DECLARED_CONDITION })
+        assertTrue(r.rankedCandidates.isNotEmpty())
     }
 
     // --- the rendered sentences ---------------------------------------------------------------

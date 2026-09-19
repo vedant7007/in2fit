@@ -28,6 +28,39 @@ import kotlinx.coroutines.flow.Flow
  *   splitting the lease: it drops spoken confirmation to on-screen confirmation and says so. Which
  *   devices this applies to is established by measurement, not assumed.
  *
+ * THE FOUR SPOKEN INTENTS (`docs/decisions/0015`)
+ * A spoken or typed turn is not a log entry until the model says so. [UserIntent.Speak] and
+ * [UserIntent.Type] carry no intent of their own; the orchestrator classifies the utterance into
+ * one [SpokenIntent] first and then routes:
+ *
+ *  - LOG        the person ate something. Extract, resolve, compute, SAVE, evaluate rules, phrase.
+ *  - SUGGEST    the person is ABOUT to eat something and asks what to add or change. Extract,
+ *               resolve, compute and evaluate exactly as LOG does, against a HYPOTHETICAL meal, and
+ *               NEVER SAVE. "I'm having rice and palak paneer, what should I add" is a question about
+ *               a plate, not a record of one. No [OrchestratorEvent.MealLogged] is emitted, the
+ *               [MealStore] is not called, and the timeline is untouched. A SUGGEST that writes is
+ *               the pollution `0015` names: a meal in their history they never ate.
+ *  - ANSWER     a question about their own diary, or about nutrition.
+ *  - RECOMMEND  what to eat for a goal or a declared condition.
+ *
+ * ANSWER AND RECOMMEND ARE NEVER CONTEXT-FREE. A question is only worth answering in the light of
+ * the person's own records: their logged meals, their lab values, the conditions they declared,
+ * where they live and eat. Before either path calls the model, the orchestrator reads the current
+ * [UserContext] from the store and renders it into the request, so "what should I eat for iron"
+ * is answered knowing their last haemoglobin, what they logged this week, what they said they are
+ * managing and that they eat in a hostel canteen. A chatbot gives the generic paragraph; this app
+ * does not, and the difference is the product. The context goes in as finished strings the model
+ * may quote and cannot compute with, the same defence the phrasing path uses.
+ *
+ * WHEN THE CLASSIFIER IS NOT SURE it emits [OrchestratorEvent.NeedsIntent] and stops. It never
+ * guesses LOG, because a guessed LOG writes to the timeline. The UI asks, and re-enters with
+ * [UserIntent.Resolve], which carries the person's own answer and skips the classifier.
+ *
+ * THE REFERRAL. When the rules engine marks a referral as required ([RuleEvaluation.referralRequired],
+ * `0015`), the referral sentence is the rendered trigger and is appended to the response by THIS
+ * class, as a fixed line, after whatever the model said. It is never generated, so no sample can
+ * soften or drop it; and it comes alongside the help, not instead of it.
+ *
  * FAILURE MODES
  * - Any stage returning [Outcome.Unavailable] ends the flow in [OrchestratorEvent.Failed] carrying
  *   that reason. The orchestrator never substitutes a fallback value and never retries silently
@@ -35,17 +68,29 @@ import kotlinx.coroutines.flow.Flow
  * - Low confidence on extraction produces [OrchestratorEvent.NeedsConfirmation] rather than a save.
  *   Spec 10.7: the system asks rather than guesses, and silently logging the wrong food is the
  *   outcome to avoid.
+ * - Generated prose failing its guard is not a failure of the turn. The rules engine's own
+ *   rendered sentence is shown in its place ([OrchestratorEvent.Advice.phrased] null), and the
+ *   turn completes. The referral, when required, is still appended.
  */
 interface Orchestrator {
     fun handle(intent: UserIntent): Flow<OrchestratorEvent>
 }
 
 sealed interface UserIntent {
-    /** Beat 1. Log a meal from speech. */
-    data class LogMealByVoice(val language: SpeechLanguageRef) : UserIntent
+    /**
+     * A spoken turn. The app does not know which of the four it is until the model has classified
+     * the transcript; beat 1 (log) and beat 2 (query) both start here.
+     */
+    data class Speak(val language: SpeechLanguageRef) : UserIntent
 
-    /** Beat 2. Ask a question about stored history. */
-    data class QueryHistoryByVoice(val language: SpeechLanguageRef) : UserIntent
+    /** The same turn, typed. The fallback when the microphone is denied, and the JVM test path. */
+    data class Type(val text: String, val language: SpeechLanguageRef) : UserIntent
+
+    /**
+     * The person answered a [OrchestratorEvent.NeedsIntent] question. Same text, their decision;
+     * the classifier is not consulted again.
+     */
+    data class Resolve(val text: String, val language: SpeechLanguageRef, val intent: SpokenIntent) : UserIntent
 
     /** Beat 3. Scan a printed lab report. */
     data object ScanLabReport : UserIntent
@@ -60,6 +105,12 @@ sealed interface UserIntent {
     data class CheckExerciseForm(val movement: String) : UserIntent
 }
 
+/**
+ * The four intents of `0015`, in domain terms. The model's own label type lives in ml/llm and is
+ * mapped onto this at the boundary, so the UI and the tests never import a prompt file.
+ */
+enum class SpokenIntent { LOG, ANSWER, SUGGEST, RECOMMEND }
+
 sealed interface OrchestratorEvent {
     /** A stage started. The UI shows what is happening, named, not a bare spinner. */
     data class Progress(val stage: Stage) : OrchestratorEvent
@@ -70,14 +121,59 @@ sealed interface OrchestratorEvent {
     /** What was heard, once endpointed. Shown immediately so the user sees they were understood. */
     data class Transcribed(val text: String) : OrchestratorEvent
 
-    /** The parse is uncertain; ask the user before saving anything. */
-    data class NeedsConfirmation(val question: String, val parsed: ParsedMeal) : OrchestratorEvent
+    /**
+     * The classifier could not tell which of the four they meant. The UI asks and re-enters with
+     * [UserIntent.Resolve]. The flow completes right after this: nothing has been written and
+     * nothing will be.
+     */
+    data class NeedsIntent(val transcript: String) : OrchestratorEvent
 
-    /** A meal was resolved and computed. Figures carry their bands and sources. */
-    data class MealResolved(val meal: ParsedMeal, val figures: List<NutritionFigure>) : OrchestratorEvent
+    /**
+     * The plate could not be resolved with confidence; ask the user before saving anything. [why]
+     * is the resolver's reason, which the UI already maps to a sentence (NO_MATCH: "I do not know
+     * that food"; KNOWN_ITEM_NO_DATA: "I know it and hold no figures for it"). The flow completes
+     * right after this, as with [NeedsIntent].
+     */
+    data class NeedsConfirmation(val why: UnavailableReason, val parsed: ParsedMeal) : OrchestratorEvent
 
-    /** Rules fired. Carries the triggering sentence for beat 4. */
-    data class Advice(val evaluation: RuleEvaluation, val phrased: String?) : OrchestratorEvent
+    /**
+     * A meal was resolved and computed. Figures carry their bands and sources. On SUGGEST this
+     * is the hypothetical plate; [hypothetical] says so and the UI must not show it as logged.
+     */
+    data class MealResolved(
+        val meal: ParsedMeal,
+        val figures: List<NutritionFigure>,
+        val hypothetical: Boolean,
+    ) : OrchestratorEvent
+
+    /** The meal is on the timeline. Emitted on LOG and on nothing else. */
+    data class MealLogged(val mealId: Long) : OrchestratorEvent
+
+    /**
+     * Rules fired: LOG, SUGGEST and RECOMMEND all end here, and the UI renders the suggestions
+     * from [RuleEvaluation.rankedCandidates], never from prose. [phrased] is the model's text when
+     * it passed its guards and null when it did not, in which case the rendered trigger sentence
+     * stands alone. [referral] is the fixed referral line when one is required, already rendered,
+     * to be shown and spoken whatever [phrased] holds. [factIds] are the knowledge rows a RECOMMEND
+     * was given, for the "why" affordance; empty on the other two.
+     */
+    data class Advice(
+        val evaluation: RuleEvaluation,
+        val phrased: String?,
+        val referral: String?,
+        val factIds: List<String> = emptyList(),
+    ) : OrchestratorEvent
+
+    /**
+     * ANSWER: the model's guarded text, the ids of the knowledge rows it was given, and the fixed
+     * referral line when the rules engine required one. [text] never contains the referral; the
+     * UI shows both.
+     */
+    data class Answered(
+        val text: String,
+        val factIds: List<String>,
+        val referral: String?,
+    ) : OrchestratorEvent
 
     data object Completed : OrchestratorEvent
 
@@ -87,7 +183,10 @@ sealed interface OrchestratorEvent {
     data class NotImplemented(val component: String) : OrchestratorEvent
 }
 
-enum class Stage { RECORDING, TRANSCRIBING, EXTRACTING, MATCHING_FOODS, COMPUTING, EVALUATING_RULES, PHRASING, SPEAKING, CAPTURING, READING_TEXT }
+enum class Stage {
+    RECORDING, TRANSCRIBING, CLASSIFYING, EXTRACTING, MATCHING_FOODS, COMPUTING, SAVING,
+    EVALUATING_RULES, RETRIEVING_FACTS, PHRASING, SPEAKING, CAPTURING, READING_TEXT,
+}
 
 data class ParsedMeal(
     val items: List<ParsedItem>,

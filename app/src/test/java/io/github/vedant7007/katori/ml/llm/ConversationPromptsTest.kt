@@ -99,7 +99,7 @@ class ConversationPromptsTest {
     // --- ANSWER ------------------------------------------------------------------------------
 
     private fun answer(figures: List<String> = listOf("Protein today: at least 42 g (two items had no protein value)"), facts: List<KnowledgeFact> = ironFacts) =
-        AnswerRequest(question = "how much protein did I eat today", languageTag = "te-IN", figures = figures.map(::DisplayFigure), facts = facts)
+        AnswerRequest(question = "how much protein did I eat today", languageTag = "te-IN", declaredConditions = emptyList(), context = null, figures = figures.map(::DisplayFigure), facts = facts)
 
     @Test fun `the answer prompt shows every figure and fact verbatim, and the question`() {
         val r = answer()
@@ -127,7 +127,7 @@ class ConversationPromptsTest {
     }
 
     @Test fun `a number the person said is permitted, because it is theirs`() {
-        val r = AnswerRequest("how much protein is in 2 rotis", "en-IN", emptyList(), emptyList())
+        val r = AnswerRequest("how much protein is in 2 rotis", "en-IN", emptyList(), null, emptyList(), emptyList())
         assertNull(DefaultNumericGuard().firstInventedNumber("I do not have a figure for 2 rotis.", ConversationPrompts.permitted(r)))
     }
 

@@ -27,8 +27,8 @@ class DefaultRulesEngine : RulesEngine {
     override val rules: List<RuleDescriptor> = listOf(
         RuleDescriptor(
             RuleIds.LAB_FAR_OUTSIDE_RANGE,
-            "A lab value sits far outside the range printed on the report. Recommends showing it " +
-                "to a doctor and emits no dietary suggestion at all.",
+            "A lab value sits far outside the range printed on the report. A doctor referral is " +
+                "mandatory in the response, ALONGSIDE the ranking the value also adjusts (0015).",
             Severity.ESCALATE,
         ),
         RuleDescriptor(
@@ -70,32 +70,29 @@ class DefaultRulesEngine : RulesEngine {
         val fired = mutableListOf<FiredRule>()
         val constraints = mutableListOf<Constraint>()
 
-        // --- safety first: anything far outside its printed range short-circuits everything ----
+        // --- safety first: anything far outside its printed range makes a referral mandatory ----
         val escalations = input.labValues.mapNotNull { lab ->
             val outside = outsideRange(lab) ?: return@mapNotNull null
             if (!isFarOutside(lab, outside)) return@mapNotNull null
             FiredRule(RuleIds.LAB_FAR_OUTSIDE_RANGE, evidenceFor(lab), Severity.ESCALATE)
         }.sortedBy { (it.evidence as Evidence.LabValueOutsideRange).testName }
 
-        if (escalations.isNotEmpty()) {
-            val first = escalations.first()
-            // Spec 15.1, escalate do not handle: no constraints, no candidates, no swaps.
-            return RuleEvaluation(
-                firedRules = escalations,
-                constraints = emptyList(),
-                rankedCandidates = emptyList(),
-                trigger = TriggerStatement(
-                    ruleId = first.id,
-                    template = (first.evidence as Evidence.LabValueOutsideRange).let { e ->
-                        if (e.referenceHigh != null && e.value > e.referenceHigh) {
-                            TriggerTemplate.ESCALATE_ABOVE_RANGE
-                        } else {
-                            TriggerTemplate.ESCALATE_BELOW_RANGE
-                        }
-                    },
-                    evidence = first.evidence,
-                ),
-                inputDigest = digest(input),
+        // 0015: a referral is mandatory, and it comes ALONGSIDE the help rather than instead of it.
+        // The escalations are fired here, first, and the same values fall through to the ordinary
+        // lab handling below so they also adjust the ranking exactly as a milder reading would.
+        // The referral sentence wins the trigger at the end, whatever else fired.
+        fired += escalations
+        val referral: TriggerStatement? = escalations.firstOrNull()?.let { first ->
+            TriggerStatement(
+                ruleId = first.id,
+                template = (first.evidence as Evidence.LabValueOutsideRange).let { e ->
+                    if (e.referenceHigh != null && e.value > e.referenceHigh) {
+                        TriggerTemplate.ESCALATE_ABOVE_RANGE
+                    } else {
+                        TriggerTemplate.ESCALATE_BELOW_RANGE
+                    }
+                },
+                evidence = first.evidence,
             )
         }
 
@@ -161,9 +158,9 @@ class DefaultRulesEngine : RulesEngine {
             rankedCandidates = ranked,
             // A trigger explains why the suggestions look the way they do. With no suggestions
             // there is nothing to explain, and a sentence on its own would be a claim about a
-            // change the user cannot see. Escalation is the exception and returns earlier, because
-            // "show this to a doctor" is the whole message rather than an explanation of a list.
-            trigger = if (ranked.isEmpty()) null else triggerFor(fired),
+            // change the user cannot see. A referral is the exception: it is shown whether or not
+            // there is a list, because "show this to a doctor" is a message in its own right.
+            trigger = referral ?: if (ranked.isEmpty()) null else triggerFor(fired),
             inputDigest = digest(input),
         )
     }

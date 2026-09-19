@@ -6,6 +6,7 @@ import io.github.vedant7007.katori.domain.RuleIds
 import io.github.vedant7007.katori.domain.TriggerStatement
 import io.github.vedant7007.katori.domain.TriggerTemplate
 import io.github.vedant7007.katori.domain.Evidence
+import io.github.vedant7007.katori.data.knowledge.KnowledgeFact
 import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.domain.model.UnavailableReason
 import kotlinx.coroutines.runBlocking
@@ -221,5 +222,65 @@ class LlmEngineTest {
         e2.phrase(phrasing())
         assertTrue("extraction must ask for JSON", rt1.prompts.single().contains("JSON"))
         assertTrue("phrasing must not ask for JSON", !rt2.prompts.single().contains("JSON"))
+    }
+
+    // --- the conversational paths (0015) ----------------------------------------------------
+
+    @Test fun `the classifier's word is read and anything else asks the person`() = runBlocking {
+        assertEquals(Intent.SUGGEST, (engine("SUGGEST").second.classify("I'm having rice, what should I add", "en-IN") as Outcome.Ok).value)
+        assertEquals(Intent.RECOMMEND, (engine("recomm").second.classify("what to eat for iron", "te").let { it as Outcome.Ok }).value)
+        val unsure = engine("I think they are asking").second.classify("hmm", "en-IN")
+        assertEquals(UnavailableReason.BELOW_CONFIDENCE_THRESHOLD, (unsure as Outcome.Unavailable).reason)
+    }
+
+    private val fact = KnowledgeFact(
+        id = "iron.vitc", topic = "iron", tags = setOf("iron", "vitamin c"),
+        fact = "Vitamin C taken with a meal increases the iron absorbed from plant foods.",
+        source = "t", sourceUrl = "https://example.invalid", accessed = "2026-09-20", note = "",
+    )
+
+    private fun answerRequest() = AnswerRequest(
+        question = "did I get enough iron this week", languageTag = "en-IN",
+        declaredConditions = listOf("low iron"), context = "a hostel canteen with no kitchen",
+        figures = listOf(DisplayFigure("19/09/2026, 13:10: roti, dal. iron: 2.5 mg"), DisplayFigure("Haemoglobin: 9.8 g/dL (report dated 2026-09-12)")),
+        facts = listOf(fact),
+    )
+
+    @Test fun `an answer quoting only the context it was given passes`() = runBlocking {
+        val (rt, e) = engine("Your meals this week show about 2.5 mg iron, and your report shows 9.8 g/dL, so adding vitamin C to a meal helps.")
+        val r = e.answer(answerRequest())
+        assertTrue("$r", r is Outcome.Ok)
+        val prompt = rt.prompts.single()
+        // The person's own context must be IN the prompt: this is the whole point of the path.
+        assertTrue(prompt.contains("low iron"))
+        assertTrue(prompt.contains("hostel canteen"))
+        assertTrue(prompt.contains("9.8 g/dL"))
+        assertTrue(prompt.contains("roti, dal"))
+    }
+
+    @Test fun `an answer inventing a figure is refused`() = runBlocking {
+        val r = engine("You need 18 mg of iron a day and you got 2.5 mg.").second.answer(answerRequest())
+        assertTrue("$r", (r as Outcome.Unavailable).detail!!.contains("18"))
+    }
+
+    @Test fun `an answer naming a condition the person did not declare is refused`() = runBlocking {
+        val r = engine("Your 9.8 g/dL suggests anaemia.").second.answer(answerRequest())
+        assertTrue("$r", (r as Outcome.Unavailable).detail!!.contains("anaemia"))
+        // Declared conditions may be named, in their words and their stem.
+        val ok = engine("Your low iron is why vitamin C with meals matters.").second.answer(answerRequest())
+        assertTrue("$ok", ok is Outcome.Ok)
+    }
+
+    @Test fun `a recommendation may name a declared condition and nothing undeclared`() = runBlocking {
+        val request = RecommendRequest(
+            request = "what should I eat for iron", languageTag = "en-IN",
+            declaredConditions = listOf("type 2 diabetes"), context = "a hostel canteen with no kitchen",
+            constraints = listOf("meat, fish or eggs (vegetarian)"), triggerText = null, facts = listOf(fact),
+            allowedFoodNames = listOf("thotakura", "palak"), referralFollows = false,
+        )
+        val ok = engine("With your type 2 diabetes in mind, thotakura with a squeeze of lemon adds iron and vitamin C.").second.recommend(request)
+        assertTrue("$ok", ok is Outcome.Ok)
+        val bad = engine("Thotakura helps with anaemia.").second.recommend(request)
+        assertTrue("$bad", bad is Outcome.Unavailable)
     }
 }

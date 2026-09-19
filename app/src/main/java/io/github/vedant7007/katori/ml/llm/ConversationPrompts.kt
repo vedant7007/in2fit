@@ -77,6 +77,12 @@ internal object ConversationPrompts {
      * does not see a number it could add up. If the question needs a figure that is not in the
      * list, the prompt tells it to say so rather than estimate, which the guard would reject
      * anyway; saying so is the better failure.
+     *
+     * NEVER CONTEXT-FREE. The orchestrator renders the person's recent meals and lab values into
+     * [AnswerRequest.figures], and their declared conditions and situation into the request
+     * verbatim, before calling this; "did I get enough iron this week" is answered from what they
+     * logged and what their last report said, not from a generic paragraph. The condition rule is
+     * the same as RECOMMEND's: only what they told us, in their words.
      */
     fun answer(request: AnswerRequest): String {
         val system = """
@@ -84,14 +90,19 @@ internal object ConversationPrompts {
 
             Rules:
             - Use ONLY the figures and facts given, with numbers exactly as written. Never calculate, total, convert or estimate. If the answer needs a figure that is not listed, say you do not have that figure.
-            - Say what the data shows. Do not name any disease or condition, do not diagnose, do not tell them to take, stop or change any medicine or supplement.
+            - Say what the data shows. You may mention only the conditions they have told us about, in their words. Never suggest they have any other condition, never diagnose, never tell them to take, stop or change any medicine or supplement.
             - Plain words, two or three short sentences. No greeting, no sign-off, no markdown, no list.
         """.trimIndent()
 
         val user = buildString {
             append("Language to reply in: ").append(request.languageTag).append("\n\n")
+            if (request.declaredConditions.isNotEmpty()) {
+                append("They have told us: ").append(request.declaredConditions.joinToString("; ")).append("\n")
+            }
+            request.context?.let { append("Their situation: ").append(it).append('\n') }
+            if (request.declaredConditions.isNotEmpty() || request.context != null) append('\n')
             if (request.figures.isNotEmpty()) {
-                append("Figures from their diary, exactly as written:\n")
+                append("Figures from their diary and reports, exactly as written:\n")
                 request.figures.forEach { append("- ").append(it.text).append('\n') }
                 append('\n')
             } else {
@@ -171,6 +182,8 @@ internal object ConversationPrompts {
     fun permitted(request: AnswerRequest): List<String> = buildList {
         request.figures.forEach { add(it.text) }
         request.facts.forEach { add(it.fact) }
+        addAll(request.declaredConditions)
+        request.context?.let { add(it) }
         add(request.question)
     }
 
@@ -237,7 +250,14 @@ data class AnswerRequest(
     /** What they asked, as transcribed. */
     val question: String,
     val languageTag: String,
-    /** Totals and per-item figures from the diary, formatted with units and completeness. Strings, never numbers. */
+    /** Conditions the person declared, in their own words. The only conditions the model may name. */
+    val declaredConditions: List<String>,
+    /** Spec 4.2 context as a display string, e.g. "hostel student, canteen food, no kitchen". */
+    val context: String?,
+    /**
+     * Their recent meals and lab values, each rendered by `ContextText` as one line with its
+     * figures formatted, units and completeness included. Strings, never numbers.
+     */
     val figures: List<DisplayFigure>,
     /** Retrieved rows. Their text is the model's only source of general nutrition claims. */
     val facts: List<KnowledgeFact>,

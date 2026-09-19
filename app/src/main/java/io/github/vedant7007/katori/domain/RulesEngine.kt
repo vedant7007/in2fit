@@ -138,7 +138,13 @@ data class RuleEvaluation(
      * does not exist is a build where beat 4 cannot be defended.
      */
     val inputDigest: String,
-)
+) {
+    /**
+     * True when any fired rule is [Severity.ESCALATE]. The UI must then show [trigger], which is
+     * the referral sentence, above anything else in the response, and TTS must speak it. `0015`.
+     */
+    val referralRequired: Boolean get() = firedRules.any { it.severity == Severity.ESCALATE }
+}
 
 /** A rule that fired, and the specific evidence that fired it. */
 data class FiredRule(
@@ -150,9 +156,17 @@ data class FiredRule(
 /**
  * How strongly a fired rule should be acted on.
  *
- * [ESCALATE] exists to satisfy spec 15.1's "escalate, do not handle": a value far outside its range
- * produces "this is worth showing to a doctor" and NO dietary suggestion at all. An implementation
- * that emits swaps alongside an ESCALATE severity has broken the safety contract.
+ * [ESCALATE] means A REFERRAL IS MANDATORY IN THIS RESPONSE. A value far outside its printed range
+ * produces "this is worth showing to a doctor", and that sentence is the trigger whatever else
+ * fired, and the UI must show it.
+ *
+ * AMENDED BY `0015`. This used to read "escalate, do not handle": no suggestion at all alongside
+ * a referral. That made the app useless at exactly the moment someone needed it most, and the
+ * ruling is now that serious matters get a referral ALONGSIDE help, not instead of it. So an
+ * escalation no longer suppresses the ranking adjustments the same value would have produced at
+ * a milder level; it adds the referral on top and makes it non-optional. An implementation that
+ * drops the referral when other rules fire has broken the safety contract; one that drops the
+ * help has broken the product.
  */
 enum class Severity { INFORM, ADJUST, ESCALATE }
 
