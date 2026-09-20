@@ -144,6 +144,10 @@ that replace these rows will be **five or six speakers, reported as a small samp
 
 ## 3. A shorter answer, held in reserve
 
+> **Superseded by `0025`, 20 September 2026.** `SHORT` is now the default for a spoken turn, on the
+> integrator's measured turn (103 generated tokens, 13.3 s). The section below records why it was
+> built and held; the ruling record has the evidence and what changed.
+
 `AnswerLength.SHORT` asks for one sentence of at most twenty words with the single most useful
 thing, and caps generation at roughly one long sentence (48 tokens for ANSWER, 56 for RECOMMEND,
 against 120 and 160). **It is not applied.** Every caller defaults to `STANDARD`, and a test

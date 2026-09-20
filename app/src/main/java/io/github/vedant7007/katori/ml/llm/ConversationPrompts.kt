@@ -84,7 +84,7 @@ internal object ConversationPrompts {
      * logged and what their last report said, not from a generic paragraph. The condition rule is
      * the same as RECOMMEND's: only what they told us, in their words.
      */
-    fun answer(request: AnswerRequest, length: AnswerLength = AnswerLength.STANDARD): String {
+    fun answer(request: AnswerRequest, length: AnswerLength = AnswerLength.SHORT): String {
         val system = """
             You answer a person's question about their food diary or about nutrition. Use only what is listed below.
 
@@ -139,7 +139,7 @@ internal object ConversationPrompts {
      * food to land on. The model picks from the list and explains; it does not invent a food
      * (spec 4.3), and the UI renders suggestions from the list, not from the prose.
      */
-    fun recommend(request: RecommendRequest, length: AnswerLength = AnswerLength.STANDARD): String {
+    fun recommend(request: RecommendRequest, length: AnswerLength = AnswerLength.SHORT): String {
         val system = """
             You help a person choose what to eat, using only the facts and foods listed below.
 
@@ -223,21 +223,25 @@ internal object ConversationPrompts {
     const val INTENT_MAX_TOKENS = 4
     val INTENT_STOPS = listOf("\n", "</s>", "<|im_end|>")
 
-    /** Generation budgets for [answer] and [recommend] at [AnswerLength.STANDARD]. Three or four sentences; the prompt asks for fewer. */
-    const val ANSWER_MAX_TOKENS = 120
-    const val RECOMMEND_MAX_TOKENS = 160
+    /**
+     * Generation budgets for [answer] and [recommend] at the default length, [AnswerLength.SHORT]:
+     * roughly one long sentence, about 5 s at the measured 9 tok/s. The engine reads these, so
+     * the default prompt and the default budget move together. [AnswerLength.STANDARD] carries
+     * its own, larger budgets for the text path.
+     */
+    const val ANSWER_MAX_TOKENS = 48
+    const val RECOMMEND_MAX_TOKENS = 56
     val CONVERSATION_STOPS = listOf("\n\n", "</s>", "<|im_end|>")
 }
 
 /**
- * How long an ANSWER or RECOMMEND may be. PREPARED, NOT APPLIED: every caller defaults to
- * [STANDARD] and the standard prompt text is unchanged. [SHORT] exists so that when the first
- * measured conversational turn lands (nothing conversational has been timed; extraction's 55
- * generated tokens cost 6 s at 9 tok/s, `0014`, and a 200-token answer would be about 22 s of
- * generation before the prompt) the response is running `AnswerScorerTest`'s cases against the
- * short prompt on the phone, not opening a design discussion. Switching is one argument at the
- * call site, and the scorer's criteria are the correctness cases the short answer must still
- * meet: the figure quoted, the allowed food named, the person's context used, nothing judged.
+ * How long an ANSWER or RECOMMEND may be. **[SHORT] IS THE DEFAULT for a spoken turn**, ruled by
+ * Vedant on 20 September 2026 (`0025`) on the first measured conversational turn: ANSWER
+ * generated 103 tokens in 13.3 s and RECOMMEND 86 in 11.6 s on the test device, on top of a
+ * 17 s prompt, and TTS cannot start a word until generation ends. SHORT's caps put generation
+ * under 7 s, and the authored quality set scores the one-sentence answers full marks on every
+ * row, so by the scorer the cost is zero. [STANDARD] stays reachable for a text path, where the
+ * person reads rather than waits, by passing it explicitly together with its own budgets.
  */
 enum class AnswerLength(
     /** The length line of the ANSWER prompt. */
@@ -247,14 +251,15 @@ enum class AnswerLength(
     val answerMaxTokens: Int,
     val recommendMaxTokens: Int,
 ) {
-    STANDARD("two or three short sentences.", "Three or four short sentences.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
+    /** The wording that was live before the ruling; two to four sentences, for a screen the person reads. */
+    STANDARD("two or three short sentences.", "Three or four short sentences.", 120, 160),
 
     /**
      * One sentence, one figure or one food. The prompt asks for the single most useful thing;
      * the token cap is the backstop, set so a runaway answer is cut at roughly the length of one
      * long sentence rather than three.
      */
-    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twenty words: the one food to add and why.", 48, 56),
+    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twenty words: the one food to add and why.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
 }
 
 /** The four conversational intents of `0015`. Capture-shaped intents (scan, correct) are not spoken and are not routed here. */

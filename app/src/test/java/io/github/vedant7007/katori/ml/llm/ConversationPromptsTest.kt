@@ -185,30 +185,42 @@ class ConversationPromptsTest {
         assertTrue(ConversationPrompts.recommend(r).contains("no food you may suggest by name"))
     }
 
-    // --- the short variant, prepared and not applied ----------------------------------------------
+    // --- answer length: SHORT is the spoken default, STANDARD the text path -----------------------
 
-    /** The live prompts are unchanged: the default is STANDARD and STANDARD is the text that was there before. */
-    @Test fun `the default length is standard and standard is the live wording`() {
-        assertEquals(ConversationPrompts.answer(answer()), ConversationPrompts.answer(answer(), AnswerLength.STANDARD))
-        assertEquals(ConversationPrompts.recommend(recommend()), ConversationPrompts.recommend(recommend(), AnswerLength.STANDARD))
-        assertTrue(ConversationPrompts.answer(answer()).contains("two or three short sentences"))
-        assertTrue(ConversationPrompts.recommend(recommend()).contains("Three or four short sentences"))
+    /** Ruled 20 September (0025): the default is the one-sentence answer, and the engine's budgets are its budgets. */
+    @Test fun `the default length is short and its budgets are the engine's constants`() {
+        assertEquals(ConversationPrompts.answer(answer()), ConversationPrompts.answer(answer(), AnswerLength.SHORT))
+        assertEquals(ConversationPrompts.recommend(recommend()), ConversationPrompts.recommend(recommend(), AnswerLength.SHORT))
+        assertTrue(ConversationPrompts.answer(answer()).contains("one sentence of at most twenty words"))
+        assertTrue(ConversationPrompts.recommend(recommend()).contains("One sentence of at most twenty words"))
+        assertEquals(ConversationPrompts.ANSWER_MAX_TOKENS, AnswerLength.SHORT.answerMaxTokens)
+        assertEquals(ConversationPrompts.RECOMMEND_MAX_TOKENS, AnswerLength.SHORT.recommendMaxTokens)
+        // The point of the ruling: a runaway answer is cut at about one long sentence, ~5 s at 9 tok/s.
+        assertTrue(ConversationPrompts.ANSWER_MAX_TOKENS <= 64 && ConversationPrompts.RECOMMEND_MAX_TOKENS <= 64)
     }
 
-    /** SHORT changes the length line and the budget, and nothing the safety line depends on. */
-    @Test fun `the short variant keeps every figure, fact, constraint and rule`() {
-        val a = ConversationPrompts.answer(answer(), AnswerLength.SHORT)
-        val r = ConversationPrompts.recommend(recommend(referral = true), AnswerLength.SHORT)
-        assertTrue(a.contains("one sentence")); assertTrue(!a.contains("two or three"))
-        assertTrue(r.contains("One sentence")); assertTrue(!r.contains("Three or four"))
-        answer().figures.forEach { assertTrue(a.contains(it.text)) }
-        answer().facts.forEach { assertTrue(a.contains(it.fact)) }
-        recommend().constraints.forEach { assertTrue(r.contains("Never suggest: $it")) }
-        recommend().allowedFoodNames.forEach { assertTrue(r.contains(it)) }
-        assertTrue(r.contains("discuss this with a doctor"))
-        assertTrue(a.contains("Never calculate") && r.contains("never diagnose"))
-        assertTrue(AnswerLength.SHORT.answerMaxTokens < AnswerLength.STANDARD.answerMaxTokens)
-        assertTrue(AnswerLength.SHORT.recommendMaxTokens < AnswerLength.STANDARD.recommendMaxTokens)
+    /** The long form stays reachable for a screen the person reads, with its own larger budgets. */
+    @Test fun `standard is reachable by passing it and keeps the longer wording and budgets`() {
+        val a = ConversationPrompts.answer(answer(), AnswerLength.STANDARD)
+        val r = ConversationPrompts.recommend(recommend(), AnswerLength.STANDARD)
+        assertTrue(a.contains("two or three short sentences")); assertTrue(!a.contains("twenty words"))
+        assertTrue(r.contains("Three or four short sentences")); assertTrue(!r.contains("twenty words"))
+        assertTrue(AnswerLength.STANDARD.answerMaxTokens > AnswerLength.SHORT.answerMaxTokens)
+        assertTrue(AnswerLength.STANDARD.recommendMaxTokens > AnswerLength.SHORT.recommendMaxTokens)
+    }
+
+    /** Length changes the length line and the budget, and nothing the safety line depends on. */
+    @Test fun `both lengths keep every figure, fact, constraint and rule`() {
+        for (len in AnswerLength.entries) {
+            val a = ConversationPrompts.answer(answer(), len)
+            val r = ConversationPrompts.recommend(recommend(referral = true), len)
+            answer().figures.forEach { assertTrue(a.contains(it.text)) }
+            answer().facts.forEach { assertTrue(a.contains(it.fact)) }
+            recommend().constraints.forEach { assertTrue(r.contains("Never suggest: $it")) }
+            recommend().allowedFoodNames.forEach { assertTrue(r.contains(it)) }
+            assertTrue(r.contains("discuss this with a doctor"))
+            assertTrue(a.contains("Never calculate") && r.contains("never diagnose"))
+        }
     }
 
     @Test fun `the conversational prompts are not the extraction prompt`() {
