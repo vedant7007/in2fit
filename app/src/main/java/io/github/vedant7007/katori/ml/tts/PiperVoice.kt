@@ -57,6 +57,20 @@ object PiperVoices {
         minimumTier = DeviceTier.LOW,
     )
 
+    /**
+     * `hi_IN-rohan-medium`, under the IIT Madras Indic TTS licence (`docs/licences/iitm-tts-eula.txt`,
+     * permissive, notice on redistribution) on the trainer's card's claim of provenance. NOT in
+     * [byLanguage] until Vedant rules on that claim (`0005`); staged and stamped so the switch is
+     * one line here. Stamped size 62,950,199 B.
+     */
+    val HINDI_ROHAN = ModelHandle(
+        id = "tts.piper-hi_IN-rohan-medium",
+        family = ModelFamily.TTS,
+        relativePath = "tts/hi_IN-rohan-medium/model.onnx",
+        estimatedResidentBytes = 62_950_199L,
+        minimumTier = DeviceTier.LOW,
+    )
+
     val byLanguage: Map<SpeechLanguage, ModelHandle> = mapOf(
         SpeechLanguage.TELUGU to TELUGU,
         SpeechLanguage.HINDI to HINDI,

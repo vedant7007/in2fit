@@ -51,10 +51,7 @@ class AndroidTtsEngine(private val context: Context) : TtsEngine {
             is Outcome.NotImplemented -> return e
         }
         val voice = offlineVoiceFor(tts, language)
-            ?: return Outcome.Unavailable(
-                UnavailableReason.MODEL_NOT_LOADED,
-                "no installed offline ${language.tag} voice in the system engine (${tts.defaultEngine})",
-            )
+            ?: return Outcome.Unavailable(UnavailableReason.MODEL_NOT_LOADED, whyNoVoice(tts, language))
         if (tts.setVoice(voice) != TextToSpeech.SUCCESS) {
             return Outcome.Unavailable(UnavailableReason.MODEL_NOT_LOADED, "system engine refused voice ${voice.name}")
         }
@@ -110,6 +107,33 @@ class AndroidTtsEngine(private val context: Context) : TtsEngine {
     }
 
     /** Bind the system engine once. `onInit` reports ERROR when the device has no engine at all. */
+    /**
+     * Why this device has no usable voice for [language], in words the person can act on.
+     *
+     * The three cases differ in what fixes them. Data not installed: a one-time download in the
+     * phone's text-to-speech settings, which needs the network once and is done before the demo,
+     * not during it. Only network voices: nothing the person can do; the fallback engine speaks.
+     * Not supported: same. `detail` is for logs and the diagnostics screen, never rendered raw.
+     */
+    private fun whyNoVoice(tts: TextToSpeech, language: SpeechLanguage): String {
+        val locale = locale(language)
+        val engine = tts.defaultEngine
+        val code = runCatching { tts.isLanguageAvailable(locale) }.getOrDefault(TextToSpeech.LANG_NOT_SUPPORTED)
+        val sameLanguage = runCatching { tts.voices }.getOrNull().orEmpty().filter { it.locale.language == locale.language }
+        return when {
+            code == TextToSpeech.LANG_NOT_SUPPORTED ->
+                "$engine does not support ${locale.toLanguageTag()}"
+            code == TextToSpeech.LANG_MISSING_DATA ->
+                "$engine supports ${locale.toLanguageTag()} but its voice data is not installed; " +
+                    "install it once under Settings > System > Languages > Text-to-speech output"
+            sameLanguage.isNotEmpty() && sameLanguage.all { it.isNetworkConnectionRequired } ->
+                "$engine has only network voices for ${locale.toLanguageTag()}: ${sameLanguage.map { it.name }}"
+            else ->
+                "no installed offline ${locale.toLanguageTag()} voice in $engine " +
+                    "(isLanguageAvailable=$code, ${sameLanguage.size} ${locale.language} voices listed)"
+        }
+    }
+
     private suspend fun engine(): Outcome<TextToSpeech> = initLock.withLock {
         engine?.let { return@withLock Outcome.Ok(it) }
         val status = CompletableDeferred<Int>()

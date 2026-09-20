@@ -268,6 +268,54 @@ the platform voices remain the candidates; the register still holds one entry, `
 `rohan` row in the rejected table are superseded by this section and left in place as the
 record of why the exclusion was made when it was made.
 
+### The second source does not exist, 20 Sep 2026, 15:15 (Meera). The gate is redesigned and the call is Vedant's.
+
+**The IITM database page, fetched for me and reported, not read by me, the same standing as
+the EULA text before the diff:** it names no individual speakers. There is no speaker table,
+no identifiers, no per-voice listing. It says only that the database holds recordings from
+both male and female native speakers across 22 languages, 10,000+ sentences each of mono and
+English; Assamese reads "No data available".
+
+So the second source the table above asked for, a listing that confirms "Hindi Mono Male" and
+a Telugu voice exist in the distribution, **cannot be obtained from that page, today or next
+week.** That is the finding, in those words, so it does not sit here as an open blocker forever.
+What the page does establish is that "Hindi Mono Male" is consistent with IITM's own corpus
+naming (one mono and one English set per language, by speaker sex). What no page can establish
+is whether a third-party trainer actually used that data: that is a claim on their model card
+and it will stay a claim.
+
+**The real question**, then, is not "can provenance be proved" but: *is an unprovable card
+claim, under a licence this permissive, an acceptable risk for a student hackathon build that
+is not being sold?* Both positions:
+
+- *Accept the claim.* The card is the same class of evidence this project accepted for
+  `padmavathi` (the card's dataset pointer, plus a licence record for that dataset), and the
+  same class every Piper voice on Hugging Face offers; the licence it points at is perpetual,
+  royalty-free and grants free distribution of derivatives; the build is non-commercial and
+  not sold, so 2.2's flow-down never triggers; the obligation that does apply, the notice, is
+  cheap and already has a string key. The residual risk is that the trainer misdescribed the
+  data, in which case the true licence is unknown; the exposure is a student demo.
+- *Hold the gate.* "Verbatim or it does not ship" was written so that an audit is a lookup, and
+  "the trainer said so" is a lookup that ends in someone else's claim. Holding costs nothing on
+  the critical path now that the demo language is Hindi and the platform voice is first in
+  line; Piper Hindi is the second rung of the ladder in `0019` addendum 4, and `pratham`, in the
+  register, already covers that rung without this question.
+
+**Recommendation:** accept the card claim for `hi_IN-rohan-medium` and `te_IN-maya-medium`, on
+the padmavathi standard, recorded here as "licence read, permissive, provenance = trainer's
+claim, unprovable", with the IITM notice shipped the day either voice does. Reason: it is the
+standard already applied, the licence is more permissive than the CC-BY-4.0 padmavathi carries,
+and the risk lands on a non-commercial demo. If Vedant prefers the hold, nothing on the ladder
+breaks: `pratham` takes the Hindi Piper rung.
+
+**The call is Vedant's**, not this record's. Until he rules, `rohan` and `maya` are "licence
+read, provenance unprovable, awaiting ruling"; the staged `PiperVoices.HINDI_ROHAN` handle
+exists and is bound to nothing.
+
+**pocket-tts is a different case and stays blocked regardless.** Its SYSPIN corpus is not a
+missing confirmation; it is a genuinely unlicensed input (a third-party re-upload with no
+licence, SYSPIN's own terms unread). No ruling on the IITM claim touches it.
+
 ## NON-COMMERCIAL DEPENDENCY REGISTER
 
 **One entry, added 20 September 2026, the day the voice was added.** Everything else shipped

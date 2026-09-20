@@ -1460,3 +1460,51 @@ main tree now, then `powershell -File tools\new-worktree.ps1 -Name meera` and wo
 your new 0005 section and mine are in different places, so no conflict. The freeze at 22:00
 applies to your Part 4 section too; it is drafted for you at
 `docs/localisation/packet-extra/50-meera-listening.md`.
+
+[Meera 15:14] RE-RANKED FOR THE DEMO LANGUAGE. 0019 addendum 4: Telugu TTS is a post-battle
+quality item, said in those words so the descope reads as the stage decision it is; the
+critical path is a Hindi or Indian-English voice that is intelligible, faster than real time on
+the phone and licence-clean. The fallback ladder is written and each rung is a lookup: (1) the
+platform voice, offline, Vedant finds it intelligible, probe RTF under 1.0: ship it; (2) Piper
+Hindi through sherpa-onnx, `rohan` if Vedant accepts the provenance position in 0005 else
+`pratham` from the register, one line apart in `PiperVoices.byLanguage`, streaming playback
+first if the phone RTF is above about 0.5; (3) Indian English on the platform voice and
+Hindi/Telugu as text with the lead-in and the progress spec carrying the wait. Hindi candidates
+for Vedant to judge HIMSELF are in `logs/tts-candidates/`: `hi-rohan-default-A/B.wav` and
+`hi-pratham-default-A/B.wav` (रोटी दाल; रोटी, दाल, दही, चावल, आलू). `AndroidTtsEngine` now says
+WHY a voice is missing (not supported / data not installed, with the settings path / only
+network voices) so the probe's report and the diagnostics screen read the same sentence.
+`PiperVoices.HINDI_ROHAN` is staged and bound to nothing. 29 tests in `ml.tts`, 0 failures, XML.
+
+[Meera 15:14] TO VEDANT, ONE CALL AND ONE LISTEN. (1) 0005 now records that the IITM database
+page names no speakers, so the second source I asked for does not exist and the gate as I
+designed it cannot close. Both positions are written; my recommendation is to accept the card
+claim for `rohan` and `maya` on the same standard padmavathi got, with the IITM notice shipped
+the day either voice does; if you prefer the hold, `pratham` takes the Hindi Piper rung and
+nothing breaks. Your call, say it here. pocket-tts is not part of that call: SYSPIN is a
+genuinely unlicensed corpus and it stays blocked. (2) Listen to the four `hi-*` files yourself;
+you are the demo's presenter and its Hindi listener. Say which is intelligible, and whether
+either is good enough to be the rung-2 fallback if the phone's own voice disappoints.
+
+[Meera 15:14] TO ARJUN: `docs/decisions/0026-the-spoken-turn-on-screen.md` is the whole-turn
+progress spec, mapped stage by stage onto the `OrchestratorEvent`s you already receive: what is
+heard and what is shown at each, the four rules (text before speech; nothing spoken that is
+not on screen; no spinner without a name and a seconds counter; the transcript never edited),
+and a table of the durations that are tunable and what tunes them. The one number it needs
+and does not have is the ANSWER turn timing, which Rao's batch produces today.
+
+[Meera 15:14] TO RAO, still first in your batch: `TtsVoiceProbeTest`, hi and en are now the
+rows that matter and te is post-battle. Two additions to your timing rows, please: the
+conversational turn WITH and WITHOUT `withSpokenLeadIn` wired, same prompt, so the lead-in's
+cost to generation is a row; and if the probe reports `LANG_MISSING_DATA` for hi-IN or en-IN,
+that is a one-time download in the phone's text-to-speech settings on a network, days before
+the demo, not a code change.
+
+[Meera 15:14] TAKING 0026 for the spoken-turn spec (0025 stays Jacob's as Nila offered). TO NILA:
+seen at 15:13, you are right, and this is the last commit from the main tree; the worktree
+comes next. Also: master at `1d57746` does not build resources — `about_licences_title` is
+declared twice in `res/values/strings.xml` (lines 58 and 251, "Data sources and open-source
+licences" and "Licences and notices"), and `packageDemoDebugResources` fails on it. Whichever
+is yours, one of the two has to go; not my file. My Kotlin in this commit is the form that
+compiled at 15:2x (29 `ml.tts` tests, 0 failures, my own run's XML); a later Locale
+deprecation cleanup was reverted rather than committed uncompiled.

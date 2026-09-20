@@ -377,3 +377,75 @@ The IITM document is now known to exist and to be readable from India; it is not
 this laptop and it is not in the repository. `0005` records the reported summary as a summary and
 keeps the gate closed until the text is here. That one document rules on `maya`, `rohan` and
 pocket-tts together.
+
+---
+
+## Addendum 4, 20 September 2026, 15:15: the demo language changed, and the ladder is decided in advance
+
+### Telugu TTS is off the critical path, and that is a ruling, not a failure
+
+Ruled today by Vedant with Jacob: **the demo runs in the language the presenter speaks, and
+Vedant does not speak Telugu.** Hindi or Indian English on stage unless he says otherwise;
+Telugu stays in the demo as the language picker and the reviewed interface strings.
+
+So the ship blocker for the 26th is a Hindi or Indian-English voice that is intelligible, faster
+than real time on the phone, and licence-clean. That is a smaller problem than the one this
+record has been fighting, and the platform's own voices are far more likely to be adequate in
+Hindi and Indian English than in Telugu. **Telugu spoken output is now a post-battle quality
+item.** Nothing above is wasted by that: the stamping script, the trimmed espeak data, the
+engine, the loader, the probe and the listening evidence are what a Telugu voice will ship on
+when one passes the ear, and the descope is a decision about the stage, not about the work.
+
+### The Hindi candidates, generated for the person who can judge them
+
+Vedant speaks Hindi, so for the demo language the listener and the decision-maker are the same
+person. `logs/tts-candidates/`:
+
+| file | voice | licence footing | phone RTF |
+| --- | --- | --- | --- |
+| `hi-rohan-default-A/B.wav` | Piper `hi_IN-rohan-medium`, sha256 `b65dc80fb34d9dcd1cf684cb297966a34983bbc93bb1696fe207f32b0b33a091`, stamped, 161 tokens | IITM licence, permissive with the notice (`0005`); provenance is the card's claim, Vedant's call | unmeasured |
+| `hi-pratham-default-A/B.wav` | Piper `hi_IN-pratham-medium` | CC-BY-NC-SA-4.0, in the register | unmeasured |
+| `platform-hi-<voice>-A.wav` | the phone's own Hindi voice | none to record | the probe prints it |
+
+Text A `रोटी दाल`, text B `रोटी, दाल, दही, चावल, आलू.`, all from the authored CSVs. Desktop RTF
+was measured with 588 MB free of 16 GB and is not reported as a number: on that laptop tonight
+both voices read 1.6-2.1, against 0.23 for the same class of model earlier in the night.
+
+### The fallback ladder, decided before the probe returns
+
+Each rung is a lookup against the probe report and the ear, in this order. The first rung that
+holds ships; nothing below it is discussed on the 25th.
+
+1. **The platform voice for the demo language is installed offline, Vedant finds it
+   intelligible, and its RTF in the probe is below 1.0.** Ship it. No file, no licence, no
+   arbiter memory, `AndroidTtsEngine` is already first in `RoutingTtsEngine`. Telugu on the
+   same phone: whatever the probe says, it is not on the stage.
+2. **The platform voice is absent, network-only, or Vedant rejects it.** Piper Hindi through
+   sherpa-onnx: `hi_IN-rohan-medium` if Vedant accepts the provenance position in `0005` (then
+   the notice ships in the About screen and the voice is permissive), otherwise
+   `hi_IN-pratham-medium` (already registered, non-commercial, acceptable under the scope
+   ruling). Both are stamped and one line apart in `PiperVoices.byLanguage`. Requires: the
+   voice staged on the phone, `espeak-ng-data` in assets, and a phone RTF below 1.0; if the RTF
+   is above about 0.5 the streaming playback in addendum 3 gets built first.
+3. **Neither Hindi path clears the ear or the clock.** The demo speaks Indian English through
+   the platform voice (English is the platform's home ground and `en-IN` or any offline English
+   voice is accepted), and Hindi and Telugu are text on screen with the spoken lead-in and the
+   progress spec (`0026`) carrying the wait. This rung is a product decision already written
+   down in `0001`: spoken confirmation degrades to on-screen confirmation, never to a wrong
+   voice.
+
+Telugu, post-battle, follows the same three rungs on its own: platform voice if the phone has
+one offline and the listeners accept it; Piper `padmavathi`/`venkatesh` when a natural sentence
+has been heard; text-only otherwise. pocket-tts stays where addendum 2 left it: blocked on the
+SYSPIN corpus's missing licence and on a runtime that does not exist on the phone.
+
+### What "shipping the platform path is a switch" now means
+
+`AndroidTtsEngine` claims all three languages, picks the same-language offline voice with the
+Indian regional variant first, refuses network voices, says in its `detail` WHY a voice is
+missing (not supported; supported but data not installed, with the settings path; only network
+voices), splits long text without truncating, holds transient audio focus, and is already
+wired first. What remains is the phone's fact, from the probe, and one preparation on the demo
+phone before the day: if the report says `LANG_MISSING_DATA`, the Hindi and English voice data
+are installed once from the phone's text-to-speech settings, on a network, days before the
+demo, so that on stage the build with no INTERNET permission finds them already there.
