@@ -170,10 +170,13 @@ against the short prompt, on the device, both thread counts.
   can't judge that" rather than nothing.
 - The reviewer: the roman Hindi and Telugu patterns in `SafetyLine`, alongside the log words.
 - The device run: the adversarial set and the quality set through the real model, scored by
-  `AnswerScorer`, prompt and generation tokens reported separately.
+  `AnswerScorer`, prompt and generation tokens reported separately. When the recorded speakers
+  replace the authored rows, they are five or six people: a small sample, reported as one, and
+  never "our test set".
 
 ## What this does not claim
 
 That the model answers any of these questions well, safely or quickly. That the scorer measures
-truth. That 86.7% or 5/5 is accuracy. Each is a device measurement; this record is the
-apparatus for it.
+truth. That 86.7% or 5/5 is accuracy. That five or six recorded speakers are more than a small
+sample. Each number is a device measurement on whatever sample exists, reported with its size;
+this record is the apparatus for it.
