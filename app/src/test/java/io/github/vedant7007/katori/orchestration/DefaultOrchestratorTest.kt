@@ -47,6 +47,7 @@ import io.github.vedant7007.katori.ml.asr.AsrEvent
 import io.github.vedant7007.katori.ml.asr.AudioClip
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import io.github.vedant7007.katori.ml.asr.Transcript
+import io.github.vedant7007.katori.ml.llm.AnswerLength
 import io.github.vedant7007.katori.ml.llm.AnswerRequest
 import io.github.vedant7007.katori.ml.llm.ExtractedItem
 import io.github.vedant7007.katori.ml.llm.ExtractionRequest
@@ -96,8 +97,8 @@ class DefaultOrchestratorTest {
         override suspend fun classify(transcript: String, languageTag: String) = intent
         override suspend fun extract(request: ExtractionRequest) = extraction
         override suspend fun phrase(request: PhrasingRequest) = phrased.also { phrasings += request }
-        override suspend fun answer(request: AnswerRequest) = answered.also { answers += request }
-        override suspend fun recommend(request: RecommendRequest) = recommended.also { recommendations += request }
+        override suspend fun answer(request: AnswerRequest, length: AnswerLength) = answered.also { answers += request }
+        override suspend fun recommend(request: RecommendRequest, length: AnswerLength) = recommended.also { recommendations += request }
         override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> = Outcome.Ok(block(this))
     }
 
@@ -334,11 +335,34 @@ class DefaultOrchestratorTest {
         assertTrue("the referral is spoken after the help", r.tts.spoken.single().endsWith(advice.referral!!))
     }
 
+    @Test fun `a question asking for a clinical judgement gets the fixed referral line with no report on file`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.ANSWER)), ctx = context(labs = emptyList()))
+        val answered = r.run(UserIntent.Type("my haemoglobin is 7, is that dangerous", en)).filterIsInstance<OrchestratorEvent.Answered>().single()
+        assertEquals(ContextText.ENGLISH.referral(), answered.referral)
+        assertTrue("the model is told the line follows", r.llm.answers.single().referralFollows)
+        // And an ordinary food question from a person who named their condition gets no such line.
+        val plain = r.run(UserIntent.Type("I have low iron, what did I eat yesterday", en)).filterIsInstance<OrchestratorEvent.Answered>().single()
+        assertNull(plain.referral)
+    }
+
+    @Test fun `an ANSWER every guard refused still reaches the person, with the referral`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.ANSWER), answered = Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "invented 18")), ctx = context(labs = listOf(glucoseFarAbove)))
+        val events = r.run(UserIntent.Type("how was my week", en))
+        val answered = events.filterIsInstance<OrchestratorEvent.Answered>().single()
+        assertNull(answered.text)
+        assertEquals(UnavailableReason.INTERNAL_ERROR, answered.refused)
+        assertNotNull("the referral stands whatever the model did", answered.referral)
+        assertTrue("the person still gets their own lines: ${answered.figures}", answered.figures.any { it.contains("Fasting glucose: 260 mg/dL") })
+        assertEquals(OrchestratorEvent.Completed, events.last())
+        assertEquals("the referral is still spoken", listOf(answered.referral), r.tts.spoken)
+    }
+
     @Test fun `ANSWER still carries the referral when the rules require one`() {
         val r = rig(FakeLlm(intent = Outcome.Ok(Intent.ANSWER)), ctx = context(labs = listOf(glucoseFarAbove)))
         val answered = r.run(UserIntent.Type("how was my week", en)).filterIsInstance<OrchestratorEvent.Answered>().single()
         assertNotNull(answered.referral)
         assertEquals("answered", answered.text)
+        assertTrue(r.llm.answers.single().referralFollows)
     }
 
     // --- the voice front end ----------------------------------------------------------------

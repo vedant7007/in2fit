@@ -29,6 +29,7 @@ import io.github.vedant7007.katori.ml.asr.AsrEngine
 import io.github.vedant7007.katori.ml.asr.AsrEvent
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import io.github.vedant7007.katori.ml.asr.Transcript
+import io.github.vedant7007.katori.ml.llm.AnswerLength
 import io.github.vedant7007.katori.ml.llm.AnswerRequest
 import io.github.vedant7007.katori.ml.llm.DisplayFigure
 import io.github.vedant7007.katori.ml.llm.ExtractionRequest
@@ -38,6 +39,7 @@ import io.github.vedant7007.katori.ml.llm.LogPrefilter
 import io.github.vedant7007.katori.ml.llm.PhrasedText
 import io.github.vedant7007.katori.ml.llm.PhrasingRequest
 import io.github.vedant7007.katori.ml.llm.RecommendRequest
+import io.github.vedant7007.katori.ml.llm.SafetyLine
 import io.github.vedant7007.katori.ml.tts.TtsEngine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -85,6 +87,8 @@ class DefaultOrchestrator(
     private val triggerText: TriggerText,
     private val contextText: ContextText,
     private val clock: Clock = Clock.systemUTC(),
+    /** The product decision on answer length (`0024`, measured in `0014`). One flip, here. */
+    private val answerLength: AnswerLength = AnswerLength.STANDARD,
 ) : Orchestrator {
 
     override fun handle(intent: UserIntent): Flow<OrchestratorEvent> = flow {
@@ -259,7 +263,7 @@ class DefaultOrchestrator(
         val evaluation = rules.evaluate(
             RuleInput(ctx.profile, ctx.declaredConditions, ctx.labValues, meal = null, candidates = ctx.candidates, evaluatedAt = now)
         )
-        val referral = evaluation.trigger?.let(triggerText::render).takeIf { evaluation.referralRequired }
+        val referral = referralFor(text, evaluation)
 
         emit(Progress(Stage.RETRIEVING_FACTS))
         val declared = ctx.declaredConditions.map { it.name }
@@ -277,19 +281,31 @@ class DefaultOrchestrator(
                 ctx.labValues.map { DisplayFigure(contextText.lab(it)) } +
                 listOfNotNull(evaluation.trigger?.let { DisplayFigure(triggerText.render(it)) }),
             facts = facts,
+            referralFollows = referral != null,
         )
 
         emit(Progress(Stage.PHRASING))
-        val answered = when (val a = withLlm { it.answer(request) }) {
-            is Outcome.Ok -> a.value.text
-            // There is no sentence of our own to fall back to on a question; say we could not.
-            is Outcome.Unavailable -> return fail(a.reason, a.detail)
+        val lines = request.figures.map { it.text }
+        val answered = when (val a = withLlm { it.answer(request, answerLength) }) {
+            is Outcome.Ok -> OrchestratorEvent.Answered(a.value.text, facts.map { it.id }, referral, figures = lines)
+            // A guard refused every attempt. The person still gets a turn: the UI's own
+            // `answer_refused` line, their own figures, and the referral. Never nothing (0024).
+            is Outcome.Unavailable -> OrchestratorEvent.Answered(null, facts.map { it.id }, referral, refused = a.reason, figures = lines)
             is Outcome.NotImplemented -> return notBuilt(a.component)
         }
-        emit(OrchestratorEvent.Answered(answered, facts.map { it.id }, referral))
-        speak(listOfNotNull(answered, referral).joinToString(" "), language)
+        emit(answered)
+        speak(listOfNotNull(answered.text, referral).joinToString(" "), language)
         emit(OrchestratorEvent.Completed)
     }
+
+    /**
+     * The referral line, fixed, never generated: the engine's rendered sentence when a value on
+     * file requires one; the string table's line when the QUESTION asks for a clinical judgement
+     * and there is no report to render a sentence about; null otherwise.
+     */
+    private fun referralFor(text: String, evaluation: io.github.vedant7007.katori.domain.RuleEvaluation): String? =
+        evaluation.trigger?.let(triggerText::render).takeIf { evaluation.referralRequired }
+            ?: contextText.referral().takeIf { SafetyLine.invitesClinicalJudgement(text) }
 
     // --- RECOMMEND: their profile, their reports, the allowed list, in the request ---------------
 
@@ -301,7 +317,7 @@ class DefaultOrchestrator(
             RuleInput(ctx.profile, ctx.declaredConditions, ctx.labValues, meal = null, candidates = ctx.candidates, evaluatedAt = now)
         )
         val trigger = evaluation.trigger?.let(triggerText::render)
-        val referral = trigger.takeIf { evaluation.referralRequired }
+        val referral = referralFor(text, evaluation)
 
         emit(Progress(Stage.RETRIEVING_FACTS))
         val declared = ctx.declaredConditions.map { it.name }
@@ -316,7 +332,7 @@ class DefaultOrchestrator(
         emit(Progress(Stage.PHRASING))
         // A guard failure here is not a failure of the turn: the ranked list and the trigger
         // sentence are the engine's own and need no model. The prose is what is lost.
-        val phrased = withLlm { it.recommend(request) }.textOrNull()
+        val phrased = withLlm { it.recommend(request, answerLength) }.textOrNull()
         emit(OrchestratorEvent.Advice(evaluation, phrased, referral, facts.map { it.id }))
         speak(listOfNotNull(phrased ?: trigger, referral.takeIf { phrased != null }).joinToString(" "), language)
         emit(OrchestratorEvent.Completed)

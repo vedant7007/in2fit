@@ -59,7 +59,10 @@ import kotlinx.coroutines.flow.Flow
  * THE REFERRAL. When the rules engine marks a referral as required ([RuleEvaluation.referralRequired],
  * `0015`), the referral sentence is the rendered trigger and is appended to the response by THIS
  * class, as a fixed line, after whatever the model said. It is never generated, so no sample can
- * soften or drop it; and it comes alongside the help, not instead of it.
+ * soften or drop it; and it comes alongside the help, not instead of it. A question that itself
+ * asks for a clinical judgement ("is 7 dangerous", "should I stop my tablets"; `SafetyLine`,
+ * `0024`) gets the fixed referral line from the string table even when no report is on file for
+ * the engine to render a sentence about.
  *
  * FAILURE MODES
  * - Any stage returning [Outcome.Unavailable] ends the flow in [OrchestratorEvent.Failed] carrying
@@ -166,13 +169,25 @@ sealed interface OrchestratorEvent {
 
     /**
      * ANSWER: the model's guarded text, the ids of the knowledge rows it was given, and the fixed
-     * referral line when the rules engine required one. [text] never contains the referral; the
-     * UI shows both.
+     * referral line when one is required. [text] never contains the referral; the UI shows both.
+     *
+     * [text] is null when every attempt failed a guard ([refused] says which). That is not a
+     * failure of the turn (`0024`: a refusal that abandons the person is what `0015` forbids):
+     * the UI shows its own "I can't judge that" sentence, and the referral, when there is one,
+     * stands exactly as it would have under an answer.
      */
     data class Answered(
-        val text: String,
+        val text: String?,
         val factIds: List<String>,
         val referral: String?,
+        val refused: UnavailableReason? = null,
+        /**
+         * The person's own lines the model was given, rendered by `ContextText`: period totals,
+         * recent meals, lab values, the engine's sentence. When [text] is null the UI shows the
+         * string table's `answer_refused` line and THESE, so a refused answer still hands the
+         * person their data; when [text] is present they are the "why" behind it.
+         */
+        val figures: List<String> = emptyList(),
     ) : OrchestratorEvent
 
     data object Completed : OrchestratorEvent

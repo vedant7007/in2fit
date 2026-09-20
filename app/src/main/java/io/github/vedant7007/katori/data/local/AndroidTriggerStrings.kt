@@ -86,6 +86,8 @@ class AndroidContextStrings(context: Context) : ContextText.Strings {
     override fun lab(): String = res.getString(R.string.context_lab)
     override fun labWithRange(): String = res.getString(R.string.context_lab_with_range)
 
+    override fun referral(): String = res.getString(R.string.context_referral)
+
     override fun neverSuggest(diet: DietType): String? = when (diet) {
         DietType.VEGETARIAN -> R.string.context_never_suggest_vegetarian
         DietType.VEGAN -> R.string.context_never_suggest_vegan

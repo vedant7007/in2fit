@@ -79,8 +79,15 @@ interface LlmEngine {
      */
     suspend fun classify(transcript: String, languageTag: String): Outcome<Intent>
 
-    /** ANSWER: a question about their own diary or about nutrition, from figures and sourced rows. */
-    suspend fun answer(request: AnswerRequest): Outcome<PhrasedText>
+    /**
+     * ANSWER: a question about their own diary or about nutrition, from figures and sourced rows.
+     *
+     * [length] is the product decision `0014` and `0024` set up: MEASURED on the phone on 20 Sep
+     * (`logs/hw-report-conversational.txt`), a STANDARD answer is about 30 s at 8 threads, of
+     * which generation is 12-15 s; SHORT caps generation at one sentence. The orchestrator holds
+     * the choice; the engine applies it.
+     */
+    suspend fun answer(request: AnswerRequest, length: AnswerLength = AnswerLength.STANDARD): Outcome<PhrasedText>
 
     /**
      * RECOMMEND: what to eat for a goal or a declared condition, from the person's own context,
@@ -88,7 +95,7 @@ interface LlmEngine {
      * iron" from a chatbot is a paragraph; from this app it knows their last haemoglobin, what they
      * logged this week, what they said they are managing, and where they eat. That is the product.
      */
-    suspend fun recommend(request: RecommendRequest): Outcome<PhrasedText>
+    suspend fun recommend(request: RecommendRequest, length: AnswerLength = AnswerLength.STANDARD): Outcome<PhrasedText>
 }
 
 data class ExtractionRequest(

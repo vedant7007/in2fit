@@ -139,6 +139,12 @@ class ContextText(
         fun labWithRange(): String
         /** The "never suggest" line for a diet type, or null when it forbids nothing. */
         fun neverSuggest(diet: DietType): String?
+        /**
+         * The fixed referral line for a question that asks for a clinical judgement when there
+         * is no report on file for the rules engine to render a sentence about (`0024`). Never
+         * generated; appended by the orchestrator, shown and spoken whatever the model said.
+         */
+        fun referral(): String
     }
 
     fun figure(f: NutritionFigure): String {
@@ -176,6 +182,8 @@ class ContextText(
 
     fun neverSuggest(diet: DietType): String? = strings.neverSuggest(diet)
 
+    fun referral(): String = strings.referral()
+
     private fun unit(u: NutrientUnit): String = when (u) {
         NutrientUnit.KCAL -> "kcal"
         NutrientUnit.GRAM -> "g"
@@ -208,6 +216,7 @@ class ContextText(
                 DietType.JAIN -> "meat, fish, eggs, onion, garlic or root vegetables (Jain)"
                 DietType.NON_VEGETARIAN -> null
             }
+            override fun referral() = "That is a question for a doctor, who can look at it with you."
         }
     }
 }

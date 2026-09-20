@@ -128,4 +128,25 @@ class NumericGuardTest {
         val out = "That comes to roughly 450 calories."
         assertEquals(check(out), check(out))
     }
+
+    // --- the unit travels with the value (0024, Priya's finding) ----------------------------
+
+    @Test fun `a value shown in one unit does not licence the same value in another`() {
+        val g = DefaultNumericGuard()
+        assertEquals("18 mg", g.firstInventedNumber("about 18 mg a day", listOf("Absorption rises from 14% to 18% with vitamin C.")))
+        assertNull(g.firstInventedNumber("absorption rises to 18% with vitamin C", listOf("Absorption rises from 14% to 18% with vitamin C.")))
+        assertNull("a bare value the input showed with a unit is not an invention", g.firstInventedNumber("about 18 with vitamin C", listOf("14% to 18%")))
+    }
+
+    @Test fun `unit spellings agree and non-units are not units`() {
+        val g = DefaultNumericGuard()
+        assertNull(g.firstInventedNumber("42g of protein", listOf("protein: 42 g")))
+        assertNull(g.firstInventedNumber("42 grams of protein", listOf("protein: 42 g")))
+        assertNull(g.firstInventedNumber("320 calories", listOf("energy: 320 kcal")))
+        assertNull(g.firstInventedNumber("your haemoglobin of 9.8 g/dL", listOf("Haemoglobin: 9.8 g/dL, printed range 12 to 15")))
+        assertEquals("42 mg", g.firstInventedNumber("42 mg of protein", listOf("protein: 42 g")))
+        assertNull("rotis is not a unit; the 2 is the person's own", g.firstInventedNumber("2 rotis", listOf("I had 2 rotis")))
+        assertEquals("a bare figure given, a unit the model added, is an invention", "12 g", g.firstInventedNumber("about 12 g", listOf("printed range 12 to 15")))
+    }
+
 }

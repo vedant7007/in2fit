@@ -27,6 +27,16 @@ package io.github.vedant7007.katori.ml.llm
  * output. "B12" would otherwise permit "12 g of protein", which is exactly the invention this
  * exists to stop. So "b12" in, "b12" out is fine; "b12" in, bare "12" out is rejected.
  *
+ * ### The unit travels with the value
+ *
+ * FOUND BY PRIYA (`0024`): a retrieved row saying "14% to 18%" licensed "18 mg a day" in an
+ * answer. The value matched and the guard was blind to the unit, which is the whole claim. So a
+ * value is now permitted WITH the unit it was shown in: "18%" in the input permits "18%" and a
+ * bare "18" out, and does not permit "18 mg". Unit is the recognised nutrition unit that follows
+ * the number (%, g, mg, µg, kcal, ml, g/dL, mg/dL and their spellings), normalised so "42g",
+ * "42 g" and "42 grams" agree; a following word that is not a unit ("2 rotis", "7 days") is not
+ * one, and such a value is permitted by its bare occurrence as before.
+ *
  * ### Out of scope, deliberately
  *
  * Numbers written as words. "two rotis" and "half a katori" are not caught here, because a guard
@@ -40,10 +50,12 @@ class DefaultNumericGuard : NumericGuard {
     override fun firstInventedNumber(output: String, permittedFrom: List<String>): String? {
         val permitted = HashSet<Long>()
         val permittedBare = HashSet<Long>()
+        val permittedWithUnit = HashSet<Pair<Long, String>>()
         for (source in permittedFrom) {
             for (t in tokens(source)) {
                 permitted += t.scaled
                 if (!t.letterAttached) permittedBare += t.scaled
+                if (t.unit != null) permittedWithUnit += t.scaled to t.unit
             }
         }
 
@@ -52,18 +64,21 @@ class DefaultNumericGuard : NumericGuard {
             // A value the input only ever showed glued to letters, such as the 12 in "B12",
             // does not licence a free-standing 12 in the output.
             if (!t.letterAttached && t.scaled !in permittedBare) return t.text
+            // A value with a unit is that value IN that unit. "18%" given does not licence "18 mg".
+            if (t.unit != null && (t.scaled to t.unit) !in permittedWithUnit) return t.withUnit
         }
         return null
     }
 
     /**
-     * One numeric run as it appeared, plus the value it denotes.
+     * One numeric run as it appeared, plus the value it denotes and the unit it carries.
      *
      * [scaled] is the value times 1000 rounded, so 2.5 and 2.500 compare equal without any
      * floating-point equality being involved. Three decimal places is past anything this app
-     * displays; nutrition figures are shown to at most one.
+     * displays; nutrition figures are shown to at most one. [unit] is the normalised nutrition
+     * unit following the run, or null when what follows is not one.
      */
-    private data class Token(val text: String, val scaled: Long, val letterAttached: Boolean)
+    private data class Token(val text: String, val scaled: Long, val letterAttached: Boolean, val unit: String?, val withUnit: String)
 
     private fun tokens(s: String): List<Token> {
         val out = mutableListOf<Token>()
@@ -84,22 +99,56 @@ class DefaultNumericGuard : NumericGuard {
             val run = s.substring(start, i)
 
             val letterBefore = start > 0 && s[start - 1].isLetter()
-            val letterAfter = i < s.length && s[i].isLetter()
+
+            // The unit, if the next thing is one: "%" attached, or a unit word attached or after
+            // one space ("42g", "42 g", "42 grams", "9.8 g/dL"). A word that is not a unit is not
+            // one, and letters glued straight on ("12th") are the letter-attachment case.
+            var u = i
+            if (u < s.length && s[u] == ' ') u++
+            val unitStart = u
+            while (u < s.length && (s[u].isLetter() || s[u] == '%' || s[u] == '/' || s[u] == 'µ')) u++
+            val unit = normaliseUnit(s.substring(unitStart, u))
+            val letterAfter = unit == null && i < s.length && s[i].isLetter()
 
             // Include the attached letters in the reported text, so the caller's error message
-            // says "B12" rather than a bare "12" that looks like it came from nowhere.
+            // says "B12" rather than a bare "12" that looks like it came from nowhere; a unit
+            // mismatch reports "18 mg", because the 18 alone is plainly in the input.
             var from = start
             while (from > 0 && s[from - 1].isLetter()) from--
             var to = i
-            while (to < s.length && s[to].isLetter()) to++
+            if (unit == null) while (to < s.length && s[to].isLetter()) to++
 
             out += Token(
                 text = s.substring(from, to),
                 scaled = scaledValue(run),
                 letterAttached = letterBefore || letterAfter,
+                unit = unit,
+                withUnit = if (unit != null) s.substring(from, u) else s.substring(from, to),
             )
         }
         return out
+    }
+
+    /** The nutrition units this app writes, and their spellings, to one form each; null for anything else. */
+    private fun normaliseUnit(raw: String): String? {
+        val w = raw.lowercase().trimEnd('.', ',')
+        if (w.isEmpty()) return null
+        return when (w) {
+            "%", "percent", "per cent" -> "%"
+            "g", "gm", "gms", "gram", "grams" -> "g"
+            "mg", "milligram", "milligrams" -> "mg"
+            "µg", "mcg", "ug", "microgram", "micrograms" -> "µg"
+            "kcal", "cal", "cals", "kcals", "calorie", "calories", "kilocalorie", "kilocalories" -> "kcal"
+            "kj", "kilojoule", "kilojoules" -> "kj"
+            "ml", "millilitre", "millilitres", "milliliter", "milliliters" -> "ml"
+            "l", "litre", "litres", "liter", "liters" -> "l"
+            "kg", "kilogram", "kilograms" -> "kg"
+            "g/dl", "gm/dl" -> "g/dl"
+            "mg/dl" -> "mg/dl"
+            "mmol/l" -> "mmol/l"
+            "iu" -> "iu"
+            else -> null
+        }
     }
 
     /**

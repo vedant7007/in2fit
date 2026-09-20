@@ -126,33 +126,39 @@ class LlamaCppLlmEngine(
             ?: Outcome.Unavailable(UnavailableReason.BELOW_CONFIDENCE_THRESHOLD, "classifier said '${raw.trim()}'")
     }
 
-    override suspend fun answer(request: AnswerRequest): Outcome<PhrasedText> {
+    override suspend fun answer(request: AnswerRequest, length: AnswerLength): Outcome<PhrasedText> {
         if (request.question.isBlank()) {
             return Outcome.Unavailable(UnavailableReason.INPUT_NOT_USABLE, "empty question")
         }
         val permitted = ConversationPrompts.permitted(request)
-        val prompt = ConversationPrompts.answer(request)
-        return guarded(prompt, ConversationPrompts.ANSWER_MAX_TOKENS, permitted, request.declaredConditions)
+        val prompt = ConversationPrompts.answer(request, length)
+        return guarded(prompt, length.answerMaxTokens, permitted)
     }
 
-    override suspend fun recommend(request: RecommendRequest): Outcome<PhrasedText> {
+    override suspend fun recommend(request: RecommendRequest, length: AnswerLength): Outcome<PhrasedText> {
         if (request.request.isBlank()) {
             return Outcome.Unavailable(UnavailableReason.INPUT_NOT_USABLE, "empty request")
         }
         val permitted = ConversationPrompts.permitted(request)
-        val prompt = ConversationPrompts.recommend(request)
-        return guarded(prompt, ConversationPrompts.RECOMMEND_MAX_TOKENS, permitted, request.declaredConditions)
+        val prompt = ConversationPrompts.recommend(request, length)
+        return guarded(prompt, length.recommendMaxTokens, permitted)
     }
 
     /**
-     * Generate, then apply both halves of the `0015` safety line as post-conditions: no number
-     * that was not given, and no condition that was not declared. A response that fails either is
-     * refused whole; the caller falls back to the rules engine's own rendered sentence, which
-     * needs no model.
+     * Generate, then apply the `0015` safety line as post-conditions: no number that was not
+     * given, no condition word the request did not contain, and no prescription or clinical
+     * verdict ([SafetyLine.prescribesOrJudges], `0024`: "take two tablets" when the 2 was
+     * permitted, "is dangerous" when the 7 was theirs). A response that fails any of the three
+     * is refused whole; the caller shows what it has without a model, and the fixed referral
+     * line stands.
+     *
+     * ONE RULE FOR BOTH GUARDS: what the request contains is permitted. [permitted] is the same
+     * list the numeric guard reads, so a condition word in a sourced row the model was told to
+     * quote ("high blood pressure" in a salt row), in a declared condition, or in the person's
+     * own question ("is 9.8 haemoglobin anaemia?", declined by name) is allowed; one from
+     * nowhere is not (`0024`, finding 2).
      */
-    private suspend fun guarded(
-        prompt: String, maxTokens: Int, permitted: List<String>, declared: List<String>,
-    ): Outcome<PhrasedText> {
+    private suspend fun guarded(prompt: String, maxTokens: Int, permitted: List<String>): Outcome<PhrasedText> {
         val raw = withContext(dispatcher) {
             runtime.generate(prompt, maxTokens, ConversationPrompts.CONVERSATION_STOPS)
         }
@@ -163,26 +169,31 @@ class LlamaCppLlmEngine(
         guard.firstInventedNumber(text, permitted)?.let { offending ->
             return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model invented the number '$offending'")
         }
-        undeclaredCondition(text, declared)?.let { named ->
-            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model named '$named', which the person did not declare")
+        undeclaredCondition(text, permitted)?.let { named ->
+            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model named '$named', which the person did not declare and the request does not contain")
+        }
+        SafetyLine.prescribesOrJudges(text)?.let { phrase ->
+            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model prescribed or judged: '$phrase'")
         }
         return Outcome.Ok(PhrasedText(text = text, numericGuardPassed = true))
     }
 
     /**
-     * A condition word the model must not produce unless the person declared it.
+     * A condition word the model must not produce unless the request contains it.
      *
      * A short, deliberate list rather than a medical vocabulary: it catches the diagnoses a food
      * assistant is most tempted to reach for, and it is the same list `RulesEngineTest` bans from
-     * the templates. Each word of a declared condition permits the list words sharing its stem,
-     * so "type 2 diabetes" declared permits "diabetic" and "thyroid" permits "hypothyroid"; a
-     * person who said "low iron" has not said "deficiency", and the model may not either. This
-     * is a structural check on the response, not a substitute for the prompt rule; it is the
+     * the templates. Each word of the request (the question, the declared conditions, the rows
+     * and figures the model was given) permits the list words sharing its stem, so "type 2
+     * diabetes" declared permits "diabetic", "thyroid" permits "hypothyroid", a salt row's
+     * "hypertension" may be quoted, and "is this anaemia?" asked permits "anaemia" in the
+     * decline; a person who said "low iron" has not said "deficiency", and the model may not
+     * either. A structural check on the response, not a substitute for the prompt rule; the
      * second defence, the way the numeric guard is for numbers.
      */
-    private fun undeclaredCondition(text: String, declared: List<String>): String? {
+    private fun undeclaredCondition(text: String, permitted: List<String>): String? {
         val lower = text.lowercase()
-        val stems = declared.flatMap { it.lowercase().split(NON_LETTERS) }.filter { it.length >= 4 }.map { it.take(5) }
+        val stems = permitted.flatMap { it.lowercase().split(NON_LETTERS) }.filter { it.length >= 4 }.map { it.take(5) }
         return CONDITION_WORDS.firstOrNull { word ->
             Regex("\\b$word").containsMatchIn(lower) && stems.none { stem -> word.contains(stem) }
         }

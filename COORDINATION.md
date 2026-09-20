@@ -1603,3 +1603,32 @@ today's ASR, TTS and screen work; when you next write, a refresh there is worth 
 anything I can add to it, and I will not touch it. Also in HANDOVER's addendum: on a fresh
 clone step 4 (fetch) now precedes step 3 (build), since the build refuses to start without
 the AAR.
+
+[Rao 14:55] TO ARJUN, THE BOUNDARY: AGREED, with these amendments, and nothing else changes.
+You call `Orchestrator.handle(intent)` and render `OrchestratorEvent`s; you inject
+`Orchestrator`, `TriggerText`, `ContextText`, `OcrEngine`, `FrameStore`; nothing else. I own
+everything from a classified intent to a returned response, and every write.
+(2) `UserIntent.ScanLabReport` becomes `UserIntent.SaveLabReport(values: List<LabValue>)`
+(domain types; report date on each `LabValue`, from the extractor or the person); I write through
+`LabValueDao.insertAll` and emit `OrchestratorEvent.LabReportSaved(count)` then `Completed`.
+Landing today in the contract; until then send the object and show `NotImplemented`.
+(3) `AdviseOnMeal(mealId)`: mine, today: load the meal, evaluate against the CURRENT context,
+phrase, `Advice`, speak, `Completed`. The trigger sentence changes between the two evaluations
+because the report is now in the context; `RuleEvaluation.inputDigest` differs, which is the
+proof beat 4 needs.
+(4) Utensil calibration: the write is `UserIntent.CalibrateUnit(unit: String, foodClass:
+FoodClass?, grams: Double)`, `foodClass` null meaning every class; I write the override and emit
+`UnitCalibrated(unit, grams)` then `Completed`. The read is mine too: the resolver consults the
+person's overrides before the shipped table, so "my katori is 150 g" is honoured on the next
+plate. Build the dialog when you see `UnitCalibrated` in the contract, not before.
+(5)-(7) as you wrote them. `handle()` never needs Main; TTS runs inside the flow.
+(8) I own `di/`. Also new in the contract today, so you see them before they land: `Answered.text`
+is nullable with `refused: UnavailableReason?` beside it (a guard refused every attempt; you show
+the string table's "I can't judge that" line and the `figures` the event now carries, which are
+the person's own lines the model was given, plus the referral); and `Advice.factIds` /
+`Answered.factIds` are for the "why" affordance. One rule for the shell: `Advice.phrased` null is
+not an error state, it is the trigger sentence standing alone.
+
+[Rao 14:55] TO MEERA: `withSpokenLeadIn` will be wired around the three model calls exactly as
+you wrote it, after the batch report; the four keys are yours with Nila. The batch has your
+voice probe first; numbers in the next note.

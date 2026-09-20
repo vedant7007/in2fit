@@ -271,6 +271,24 @@ class LlmEngineTest {
         assertTrue("$ok", ok is Outcome.Ok)
     }
 
+    @Test fun `the person's own question word may be used to decline, and a verdict is refused`() = runBlocking {
+        val asked = answerRequest().copy(question = "is 9.8 haemoglobin anaemia?")
+        val declined = engine("Whether a reading means anaemia is for a doctor; your report shows 9.8 g/dL.").second.answer(asked)
+        assertTrue("$declined", declined is Outcome.Ok)
+        val verdict = engine("Yes, 9.8 g/dL is dangerous and you should take iron tablets.").second.answer(asked)
+        assertTrue("$verdict", (verdict as Outcome.Unavailable).detail!!.contains("prescribed or judged"))
+    }
+
+    @Test fun `a condition word in a sourced row the model was given may be quoted`() = runBlocking {
+        val salt = KnowledgeFact("salt.low_intake", "salt", setOf("salt", "sodium"), "Populations with low salt intake have less hypertension.", "t", "https://example.invalid", "2026-09-20", "")
+        val request = answerRequest().copy(question = "is salt bad for me", facts = listOf(salt))
+        val ok = engine("Populations with low salt intake have less hypertension, so a lighter hand with salt helps.").second.answer(request)
+        assertTrue("$ok", ok is Outcome.Ok)
+        // The same word from nowhere is still refused.
+        val bad = engine("Your report suggests hypertension.").second.answer(answerRequest())
+        assertTrue("$bad", (bad as Outcome.Unavailable).detail!!.contains("hypertension"))
+    }
+
     @Test fun `a recommendation may name a declared condition and nothing undeclared`() = runBlocking {
         val request = RecommendRequest(
             request = "what should I eat for iron", languageTag = "en-IN",
