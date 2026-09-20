@@ -45,16 +45,17 @@ thotakura pappu, chana masala, dal tadka. (The first run of the list put white b
 "katori" of bread is five slices, and the US record is iron-enriched flour. A slice is the
 helping now, and the enrichment is in the shipped disclosure beside milk's vitamin D.)
 
-Beat 4, "fibre higher, carbohydrate lower", is still the engine's: boiled egg, fried egg, then
-coconut, because every real food scores below zero, the carbohydrate term being ten times the
-fibre term per serving, and the only candidates not below zero are the ones with nothing in
-them. **Ruled (Vedant, evening): make the terms comparable; do not filter by sign.** "Positive
-scores only" under the additive scoring would leave beat 4 EMPTY; the defect is that the two
-terms were never on the same scale. `RankingDefectsTest` (two red for the integrator, one green
-guard that turns red under the sign filter) pins it: a food best on fibre and middling on
-carbohydrate beats one with nothing in it, and the list is never emptied. With a percentile per
-nutrient the hostel list gives fresh coconut, cooked moong dal, carrot, beetroot, chicken curry:
-a plate a judge can look at. Water, black tea and black coffee are off the list entirely: they
+Beat 4, "fibre higher, carbohydrate lower", was the engine's: under the additive scoring every
+real food scored below zero, the carbohydrate term being ten times the fibre term per serving,
+and the only candidates not below zero were the ones with nothing in them. **Ruled (Vedant,
+evening): make the terms comparable; do not filter by sign.** The integrator's `fddedf3` scales
+each term as a fraction of a day's reference amount, which is the terms made comparable, and
+with the list beat 4 now reads cooked moong dal, cooked chana dal, cooked toor dal. The same
+commit also filters scores at zero and below, which the ruling forbids: "positive scores only"
+under the additive scoring would have left beat 4 EMPTY, and under any scoring it turns "ordered
+by the preference" into "deleted by the preference". `RankingDefectsTest`, three tests, is the
+guard: an empty cup does not lead; coconut, best on fibre and middling on carbohydrate, ranks
+above the egg; and the list is never emptied. Two are red on master until the filter goes. Water, black tea and black coffee are off the list entirely: they
 have nothing of the eight nutrients, so any "lower" preference reads them as the best food
 there is, and "you should drink more water" is the failure that ends the pitch.
 

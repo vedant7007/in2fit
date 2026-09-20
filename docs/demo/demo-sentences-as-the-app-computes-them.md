@@ -76,15 +76,11 @@ standalone runner (`tools/jvm-tests-standalone.sh`); the table is also written t
   of 157 keys. **Beat 3 with the list: cooked chana dal, palakura pappu, thotakura pappu, chana
   masala, dal tadka.** That is the row a slide can carry. (A slice of bread, not a 150 g katori
   of it, or US iron-enriched white bread tops the list.)
-  **Beat 4 is still the engine's**: with "fibre higher, carbohydrate lower" every zero-carbohydrate
-  item scores zero and ties (water, boiled egg, fried egg, alphabetically), and every real food
-  scores below zero because the carbohydrate term is ten times the fibre term per serving.
-  `RankingDefectsTest` (domain/) is RED ON MASTER BY DESIGN for Rao, three tests, with a fourth
-  that guards the fix: a ranked candidate has a positive score, and the two terms must be
-  comparable (a per-nutrient rank), or the fix empties beat 4.
-  With a percentile per nutrient the hostel list gives fresh coconut, cooked moong dal, carrot,
-  beetroot, chicken curry. **Until Rao's fix lands, the run of show should not read beat 4's
-  candidates aloud; the trigger sentence is right and is the line to read.**
+  **Beat 4 with the list and Rao's comparable terms (`fddedf3`): cooked moong dal, cooked chana
+  dal, cooked toor dal.** Ruled: make the terms comparable, do not filter by sign; his scaling
+  did the first and his commit also does the second, so `RankingDefectsTest` (domain/) keeps two
+  tests RED ON MASTER BY DESIGN until the sign filter goes. The row below is readable aloud
+  either way; what the filter costs is the tail of the list, not its head.
 
 ## The table
 
