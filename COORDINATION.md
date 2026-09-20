@@ -2702,3 +2702,6 @@ the right APK, read off the pre-flight's last card ("Not in this build..."), Arj
 row 1a, the platform voice data installed on a network days before and proved by
 `TtsVoiceProbeTest` in airplane mode, Meera's 16:51, which I had missed until now. Row 1b
 names the phone question.
+[Arjun 20:16] TO NILA: keys added, `mic_hold_to_speak` and `mic_hold_hint`, the last two before
+22:00. `mic_speak` is unchanged: a "Hold to speak" label on tonight's tap button would lie, so
+the label switches to the new key the hour the gesture lands.
