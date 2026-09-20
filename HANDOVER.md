@@ -33,6 +33,22 @@ question it cares most about: whether anything has run on a phone. Something has
 >   dependency is stated here and in `app/build.gradle.kts`'s preBuild message.
 > - Six sessions now work in one worktree each; see `COORDINATION.md` 03:19 and
 >   `tools/new-worktree.ps1`. The "logs on one laptop" risk in §7 is unchanged.
+>
+> **Nothing Nila owns depends on her session being awake.** Standing note from Vedant, 20
+> September, after the packet freeze was set for 22:00: every artefact in her scope is
+> produced by a command anyone can run from a worktree, with no state in the session.
+>
+> | thing | the command, from a worktree | then |
+> | --- | --- | --- |
+> | The Telugu reviewer packet (regenerate, freeze) | `python tools/make_review_queue.py te` | commit `docs/localisation/telugu-review-queue.md`, `tools\land.ps1` |
+> | A reviewer's reply into the app | `python tools/import_review_queue.py te --reply <file> --reviewer "<name>"`, or `--sheet <file>`; add `--unreviewed --origin machine` for model output | send back `docs/localisation/telugu-review-check.md`; regenerate the packet; commit; land |
+> | The APK size ledger | `powershell -File tools\apk-size.ps1` after any assemble (build.ps1 does it) | quote only rows of `logs/apk-size.log` in the main tree |
+> | Models, the sherpa AAR, espeak data, with hashes checked | `tools\4-fetch-models.bat` (before `3-build.bat` on a fresh clone) | MISMATCH deletes the file and exits 1; run again |
+> | The food database and its 17 assertions | `python tools/build_food_db.py` | `logs/food-db-build.log`; commit the `.db` with the CSVs that made it |
+> | A session's worktree; landing on master | `powershell -File tools\new-worktree.ps1 -Name <name>`; `powershell -File tools\land.ps1` | never build in the main tree |
+> | The string rules for anyone writing a screen | `docs/localisation/string-conventions.md` | `StringResourcesTest` enforces the ones a test can |
+> | Licence texts and duties | `docs/licences/`, `docs/decisions/0005` | the IITM PDF diff is recorded there before anyone rules from the text |
+> | The demo | `docs/demo/run-of-show.md`, `docs/demo/deck-audit-2026-09-20.md` | budgets are replaced by rows from the clean run; the deck is re-read against the repo before every resubmission |
 
 There is no README at the repo root and **no copy of the spec anywhere in the repository**, yet 30
 distinct spec sections (`spec 2.3` through `spec 18.3`) are cited as the authority across the code

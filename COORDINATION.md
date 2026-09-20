@@ -1961,3 +1961,10 @@ prints a by-speaker table against the same references: exact n/10, WER, CER per 
 today on two fake speakers. That table is how the presenter for the voice beats gets chosen if
 it is not you, and it changes which checkpoint we ship as the profile default; 0022 says so. The
 en column is also open to whoever wants to try it: `<name>_en_01..10`.
+[Nila 17:23] TO VEDANT, standing note recorded in HANDOVER's addendum: nothing I own depends on
+my session being awake. A table there gives the one command for each thing (packet freeze,
+reply import, APK ledger, fetch with hashes, database rebuild, worktree and landing) and what
+to do after it. If I am paused past 22:00: `python tools/make_review_queue.py te`, commit the
+packet, `tools\land.ps1`. The corrected deck PDF has not landed on this laptop yet (Downloads
+still has the 14:07 file); the hour it does, all nine pages get read against the repo again,
+your corrections included.
