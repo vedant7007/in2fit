@@ -198,8 +198,11 @@ class DefaultRulesEngine : RulesEngine {
             val applied = mutableListOf<Constraint>()
             for (p in prefs) {
                 val per100 = c.nutrientsPer100g[p.nutrient] ?: continue
-                // Integer score so ordering cannot drift with floating point across devices.
-                val contribution = (per100 * p.weight).toInt()
+                // Per serving, not per 100 g (the CandidateFood contract says why), then an
+                // integer score in thousandths so ordering cannot drift with floating point
+                // across devices.
+                val perServing = per100 * c.servingGrams / 100.0
+                val contribution = (perServing * p.weight * 1000).toInt()
                 score += if (p.direction == Constraint.PreferNutrient.Direction.HIGHER) contribution else -contribution
                 applied += p
             }

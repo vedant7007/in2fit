@@ -260,12 +260,23 @@ sealed interface Constraint {
     ) : Constraint
 }
 
-/** A food that may be suggested: from the bundled context list, never invented. */
+/**
+ * A food that may be suggested: from the bundled context list, never invented.
+ *
+ * RANKED PER SERVING, NEVER PER 100 g. Ruled 20 Sep after the first end-to-end run: ranked per
+ * 100 g, the top four foods for a person with low haemoglobin were cumin, turmeric, bay leaf
+ * and fenugreek, because a spice is iron-rich per 100 g and nobody eats 100 g of cumin. The
+ * wrong denominator, not a missing exclusion list. [servingGrams] is the serving the database
+ * actually models for this food (a recipe's yield over its servings; a household unit of the
+ * food's class otherwise), and the engine ranks nutrient per THAT.
+ */
 data class CandidateFood(
     val foodCode: String,
     val displayName: String,
     val contexts: Set<LifeContext>,
     val nutrientsPer100g: Map<Nutrient, Double>,
+    /** The serving the database models for this food, in grams. What one helping weighs. */
+    val servingGrams: Double = 100.0,
 )
 
 /** A candidate after filtering and ranking. */

@@ -51,6 +51,11 @@ import java.time.ZoneId
  * not a placeholder: the rules engine ranks on nutrients, and the ranking is real; what is
  * missing is the per-context pruning, and the day it is authored it plugs in here.
  *
+ * THE SERVING each candidate is ranked by is the one the database models: a recipe's yield
+ * over its servings; for a plain food, the household unit its class is usually served in
+ * (`unit_conversions`: a katori of dal, a katori of sabzi, a teaspoon of a spice), 100 g when
+ * the class has no such unit. Ranking per serving is what stops a spice topping an iron list.
+ *
  * ponytail: the diet filter is a word match over the USDA description, because the bundled
  * database has no diet column and classifies egg as DAIRY and meats as COMPOSED_DISH. It errs
  * towards excluding: a vegetable with "meat" in its USDA name ("Coconut meat") is dropped for a
@@ -157,16 +162,15 @@ class RoomUserContextSource(
         val forbidden = FORBIDDEN_WORDS[diet].orEmpty()
         fun allowed(key: String, description: String, foodClass: String?): Boolean {
             if (key in avoided) return false
-            // MEASURED on the first end-to-end run (20 Sep): ranked by iron per 100 g, the top four
-            // candidates for a person with low haemoglobin were cumin, turmeric, bay leaf and
-            // fenugreek. Nobody eats 100 g of cumin. A spice or a cooking fat is a seasoning, not
-            // a food anyone is told to add a portion of; they are not candidates.
-            if (foodClass == "SPICE" || foodClass == "FAT_OIL") return false
             if (diet == DietType.VEGAN && foodClass == "DAIRY") return false
             val words = description.lowercase().split(Regex("[^a-z]+")).filter { it.isNotEmpty() }
             return forbidden.none { it in words }
         }
         val everywhere = LifeContext.entries.toSet()
+        // The usual serving per class, from the same table the resolver converts spoken units with.
+        val servingByClass: Map<String, Double> = foods.query("SELECT unit, food_class, grams FROM unit_conversions")
+            .filter { it.str("unit") == USUAL_UNIT[it.str("food_class")] }
+            .associate { it.str("food_class") to it.dbl("grams") }
 
         val foodNutrients = foods.query("SELECT food_key, nutrient, amount FROM food_nutrients WHERE state = 'MEASURED'")
             .groupBy({ it.str("food_key") }) { enumOrNull<Nutrient>(it.str("nutrient"))?.let { n -> n to it.dbl("amount") } }
@@ -174,7 +178,10 @@ class RoomUserContextSource(
             .filter { allowed(it.str("food_key"), it.str("display_name") + " " + it.str("usda_description"), it.str("food_class")) }
             .map { row ->
                 val key = row.str("food_key")
-                CandidateFood(key, row.str("display_name"), everywhere, foodNutrients[key].orEmpty().filterNotNull().toMap())
+                CandidateFood(
+                    key, row.str("display_name"), everywhere, foodNutrients[key].orEmpty().filterNotNull().toMap(),
+                    servingGrams = servingByClass[row.str("food_class")] ?: 100.0,
+                )
             }
 
         val recipeNutrients = foods.query("SELECT recipe_key, nutrient, amount_per_100g FROM recipe_nutrients WHERE state = 'MEASURED'")
@@ -183,7 +190,7 @@ class RoomUserContextSource(
         val recipeIngredientNames = foods.query(
             "SELECT ri.recipe_key AS recipe_key, f.display_name AS name, f.usda_description AS description, f.food_class AS food_class FROM recipe_ingredients ri JOIN foods f ON f.food_key = ri.food_key"
         ).groupBy({ it.str("recipe_key") }) { Triple(it.str("name"), it.str("description"), it.str("food_class")) }
-        val recipeRows = foods.query("SELECT recipe_key, display_name FROM recipes")
+        val recipeRows = foods.query("SELECT recipe_key, display_name, servings, yield_g FROM recipes")
             .filter { row ->
                 val key = row.str("recipe_key")
                 allowed(key, row.str("display_name"), null) &&
@@ -191,7 +198,11 @@ class RoomUserContextSource(
             }
             .map { row ->
                 val key = row.str("recipe_key")
-                CandidateFood(key, row.str("display_name"), everywhere, recipeNutrients[key].orEmpty().filterNotNull().toMap())
+                val servings = row.dbl("servings")
+                CandidateFood(
+                    key, row.str("display_name"), everywhere, recipeNutrients[key].orEmpty().filterNotNull().toMap(),
+                    servingGrams = if (servings > 0.0) row.dbl("yield_g") / servings else 100.0,
+                )
             }
 
         return foodRows + recipeRows
@@ -202,6 +213,13 @@ class RoomUserContextSource(
 
     private companion object {
         const val RECENT_MEALS = 6
+
+        /** The household unit a class is usually served in; the same defaults the resolver assumes. */
+        val USUAL_UNIT = mapOf(
+            "PULSE_COOKED" to "katori", "GRAIN_COOKED" to "katori", "VEGETABLE" to "katori", "DAIRY" to "katori",
+            "BEVERAGE" to "glass", "FAT_OIL" to "teaspoon", "SPICE" to "teaspoon",
+            "GRAIN_RAW" to "cup", "PULSE_RAW" to "cup", "COMPOSED_DISH" to "piece",
+        )
 
         /** Words in a USDA description that mark a food a diet forbids. Errs towards excluding. */
         val FORBIDDEN_WORDS: Map<DietType?, Set<String>> = run {

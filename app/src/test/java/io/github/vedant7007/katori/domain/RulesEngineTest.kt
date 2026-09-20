@@ -238,6 +238,22 @@ class RulesEngineTest {
         assertNull(r.trigger)
     }
 
+    /** Ruled 20 Sep: the first end-to-end run ranked cumin, turmeric, bay leaf and fenugreek top for iron. Wrong denominator. */
+    @Test
+    fun `candidates rank by nutrient per serving, so a spice never tops a green on iron`() {
+        val cumin = CandidateFood("cumin", "cumin seed", setOf(LifeContext.HOSTEL_STUDENT), mapOf(Nutrient.IRON to 66.4), servingGrams = 2.0)
+        val palak = CandidateFood("palak", "spinach", setOf(LifeContext.HOSTEL_STUDENT), mapOf(Nutrient.IRON to 2.7), servingGrams = 100.0)
+        val r = engine.evaluate(
+            RuleInput(
+                profile = ProfileSnapshot(19, 62.0, 172.0, Sex.MALE, Goal.MAINTAIN, LifeContext.HOSTEL_STUDENT, DietType.VEGETARIAN, emptySet()),
+                declaredConditions = emptyList(),
+                labValues = listOf(LabValue("Haemoglobin", 9.8, "g/dL", 12.0, 15.0, LocalDate.parse("2026-09-12"))),
+                meal = null, candidates = listOf(cumin, palak), evaluatedAt = Instant.parse("2026-09-19T08:00:00Z"),
+            )
+        )
+        assertEquals(listOf("palak", "cumin"), r.rankedCandidates.map { it.candidate.foodCode })
+    }
+
     @Test
     fun `ranked candidates carry a confidence band and never a percentage`() {
         val r = engine.evaluate(input(labs = listOf(glucoseAbove())))
