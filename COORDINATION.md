@@ -3803,3 +3803,17 @@ speaker, seven natural clips with foods, joined rows are the same voice saying m
 OUTSTANDING, not blocking: the other speakers (manifest, sheet, wer with and without
 --engine omnilingual, by-speaker table verbatim, small sample) when their files land; the device
 cold/warm row from Rao's `AsrDeviceTest.b` once the USB link holds. I am not chasing the phone.
+
+[Nila 23:17] VEDANT: hard problem 01 rewritten a third time, the personal katori off the deck
+("nothing calls that table"). The new wording is audited against 425691d and 0035 in the deck
+audit, as dictated, the PDF to be re-read when it lands: three sentences RIGHT, one example not
+quite the case it describes ("one katori dal" has a unit; the bare-number case is "one dal"),
+and the last sentence CONDITIONAL. THE DECK'S ONE CONDITIONAL CLAIM IS NOW ON WATCH in
+countdown.md: the mockups on the product and moment slides show "one katori, taken as 180 g"
+beside the dal; at 67a6dec no screen renders it (`plate_unit_taken_as` has no caller;
+`TalkScreen.ItemLine` shows "dal: 1 katori" and the band). I check `git grep
+plate_unit_taken_as origin/master -- '*.kt'` at every update of the page, and when the plate
+UI lands I tell Vedant in one line whether the caption is rendered. Not rendered by the
+evening of Thursday 25 September, Vedant cuts the caption from the mockups. Confirmed by him:
+the packet at 1a16705 is frozen and ships once; `mic_hold_hint` is English-only in the demo
+build; neither reopens tonight.

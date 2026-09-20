@@ -139,6 +139,12 @@ checklist aloud, one spoken turn from the back of the room, the run of show, and
 
 **October 9 to 11, Bengaluru**, if Hyderabad is won. Nobody treats the 27th as the finish.
 
+## On watch: the deck's one conditional claim
+
+| risk | the facts | the check | if it fails |
+| --- | --- | --- | --- |
+| **The "taken as" caption on the plate.** The deck's phone mockups on the product and moment slides show a plate with "one katori, taken as 180 g" beside the dal; hard problem 01 says the assumed amount "travels beside" the total. **At `67a6dec` the app does not render it.** `TalkScreen.ItemLine` shows "dal: 1 katori" and the band word; `plate_unit_taken_as` is in the string table and no screen references it. The resolver half is right since `425691d` (`0035`): the assumed quantity and unit are on the item, QUANTITY_INFERRED, band Rough. The caption is Ira's card. | Nila watches, does not chase: `git grep plate_unit_taken_as origin/master -- '*.kt'` at every update of this page, and the moment Ira lands the plate UI, one line to Vedant: rendered, yes or no. | **Not rendered by the evening of Thursday 25 September: Vedant cuts the caption from the mockups** rather than show a screen that does not exist (ruled 23:17, 20 Sep). |
+
 ## Decided NOT to do, so nobody rediscovers it on Friday night
 
 | not doing | ruled | where |
