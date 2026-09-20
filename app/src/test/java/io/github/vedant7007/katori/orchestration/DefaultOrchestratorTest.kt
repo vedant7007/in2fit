@@ -112,8 +112,21 @@ class DefaultOrchestratorTest {
             saved += meal
             return Outcome.Ok(42L)
         }
+        /**
+         * As Room returns it, not as the resolver built it: the SPOKEN name, the measured
+         * amounts only, the time to the millisecond. MEASURED on the demo-condition run (20
+         * Sep): evaluating the resolver's snapshot at LOG made the first AdviseOnMeal a digest
+         * mismatch and a 9 s regeneration; a fake that returned the resolver's snapshot could
+         * not have caught it.
+         */
         override suspend fun meal(mealId: Long): MealSnapshot? = saved.lastOrNull()?.let { r ->
-            MealSnapshot(mealId, r.items.map { it.snapshot }, Instant.parse("2026-09-20T07:00:00Z"))
+            MealSnapshot(
+                mealId,
+                r.items.zip(r.parsed.items).map { (item, parsed) ->
+                    MealItemSnapshot(parsed.spokenName, item.snapshot.foodCode, item.snapshot.grams, item.snapshot.nutrients)
+                },
+                Instant.ofEpochMilli(Instant.parse("2026-09-20T07:00:00Z").toEpochMilli()),
+            )
         }
         override suspend fun latestMealId(): Long? = if (saved.isEmpty()) null else 42L
     }
@@ -136,7 +149,8 @@ class DefaultOrchestratorTest {
                     parsed = parsed,
                     items = parsed.items.map {
                         ResolvedItem(
-                            snapshot = MealItemSnapshot(it.spokenName, it.spokenName, 150.0, mapOf(Nutrient.CARBOHYDRATE to 40.0, Nutrient.IRON to 0.8)),
+                            // The database's name, not the spoken one, as the real resolver returns it.
+                            snapshot = MealItemSnapshot("${it.spokenName.replaceFirstChar { c -> c.uppercase() }}, cooked", it.spokenName, 150.0, mapOf(Nutrient.CARBOHYDRATE to 40.0, Nutrient.IRON to 0.8)),
                             source = DataSource.USDA_SR_LEGACY,
                             nutrients = NutrientProfile(mapOf(Nutrient.CARBOHYDRATE to NutrientValue.Measured(40.0, NutrientUnit.GRAM), Nutrient.IRON to NutrientValue.Measured(0.8, NutrientUnit.MILLIGRAM))),
                             confidence = it.confidence,
