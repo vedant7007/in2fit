@@ -1,0 +1,178 @@
+# Spec 4.3: the constrained candidate list per life context. THE RULE: a food or recipe that is
+# not in this file, or is in it with no context, is an INGREDIENT, not a candidate: the engine
+# never ranks it and the model never names it. Raw grains and pulses are ingredients, not
+# candidates (Vedant, 20 September 2026): the ranked list for anaemia once topped out at raw
+# cowpea, raw urad and raw masoor, because a raw pulse's "serving" is a 200 g cup, and before
+# that at cumin, turmeric and bay leaf per 100 g.
+#
+# AUTHORED, by one hand, from the spec 4.2 table: budget reality, kitchen access and schedule
+# per context. A row's contexts are where the food is AVAILABLE, not where it is good for
+# you: merit is the rules engine's ranking, availability is this file. Fried snacks, sweets,
+# fats, biscuits and spices are listed with no context so the sweep is complete and the reason
+# is recorded.
+#
+# key         food_key or recipe_key; must exist
+# suggest_as  the name the suggestion shows ("Boiled egg", not "Egg, whole, raw"); empty = the display name
+# serving_g   what one helping weighs when SUGGESTED; empty = the class's usual unit (a food) or
+#             the recipe's serving. Given where the class unit is wrong for a suggestion: a
+#             handful of peanuts is 30 g, not the spice-class teaspoon; a glass of milk is 200.
+# contexts    '|'-separated LifeContext names, or empty for "never a candidate"
+# note        why, in one line, per row. A row without a reason does not ship.
+key,suggest_as,serving_g,contexts,note
+egg,Boiled egg,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Spec 4.2's own hostel example. One egg is the 50 g piece; the canteen boils them.
+curd,Curd,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Spec 4.2's own PG example: add curd to lunch for protein. Sold everywhere; a katori.
+milk_whole,Milk,200,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass, 200 ml, not the dairy katori. Every mess and shop."
+buttermilk,Buttermilk,200,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass. Cheap, sold at stalls, holds a morning without a fridge."
+cheese_processed,Processed cheese,20,DESK_PROFESSIONAL|HOMEMAKER,A slice. Fridge and a moderate budget; not a canteen or tiffin food.
+banana,Banana,100,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,One banana; the cheapest fruit at every canteen and stall.
+apple,Apple,150,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,One apple. Moderate price; not a canteen fruit.
+peanuts_roasted,Roasted peanuts,30,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A handful, 30 g, not the spice-class teaspoon. Sold in paper cones at every corner."
+sprouted_moong,,,,"Classed PULSE_RAW, so the rule keeps it out; the sprouts salad recipe is the candidate, with the dressing that makes it a helping."
+tea_brewed,Black tea,150,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,A cup without milk; the with-milk version is the chai recipe.
+coffee_brewed,Black coffee,150,DESK_PROFESSIONAL|HOMEMAKER,A cup without milk. Brewed coffee is a home or office thing; the canteen serves it with milk (coffee_milk).
+water,Water,200,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass. Named so the engine can suggest it when nothing else fits, never as an answer to a nutrient question."
+orange_juice,Orange juice,200,DESK_PROFESSIONAL|HOMEMAKER,A glass. Packaged juice is a moderate-budget item.
+mango_juice,Mango juice,200,DESK_PROFESSIONAL|HOMEMAKER,A glass. Packaged; moderate budget.
+rice_cooked,Cooked rice,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,A katori of plain rice; on every plate in every context.
+bread_brown,Brown bread,29,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A slice, 29 g, not the grain-class katori (150 g of bread is five slices). Sold at the tuck shop and every general store."
+bread_white,White bread,29,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A slice, 29 g. As a 150 g katori it topped the iron list: the US record is iron-ENRICHED flour (3.6 mg per 100 g) and Indian bread is not; a slice puts it where it belongs, and the enrichment is a disclosure for the about screen, like milk's vitamin D."
+chana_dal_cooked,Cooked chana dal,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A katori, cooked. Mess dal or home dal."
+moong_dal_cooked,Cooked moong dal,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A katori, cooked."
+toor_dal_cooked,Cooked toor dal,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A katori, cooked; the plain dal under sambar and tadka."
+urad_dal_cooked,Cooked urad dal,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"A katori, cooked. A home dal; the mess serves it as idli and vada."
+carrot,Carrot,100,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Eaten raw as salad with a mess plate, or cooked at home. A katori, 100 g."
+tomato,Tomato,100,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Eaten raw as salad with a mess plate, or cooked at home. A katori, 100 g."
+onion,Onion,100,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Eaten raw as salad with a mess plate, or cooked at home. A katori, 100 g."
+beetroot,Beetroot,100,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Eaten raw as salad with a mess plate, or cooked at home. A katori, 100 g."
+cabbage,Cabbage,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+cauliflower,Cauliflower,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+brinjal,Brinjal,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+okra,Okra (bendakaya),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+bottle_gourd,Bottle gourd (sorakaya),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+ridge_gourd,Ridge gourd (beerakaya),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+ash_gourd,Ash gourd,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+bitter_gourd,Bitter gourd (kakarakaya),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+french_beans,French beans,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+green_peas,Green peas,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+potato,Potato,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+colocasia,Colocasia (chamagadda),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+yam,Yam (kanda),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+raw_banana,Raw banana,100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+drumstick_pod,Drumstick (munagakaya),100,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,"Needs cooking: a kitchen context. A katori of the cooked vegetable, taken as 100 g of the raw entry."
+palakura,Spinach (palakura),50,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Leafy greens need a kitchen; a cooked helping is about 50 g raw. The mess versions are the pappu recipes.
+thotakura,Amaranth leaves (thotakura),50,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Leafy greens need a kitchen; a cooked helping is about 50 g raw. The mess versions are the pappu recipes.
+gongura,Gongura,50,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Leafy greens need a kitchen; a cooked helping is about 50 g raw. The mess versions are the pappu recipes.
+drumstick_leaves,Drumstick leaves (munagaku),50,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Leafy greens need a kitchen; a cooked helping is about 50 g raw. The mess versions are the pappu recipes.
+coriander_leaves,Coriander leaves,50,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Leafy greens need a kitchen; a cooked helping is about 50 g raw. The mess versions are the pappu recipes.
+mint,Mint,50,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Leafy greens need a kitchen; a cooked helping is about 50 g raw. The mess versions are the pappu recipes.
+coconut_fresh,Fresh coconut,30,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A few pieces, 30 g; sold cut at stalls and temples."
+tamarind,,,,"Ingredient only: souring agent, never a suggestion."
+coconut_dried,,,,"Ingredient only (chutney, curries); a handful of copra is not advice."
+green_chilli,,,,Ingredient only.
+idli,Idli,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+plain_dosa,Plain dosa,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+masala_dosa,Masala dosa,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+pesarattu,Pesarattu,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+upma,Upma,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+poha_upma,Poha,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+pongal,Ven pongal,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+plain_vada,Medu vada,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Tiffin: every canteen, mess and roadside stall; holds a morning unrefrigerated; cooked at home too."
+sambar,Sambar,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,With every tiffin and every mess meal.
+rasam,Rasam,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Mess and home.
+toor_dal_tadka,Dal tadka,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,The mess dal and the PG Sunday batch (spec 4.2).
+chapati,Chapati / roti,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Every mess, every tiffin box, every home."
+chapati_ghee,Chapati with ghee,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Ghee is a home addition; the mess roti is dry.
+jowar_roti,Jonna rotte,,FIELD_OR_MANUAL_WORKER|PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Holds all day in a tiffin box (spec 4.2's field worker); a home roti; not a hostel mess item.
+poori,,,,"Fried breakfast bread: logged when eaten, never suggested as an addition."
+curd_rice,Curd rice,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A mixed rice: sold as a tiffin box that holds without a fridge, and quick at home."
+lemon_rice,Lemon rice,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A mixed rice: sold as a tiffin box that holds without a fridge, and quick at home."
+tamarind_rice,Tamarind pulihora,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A mixed rice: sold as a tiffin box that holds without a fridge, and quick at home."
+tomato_rice,Tomato rice,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A mixed rice: sold as a tiffin box that holds without a fridge, and quick at home."
+sambar_rice,Sambar rice,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A mixed rice: sold as a tiffin box that holds without a fridge, and quick at home."
+jeera_rice,Jeera rice,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home rice; not a mess or tiffin item.
+ghee_rice,Ghee rice,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home rice.
+coconut_rice,Coconut rice,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home rice.
+veg_biryani,Vegetable biryani,,HOSTEL_STUDENT|DESK_PROFESSIONAL|HOMEMAKER,"Mess Sunday special and a restaurant plate; too long for a PG evening, too heavy for a tiffin box."
+chicken_biryani,Chicken biryani,,DESK_PROFESSIONAL|HOMEMAKER,A restaurant or home plate at a moderate budget.
+chana_masala,Chana masala,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Mess curry, tiffin curry, and a quick home curry."
+aloo_curry,Aloo curry,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,The mess curry that is always there; quick at home.
+aloo_fry,Aloo vepudu,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+cabbage_koora,Cabbage koora,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+beerakaya_koora,Beerakaya koora,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+sorakaya_koora,Sorakaya koora,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+bendakaya_fry,Bendakaya vepudu,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+bagara_baingan,Bagara baingan,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+gutti_vankaya,Gutti vankaya koora,,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A home sabzi; needs a kitchen.
+palakura_pappu,Palakura pappu,,HOSTEL_STUDENT|PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A mess pappu and a home pappu; not a tiffin-box item (it does not travel).
+thotakura_pappu,Thotakura pappu,,HOSTEL_STUDENT|PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A mess pappu and a home pappu; not a tiffin-box item (it does not travel).
+dosakaya_pappu,Tomato pappu,,HOSTEL_STUDENT|PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,A mess pappu and a home pappu; not a tiffin-box item (it does not travel).
+munagakaya_sambar,Drumstick sambar,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Mess and home sambar.
+sprouts_salad,Sprouts salad,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Spec 4.2's own hostel example: sprouts from the canteen instead of a second plate of rice.
+omelette,Omelette,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Every canteen and egg cart; two minutes at home.
+egg_bhurji,Egg bhurji,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Egg cart and home; the fastest protein a PG kitchen makes.
+fried_egg,Fried egg,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Egg cart and home.
+egg_curry,Egg curry,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Mess Wednesday and a home curry.
+egg_sandwich,Egg sandwich,,HOSTEL_STUDENT|PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,Canteen sandwich counter; not a tiffin-box food in the heat.
+cheese_sandwich,Cheese sandwich,,DESK_PROFESSIONAL|HOMEMAKER,Needs a fridge and a moderate budget.
+bread_butter,Bread and butter,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,The tuck-shop breakfast.
+chicken_curry,Chicken curry,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Mess Sunday, the dhaba plate, and home."
+mutton_curry,Mutton curry,,DESK_PROFESSIONAL|HOMEMAKER,Moderate to high budget.
+fish_pulusu,Chepala pulusu,,FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,The dhaba and the home kitchen; not a hostel mess dish.
+royyala_iguru,Royyala iguru,,DESK_PROFESSIONAL|HOMEMAKER,Prawns are a moderate-budget buy.
+chai,Chai,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"Every canteen, every stall, every home."
+coffee_milk,Coffee with milk,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Every canteen and stall.
+banana_shake,Banana milkshake,,HOSTEL_STUDENT|DESK_PROFESSIONAL|HOMEMAKER,Juice-corner and home blender; not a tiffin item.
+cold_coffee,Cold coffee,,DESK_PROFESSIONAL|HOMEMAKER,Cafe or home blender.
+sweet_lassi,Sweet lassi,,DESK_PROFESSIONAL|HOMEMAKER,"Sugar-heavy; a treat, suggested only where the budget is not the constraint."
+rice_kheer,Payasam,,DESK_PROFESSIONAL|HOMEMAKER,A sweet; the engine ranks it where sugar is not a concern.
+peanut_chutney,Peanut chutney,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"With every tiffin; a spoonful, 40 g."
+coconut_chutney,Coconut chutney,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"With every tiffin; a spoonful, 40 g."
+tomato_pachadi,Tomato pachadi,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"With every tiffin; a spoonful, 40 g."
+gongura_pachadi,Gongura pachadi,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"With every tiffin; a spoonful, 40 g."
+samosa,,,,"Fried snack: logged when eaten, never suggested as an addition."
+pakoda,,,,"Fried snack: logged when eaten, never suggested as an addition."
+mirchi_bajji,,,,"Fried snack: logged when eaten, never suggested as an addition."
+punugulu,,,,"Fried snack: logged when eaten, never suggested as an addition."
+atta,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+besan,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+jowar,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+poha,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+rice_flour,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+rice_raw,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+sooji,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+chana_dal,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+cowpea,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+masoor_dal,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+moong_dal,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+toor_dal_raw,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+urad_dal,,,,"Raw grain or pulse: an ingredient, never a candidate (Vedant, 20 Sep). The ranked list once topped out at raw cowpea and raw urad because a raw pulse's serving is a 200 g cup."
+butter,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+ghee,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+groundnut_oil,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+mustard_oil,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+sesame_oil,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+sunflower_oil,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+sugar,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+salt,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+biscuit_marie,,,,"Cooking fat, sugar, salt or a packaged biscuit: nothing to suggest adding."
+bay_leaf,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+black_pepper,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+cardamom,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+cashew,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+cinnamon,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+cloves,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+coriander_seed,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+cumin,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+fenugreek_seed,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+garlic,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+ginger,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+mustard_seed,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+peanuts_raw,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+red_chilli_powder,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+sesame_seeds,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+turmeric,,,,Spice or seasoning: cumin topped the iron list at 66 mg per 100 g and nobody eats 100 g of cumin.
+chicken,,,,"Raw meat or a category stand-in: the dish (chicken curry, chepala pulusu, mutton curry, royyala iguru) is the candidate, not the raw entry."
+fish_carp,,,,"Raw meat or a category stand-in: the dish (chicken curry, chepala pulusu, mutton curry, royyala iguru) is the candidate, not the raw entry."
+goat_meat,,,,"Raw meat or a category stand-in: the dish (chicken curry, chepala pulusu, mutton curry, royyala iguru) is the candidate, not the raw entry."
+prawn,,,,"Raw meat or a category stand-in: the dish (chicken curry, chepala pulusu, mutton curry, royyala iguru) is the candidate, not the raw entry."
+juice_generic,,,,"Raw meat or a category stand-in: the dish (chicken curry, chepala pulusu, mutton curry, royyala iguru) is the candidate, not the raw entry."

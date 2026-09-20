@@ -14,9 +14,9 @@ three deterministic stages of a turn, on the JVM:
 2. `LookupMealResolver` over `SqliteFoodLookup` on the bundled `katori-food.db`: which food each
    spoken name resolves to, the grams the household unit becomes, and the figures.
 3. `DefaultRulesEngine.evaluate` with the demo profile (22 years, 62 kg, 168 cm, hostel student,
-   no diet type, nothing declared except in #9), the candidate list built as
-   `RoomUserContextSource` builds it (every food and recipe, scored per serving since
-   `02417a9`), and for beat 4 a placeholder lab value with the shape of the report (fasting
+   no diet type, nothing declared except in #9), the candidate list of spec 4.3
+   (`data-authoring/candidates.csv`, `0030`: what a hostel student can actually get, scored per
+   serving), and for beat 4 a placeholder lab value with the shape of the report (fasting
    glucose 118 mg/dL, printed range 70 to 100).
 
 **Not in it:** speech (the reference column IS the transcript; the recogniser's real output is
@@ -61,17 +61,22 @@ standalone runner (`tools/jvm-tests-standalone.sh`); the table is also written t
   curd", which is what the presenter would say anyway.
 - **Two spoons of oil is 20 g** (a spoon is 10 g in the unit table), not the 10 g in the scripted
   feed. The scripted feed's figures are someone's memory; the ones below are the database's.
-- **Beat 3 and beat 4 rankings, loudly, for Rao.** Ranked by iron per 100 g the top candidates
-  for anaemia were cumin, turmeric and bay leaf. Vedant ruled candidates rank per serving
-  (`02417a9`); the beat 3 row below is what that gives: raw cowpea, raw urad, raw masoor, because
-  a raw pulse's serving is a 200 g cup and nobody eats one. Raw grains and pulses are
-  ingredients, not candidates; that is spec 4.3's per-context list, unauthored, Priya's, next.
-  What per serving does not fix either is beat 4:
-  with "fibre higher, carbohydrate lower" every item with no carbohydrate and no fibre scores
-  exactly zero and ties, and the alphabetical tiebreak presents raw chicken breast, brewed
-  coffee, raw carp and water under a correct trigger sentence. `RankingDefectsTest` (domain/)
-  is RED ON MASTER BY DESIGN for Rao, his "2d": a ranked candidate has a positive score; zero
-  and below are not suggestions, by the engine's own "no preference, no suggestions" reasoning.
+- **Beat 3 and beat 4 rankings.** Ranked by iron per 100 g over the whole database the top
+  candidates for anaemia were cumin, turmeric and bay leaf; per serving (`02417a9`), raw cowpea,
+  raw urad and raw masoor. Ruled: raw grains and pulses are ingredients, not candidates. Spec
+  4.3's list is authored (`0030`): what a hostel student can get from a canteen and a shop, 58
+  of 157 keys. **Beat 3 with the list: cooked chana dal, palakura pappu, thotakura pappu, chana
+  masala, dal tadka.** That is the row a slide can carry. (A slice of bread, not a 150 g katori
+  of it, or US iron-enriched white bread tops the list.)
+  **Beat 4 is still the engine's**: with "fibre higher, carbohydrate lower" every zero-carbohydrate
+  item scores zero and ties (water, boiled egg, fried egg, alphabetically), and every real food
+  scores below zero because the carbohydrate term is ten times the fibre term per serving.
+  `RankingDefectsTest` (domain/) is RED ON MASTER BY DESIGN for Rao, three tests, with a fourth
+  that guards the fix: a ranked candidate has a positive score, and the two terms must be
+  comparable (a per-nutrient rank), or the fix empties beat 4.
+  With a percentile per nutrient the hostel list gives fresh coconut, cooked moong dal, carrot,
+  beetroot, chicken curry. **Until Rao's fix lands, the run of show should not read beat 4's
+  candidates aloud; the trigger sentence is right and is the line to read.**
 
 ## The table
 
@@ -93,8 +98,8 @@ standalone runner (`tools/jvm-tests-standalone.sh`); the table is also written t
 | 7 | 2 | en | How much protein was in my lunch? | ANSWER | words: a question about what they ate | — | rows: protein.rda_india, protein.cereal_based_needs_more; the protein figure is the logged lunch's (see #2 or #5) | fired: profile.life_context/INFORM | prefers: no preference | "no trigger" | top: no ranking |
 | 8 | 4 | hi | मैं चावल और दाल खा रहा हूँ इसमें क्या ऐड करूँ | SUGGEST | words: a plate in front of them | चावल → rice_cooked 150 g rough; दाल → toor_dal_tadka 180 g rough | energy 429.9 kcal; protein 15.9 g; carbohydrate 78 g; fat 6.2 g; fibre 9 g; iron 3.9 mg; vitamin_b12 0 µg; sodium 498.5 mg | fired: profile.life_context/INFORM, meal.nutrient_dominant/INFORM | prefers: no preference | "no trigger" | top: no ranking |
 | 8 | 4 | en | I'm having rice and dal, what should I add? | SUGGEST | words: a plate in front of them | rice → rice_cooked 150 g rough; dal → toor_dal_tadka 180 g rough | energy 429.9 kcal; protein 15.9 g; carbohydrate 78 g; fat 6.2 g; fibre 9 g; iron 3.9 mg; vitamin_b12 0 µg; sodium 498.5 mg | fired: profile.life_context/INFORM, meal.nutrient_dominant/INFORM | prefers: no preference | "no trigger" | top: no ranking |
-| 9 | 3 | hi | मेरा आयरन कम है मुझे क्या खाना चाहिए | RECOMMEND | words: asking what they should eat | — | rows: iron.haem_vs_nonhaem, iron.bioavailability_by_diet | fired: profile.life_context/INFORM, profile.declared_condition/ADJUST | prefers: iron higher | "You told us you are managing anaemia, so suggestions are ranked with that in mind." | top: Cowpeas (catjang), raw, Mungo beans (urad), raw, Lentils, pink or red, raw |
-| 9 | 3 | en | I have anaemia, what should I eat for iron? | RECOMMEND | words: asking what they should eat | — | rows: iron.haem_vs_nonhaem, iron.bioavailability_by_diet | fired: profile.life_context/INFORM, profile.declared_condition/ADJUST | prefers: iron higher | "You told us you are managing anaemia, so suggestions are ranked with that in mind." | top: Cowpeas (catjang), raw, Mungo beans (urad), raw, Lentils, pink or red, raw |
+| 9 | 3 | hi | मेरा आयरन कम है मुझे क्या खाना चाहिए | RECOMMEND | words: asking what they should eat | — | rows: iron.haem_vs_nonhaem, iron.bioavailability_by_diet | fired: profile.life_context/INFORM, profile.declared_condition/ADJUST | prefers: iron higher | "You told us you are managing anaemia, so suggestions are ranked with that in mind." | top: Cooked chana dal, Palakura pappu, Thotakura pappu |
+| 9 | 3 | en | I have anaemia, what should I eat for iron? | RECOMMEND | words: asking what they should eat | — | rows: iron.haem_vs_nonhaem, iron.bioavailability_by_diet | fired: profile.life_context/INFORM, profile.declared_condition/ADJUST | prefers: iron higher | "You told us you are managing anaemia, so suggestions are ranked with that in mind." | top: Cooked chana dal, Palakura pappu, Thotakura pappu |
 | 10 | 1 | hi | नाश्ते में तीन इडली और सांबर खाया | LOG | words: a meal stated: an eating word or a quantity, no marker | इडली → idli 162 g approximate; सांबर → sambar 200 g rough | energy 395.6 kcal; protein 15.3 g; carbohydrate 73 g; fat 5.8 g; fibre 11.2 g; iron 4.4 mg; vitamin_b12 0 µg; sodium 978.8 mg | fired: profile.life_context/INFORM, meal.nutrient_dominant/INFORM | prefers: no preference | "no trigger" | top: no ranking |
 | 10 | 1 | en | For breakfast I had three idlis and sambar. | LOG | words: a meal stated: an eating word or a quantity, no marker | idli → idli 162 g approximate; sambar → sambar 200 g rough | energy 395.6 kcal; protein 15.3 g; carbohydrate 73 g; fat 5.8 g; fibre 11.2 g; iron 4.4 mg; vitamin_b12 0 µg; sodium 978.8 mg | fired: profile.life_context/INFORM, meal.nutrient_dominant/INFORM | prefers: no preference | "no trigger" | top: no ranking |
-| 4b | 4 | — | *Advise again on my last meal*, after the report (placeholder: fasting glucose 118 mg/dL, printed range 70 to 100) | — | button | same plate as #2 | same figures as #2 | fired: profile.life_context/INFORM, lab.above_range/ADJUST, meal.nutrient_dominant/INFORM | prefers: fibre higher, carbohydrate lower | "Your report from 2026-09-24 shows Fasting glucose at 118 mg/dL, above the 100 printed on it, so suggestions are ranked differently now." | top: Chicken breast, skinless, raw, Coffee, brewed, no milk, Fish, carp, raw |
+| 4b | 4 | — | *Advise again on my last meal*, after the report (placeholder: fasting glucose 118 mg/dL, printed range 70 to 100) | — | button | same plate as #2 | same figures as #2 | fired: profile.life_context/INFORM, lab.above_range/ADJUST, meal.nutrient_dominant/INFORM | prefers: fibre higher, carbohydrate lower | "Your report from 2026-09-24 shows Fasting glucose at 118 mg/dL, above the 100 printed on it, so suggestions are ranked differently now." | top: Water, Boiled egg, Fried egg |

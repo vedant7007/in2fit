@@ -33,13 +33,32 @@ the database's (a chapati serving is 45 g, a spoon of oil is 10 g, so two are 20
    spoon, ml, gram, and their Hindi forms) as positive evidence. The asymmetry of `0027` holds:
    a question marker still wins, so "how much protein in two rotis" is a question and "I need
    two rotis" is a request; and a LOG verdict on any question is still refused. The cost, named:
-   "three days no rice" would log rice. Not a demo sentence; accepted.
+   "three days no rice" would log rice. **Handled, ruled with the rule (Vedant, evening):** a
+   negation near the food blocks the LOG regardless, from the words and from the model. "no
+   rice", "didn't eat", "nahi khaya", "skipped", "nothing", and their Devanagari and Telugu
+   forms (`LogPrefilter.NEGATIONS`, on the reviewer's sheet). Logging a meal somebody just said
+   they did not eat is the worst version of this failure, because the person is actively telling
+   us the opposite. The one exception is a correction of the count, which the demo's #4 is:
+   "two rotis no, three rotis and dal" has the negation followed directly by a quantity, and is
+   a meal.
 
 3. **A counted egg is one egg.** "One boiled egg" weighed 150 g: the egg was classed DAIRY "so
    the katori and piece rules apply", and DAIRY has no piece rule, so an egg with no unit took
    the class's usual unit, a katori. Reclassed as chicken already is, `COMPOSED_DISH`, whose
-   usual unit is a 50 g piece. #3's protein went from 25.1 g to 12.6 g. This was the one wrong
-   number in the set, and a plate a judge would have read.
+   usual unit is a 50 g piece. #3's protein went from 25.1 g to 12.6 g.
+
+   **This is the find of the night, and the whole argument for the exercise, in Vedant's
+   words: 150 g for one boiled egg, protein 25.1 where the truth is 12.6, on a sentence we were
+   going to say out loud on stage. Nothing in the test suite would have caught it, because
+   every test agreed with the classification. Only running the exact sentences found it.**
+   The matcher tests proved "boiled egg" resolves to `egg`; the resolver tests proved a DAIRY
+   item with no unit takes a katori; the importer proved the egg row was well formed. Every
+   part was right by its own test and the plate was wrong. The demo sentences are therefore a
+   fixed test in the suite from now on, asserting the figures a judge will read, not the parts.
+
+   The same run also found, with the same shape, the quantity rule (2) and the negation rule
+   below: the words tests passed on the authored set and three demo sentences still went to
+   the model.
 
 4. **Same sentence, two bowls.** #5's English column says "a bowl of curd" (200 g) and its Hindi
    column "एक कटोरी दही" (150 g); the figures differ by column and neither is wrong. Per the

@@ -58,6 +58,32 @@ class RankingDefectsTest {
         assertEquals("white rice scores below zero on 'fibre higher, carbohydrate lower' and is not a suggestion", listOf("sprouts"), r.rankedCandidates.map { it.candidate.foodCode })
     }
 
+    /**
+     * Found by the spec 4.3 list, on the shipped database, hostel context: under "fibre higher,
+     * carbohydrate lower" the additive integer score is dominated by the carbohydrate term (a
+     * katori of dal is 40 g of carbohydrate and 11 g of fibre, so it scores -290), every real
+     * food is negative, and the only non-negative candidates are the zero-carbohydrate ones. So
+     * "positive only" alone would leave beat 4 with NO suggestions. The two terms must be
+     * comparable: a per-nutrient rank or a normalisation within the candidate set, so that the
+     * dal, which is high in fibre and moderate in carbohydrate, ranks with the egg and above
+     * the rice, and the list is not empty.
+     *
+     * GREEN TODAY, because today everything is ranked. It is the guard on the fix for the three
+     * above: a fix that drops non-positive scores under the additive scoring turns this red.
+     */
+    @Test fun `a high-fibre dal is a suggestion under fibre higher carbohydrate lower, and rice is not`() {
+        val r = engine.evaluate(input(listOf(
+            candidate("white_rice", Nutrient.FIBRE to 0.4, Nutrient.CARBOHYDRATE to 28.0),
+            candidate("chana_dal_cooked", Nutrient.FIBRE to 7.6, Nutrient.CARBOHYDRATE to 27.4),
+            candidate("boiled_egg", Nutrient.FIBRE to 0.0, Nutrient.CARBOHYDRATE to 1.1),
+            candidate("sprouts_salad", Nutrient.FIBRE to 4.0, Nutrient.CARBOHYDRATE to 12.0),
+        )))
+        val ranked = r.rankedCandidates.map { it.candidate.foodCode }
+        assertTrue("beat 4 must have suggestions: $ranked", ranked.isNotEmpty())
+        assertTrue("the dal and the sprouts help and must be ranked: $ranked", "chana_dal_cooked" in ranked && "sprouts_salad" in ranked)
+        assertTrue("rice is what the preference argues against: $ranked", "white_rice" !in ranked || ranked.indexOf("white_rice") == ranked.lastIndex)
+    }
+
     @Test fun `when every candidate scores zero there are no suggestions, as when there is no preference`() {
         val r = engine.evaluate(input(listOf(candidate("water"), candidate("tea_brewed", Nutrient.CARBOHYDRATE to 0.0))))
         assertTrue("an alphabetical list of zero-scored items is not advice: ${r.rankedCandidates}", r.rankedCandidates.isEmpty())

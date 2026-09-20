@@ -60,6 +60,32 @@ advice words the app treats as "not a meal": `क्या कितना क�
 बताइए बताइये अच्छा बेहतर सही ठीक सुझाव ऐड जोड़ बदल हटा डिलीट`, and the phrases `खा रहा`, `खा रही`,
 `खा रहे`, `के लिए`, `खाना चाहिए`.
 
+**Words that say a food was NOT eaten.** A sentence with one of these is never written into the
+diary, whatever else it contains ("no rice today", "didn't eat lunch"); the one exception is a
+correction of a count, "two rotis no, three rotis". The same question as above, the other way
+round: does each of these mean *not* / *did not eat*, and could it mean something else?
+
+| # | Word | Meant as | Means not / did not eat? (yes/no) | Could mean something else? | Missing form? |
+| --- | --- | --- | --- | --- | --- |
+| N1 | `nahi` | Hindi, not / no | | | |
+| N2 | `nahin` | Hindi, not, long spelling | | | |
+| N3 | `nai` | Hindi, not, short spelling (also "new"?) | | | |
+| N4 | `nahee` | Hindi, not, long-vowel spelling | | | |
+| N5 | `mat` | Hindi, don't | | | |
+| N6 | `bina` | Hindi, without | | | |
+| N7 | `ledu` | Telugu, is not / did not | | | |
+| N8 | `ledhu` | Telugu, is not, dh- spelling | | | |
+| N9 | `kadu` | Telugu, not (that) | | | |
+| N10 | `kaadu` | Telugu, not, long-vowel spelling | | | |
+| N11 | `tinaledu` | Telugu, did not eat | | | |
+| N12 | `thinaledu` | Telugu, did not eat, th- spelling | | | |
+
+English on the same list: `no`, `not`, `never`, `nothing`, `none`, `without`, `skip`, `skipped`,
+`skipping`, and the stems of "didn't", "don't", "doesn't", "hadn't", "haven't", "wasn't", "couldn't"
+(`didn` `didnt` `don` `dont` `doesn` `doesnt` `hadn` `hadnt` `haven` `havent` `wasn` `wasnt` `couldn` `couldnt`).
+Devanagari, for Vedant: `नहीं`, `नही`, `बिना`, `छोड़`, `छोड़ा`, `छोड़ी`. Telugu script, generated, unreviewed:
+`లేదు`, `కాదు`, `తినలేదు`.
+
 ## The words that make the app ask instead
 
 A sentence containing any of these is sent to the app's slower, careful path. **A wrong word

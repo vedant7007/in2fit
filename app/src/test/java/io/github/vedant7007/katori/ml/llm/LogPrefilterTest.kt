@@ -152,8 +152,23 @@ class LogPrefilterTest {
     @Test fun `every log word and phrase is on the reviewer's sheet`() {
         val dir = System.getProperty("katori.projectDir") ?: error("katori.projectDir not set")
         val sheet = File(dir, "data-authoring/log-words-review.md").readText()
-        val missing = (LogPrefilter.LOG_WORDS + LogPrefilter.MEAL_WAS).filterNot { sheet.contains("`$it`") }
+        val missing = (LogPrefilter.LOG_WORDS + LogPrefilter.MEAL_WAS + LogPrefilter.NEGATIONS).filterNot { sheet.contains("`$it`") }
         assertTrue("log words the reviewer will never see: $missing", missing.isEmpty())
+    }
+
+    /** The counterweight to the quantity rule, ruled with it: a denied food is never a certain log. */
+    @Test fun `a negation near the food blocks the log`() {
+        for (s in listOf("three days no rice", "no rice today", "I didn't eat lunch", "didn't have breakfast, just two biscuits",
+                         "skipped dinner", "maine aaj roti nahi khayi", "kuch nahi khaya", "aaj chawal nahi", "मैंने आज रोटी नहीं खाई",
+                         "nenu annam tinaledu", "I had nothing for lunch")) {
+            assertFalse("'$s' would be written into the diary", LogPrefilter.isCertainLog(s))
+            assertTrue("'$s' is not read as a denial", LogPrefilter.negatesFood(s))
+        }
+        // the demo's #4 is a correction of the count, not a denial of the food
+        assertTrue(LogPrefilter.isCertainLog("Two rotis no, three rotis and dal."))
+        assertTrue(LogPrefilter.isCertainLog("दो रोटी नहीं, तीन रोटी और दाल"))
+        assertTrue(LogPrefilter.isCertainLog("ek nahi do roti khayi"))
+        assertFalse(LogPrefilter.negatesFood("I had two rotis and dal"))
     }
 
     @Test fun `a plate in front of them is not a log yet`() {

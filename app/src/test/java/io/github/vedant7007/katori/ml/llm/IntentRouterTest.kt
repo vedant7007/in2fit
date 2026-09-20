@@ -70,6 +70,14 @@ class IntentRouterTest {
         }
     }
 
+    /** The worst misroute: the person says they did NOT eat it, the model says LOG. Refused; the person is asked. */
+    @Test fun `a model LOG on a sentence that denies the food is refused`() {
+        for (s in listOf("no rice today", "I didn't eat lunch", "aaj chawal nahi", "skipped breakfast")) {
+            assertNull("'$s': a denied food reached the diary", IntentRouter.accept(Intent.LOG, s))
+        }
+        assertEquals(Intent.ANSWER, IntentRouter.accept(Intent.ANSWER, "no rice today"))
+    }
+
     @Test fun `a model verdict outside what the words allow is refused, inside it is accepted`() {
         // No evidence at all: the model may say anything.
         assertEquals(Intent.LOG, IntentRouter.accept(Intent.LOG, "rice and dal"))

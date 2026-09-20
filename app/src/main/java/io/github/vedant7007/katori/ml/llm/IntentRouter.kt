@@ -65,6 +65,8 @@ object IntentRouter {
             evidence.size == 1 -> Decision.Decided(evidence.single(), evidenceName(evidence.single()))
             evidence.size > 1 -> Decision.AskModel(evidence.toSet(), "conflicting: ${evidence.joinToString()}")
             question -> Decision.Decided(Intent.ANSWER, "a general question")
+            // "no rice today": the model may say anything but LOG.
+            LogPrefilter.negatesFood(transcript) -> Decision.AskModel(Intent.entries.toSet() - Intent.LOG, "a food denied")
             // No marker and no eating word: "a plate of biryani and some raita". The model may
             // say any of the four; a LOG here is accepted because nothing says it is a question.
             else -> Decision.AskModel(Intent.entries.toSet(), "no evidence")
@@ -77,7 +79,9 @@ object IntentRouter {
      * is refused the same way. Everything else is accepted as the model said it.
      */
     fun accept(modelSays: Intent, transcript: String): Intent? {
-        if (modelSays == Intent.LOG && LogPrefilter.hasMarker(transcript)) return null
+        // A LOG on a question, or on a sentence that says a food was NOT eaten, is refused
+        // whatever the model says: the person is asked.
+        if (modelSays == Intent.LOG && (LogPrefilter.hasMarker(transcript) || LogPrefilter.negatesFood(transcript))) return null
         val d = decide(transcript)
         return when (d) {
             is Decision.Decided -> d.intent

@@ -113,7 +113,8 @@ def main():
     units = load_authored("household-units.csv")
     recipes = load_authored("recipes.csv")
     recipe_ings_raw = load_authored("recipe-ingredients.csv")
-    log(f"authored: {len(ingredients)} ingredients, {len(nodata)} no-data items, {len(units)} unit rows")
+    candidates = load_authored("candidates.csv")
+    log(f"authored: {len(ingredients)} ingredients, {len(nodata)} no-data items, {len(units)} unit rows, {len(candidates)} candidate rows")
 
     wanted_ids = {int(r["fdc_id"]) for r in ingredients}
 
@@ -247,6 +248,12 @@ def main():
     CREATE TABLE unit_conversions (
         unit TEXT NOT NULL, food_class TEXT NOT NULL, grams REAL NOT NULL, note TEXT,
         PRIMARY KEY (unit, food_class)
+    );
+    -- Spec 4.3: what may be SUGGESTED, per life context. A key absent here is an ingredient.
+    -- suggest_as and serving_g are NULL when the food's own display name and usual serving apply.
+    CREATE TABLE candidates (
+        key TEXT NOT NULL, context TEXT NOT NULL, suggest_as TEXT, serving_g REAL, note TEXT NOT NULL,
+        PRIMARY KEY (key, context)
     );
     CREATE TABLE recipes (
         recipe_key TEXT PRIMARY KEY,
@@ -427,8 +434,9 @@ def main():
                         "FoodData Central. fdc.nal.usda.gov"),
         "licence": "USDA FoodData Central data are in the public domain, published under CC0 1.0 Universal.",
         "disclosure": ("Values are based on foods sampled in the United States and may differ from "
-                       "Indian-grown produce and Indian preparation. They are estimates, not "
-                       "measurements of your own food."),
+                       "Indian-grown produce and Indian preparation. US milk is vitamin-D fortified "
+                       "and US bread flour is iron-enriched; Indian milk and bread are not, so those "
+                       "two figures read high. They are estimates, not measurements of your own food."),
     }.items():
         c.execute("INSERT INTO meta VALUES (?,?)", (k, v))
 
@@ -687,6 +695,53 @@ def main():
                         "The yield is the number to check first:\n  " + "\n  ".join(off))
     else:
         log(f"RECIPE ok: implied moisture is plausible for all {len(rows)} recipes")
+
+    # ---- candidates (spec 4.3) -----------------------------------------------------------
+    # Every food and recipe is listed exactly once, with or without contexts, so the sweep is
+    # complete; a raw grain or pulse never has a context (Vedant, 20 Sep); a spice, fat, sweet
+    # or packaged item has one only with its own serving stated; every context is a LifeContext.
+    LIFE_CONTEXTS = {"HOSTEL_STUDENT", "PG_OWN_COOKING", "FIELD_OR_MANUAL_WORKER", "DESK_PROFESSIONAL", "HOMEMAKER"}
+    NEVER = {"GRAIN_RAW", "PULSE_RAW"}
+    ONLY_WITH_SERVING = {"SPICE", "FAT_OIL", "SWEET", "PACKAGED"}
+    food_class_of = {k: cls for k, cls in c.execute("SELECT food_key, food_class FROM foods")}
+    recipe_keys = {k for (k,) in c.execute("SELECT recipe_key FROM recipes")}
+    seen = set()
+    cand_fail = []
+    for r in candidates:
+        key = r["key"].strip()
+        if key in seen:
+            cand_fail.append(f"{key} listed twice")
+        seen.add(key)
+        if key not in food_class_of and key not in recipe_keys:
+            cand_fail.append(f"{key} is neither a food nor a recipe")
+            continue
+        if not r["note"].strip():
+            cand_fail.append(f"{key} has no reason")
+        contexts = [x.strip() for x in r["contexts"].split("|") if x.strip()]
+        bad = [x for x in contexts if x not in LIFE_CONTEXTS]
+        if bad:
+            cand_fail.append(f"{key}: unknown context {bad}")
+        cls = food_class_of.get(key)
+        serving = float(r["serving_g"]) if r["serving_g"].strip() else None
+        if contexts and cls in NEVER:
+            cand_fail.append(f"{key} is {cls}: a raw grain or pulse is an ingredient, never a candidate")
+        if contexts and cls in ONLY_WITH_SERVING and serving is None:
+            cand_fail.append(f"{key} is {cls} and states no serving: the class unit is a teaspoon, not a helping")
+        if serving is not None and not (5.0 <= serving <= 500.0):
+            cand_fail.append(f"{key}: serving {serving} g is not a helping")
+        for ctx in contexts:
+            c.execute("INSERT INTO candidates VALUES (?,?,?,?,?)",
+                      (key, ctx, r["suggest_as"].strip() or None, serving, r["note"].strip()))
+    unlisted = (set(food_class_of) | recipe_keys) - seen
+    if unlisted:
+        cand_fail.append(f"not in candidates.csv at all (list it, with or without a context): {sorted(unlisted)}")
+    if cand_fail:
+        failures.append("CANDIDATES: " + "; ".join(cand_fail))
+    else:
+        n_keys = c.execute("SELECT COUNT(DISTINCT key) FROM candidates").fetchone()[0]
+        per_ctx = c.execute("SELECT context, COUNT(*) FROM candidates GROUP BY context ORDER BY context").fetchall()
+        log(f"CANDIDATES ok: {n_keys} of {len(seen)} foods and recipes may be suggested; per context " +
+            ", ".join(f"{ctx} {n}" for ctx, n in per_ctx))
 
     # No-data items must not have any nutrients.
     rows = c.execute("""
