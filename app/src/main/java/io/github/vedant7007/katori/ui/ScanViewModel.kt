@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.vedant7007.katori.domain.LabValue
+import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.Orchestrator
+import io.github.vedant7007.katori.domain.RulesEngine
+import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.OrchestratorEvent
 import io.github.vedant7007.katori.domain.UserIntent
 import io.github.vedant7007.katori.domain.model.Outcome
@@ -25,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -32,15 +36,21 @@ import javax.inject.Inject
  *
  * A captured frame goes through [OcrEngine] and [LabReportExtractor]; every field is shown
  * beside the row it was read from, ticked, for the person to untick. Saving hands the ticked
- * values to the orchestrator. Until `UserIntent.SaveLabReport` lands (COORDINATION.md, 14:30)
- * the existing `ScanLabReport` intent is sent and its NotImplemented is shown as such.
+ * values to the orchestrator as `UserIntent.SaveLabReport` (COORDINATION.md, agreed 14:55),
+ * which writes them and answers with how many.
  */
 @HiltViewModel
 class ScanViewModel @Inject constructor(
     private val frames: FrameStore,
     private val ocr: OcrEngine,
     private val orchestrator: Orchestrator,
+    rules: RulesEngine,
+    contextText: ContextText,
+    triggerText: TriggerText,
 ) : ViewModel() {
+
+    /** The scripted feed's twin, so a scripted save lands where the scripted advise-again reads (0027). */
+    private val scripted = ScriptedOrchestrator(rules, contextText, triggerText)
 
     data class Field(val field: LabField, val ticked: Boolean)
 
@@ -89,17 +99,14 @@ class ScanViewModel @Inject constructor(
         _state.update { it.copy(saving = true, notBuilt = null, failure = null) }
         val confirmed = state.value.fields.filter { it.ticked }.map { it.field }
         val date = state.value.report?.reportDate
+        // The write is the orchestrator's (agreed 14:55, landed 18:07). A row whose unit was not
+        // read is saved with an empty unit: its value is still comparable to its own printed range.
+        val values = confirmed.map { LabValue(it.testName, it.value, it.unit.orEmpty(), it.referenceLow, it.referenceHigh, date ?: LocalDate.now()) }
+        val source = if (DemoFeed.enabled.value) scripted else orchestrator
         viewModelScope.launch(Dispatchers.Default) {
-            if (DemoFeed.enabled.value) {
-                // The script keeps the confirmed values so beat 4 evaluates against them.
-                DemoFeed.labValues += confirmed.map { LabValue(it.testName, it.value, it.unit.orEmpty(), it.referenceLow, it.referenceHigh, date ?: ScriptedOrchestrator.REPORT_DATE) }
-                _state.update { it.copy(saving = false, savedCount = confirmed.size) }
-                return@launch
-            }
-            // The intent that carries the confirmed values is Rao's to add (agreed 14:55). Until
-            // then this is the contract's own not-built path.
-            orchestrator.handle(UserIntent.ScanLabReport).collect { ev ->
+            source.handle(UserIntent.SaveLabReport(values)).collect { ev ->
                 when (ev) {
+                    is OrchestratorEvent.LabReportSaved -> _state.update { it.copy(savedCount = ev.count) }
                     is OrchestratorEvent.NotImplemented -> _state.update { it.copy(notBuilt = ev.component) }
                     is OrchestratorEvent.Failed -> _state.update { it.copy(failure = ev.reason, failureDetail = ev.detail) }
                     else -> Unit

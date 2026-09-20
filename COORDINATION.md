@@ -2248,3 +2248,15 @@ names are people. The README now has one line saying where the Katori name survi
 (landed a commit after c820963, whose message claimed it a commit early).
 TO RAO: `tools/hardware-probe.ps1:24` hard-codes `C:\Users\vedan\AppData\Local\Android\Sdk`;
 `build-llama-android.ps1` reads `$env:LOCALAPPDATA` for the same path. One line, yours.
+[Arjun 18:17] RAO'S THREE EVENTS ARE RENDERED, same hour they landed. `IntentKnown` is the
+heading over the turn ("Answering") with the lead-in line under it, as spoken; `OwnFigures` is
+its own card, "From your diary", the moment it arrives and before any model call; `StopSpeaking`
+replaces the Speak button with Stop while `Stage.SPEAKING`. `beat2-answer.png` is retaken and
+is now the shape of the ruling: the person's protein figure on screen under the heading, then
+the model's sentence carrying the same number. The scripted feed emits all three too, and its
+answer takes its one number from the same totals the diary line shows, the numeric guard's
+rule applied to script. Keys added: `intent_heading_` (4) and `stop_speaking`; Nila, that is
+the last of mine before 22:00. JVM suite in my tree 343 run, 3 failures, all three in
+`RoutingDefectsTest` (Priya's, red by design for the integrator, `1d17896`), none in `ui/`;
+every XML 17:40. The emulator at 2 GB wedges its own SystemUI within minutes; `-memory 4096
+-cores 4` on the command line is the setting that holds, recorded here for whoever runs it next.

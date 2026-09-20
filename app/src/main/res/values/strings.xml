@@ -265,6 +265,13 @@
     <string name="about_usda_title">Nutrition data</string>
     <!-- Talk, an answer: the label over the person's own lines (Answered.figures), shown above the model's sentence. -->
     <string name="answer_from_diary">From your diary</string>
+    <!-- 0026 step 5: the intent as a heading over the turn, once it is known. One per SpokenIntent. -->
+    <string name="intent_heading_log">Logging</string>
+    <string name="intent_heading_answer">Answering</string>
+    <string name="intent_heading_suggest">Suggesting</string>
+    <string name="intent_heading_recommend">Recommending</string>
+    <!-- 0026 step 8: replaces the Speak button while the answer is being spoken. Stops speech only. -->
+    <string name="stop_speaking">Stop</string>
 
     <!-- THE PRE-FLIGHT CHECK (Arjun, 20 Sep). Reached only by a long-press on the About title; for
          whoever sets the phone up on the morning of the demo. Every line is a fact read off the

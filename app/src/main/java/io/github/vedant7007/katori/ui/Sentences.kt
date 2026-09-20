@@ -2,6 +2,7 @@ package io.github.vedant7007.katori.ui
 
 import androidx.annotation.StringRes
 import io.github.vedant7007.katori.R
+import io.github.vedant7007.katori.domain.SpokenIntent
 import io.github.vedant7007.katori.domain.Stage
 import io.github.vedant7007.katori.domain.model.ConfidenceBand
 import io.github.vedant7007.katori.domain.model.UnavailableReason
@@ -44,6 +45,15 @@ object Sentences {
         UnavailableReason.CANCELLED -> R.string.unavailable_cancelled
         UnavailableReason.SCHEMA_VALIDATION_FAILED -> R.string.unavailable_schema_validation_failed
         UnavailableReason.INTERNAL_ERROR -> R.string.unavailable_internal_error
+    }
+
+    /** 0026 step 5: the intent as a heading. */
+    @StringRes
+    fun intent(intent: SpokenIntent): Int = when (intent) {
+        SpokenIntent.LOG -> R.string.intent_heading_log
+        SpokenIntent.ANSWER -> R.string.intent_heading_answer
+        SpokenIntent.SUGGEST -> R.string.intent_heading_suggest
+        SpokenIntent.RECOMMEND -> R.string.intent_heading_recommend
     }
 
     @StringRes

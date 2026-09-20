@@ -56,6 +56,8 @@ class ScriptedOrchestrator(
     private val rules: RulesEngine,
     private val contextText: ContextText,
     private val triggerText: TriggerText,
+    /** The lead-in phrase per intent, from the string table; empty in a JVM test. */
+    private val leadIns: Map<SpokenIntent, String> = emptyMap(),
 ) : Orchestrator {
 
     override fun handle(intent: UserIntent): Flow<OrchestratorEvent> = flow {
@@ -73,9 +75,13 @@ class ScriptedOrchestrator(
             is UserIntent.Resolve -> turn(intent.text, intent.intent)
             is UserIntent.AdviseOnMeal -> adviseAgain()
             UserIntent.ScanLabReport -> { emit(Progress(Stage.SAVING)); delay(400); emit(OrchestratorEvent.Completed) }
-            // The two intents the contract gained on 20 Sep; the scripted feed treats the save as
-            // its scan and has no voice to stop. Arjun's to script if the beats need them.
-            is UserIntent.SaveLabReport -> { emit(Progress(Stage.SAVING)); delay(400); emit(OrchestratorEvent.LabReportSaved(intent.values.size, null)); emit(OrchestratorEvent.Completed) }
+            is UserIntent.SaveLabReport -> {
+                // The script keeps the confirmed values so beat 4 evaluates against them.
+                emit(Progress(Stage.SAVING)); delay(400)
+                DemoFeed.labValues += intent.values
+                emit(OrchestratorEvent.LabReportSaved(intent.values.size, DemoFeed.lastMeal?.mealId))
+                emit(OrchestratorEvent.Completed)
+            }
             UserIntent.StopSpeaking -> emit(OrchestratorEvent.Completed)
             is UserIntent.CorrectValue, is UserIntent.ScanPackagedLabel, is UserIntent.CheckExerciseForm ->
                 { emit(OrchestratorEvent.NotImplemented("demo." + intent::class.simpleName)); emit(OrchestratorEvent.Completed) }
@@ -91,6 +97,7 @@ class ScriptedOrchestrator(
             emit(OrchestratorEvent.Completed)
             return
         }
+        emit(OrchestratorEvent.IntentKnown(decided, leadIns[decided]))
         when (decided) {
             SpokenIntent.LOG -> plate(text, save = true)
             SpokenIntent.SUGGEST -> plate(text, save = false)
@@ -143,6 +150,7 @@ class ScriptedOrchestrator(
     private suspend fun FlowCollector<OrchestratorEvent>.answer() {
         emit(Progress(Stage.EVALUATING_RULES)); delay(300)
         val lines = ownLines()
+        emit(OrchestratorEvent.OwnFigures(lines))
         emit(Progress(Stage.RETRIEVING_FACTS)); delay(400)
         emit(Progress(Stage.PHRASING)); delay(2500)
         // The script obeys the numeric guard's rule: the only number in its sentence is one the
@@ -156,6 +164,7 @@ class ScriptedOrchestrator(
     private suspend fun FlowCollector<OrchestratorEvent>.recommend() {
         emit(Progress(Stage.EVALUATING_RULES)); delay(400)
         val evaluation = rules.evaluate(input(meal = null, Instant.now()))
+        emit(OrchestratorEvent.OwnFigures(ownLines()))
         emit(Progress(Stage.RETRIEVING_FACTS)); delay(400)
         emit(Progress(Stage.PHRASING)); delay(2200)
         val referral = evaluation.trigger?.let(triggerText::render).takeIf { evaluation.referralRequired }

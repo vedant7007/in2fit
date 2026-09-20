@@ -106,15 +106,20 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Button(
-                enabled = !state.busy,
-                onClick = {
-                    val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-                    if (granted) vm.speak() else askMic.launch(Manifest.permission.RECORD_AUDIO)
-                },
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(stringResource(if (state.stage == Stage.RECORDING) R.string.mic_listening else R.string.mic_speak))
+            if (state.stage == Stage.SPEAKING) {
+                // 0026 step 8: stops speech only; the answer stays on screen.
+                Button(onClick = vm::stopSpeaking, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.stop_speaking)) }
+            } else {
+                Button(
+                    enabled = !state.busy,
+                    onClick = {
+                        val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+                        if (granted) vm.speak() else askMic.launch(Manifest.permission.RECORD_AUDIO)
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(stringResource(if (state.stage == Stage.RECORDING) R.string.mic_listening else R.string.mic_speak))
+                }
             }
             if (state.lastMealId != null) {
                 OutlinedButton(enabled = !state.busy, onClick = vm::adviseAgain, modifier = Modifier.weight(1f)) {
@@ -151,6 +156,15 @@ private fun EntryCard(entry: Entry, onResolve: (String, SpokenIntent) -> Unit) {
                 is Entry.Said -> {
                     Text(stringResource(R.string.said_by_you), style = MaterialTheme.typography.labelMedium)
                     Text(entry.text, style = MaterialTheme.typography.bodyLarge)
+                }
+                is Entry.Heading -> {
+                    Text(stringResource(Sentences.intent(entry.intent)), style = MaterialTheme.typography.titleMedium)
+                    // Nothing spoken is not on screen (0026): the lead-in phrase, as it is spoken.
+                    entry.leadIn?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                }
+                is Entry.Figures -> {
+                    Text(stringResource(R.string.answer_from_diary), style = MaterialTheme.typography.labelMedium)
+                    entry.lines.forEach { Text(it, style = MaterialTheme.typography.bodyLarge) }
                 }
                 is Entry.Plate -> {
                     if (entry.hypothetical) Text(stringResource(R.string.meal_hypothetical), style = MaterialTheme.typography.labelMedium)

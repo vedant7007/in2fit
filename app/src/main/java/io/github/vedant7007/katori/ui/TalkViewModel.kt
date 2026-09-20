@@ -1,8 +1,11 @@
 package io.github.vedant7007.katori.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.Orchestrator
 import io.github.vedant7007.katori.domain.OrchestratorEvent
@@ -50,13 +53,28 @@ class TalkViewModel @Inject constructor(
     private val triggerText: TriggerText,
     private val contextText: ContextText,
     rules: RulesEngine,
+    @ApplicationContext context: Context,
 ) : ViewModel() {
 
-    private val scripted = ScriptedOrchestrator(rules, contextText, triggerText)
+    private val scripted = ScriptedOrchestrator(
+        rules, contextText, triggerText,
+        leadIns = mapOf(
+            SpokenIntent.LOG to context.getString(R.string.tts_lead_in_log),
+            SpokenIntent.ANSWER to context.getString(R.string.tts_lead_in_answer),
+            SpokenIntent.SUGGEST to context.getString(R.string.tts_lead_in_suggest),
+            SpokenIntent.RECOMMEND to context.getString(R.string.tts_lead_in_recommend),
+        ),
+    )
 
     sealed interface Entry {
         /** What was heard or typed, shown the moment it is known. */
         data class Said(val text: String) : Entry
+
+        /** 0026 step 5: which of the four the turn became, and the lead-in phrase as it is spoken. */
+        data class Heading(val intent: SpokenIntent, val leadIn: String?) : Entry
+
+        /** The person's own lines, straight from the store, before any model call: the answer itself. */
+        data class Figures(val lines: List<String>) : Entry
 
         /** A resolved plate: the items as said, each figure as a rendered line with its band. */
         data class Plate(
@@ -110,6 +128,12 @@ class TalkViewModel @Inject constructor(
     fun resolve(transcript: String, intent: SpokenIntent) = run(UserIntent.Resolve(transcript, language(), intent))
     fun adviseAgain() { state.value.lastMealId?.let { run(UserIntent.AdviseOnMeal(it)) } }
 
+    /** 0026 step 8: stops speech only; the turn and its text are untouched. Sent while busy, by design. */
+    fun stopSpeaking() {
+        val source = if (DemoFeed.enabled.value) scripted else orchestrator
+        viewModelScope.launch(Dispatchers.Default) { source.handle(UserIntent.StopSpeaking).catch { }.collect { } }
+    }
+
     private fun language() = SpeechLanguageRef(state.value.language)
 
     private fun run(intent: UserIntent) {
@@ -135,9 +159,9 @@ class TalkViewModel @Inject constructor(
             is OrchestratorEvent.Progress -> _state.update { it.copy(stages = it.stages + event.stage, elapsedSeconds = 0) }
             is OrchestratorEvent.AudioLevel -> _state.update { it.copy(level = event.rms.coerceIn(0f, 1f)) }
             is OrchestratorEvent.Transcribed -> add(Entry.Said(event.text))
-            // The two events the 0026 screen asked for; rendering them is Arjun's next step.
-            is OrchestratorEvent.IntentKnown -> Unit
-            is OrchestratorEvent.OwnFigures -> Unit
+            is OrchestratorEvent.IntentKnown -> add(Entry.Heading(event.intent, event.leadIn))
+            is OrchestratorEvent.OwnFigures -> add(Entry.Figures(event.lines))
+            // The Scan tab's turn; the Talk tab never sends SaveLabReport.
             is OrchestratorEvent.LabReportSaved -> Unit
             is OrchestratorEvent.NeedsIntent -> add(Entry.AskIntent(event.transcript))
             is OrchestratorEvent.NeedsConfirmation -> add(Entry.Confirm(event.why, event.parsed.items))
@@ -162,7 +186,12 @@ class TalkViewModel @Inject constructor(
                     candidates = event.evaluation.rankedCandidates.map { it.candidate.displayName },
                 )
             )
-            is OrchestratorEvent.Answered -> add(Entry.Answer(event.text, event.referral, event.figures))
+            // The lines were already on screen if OwnFigures came first; the answer card repeats
+            // them only when they were not.
+            is OrchestratorEvent.Answered -> _state.update { s ->
+                val shown = s.entries.indexOfLast { it is Entry.Figures } > s.entries.indexOfLast { it is Entry.Said }
+                s.copy(entries = s.entries + Entry.Answer(event.text, event.referral, if (shown) emptyList() else event.figures))
+            }
             is OrchestratorEvent.Failed -> add(Entry.Failed(event.reason, event.detail))
             is OrchestratorEvent.NotImplemented -> add(Entry.NotBuilt(event.component))
             OrchestratorEvent.Completed -> Unit
