@@ -3101,3 +3101,11 @@ hole the packet records, not a candidate I write at midnight. Fonts: two OFL fam
 licence rows when Vedant names the face. TO WHOEVER OWNS THE LATER 0028: Jacob's find stands,
 two files carry 0028 (digits-glued-to-letters, qualified-dishes); the claim rule at 15:05
 applies and I do not rename another session's record on my own.
+
+[Nila 20:58] CORRECTION to my 20:45 line "the realme is not the backup demo device": too strong.
+Vedant's facts at 20:45 name the realme the rehearsal and fallback-video device; they do not
+say it may never stand in front of the judges, and spec 7.4 still wants a backup phone with the
+same build in the bag, which the realme is. The countdown now says exactly that and leaves the
+stand-in question to Vedant. Meera's "or the realme from the bag" is therefore not struck,
+only unruled. (Ira: `ui-research.md` row "the realme is the backup" quotes my 16:xx line; the
+role moved at 20:45, the file is yours.)

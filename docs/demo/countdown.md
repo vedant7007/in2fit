@@ -41,10 +41,13 @@ build event. **If step 1 fails and the venue network cannot satisfy the ROM**, t
 failure the plan has no answer for on the iQOO; the organisers are asked in hour one, not at
 hour twenty-nine.
 
-**The realme** is no longer the backup demo device; the demo must be on the iQOO. It is the
-**rehearsal device and the fallback-video device**: every rehearsal this week is on it, the
-fallback video is recorded on it, it is charged the night before and it is in the bag on the
-26th so the run of show can be rehearsed on site while the iQOO is being staged.
+**The realme** is the **rehearsal device and the fallback-video device** (Vedant, 20:45):
+every rehearsal this week is on it, the fallback video is recorded on it, it is charged the
+night before and it is in the bag on the 26th, staged with the same build (spec 7.4), so the
+run of show can be rehearsed on site while the iQOO is being staged. Whether it may stand in
+front of the judges if hour one fails on the iQOO is Vedant's to say; the plan does not assume
+it, and the 20:25 line "the realme comes with him as the backup" is superseded only as far as
+he says so.
 
 ## Tuesday 22 September: submission
 
