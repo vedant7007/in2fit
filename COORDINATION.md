@@ -4110,3 +4110,36 @@ airplane mode + Wi-Fi off + default-server ownership + no second server; hard ti
 retried; runner verdict per stage; NOT CLAIMABLE on an emulator). The emulator cannot run the
 native libraries (sherpa-onnx SIGSEGV under x86 translation; the model killed at 2.29 GB on 4 GB),
 so its dry run proves the harness only. JVM after the rebase onto 8985fe8: 410 tests, 0 failures, 0 errors, 45 XML files from my own run at 00:50.
+
+[Arjun 01:09] taking `TalkScreen.kt` for ONE function, the hold button's release and cue, back
+to Ira the moment this lands (the per-file rule, logged both ways).
+
+[Arjun 01:09] ITEMS 1 AND 2 OF VEDANT'S ORDER ARE LANDED; 3 STARTS NOW.
+1. PUSH-TO-TALK IS CONNECTED ON MY SIDE. (a) `UserIntent.EndSpeech` is in the contract, with
+`OrchestratorEvent.MicrophoneLive` beside it (the mic delivering signal: `AsrEvent.SpeechStarted`,
+first frame with signal, never the press). (b) The Talk screen's press sends `Speak`, its
+release sends `EndSpeech` (`onRelease = vm::endSpeech`, the block that was empty), and nothing
+else ends a recording on my side. (d) The cue lights on `MicrophoneLive` and on nothing else:
+not on the press, not on `Stage.RECORDING`; the label reads "Hold to speak" until the mic is
+live and "Listening…" from then; the five-word hint sits under the button. (e) Two tests fail
+if it is unwired again: `TalkScreenWiringTest` reads the screen's source and refuses an empty
+`onRelease` on the hold button or a cue driven by the stage; `TalkViewModelTest` proves
+`endSpeech()` sends exactly `EndSpeech`, and that the cue is dark after `RECORDING`, lit after
+`MicrophoneLive`, dark after `TRANSCRIBING`. The scripted feed emits `MicrophoneLive` 150 ms
+after the press and answers `EndSpeech`. Demo suite 415/0/0, XML 01:06; both flavours green.
+(c) TO RAO, YOUR TWO LINES, NAMED, and the hour please: `DefaultOrchestrator.spoken()` collects
+`pushToTalk.hold(lang)` in place of `asr.listen(lang)` and maps `AsrEvent.SpeechStarted ->
+emit(OrchestratorEvent.MicrophoneLive)` (today it is swallowed as `Unit`); and the
+`UserIntent.EndSpeech` branch calls `pushToTalk.release()` and completes, replacing the
+`notBuilt("orchestration.EndSpeech")` stub I left so master compiles and the screen shows the
+honest not-built state until you land. The instance is Jacob's `PushToTalk(asrEngine,
+AndroidAudioSource(context))`, one per orchestrator, provided in `AppModule`, which is yours.
+Until those two lines land the presenter's release does nothing and the endpointer still ends
+the sentence: the screen is wired, the pipeline is not.
+2. THE SPEECH LANGUAGE DEFAULTS TO HINDI AND SURVIVES ANYTHING. `TalkViewModel.DEFAULT_LANGUAGE =
+"hi"`; the chosen language is written to `SharedPreferences` ("talk"/"language") on every change
+and read back at construction, so a crash, a process death or a restart mid-demo comes back in
+the language last chosen, never silently in English. `TalkViewModelTest` pins the default.
+TO NILA: strike "tap हिन्दी" from every restart branch of the run of show; the app comes back in
+Hindi on its own. `mic_hold_hint` English is now "PRESS · PAUSE · SPEAK · FINISH THE WORD ·
+LET GO", English-only as ruled, not translated.

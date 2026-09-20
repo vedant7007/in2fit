@@ -150,20 +150,22 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
             // 0026 step 8: stops speech only; the answer stays on screen.
             MicButton(label = stringResource(R.string.stop_speaking), enabled = true, active = false, level = { 0f }, onPress = {}, onRelease = {}, stop = vm::stopSpeaking)
         } else {
-            val recording = state.stage == Stage.RECORDING
+            // Push-to-talk (0031). Press starts the turn; release ends the recording and nothing
+            // else ends it. The cue lights on MicrophoneLive, the first frame with signal, never on
+            // the press: anything said before it was not recorded. TalkViewModelTest and
+            // TalkScreenWiringTest fail if either half is unwired again.
             MicButton(
-                label = stringResource(if (recording) R.string.mic_listening else R.string.mic_speak),
+                label = stringResource(if (state.micLive) R.string.mic_listening else R.string.mic_hold_to_speak),
                 enabled = !state.busy,
-                active = recording,
+                active = state.micLive,
                 level = { level.value },
                 onPress = {
                     val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                     if (granted) vm.speak() else askMic.launch(Manifest.permission.RECORD_AUDIO)
                 },
-                // Release ends the recording the hour `UserIntent.EndSpeech` is in the contract
-                // (Arjun 20:15); until then the endpointer ends it and this is a no-op.
-                onRelease = {},
+                onRelease = vm::endSpeech,
             )
+            Text(stringResource(R.string.mic_hold_hint), style = In2fitText.bodySmall, color = In2fitColors.inkSecondary, modifier = Modifier.padding(top = Space.xs))
         }
         TextButton(onClick = { typing = !typing }, contentPadding = PaddingValues(0.dp), modifier = Modifier.padding(top = Space.xs)) {
             Text(stringResource(R.string.talk_type_instead), style = In2fitText.bodySmall.copy(fontWeight = FontWeight.Medium), color = In2fitColors.ink)

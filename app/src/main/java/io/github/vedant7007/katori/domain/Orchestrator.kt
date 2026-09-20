@@ -128,6 +128,15 @@ sealed interface UserIntent {
 
     /** Stop whatever is being spoken. The screen's stop control; nothing is written or undone. */
     data object StopSpeaking : UserIntent
+
+    /**
+     * Push-to-talk (`0031`, ruled 20 Sep): the thumb lifted. Ends the recording that [Speak] began
+     * and nothing else ends it; the clip goes to the recogniser as it stands. Accepted at any
+     * moment of a spoken turn, including before the microphone is live (a very fast tap), and a
+     * no-op outside one. Added by Arjun 21 Sep with the screen's release; the orchestrator's
+     * handling is Rao's.
+     */
+    data object EndSpeech : UserIntent
 }
 
 /**
@@ -142,6 +151,15 @@ sealed interface OrchestratorEvent {
 
     /** Microphone level while recording, for the meter that replaces streaming transcripts. */
     data class AudioLevel(val rms: Float) : OrchestratorEvent
+
+    /**
+     * The microphone is delivering signal: `AsrEvent.SpeechStarted`, which push-to-talk emits on
+     * the first frame that carries any signal, not at the press (`PushToTalk`, 2f5f803). The
+     * screen lights its recording cue on THIS and never on touch-down, so the cue tells the
+     * truth: anything said before it was not recorded. [Progress] with `Stage.RECORDING` means
+     * the turn has begun, not that the microphone is live.
+     */
+    data object MicrophoneLive : OrchestratorEvent
 
     /** What was heard, once endpointed. Shown immediately so the user sees they were understood. */
     data class Transcribed(val text: String) : OrchestratorEvent

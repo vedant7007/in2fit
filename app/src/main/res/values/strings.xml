@@ -164,7 +164,7 @@
     <!-- ENGLISH-ONLY IN THE DEMO BUILD (Vedant, 20 Sep 2026): the sentence becomes Jacob's measured
          "Press, pause, speak, finish the word, let go"; its Telugu line was generated for the earlier
          sentence and was removed, so the key waits for the next packet. Arjun changes the English. -->
-    <string name="mic_hold_hint">Hold the button while you speak, then let go.</string>
+    <string name="mic_hold_hint">PRESS · PAUSE · SPEAK · FINISH THE WORD · LET GO</string>
     <string name="mic_permission_needed">Microphone permission was not granted. You can type instead.</string>
     <string name="type_hint">Type what you ate, or a question</string>
     <string name="send">Send</string>

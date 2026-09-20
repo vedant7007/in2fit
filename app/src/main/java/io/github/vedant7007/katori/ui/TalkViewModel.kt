@@ -1,6 +1,7 @@
 package io.github.vedant7007.katori.ui
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,23 +49,35 @@ import javax.inject.Inject
  * script. [RulesEngine] is injected for that feed alone.
  */
 @HiltViewModel
-class TalkViewModel @Inject constructor(
+class TalkViewModel(
     private val orchestrator: Orchestrator,
     private val triggerText: TriggerText,
     private val contextText: ContextText,
-    rules: RulesEngine,
-    @ApplicationContext context: Context,
+    /** Null in the demo build: the flavour's `DemoFeed` has nothing behind it (0027). */
+    private val scripted: Orchestrator?,
+    /** Where the chosen language outlives the process (a crash mid-demo must not switch it). Null in a JVM test. */
+    private val prefs: SharedPreferences?,
 ) : ViewModel() {
 
-    /** Null in the demo build: the flavour's `DemoFeed` has nothing behind it (0027). */
-    private val scripted: Orchestrator? = DemoFeed.orchestrator(
-        rules, contextText, triggerText,
-        leadIns = mapOf(
-            SpokenIntent.LOG to context.getString(R.string.tts_lead_in_log),
-            SpokenIntent.ANSWER to context.getString(R.string.tts_lead_in_answer),
-            SpokenIntent.SUGGEST to context.getString(R.string.tts_lead_in_suggest),
-            SpokenIntent.RECOMMEND to context.getString(R.string.tts_lead_in_recommend),
+    @Inject
+    constructor(
+        orchestrator: Orchestrator,
+        triggerText: TriggerText,
+        contextText: ContextText,
+        rules: RulesEngine,
+        @ApplicationContext context: Context,
+    ) : this(
+        orchestrator, triggerText, contextText,
+        scripted = DemoFeed.orchestrator(
+            rules, contextText, triggerText,
+            leadIns = mapOf(
+                SpokenIntent.LOG to context.getString(R.string.tts_lead_in_log),
+                SpokenIntent.ANSWER to context.getString(R.string.tts_lead_in_answer),
+                SpokenIntent.SUGGEST to context.getString(R.string.tts_lead_in_suggest),
+                SpokenIntent.RECOMMEND to context.getString(R.string.tts_lead_in_recommend),
+            ),
         ),
+        prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE),
     )
 
     sealed interface Entry {
@@ -103,9 +116,19 @@ class TalkViewModel @Inject constructor(
     }
 
     data class State(
-        /** The language the person chose (spec 10.2: chosen, never detected). The presenter's, by default (0022). */
-        val language: String = "en-IN",
+        /**
+         * The language the person will speak in (spec 10.2: chosen, never detected). HINDI by
+         * default, ruled 21 Sep: the presenter's Hindi hears 16 of 16 food words, English 7 of 16,
+         * and every restart of the app must come back to it without a tap.
+         */
+        val language: String = DEFAULT_LANGUAGE,
         val busy: Boolean = false,
+        /**
+         * The microphone is delivering signal ([OrchestratorEvent.MicrophoneLive]). The recording
+         * cue lights on this and on nothing else: not on the press, not on `Stage.RECORDING`,
+         * because anything said before it was not recorded (PushToTalk, 2f5f803).
+         */
+        val micLive: Boolean = false,
         /** Stages of the current turn in order; the last one is current until Completed. */
         val stages: List<Stage> = emptyList(),
         /** Seconds since the current stage began (0026: the counter is the honesty device). */
@@ -119,10 +142,13 @@ class TalkViewModel @Inject constructor(
         val stage: Stage? get() = stages.lastOrNull()
     }
 
-    private val _state = MutableStateFlow(State())
+    private val _state = MutableStateFlow(State(language = prefs?.getString(KEY_LANGUAGE, null) ?: DEFAULT_LANGUAGE))
     val state: StateFlow<State> = _state.asStateFlow()
 
-    fun setLanguage(tag: String) = _state.update { it.copy(language = tag) }
+    fun setLanguage(tag: String) {
+        _state.update { it.copy(language = tag) }
+        prefs?.edit()?.putString(KEY_LANGUAGE, tag)?.apply()
+    }
 
     fun speak() = run(UserIntent.Speak(language()))
     fun type(text: String) = run(UserIntent.Type(text, language()))
@@ -130,16 +156,26 @@ class TalkViewModel @Inject constructor(
     fun adviseAgain() { state.value.lastMealId?.let { run(UserIntent.AdviseOnMeal(it)) } }
 
     /** 0026 step 8: stops speech only; the turn and its text are untouched. Sent while busy, by design. */
-    fun stopSpeaking() {
+    fun stopSpeaking() = aside(UserIntent.StopSpeaking)
+
+    /**
+     * Push-to-talk: the thumb lifted. Press starts the turn ([speak]); THIS ends the recording, and
+     * nothing else ends it. Sent while busy, by design, and accepted by the orchestrator before
+     * the microphone is live (a fast tap) or after (the normal case).
+     */
+    fun endSpeech() = aside(UserIntent.EndSpeech)
+
+    /** An intent sent INTO a running turn rather than starting one: stop, release. */
+    private fun aside(intent: UserIntent) {
         val source = scripted?.takeIf { DemoFeed.enabled.value } ?: orchestrator
-        viewModelScope.launch(Dispatchers.Default) { source.handle(UserIntent.StopSpeaking).catch { }.collect { } }
+        viewModelScope.launch(Dispatchers.Default) { source.handle(intent).catch { }.collect { } }
     }
 
     private fun language() = SpeechLanguageRef(state.value.language)
 
     private fun run(intent: UserIntent) {
         if (state.value.busy) return
-        _state.update { it.copy(busy = true, stages = emptyList(), elapsedSeconds = 0, level = 0f) }
+        _state.update { it.copy(busy = true, stages = emptyList(), elapsedSeconds = 0, level = 0f, micLive = false) }
         val source = scripted?.takeIf { DemoFeed.enabled.value } ?: orchestrator
         viewModelScope.launch(Dispatchers.Default) {
             val ticker = launch {
@@ -151,13 +187,17 @@ class TalkViewModel @Inject constructor(
                 .catch { e -> add(Entry.Failed(UnavailableReason.INTERNAL_ERROR, e.toString())) }
                 .collect(::on)
             ticker.cancel()
-            _state.update { it.copy(busy = false, stages = emptyList(), elapsedSeconds = 0, level = 0f) }
+            _state.update { it.copy(busy = false, stages = emptyList(), elapsedSeconds = 0, level = 0f, micLive = false) }
         }
     }
 
     private fun on(event: OrchestratorEvent) {
         when (event) {
-            is OrchestratorEvent.Progress -> _state.update { it.copy(stages = it.stages + event.stage, elapsedSeconds = 0) }
+            is OrchestratorEvent.Progress -> _state.update {
+                // The microphone is done the moment the turn moves past recording.
+                it.copy(stages = it.stages + event.stage, elapsedSeconds = 0, micLive = it.micLive && event.stage == Stage.RECORDING)
+            }
+            is OrchestratorEvent.MicrophoneLive -> _state.update { it.copy(micLive = true) }
             is OrchestratorEvent.AudioLevel -> _state.update { it.copy(level = event.rms.coerceIn(0f, 1f)) }
             is OrchestratorEvent.Transcribed -> add(Entry.Said(event.text))
             is OrchestratorEvent.IntentKnown -> add(Entry.Heading(event.intent, event.leadIn))
@@ -200,4 +240,10 @@ class TalkViewModel @Inject constructor(
     }
 
     private fun add(entry: Entry) = _state.update { it.copy(entries = it.entries + entry) }
+
+    companion object {
+        const val DEFAULT_LANGUAGE = "hi"
+        const val PREFS = "talk"
+        const val KEY_LANGUAGE = "language"
+    }
 }

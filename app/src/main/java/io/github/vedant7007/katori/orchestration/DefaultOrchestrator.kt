@@ -117,6 +117,10 @@ class DefaultOrchestrator(
             is UserIntent.ScanPackagedLabel -> notBuilt("orchestration.ScanPackagedLabel")
             is UserIntent.CheckExerciseForm -> notBuilt("orchestration.CheckExerciseForm")
             UserIntent.StopSpeaking -> { tts.stop(); emit(OrchestratorEvent.Completed) }
+            // Rao's two lines replace this: `spoken()` collects `pushToTalk.hold(lang)` and maps
+            // SpeechStarted to MicrophoneLive; this branch calls `pushToTalk.release()`. Until then
+            // the contract's own not-built path, never a silent no-op (Arjun, 21 Sep).
+            UserIntent.EndSpeech -> notBuilt("orchestration.EndSpeech")
         }
     }
 

@@ -64,6 +64,9 @@ class ScriptedOrchestrator(
         when (intent) {
             is UserIntent.Speak -> {
                 emit(Progress(Stage.RECORDING))
+                // The microphone goes live after the press, never at it (PushToTalk, 2f5f803).
+                delay(150)
+                emit(OrchestratorEvent.MicrophoneLive)
                 repeat(12) { i -> emit(OrchestratorEvent.AudioLevel(0.15f + 0.6f * ((i % 4) / 3f))); delay(120) }
                 emit(Progress(Stage.TRANSCRIBING))
                 delay(500)
@@ -83,6 +86,8 @@ class ScriptedOrchestrator(
                 emit(OrchestratorEvent.Completed)
             }
             UserIntent.StopSpeaking -> emit(OrchestratorEvent.Completed)
+            // The script's recording is on a timer; the release has nothing to cut.
+            UserIntent.EndSpeech -> emit(OrchestratorEvent.Completed)
             is UserIntent.CorrectValue, is UserIntent.ScanPackagedLabel, is UserIntent.CheckExerciseForm ->
                 { emit(OrchestratorEvent.NotImplemented("demo." + intent::class.simpleName)); emit(OrchestratorEvent.Completed) }
         }
