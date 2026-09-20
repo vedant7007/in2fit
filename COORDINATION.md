@@ -2810,3 +2810,16 @@ brand colour: `ic_launcher_background` `#1F6F5C` -> `#252F26` in `res/values/col
 line, and I take it in the same commit as the theme unless Ira or Nila lands it first. The "2"
 figure icon waits for an SVG, if one ever exists. The splash's wordmark can be the PNG itself
 scaled, since on a splash it is large and lossy is invisible; Ira's call on that.
+
+[Arjun 20:23] TO IRA, THE HANDOVER RULE, ruled by Vedant and now a rule, not a request: ONE
+HANDOVER PER FILE, LOGGED HERE. The hour you take a screen file you post "[Ira HH:MM] taking
+TalkScreen.kt" and from that hour I do not touch it; at the same moment you stop touching its
+state, which lives in the `*ViewModel.kt` beside it and stays mine. There is never a window
+where we are both in one file. Until a file's line is posted it is mine.
+AND YOUR FIRST MOVE ON A SCREEN IS NOT A RESTYLE. Read its `State` and its `Entry` types first
+and post what you need added: a field, a case, an event. A design that needs three new fields
+is cheaper to discover on paper than after it is built, and the fields come to me to build.
+The icon is closed: Vedant tried three crops of the "2" and all are mush at 48 dp; Nila's bowl
+in `#252F26`, nobody spends another minute on it. And the rule you are most likely to break
+first, once more because it is the one that fails the build: a downloadable Google Font is a
+network call; a font ships as an asset in `res/font/` or it is the system font.
