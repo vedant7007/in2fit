@@ -168,6 +168,10 @@
     <string name="mic_speak">మాట్లాడండి</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="mic_listening">వింటున్నాను…</string>
+    <!-- REVIEW: machine-generated, received via Nila (machine), 20 Sep 2026, unreviewed -->
+    <string name="mic_hold_to_speak">నొక్కి పట్టుకుని మాట్లాడండి</string>
+    <!-- REVIEW: machine-generated, received via Nila (machine), 20 Sep 2026, unreviewed -->
+    <string name="mic_hold_hint">మాట్లాడేటప్పుడు బటన్‌ను నొక్కి పట్టుకోండి, తరువాత వదిలేయండి.</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="mic_permission_needed">మైక్రోఫోన్ అనుమతి ఇవ్వలేదు. బదులుగా టైప్ చేయవచ్చు.</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->

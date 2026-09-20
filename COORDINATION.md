@@ -3052,3 +3052,35 @@ same line goes in the READ-ME of every zip from here, including the four Google 
 Rao's rerun. And for the record: the 0.70 RTF on English is a first-call figure; the warm
 English number is the one any claim uses, since `prepare()` runs at launch, and it lands with
 Rao's rerun.
+[Nila 20:45] TO RAO AND PRIYA, A SPEC 13.4 FINDING FROM BEAT 1, and it decides what the opening
+beat shows. "थोड़ी दाल" / "a little dal" states no amount. In the demo-condition log, row #1,
+the model wrote `dal=1.0 none`: it INVENTED the 1. Then, because dal tadka is an authored
+dish, `LookupMealResolver.weigh` took a quantity with no unit as one piece and marked it
+QUANTITY_STATED (the COMPOSED_DISH guard skips QUANTITY_INFERRED whenever a quantity is
+present), so the plate reads one serving, 467.2 kcal, at full confidence. A number the model
+guessed was treated as a number the person said; spec 13.4 says a quantity is never silently
+guessed, and the deck's hard problem 01 says the app ASKS what "some" means. Nothing in the
+app asks: no orchestrator event, no card, no key. The deck audit has a dated correction to
+that row (UNSUPPORTED for "some / a little" as of this log). Two changes make the opening beat
+demonstrate the rule live, which is Vedant's preference: (1) PRIYA, the extraction prompt
+leaves "some / a little / thoda / थोड़ी" as null, with a test that says so; (2) RAO then ARJUN,
+a needs-quantity event when an item has no quantity, and a card "How much dal?" with the
+household choices (katori, bowl, spoon, grams), answered by a tap and remembered for the
+plate. Both branches are in the run of show with the presenter's line for each; Tuesday's
+rehearsal strikes one. Say by Tuesday whether Branch A exists; if not, Beat 1 shows the silent
+default and the asking exists only on a slide.
+
+[Nila 20:45] `tools/stage-models.ps1` exists, written from 0012's prose and the loaders' own
+paths (LlmModels, AsrModels, PiperVoice), NOT YET RUN ON A PHONE: chunked push with per-chunk
+retry, on-device sha256sum, idempotent by hash, every step timed into logs\stage-models.log.
+TO RAO: three tunables are marked CONFIRM in its header (64 MB chunks, 5 retries, 3 s wait);
+verify it inside your next realme cable session and correct it; the person holding the cable
+on the 26th may not be you, and hour one on site is not the place to find out what a script
+does. THE COUNTDOWN IS RESTRUCTURED on Vedant's facts: the iQOO is handed out on site on the
+day, so the whole handset list is an HOUR-ONE LIST run on the venue network in order (vivo USB
+toggle, install, stage-models, pre-flight card, voice data, then airplane mode, probes, a full
+rehearsal); the 26th to 27th is a 30-hour build event with the demo at its end; the realme is
+the rehearsal and fallback-video device, not the backup demo device; Bengaluru 9 to 11 October
+if Hyderabad is won. TO VEDANT, BLOCKING, TONIGHT, top of the Tuesday table: the rules on
+pre-existing code. Read them or email the organisers; "most hackathons permit disclosed prior
+work" is not a rule.

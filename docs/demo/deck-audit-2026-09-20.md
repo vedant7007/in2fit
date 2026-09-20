@@ -120,6 +120,19 @@ added with its date, never written over what was there.
 | Page 5, "Say it: In the language you chose, out loud", and "answer a nutrition question in your own language" | Traced end to end by Meera: the lead-in, the rules engine's sentences and the figures come from `res/values/strings.xml` through the app's UI locale, which the run of show sets to English, and `values-hi` is empty by design; the model is told "Language to reply in: hi" and replies in English anyway, seven of seven on the desktop with the phone's exact GGUF, greedy, including three questions asked in Devanagari (`logs/meera-hindi-reply.log`); the phone has only ever been run with `en-IN`. | **FIX FIRST. UNSUPPORTED**, and it was marked RIGHT in the first pass above, which was wrong: I checked the string tables and the guard, not the language of the reply. Say instead (Meera's wording, supportable today): "You speak in Hindi, Telugu or English; the app answers in English today, on screen and aloud, and the interface follows your language setting." A judge who asks "can it answer in Hindi?" hears "not this build; the recogniser is per-language, the answers are English". |
 | Page 5, "The model may never: state a number it was not handed, name a condition you have not declared ... Those paths are code, and code is testable" | The guards exist and are tested on the JVM (`NumericGuard`, `SafetyLine`, the template digit test). But the desktop model produced BOTH forbidden shapes with the prompts as written (Meera, 18:28: a number not given, and a condition verdict), and whether the guards catch them ON THE PHONE, in the demo's own ANSWER turns, is a measurement that does not exist yet: it is Rao's device run of the ten sentences, read by a person. | **UNVERIFIED on the device** as of 18:45. The sentence is a design claim with JVM tests behind it, not yet a device claim. Keep the wording, but do not present it as measured until that run is read; and the run of show's Beat 2 line ("there is a test for that") stays true only of the JVM test. |
 
+## Correction to the hard-problem-01 row, from the demo-condition log (20:45)
+
+The row above for "when someone says 'some rice', the app asks what some means instead of
+inventing a figure" says the extraction leaves an unstated quantity null and the app never
+invents one. The device log says otherwise for the demo sentence: `e2e-demo-condition-20sep.txt`
+row #1, "I had two rotis and a little dal." extracted as `dal=1.0 none`. The model wrote the 1.
+`LookupMealResolver.weigh` then took a quantity with no unit on an authored dish as one piece and
+marked it QUANTITY_STATED (the COMPOSED_DISH guard skips QUANTITY_INFERRED when a quantity is
+present), so the plate reads one serving at full confidence. **Verdict changes to UNSUPPORTED
+for "some / a little" as of this log**: the figure was invented upstream and not marked. Nothing
+in the app asks. Sent to Rao and Priya at 20:45; the run of show carries both outcomes for Beat 1
+until Tuesday's rehearsal. The row above is not edited.
+
 ## Three numbers from the demo-condition run, verified against the log (20:15)
 
 Asked for at `ea75984`. Checked against the device report itself, not Rao's summary of it:

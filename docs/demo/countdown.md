@@ -5,32 +5,45 @@ in their own name. Written Sunday 20 September 2026 at 20:20. Two deadlines:
 
 - **Tuesday 22 September: submission.** Every field of the form, the deck PDF, the repository
   public, the prototype URL live. **[confirm the hour the form closes]**
-- **Saturday 26 September: the battle.** Four beats, live, on a phone, in a hall.
+- **Saturday 26 to Sunday 27 September: the Hyderabad City Battle, a 30-hour build event on
+  site**, not a demo day. The loaner iQOO is handed to selected teams on the day the event
+  starts, on site; early collection is impossible. The demo runs on it, at the end of those
+  thirty hours. Winning Hyderabad leads to a **Grand Finale in Bengaluru, 9 to 11 October**;
+  the 27th is not the finish.
 
 Rows are things that, if they slip, cost a beat or a claim. Wishes are not on this page.
 Owners are as the log shows them; **[unowned]** means nobody has said "mine".
 
-## The row above every other row, on every list: get the iQOO in hand before the 26th
+## The reality about the phone, and hour one of thirty
 
-**Ruled by Vedant, 20 Sep 20:25: the demo runs on the loaner iQOO, and his realme comes with him
-as the backup.** The loaner is not optional and the backup is not the official device. Every
-measurement in this repository is on the realme (RMX3780); nobody has held the iQOO.
+**The demo runs on the loaner iQOO** (ruled by Vedant, 20 Sep 20:25). **The iQOO cannot be
+collected early**: it is handed to selected teams only on the day the event starts, on site.
+Every measurement in this repository is on Vedant's realme RMX3780; nobody will have held the
+iQOO before hour one. So the whole "handset arrival" list is an **HOUR-ONE LIST, run on site
+with the venue network available, before airplane mode goes on for the demo**, in this order.
+Meera's steps are right; only the timing moved. Thirty hours, not twenty tense minutes at a
+table, is the good news.
 
-Why "in hand before the 26th" is the first row everywhere and not a contingency line: every
-model crosses a cable onto the loaner, and Meera's finding (20:25, `0019` addendum 9) is that a
-vivo/iQOO ROM can require **"Install via USB" to be switched on, and on some of those ROMs that
-wants a vivo account and a network** before it permits an install over USB. That is the one
-step in the chain that can need a login and a network, and airplane mode at the table cannot
-work around it. It has to be verified **the hour the handset arrives, not on the morning.**
-Then: USB mode "File transfer", the RSA prompt accepted, `adb devices` showing `device`, the
-APK installed and opened once, the models pushed in chunks with an on-device `sha256sum`
-(`0012`), the pre-flight card read, the voice data installed on a network and proved by the
-probe in airplane mode, and the four beats run on it once. Rao's chunked push commands belong
-in `tools/` as a script before the 26th.
+| # | in hour one, on site, on the venue network | who | evidence it worked |
+| --- | --- | --- | --- |
+| 1 | **The vivo/iQOO ROM's "Install via USB"** and "USB debugging (Security settings)" switched on. Some of those ROMs want a vivo account and a network for this: the venue network is there, and this is why it is first. Developer options via Build number ×7, USB debugging on, USB mode "File transfer", the RSA prompt accepted. | whoever holds the cable | `adb devices` shows `device`, not `unauthorized` |
+| 2 | Free space: at least 2 GB (`adb shell df /sdcard`). | same | the number, written down |
+| 3 | `adb install -r app-demo-debug.apk` (the `assembleDemoDebug` build), opened once. | same | install "Success"; the app opens |
+| 4 | **The models: `powershell -File tools\stage-models.ps1`.** Chunked push with per-chunk retry and an on-device `sha256sum`, written from `0012`; 1.6 GB; at the realme's measured 6.3 MB/s about 4.3 minutes of pure transfer if nothing drops. Rao verifies the script's three tunables in his next realme cable session, before the day. | same; Rao (the verification) | the script's `OK ... sha256` line per file and its total seconds |
+| 5 | **The pre-flight card**: long-press the IN2FIT title on About; the last card must read "Not in this build. The demo build carries no scripted feed." | same | read off the device |
+| 6 | **Voice data, on the venue network**: Speech Services by Google → Install voice data → English (India) and Hindi (India). | same | both listed as installed |
+| 7 | **Airplane mode ON, Bluetooth icon absent. Then the probes**: `TtsVoiceProbeTest` must show `en-IN` and `hi-IN` voices with `network=false`; `OrchestratorDeviceTest` once for the four beats' timings on THIS phone. | Rao (or whoever holds the cable, from the run of show) | the probe reports; every timing on the run of show re-read against them |
+| 8 | **A full rehearsal on the iQOO**, the run of show end to end, the device checklist aloud. | Vedant (P), S | timed per beat, written beside the run of show's realme figures |
 
-**Both phones staged, both rehearsed, the realme charged the night before and in the bag on the
-26th beside the organisers' handset.** If the loaner is fine, the loaner; if it wants a login,
-or the cable drops, or the push runs long, the phone that already works comes out of the bag.
+After 8, the iQOO is the demo phone in every sense, and the rest of the thirty hours is the
+build event. **If step 1 fails and the venue network cannot satisfy the ROM**, that is the one
+failure the plan has no answer for on the iQOO; the organisers are asked in hour one, not at
+hour twenty-nine.
+
+**The realme** is no longer the backup demo device; the demo must be on the iQOO. It is the
+**rehearsal device and the fallback-video device**: every rehearsal this week is on it, the
+fallback video is recorded on it, it is charged the night before and it is in the bag on the
+26th so the run of show can be rehearsed on site while the iQOO is being staged.
 
 ## Tuesday 22 September: submission
 
@@ -39,6 +52,7 @@ section.
 
 | must be true | by | owner | state Sunday 20:20 |
 | --- | --- | --- | --- |
+| **BLOCKING: the rules on pre-existing code.** The event is 30 hours of building on site and we arrive with a working app. Most hackathons permit prior work when disclosed, and the form's disclosure checkbox is probably exactly that; "probably" is not a rule. **Action: read the rules, or email the organisers, tonight.** The answer decides what the form says and what the 30 hours are for. | tonight | Vedant | unread; `docs/submission/form-answers.md` lists what the repository discloses |
 | The clinical-judgement referral test green on `master` (the safety path; red since 17:48) | Monday morning | Rao, copy Priya | **RED**; stop-the-line since 19:45; the repository does not go public while it is red unless Vedant publishes with a README line naming it |
 | Vedant has read the README as a stranger and said "public" out loud | Monday | Vedant | reading now; README ready; repository private at `8b9b4ba` |
 | `gh repo edit vedant7007/in2fit --visibility public` | on his word | Nila | not before |
@@ -54,15 +68,15 @@ section.
 test, or a README apologising for one); the deck re-read (submitting a deck nobody checked
 against the code since 14:07); the team slide; the form's `[confirm]` lines answered at midnight.
 
-## Saturday 26 September: the battle
+## Saturday 26 to Sunday 27 September: the build event, and the demo at the end of it
 
 | must be true | by | owner | state Sunday 20:20 |
 | --- | --- | --- | --- |
-| **The iQOO in the team's hands, "Install via USB" verified the hour it arrives** | the hour it arrives; before Wednesday to be useful | Vedant (the handset), Rao (the cable) | ruled 20:25: the iQOO is the demo phone; not yet in hand; **[Vedant: when does it arrive?]** |
-| **The realme as the backup: staged, rehearsed, charged the night before, in the bag on the 26th** | Friday | Rao (staging), Vedant (the bag) | the realme is staged as of 19 Sep; rehearsal not done |
-| The demo APK cut: `assembleDemoDebug`, permission check green, installed; **on the phone, long-press the IN2FIT title on About and read the pre-flight's last card: "Not in this build. The demo build carries no scripted feed."** If it shows a switch, the wrong APK is installed; reinstall | Friday, and again Saturday morning | Rao (install), whoever holds the phone (the card) | Arjun's two lines, 20:09, ruled into the checklist |
-| Models staged on that phone, checksums verified: LLM, Hindi ASR + `tokens.txt`, the TTS voice; **models are wiped by an uninstall** (`0012`) | Friday | Rao | staged on the realme 19 Sep; not on any iQOO |
-| Voice data installed: Speech Services by Google, Hindi (India) and English (India) voices, downloaded ON A NETWORK days before, then `TtsVoiceProbeTest` in airplane mode showing `hi-IN` and `en-IN` with `network=false` (Meera, 16:51) | Wednesday | whoever holds the phone; Meera confirms from the probe | not done on any phone |
+| **Hour one on site, steps 1 to 8 above, in order, on the venue network, before airplane mode** | 26 Sep, hour one | whoever holds the cable; Rao; Vedant | the list exists; `tools/stage-models.ps1` exists and is unverified on a phone |
+| **`tools/stage-models.ps1` verified by Rao on the realme**, its three tunables confirmed, so the person holding the cable on the 26th runs a script that has run before | Wednesday | Rao | written 20 Sep from `0012`; not yet run |
+| **The realme: rehearsal device and fallback-video device**, staged, charged the night before, in the bag on the 26th | Friday | Rao (staging), Vedant (the bag) | staged as of 19 Sep |
+| The demo APK cut on Friday: `assembleDemoDebug`, permission check green, the file copied to the laptop that goes on site (and to a second place: a USB stick), its sha256 written in the log | Friday | Rao | not cut |
+| On the realme this week, the same steps 3 to 7 as a dry run of hour one, so that the only new thing on site is the phone | Wednesday | Rao; whoever will hold the cable on the 26th | not done |
 | Piper or platform voice decided from that probe; if Piper, the espeak-ng source pointer recorded (`0005`) | Thursday | Meera, Vedant (the Hindi listener) | ladder in `0019`; English clips sent to Vedant 18:28, no answer yet |
 | Profile pre-seeded: Hindi speech, English interface, bundled utensil defaults, a meal logged, the report scanned once as the fallback | Friday, and Saturday morning at the table | Rao (seed), presenter (the table) | `TalkViewModel` still sends `te`: Arjun, tonight |
 | The wired speaker bought, plugged, `TtsVoiceProbeTest` "routed to" naming it, one turn heard from the back of a room; the wired headset or lapel mic bought and rehearsed once | Thursday | **[unowned: who buys them]**; Meera (the probe) | not bought |
@@ -79,10 +93,11 @@ against the code since 14:07); the team slide; the form's `[confirm]` lines answ
 
 ## Day by day
 
-**Sunday 20 (tonight).** Packet frozen at 22:00 and sent (Nila, Vedant). Vedant reads the
-README and answers: public or not yet; **when the iQOO arrives**; which Hindi voice he prefers
-from the clips; the video, in or out. Arjun lands the `te` constant fix. Rao starts on the red
-test. Beat 1 is the two-food sentence from now on (ruled 20:30).
+**Sunday 20 (tonight).** Packet frozen at 22:00 and sent (Nila, Vedant). **Vedant reads the
+rules on pre-existing code or emails the organisers.** He reads the README and answers: public
+or not yet; which Hindi voice he prefers from the clips; the video, in or out. Arjun lands the
+`te` constant fix. Rao starts on the red test. Beat 1 is the two-food sentence from now on
+(ruled 20:30).
 
 **Monday 21.** Rao: the safety test green, with the XML time in the log; the post-fix device run
 that proves the first AdviseOnMeal is instant. Vedant: the corrected deck PDF onto this laptop;
@@ -96,24 +111,28 @@ string count and corpus; the URL opened in a private window and read as a judge.
 submits. **Afternoon, a row in its own right: the first end-to-end rehearsal on the realme,
 whatever the iQOO's status, Vedant standing through Beat 1's wait himself.**
 
-**Wednesday 23.** The report printed, two copies. Speaker and headset bought. **The iQOO, the
-hour it is in hand, whichever day that is: "Install via USB" verified, models staged, APK
-installed, pre-flight card read, voice data installed on a network then proved in airplane
-mode, the four beats run on it once, every timing re-read.** The realme gets the same voice
-step the same day.
+**Wednesday 23.** The report printed, two copies. Speaker and headset bought. **The dry run of
+hour one on the realme**, by the person who will hold the cable on the 26th: `stage-models.ps1`
+end to end with Rao watching and correcting its tunables, the voice data installed on a
+network, the probes in airplane mode. Whatever that dry run finds is fixed by Friday, because
+on the 26th there is no laptop time to fix a script.
 
-**Thursday 24.** Full rehearsal on the demo phone: cool, airplane, the checklist run aloud by S,
+**Thursday 24.** Full rehearsal on the realme: cool, airplane, the checklist run aloud by S,
 each beat timed and written into the run of show beside the budget it replaces. Piper or
 platform decided from the probe. The packet's answer in, or `values-te` stripped and Beat 5
 cut. The playbook rehearsed: every branch twice.
 
-**Friday 25.** Second rehearsal, on the phone as it will be carried, from a cold start of the
-day: the checklist from row 1. The fallback video recorded on that phone in that state. The
-backup phone staged. The bag packed against the checklist: two reports, speaker, headset,
-cable, charger, both phones. Nothing new lands after Friday noon.
+**Friday 25.** Second rehearsal on the realme from a cold start of the day: the checklist from
+row 0. The fallback video recorded on the realme in that state. The demo APK cut, hashed,
+copied twice. The bag packed against the checklist: two reports, speaker, headset, two cables,
+charger, the realme, the laptop with `data-sources/models` and the APK on it, a USB stick with
+both. Nothing new lands after Friday noon.
 
-**Saturday 26.** The device checklist at the table, aloud. One spoken turn from the back of the
-room before the judges arrive. The run of show, and nothing else.
+**Saturday 26, hour one.** The eight steps above, on site, on the venue network, in order. Then
+the thirty hours are what the rules say they are for. **The demo**, at the end: the device
+checklist aloud, one spoken turn from the back of the room, the run of show, and nothing else.
+
+**October 9 to 11, Bengaluru**, if Hyderabad is won. Nobody treats the 27th as the finish.
 
 ## Decided NOT to do, so nobody rediscovers it on Friday night
 
@@ -138,7 +157,7 @@ room before the judges arrive. The run of show, and nothing else.
 | **The second person at the table (S)**: holds the backup phone, the report, the checklist, mirrors the screen | The run of show is written for two people | Vedant names them |
 | **The wired speaker and the wired headset**: who buys, by Wednesday | Meera's probe needs the hardware to name | Vedant names a buyer, or does it |
 | **The backup phone** | spec 7.4 | which phone, who stages it |
-| **The iQOO's arrival date** | ruled the demo phone; every other row hangs on the hour it is in hand | Vedant |
+| **The person who holds the cable in hour one** and runs steps 1 to 8; they dry-run it on the realme on Wednesday | hour one is theirs | Vedant names them |
 
 ## How this page is kept
 

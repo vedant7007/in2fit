@@ -2,7 +2,7 @@
 
 **If you only do one part, do Part 1.** Those nine lines decide whether the app speaks Telugu at all.
 
-Generated 20 September 2026 from the app's English string table. 171 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
+Generated 20 September 2026 from the app's English string table. 173 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
 
 Reviewer's name: ______________________
 
@@ -207,7 +207,25 @@ The main screen. The person says or types what they ate, or asks a question.
    Correct Telugu (leave blank if the line above is right):
 
 
-17. `mic_permission_needed`
+17. `mic_hold_to_speak`
+
+   English: Hold to speak
+
+   Telugu, as written, unreviewed: నొక్కి పట్టుకుని మాట్లాడండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+18. `mic_hold_hint`
+
+   English: Hold the button while you speak, then let go.
+
+   Telugu, as written, unreviewed: మాట్లాడేటప్పుడు బటన్‌ను నొక్కి పట్టుకోండి, తరువాత వదిలేయండి.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+19. `mic_permission_needed`
 
    English: Microphone permission was not granted. You can type instead.
 
@@ -216,7 +234,7 @@ The main screen. The person says or types what they ate, or asks a question.
    Correct Telugu (leave blank if the line above is right):
 
 
-18. `type_hint`
+20. `type_hint`
 
    English: Type what you ate, or a question
 
@@ -225,7 +243,7 @@ The main screen. The person says or types what they ate, or asks a question.
    Correct Telugu (leave blank if the line above is right):
 
 
-19. `send`
+21. `send`
 
    English: Send
 
@@ -234,7 +252,7 @@ The main screen. The person says or types what they ate, or asks a question.
    Correct Telugu (leave blank if the line above is right):
 
 
-20. `said_by_you`
+22. `said_by_you`
 
    English: You
 
@@ -243,7 +261,7 @@ The main screen. The person says or types what they ate, or asks a question.
    Correct Telugu (leave blank if the line above is right):
 
 
-21. `advise_again`
+23. `advise_again`
 
    English: Advise again on my last meal
 
@@ -256,7 +274,7 @@ The main screen. The person says or types what they ate, or asks a question.
 
 Shown one after another while the app is busy, instead of a spinner, so a ten-second wait reads as work. Each is a short phrase in the present tense: what it is doing now.
 
-22. `stage_recording`
+24. `stage_recording`
 
    English: Listening
 
@@ -265,7 +283,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-23. `stage_transcribing`
+25. `stage_transcribing`
 
    English: Writing down what you said
 
@@ -274,7 +292,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-24. `stage_classifying`
+26. `stage_classifying`
 
    English: Working out what you meant
 
@@ -283,7 +301,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-25. `stage_extracting`
+27. `stage_extracting`
 
    English: Picking out the foods
 
@@ -292,7 +310,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-26. `stage_matching_foods`
+28. `stage_matching_foods`
 
    English: Matching the foods
 
@@ -301,7 +319,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-27. `stage_computing`
+29. `stage_computing`
 
    English: Adding up the figures
 
@@ -310,7 +328,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-28. `stage_saving`
+30. `stage_saving`
 
    English: Saving
 
@@ -319,7 +337,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-29. `stage_evaluating_rules`
+31. `stage_evaluating_rules`
 
    English: Checking your records
 
@@ -328,7 +346,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-30. `stage_retrieving_facts`
+32. `stage_retrieving_facts`
 
    English: Looking up facts
 
@@ -337,7 +355,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-31. `stage_phrasing`
+33. `stage_phrasing`
 
    English: Writing the reply
 
@@ -346,7 +364,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-32. `stage_speaking`
+34. `stage_speaking`
 
    English: Speaking
 
@@ -355,7 +373,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-33. `stage_capturing`
+35. `stage_capturing`
 
    English: Capturing
 
@@ -364,7 +382,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
    Correct Telugu (leave blank if the line above is right):
 
 
-34. `stage_reading_text`
+36. `stage_reading_text`
 
    English: Reading the text
 
@@ -377,7 +395,7 @@ Shown one after another while the app is busy, instead of a spinner, so a ten-se
 
 The foods as the person said them, with the figures. 'Logged' means written into their food history; the other line means the plate was only asked about.
 
-35. `meal_logged`
+37. `meal_logged`
 
    English: Logged
 
@@ -386,7 +404,7 @@ The foods as the person said them, with the figures. 'Logged' means written into
    Correct Telugu (leave blank if the line above is right):
 
 
-36. `meal_hypothetical`
+38. `meal_hypothetical`
 
    English: A plate you asked about. Not logged.
 
@@ -395,7 +413,7 @@ The foods as the person said them, with the figures. 'Logged' means written into
    Correct Telugu (leave blank if the line above is right):
 
 
-37. `meal_item_with_quantity`
+39. `meal_item_with_quantity`
 
    English: %1$s: %2$s %3$s
 
@@ -404,7 +422,7 @@ The foods as the person said them, with the figures. 'Logged' means written into
    Correct Telugu (leave blank if the line above is right):
 
 
-38. `meal_item_no_quantity`
+40. `meal_item_no_quantity`
 
    English: %1$s: quantity not stated
 
@@ -413,7 +431,7 @@ The foods as the person said them, with the figures. 'Logged' means written into
    Correct Telugu (leave blank if the line above is right):
 
 
-39. `figure_with_band`
+41. `figure_with_band`
 
    English: %1$s (%2$s)
 
@@ -426,7 +444,7 @@ The foods as the person said them, with the figures. 'Logged' means written into
 
 What the app says back: a sentence from its rules, then foods a person could consider.
 
-40. `advice_title`
+42. `advice_title`
 
    English: Advice
 
@@ -435,7 +453,7 @@ What the app says back: a sentence from its rules, then foods a person could con
    Correct Telugu (leave blank if the line above is right):
 
 
-41. `advice_no_rule`
+43. `advice_no_rule`
 
    English: Nothing in your records changes this.
 
@@ -444,7 +462,7 @@ What the app says back: a sentence from its rules, then foods a person could con
    Correct Telugu (leave blank if the line above is right):
 
 
-42. `advice_candidates_title`
+44. `advice_candidates_title`
 
    English: You could consider
 
@@ -453,7 +471,7 @@ What the app says back: a sentence from its rules, then foods a person could con
    Correct Telugu (leave blank if the line above is right):
 
 
-43. `answer_title`
+45. `answer_title`
 
    English: Answer
 
@@ -462,7 +480,7 @@ What the app says back: a sentence from its rules, then foods a person could con
    Correct Telugu (leave blank if the line above is right):
 
 
-44. `answer_refused`
+46. `answer_refused`
 
    English: I can\'t put a number or a judgement on that. Here is what your diary shows.
 
@@ -471,7 +489,7 @@ What the app says back: a sentence from its rules, then foods a person could con
    Correct Telugu (leave blank if the line above is right):
 
 
-45. `answer_from_diary`
+47. `answer_from_diary`
 
    English: From your diary
 
@@ -484,7 +502,7 @@ What the app says back: a sentence from its rules, then foods a person could con
 
 It asks rather than guesses: was that a meal eaten, a question, a plate about to be eaten, or a request for what to eat. The four short lines are the four answers.
 
-46. `ask_intent_question`
+48. `ask_intent_question`
 
    English: Was that a meal you ate, a question, a plate you are about to eat, or a request for what to eat?
 
@@ -493,7 +511,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-47. `intent_log`
+49. `intent_log`
 
    English: I ate this
 
@@ -502,7 +520,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-48. `intent_answer`
+50. `intent_answer`
 
    English: A question
 
@@ -511,7 +529,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-49. `intent_suggest`
+51. `intent_suggest`
 
    English: About to eat this
 
@@ -520,7 +538,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-50. `intent_recommend`
+52. `intent_recommend`
 
    English: What should I eat
 
@@ -529,7 +547,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-51. `intent_heading_log`
+53. `intent_heading_log`
 
    English: Logging
 
@@ -538,7 +556,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-52. `intent_heading_answer`
+54. `intent_heading_answer`
 
    English: Answering
 
@@ -547,7 +565,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-53. `intent_heading_suggest`
+55. `intent_heading_suggest`
 
    English: Suggesting
 
@@ -556,7 +574,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
    Correct Telugu (leave blank if the line above is right):
 
 
-54. `intent_heading_recommend`
+56. `intent_heading_recommend`
 
    English: Recommending
 
@@ -569,7 +587,7 @@ It asks rather than guesses: was that a meal eaten, a question, a plate about to
 
 Nothing was saved. The app says so and asks the person to say it another way.
 
-55. `confirm_title`
+57. `confirm_title`
 
    English: Not logged yet
 
@@ -578,7 +596,7 @@ Nothing was saved. The app says so and asks the person to say it another way.
    Correct Telugu (leave blank if the line above is right):
 
 
-56. `confirm_hint`
+58. `confirm_hint`
 
    English: Say it differently, or type it.
 
@@ -591,7 +609,7 @@ Nothing was saved. The app says so and asks the person to say it another way.
 
 One sentence for each thing that can stop the app. Each states a limitation of the app or the phone, never a number, never a guess.
 
-57. `unavailable_model_not_loaded`
+59. `unavailable_model_not_loaded`
 
    English: The model is not loaded on this phone yet.
 
@@ -600,7 +618,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-58. `unavailable_model_load_failed`
+60. `unavailable_model_load_failed`
 
    English: The model could not start.
 
@@ -609,7 +627,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-59. `unavailable_insufficient_memory`
+61. `unavailable_insufficient_memory`
 
    English: Not enough memory free to do this now.
 
@@ -618,7 +636,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-60. `unavailable_no_match`
+62. `unavailable_no_match`
 
    English: I do not know a food in that.
 
@@ -627,7 +645,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-61. `unavailable_known_item_no_data`
+63. `unavailable_known_item_no_data`
 
    English: I know that food and hold no figures for it.
 
@@ -636,7 +654,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-62. `unavailable_below_confidence_threshold`
+64. `unavailable_below_confidence_threshold`
 
    English: I am not sure enough of what you said.
 
@@ -645,7 +663,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-63. `unavailable_permission_denied`
+65. `unavailable_permission_denied`
 
    English: A permission was not granted.
 
@@ -654,7 +672,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-64. `unavailable_hardware_unsupported`
+66. `unavailable_hardware_unsupported`
 
    English: This phone cannot run this.
 
@@ -663,7 +681,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-65. `unavailable_input_not_usable`
+67. `unavailable_input_not_usable`
 
    English: That could not be used. Please try again.
 
@@ -672,7 +690,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-66. `unavailable_cancelled`
+68. `unavailable_cancelled`
 
    English: Cancelled.
 
@@ -681,7 +699,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-67. `unavailable_schema_validation_failed`
+69. `unavailable_schema_validation_failed`
 
    English: The reply could not be read. Please try again.
 
@@ -690,7 +708,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
    Correct Telugu (leave blank if the line above is right):
 
 
-68. `unavailable_internal_error`
+70. `unavailable_internal_error`
 
    English: Something went wrong inside the app.
 
@@ -703,7 +721,7 @@ One sentence for each thing that can stop the app. Each states a limitation of t
 
 Shown instead of a made-up result. %1$s is the name of the missing part.
 
-69. `not_built`
+71. `not_built`
 
    English: Not built yet: %1$s
 
@@ -716,7 +734,7 @@ Shown instead of a made-up result. %1$s is the name of the missing part.
 
 The camera, then each value read off the report beside where it came from, with the range printed on the report if there was one. The person ticks what to save.
 
-70. `scan_title`
+72. `scan_title`
 
    English: Scan a lab report
 
@@ -725,7 +743,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-71. `scan_capture`
+73. `scan_capture`
 
    English: Capture
 
@@ -734,7 +752,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-72. `scan_retake`
+74. `scan_retake`
 
    English: Retake
 
@@ -743,7 +761,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-73. `scan_reading`
+75. `scan_reading`
 
    English: Reading the report…
 
@@ -752,7 +770,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-74. `scan_no_fields`
+76. `scan_no_fields`
 
    English: No test values could be read. Try a sharper, straighter photo.
 
@@ -761,7 +779,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-75. `scan_field_line`
+77. `scan_field_line`
 
    English: %1$s: %2$s %3$s
 
@@ -770,7 +788,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-76. `scan_range_both`
+78. `scan_range_both`
 
    English: printed range %1$s to %2$s
 
@@ -779,7 +797,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-77. `scan_range_high_only`
+79. `scan_range_high_only`
 
    English: printed range up to %1$s
 
@@ -788,7 +806,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-78. `scan_range_low_only`
+80. `scan_range_low_only`
 
    English: printed range from %1$s
 
@@ -797,7 +815,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-79. `scan_range_none`
+81. `scan_range_none`
 
    English: no range printed, so nothing will be judged against it
 
@@ -806,7 +824,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-80. `scan_report_date`
+82. `scan_report_date`
 
    English: Report date %1$s
 
@@ -815,7 +833,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-81. `scan_report_date_unknown`
+83. `scan_report_date_unknown`
 
    English: Report date not read
 
@@ -824,7 +842,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-82. `scan_save`
+84. `scan_save`
 
    English: Save %1$d values
 
@@ -833,7 +851,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-83. `scan_saved`
+85. `scan_saved`
 
    English: Saved %1$d values from this report.
 
@@ -842,7 +860,7 @@ The camera, then each value read off the report beside where it came from, with 
    Correct Telugu (leave blank if the line above is right):
 
 
-84. `camera_permission_needed`
+86. `camera_permission_needed`
 
    English: Camera permission is needed to scan a report.
 
@@ -855,7 +873,7 @@ The camera, then each value read off the report beside where it came from, with 
 
 Where the app says it runs offline, where its numbers come from and which open-source parts it contains. The legal notices themselves are not translated.
 
-85. `about_title`
+87. `about_title`
 
    English: About
 
@@ -864,7 +882,7 @@ Where the app says it runs offline, where its numbers come from and which open-s
    Correct Telugu (leave blank if the line above is right):
 
 
-86. `about_licences_title`
+88. `about_licences_title`
 
    English: Licences and notices
 
@@ -873,7 +891,7 @@ Where the app says it runs offline, where its numbers come from and which open-s
    Correct Telugu (leave blank if the line above is right):
 
 
-87. `about_offline`
+89. `about_offline`
 
    English: IN2FIT runs entirely on this phone. The demo build has no internet permission: nothing you say, scan or log leaves the device.
 
@@ -882,7 +900,7 @@ Where the app says it runs offline, where its numbers come from and which open-s
    Correct Telugu (leave blank if the line above is right):
 
 
-88. `about_notices_pending`
+90. `about_notices_pending`
 
    English: The verbatim copyright notice for the voice models is being prepared and will appear here.
 
@@ -891,7 +909,7 @@ Where the app says it runs offline, where its numbers come from and which open-s
    Correct Telugu (leave blank if the line above is right):
 
 
-89. `about_usda_title`
+91. `about_usda_title`
 
    English: Nutrition data
 
@@ -904,7 +922,7 @@ Where the app says it runs offline, where its numbers come from and which open-s
 
 Not shown on a screen. When the person asks a question, the app writes their own meals, lab values and diet into a few lines like these and gives them to its language model, in the person's language, before it answers; the answer may repeat them back. Plain and literal, no advice in them: every slot is a name, a number or a date the app fills in.
 
-90. `context_figure`
+92. `context_figure`
 
    English: %1$s: %2$s %3$s
 
@@ -915,7 +933,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-91. `context_figure_partial`
+93. `context_figure_partial`
 
    English: %1$s: at least %2$s %3$s (no value for %4$s)
 
@@ -926,7 +944,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-92. `context_figure_none`
+94. `context_figure_none`
 
    English: %1$s: not known
 
@@ -937,7 +955,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-93. `context_meal`
+95. `context_meal`
 
    English: %1$s: %2$s. %3$s
 
@@ -948,7 +966,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-94. `context_period`
+96. `context_period`
 
    English: %1$s: %2$s
 
@@ -959,7 +977,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-95. `context_period_today`
+97. `context_period_today`
 
    English: Today so far
 
@@ -968,7 +986,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-96. `context_period_last_seven_days`
+98. `context_period_last_seven_days`
 
    English: The last seven days
 
@@ -977,7 +995,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-97. `context_lab`
+99. `context_lab`
 
    English: %1$s: %2$s %3$s (report dated %4$s)
 
@@ -988,7 +1006,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-98. `context_lab_with_range`
+100. `context_lab_with_range`
 
    English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
 
@@ -999,7 +1017,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-99. `context_never_suggest_vegetarian`
+101. `context_never_suggest_vegetarian`
 
    English: meat, fish or eggs (vegetarian)
 
@@ -1010,7 +1028,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-100. `context_never_suggest_vegan`
+102. `context_never_suggest_vegan`
 
    English: meat, fish, eggs, milk or any dairy (vegan)
 
@@ -1019,7 +1037,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-101. `context_never_suggest_eggetarian`
+103. `context_never_suggest_eggetarian`
 
    English: meat or fish (eggetarian)
 
@@ -1028,7 +1046,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-102. `context_never_suggest_jain`
+104. `context_never_suggest_jain`
 
    English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
 
@@ -1037,7 +1055,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-103. `context_referral`
+105. `context_referral`
 
    English: That is a question for a doctor, who can look at it with you.
 
@@ -1050,7 +1068,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
 
 The app says one of these aloud while it is thinking, so a ten-second wait sounds like work and not like silence. One or two seconds long when spoken. No health content.
 
-104. `tts_lead_in_log`
+106. `tts_lead_in_log`
 
    English: Noting that down.
 
@@ -1059,7 +1077,7 @@ The app says one of these aloud while it is thinking, so a ten-second wait sound
    Correct Telugu (leave blank if the line above is right):
 
 
-105. `tts_lead_in_answer`
+107. `tts_lead_in_answer`
 
    English: Let me check your records.
 
@@ -1068,7 +1086,7 @@ The app says one of these aloud while it is thinking, so a ten-second wait sound
    Correct Telugu (leave blank if the line above is right):
 
 
-106. `tts_lead_in_suggest`
+108. `tts_lead_in_suggest`
 
    English: Let me think about what fits.
 
@@ -1077,7 +1095,7 @@ The app says one of these aloud while it is thinking, so a ten-second wait sound
    Correct Telugu (leave blank if the line above is right):
 
 
-107. `tts_lead_in_recommend`
+109. `tts_lead_in_recommend`
 
    English: Let me see what suits you.
 
@@ -1094,7 +1112,7 @@ Labels, explanations and the words dropped into sentences. Same rules.
 
 Single words dropped into the sentences above and shown next to figures, so they should read naturally mid-sentence.
 
-108. `nutrient_energy`
+110. `nutrient_energy`
 
    English: energy
 
@@ -1103,7 +1121,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-109. `nutrient_protein`
+111. `nutrient_protein`
 
    English: protein
 
@@ -1112,7 +1130,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-110. `nutrient_carbohydrate`
+112. `nutrient_carbohydrate`
 
    English: carbohydrate
 
@@ -1121,7 +1139,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-111. `nutrient_fat`
+113. `nutrient_fat`
 
    English: fat
 
@@ -1130,7 +1148,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-112. `nutrient_fibre`
+114. `nutrient_fibre`
 
    English: fibre
 
@@ -1139,7 +1157,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-113. `nutrient_iron`
+115. `nutrient_iron`
 
    English: iron
 
@@ -1148,7 +1166,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-114. `nutrient_vitamin_b12`
+116. `nutrient_vitamin_b12`
 
    English: vitamin B12
 
@@ -1157,7 +1175,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-115. `nutrient_sodium`
+117. `nutrient_sodium`
 
    English: sodium
 
@@ -1170,7 +1188,7 @@ Single words dropped into the sentences above and shown next to figures, so they
 
 Dropped into the sentence 'Suggestions are limited to what is realistic for ...' in place of the slot, so each phrase should complete that sentence.
 
-116. `life_context_hostel_student`
+118. `life_context_hostel_student`
 
    English: hostel and canteen food
 
@@ -1179,7 +1197,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-117. `life_context_pg_own_cooking`
+119. `life_context_pg_own_cooking`
 
    English: cooking for yourself with limited time
 
@@ -1188,7 +1206,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-118. `life_context_field_or_manual_worker`
+120. `life_context_field_or_manual_worker`
 
    English: long physical shifts and eating out
 
@@ -1197,7 +1215,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-119. `life_context_desk_professional`
+121. `life_context_desk_professional`
 
    English: a desk day with a full kitchen
 
@@ -1206,7 +1224,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-120. `life_context_homemaker`
+122. `life_context_homemaker`
 
    English: cooking for the household
 
@@ -1219,7 +1237,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
 
 The heading of the screen where the person picks Telugu, Hindi or English.
 
-121. `language_picker_title`
+123. `language_picker_title`
 
    English: Language
 
@@ -1232,7 +1250,7 @@ The heading of the screen where the person picks Telugu, Hindi or English.
 
 A one-word label next to every nutrition figure saying how far to trust it. Good means the food and the amount were both clear; Approximate means something was assumed, such as a standard bowl size; Rough means the figure could be far off.
 
-122. `confidence_band_good`
+124. `confidence_band_good`
 
    English: Good
 
@@ -1241,7 +1259,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
    Correct Telugu (leave blank if the line above is right):
 
 
-123. `confidence_band_approximate`
+125. `confidence_band_approximate`
 
    English: Approximate
 
@@ -1250,7 +1268,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
    Correct Telugu (leave blank if the line above is right):
 
 
-124. `confidence_band_rough`
+126. `confidence_band_rough`
 
    English: Rough
 
@@ -1263,7 +1281,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
 
 Shown when the person taps the confidence label. One sentence explaining it.
 
-125. `confidence_reason_exact_food_match`
+127. `confidence_reason_exact_food_match`
 
    English: Matched exactly to a food in the database.
 
@@ -1272,7 +1290,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-126. `confidence_reason_fuzzy_food_match`
+128. `confidence_reason_fuzzy_food_match`
 
    English: Matched to the closest name in the database; check it is the food you meant.
 
@@ -1281,7 +1299,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-127. `confidence_reason_category_level_match`
+129. `confidence_reason_category_level_match`
 
    English: Matched only to a food category, not a specific food.
 
@@ -1290,7 +1308,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-128. `confidence_reason_quantity_stated`
+130. `confidence_reason_quantity_stated`
 
    English: You gave the quantity in a unit we can convert.
 
@@ -1299,7 +1317,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-129. `confidence_reason_household_unit_default`
+131. `confidence_reason_household_unit_default`
 
    English: A household measure was converted with a standard weight. Tap to correct the grams.
 
@@ -1310,7 +1328,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-130. `confidence_reason_quantity_inferred`
+132. `confidence_reason_quantity_inferred`
 
    English: You did not say how much, so this quantity is a guess. Tap to correct it.
 
@@ -1319,7 +1337,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-131. `confidence_reason_authored_reference_recipe`
+133. `confidence_reason_authored_reference_recipe`
 
    English: Based on a reference recipe. Edit it to match how you cook.
 
@@ -1330,7 +1348,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-132. `confidence_reason_user_edited_recipe`
+134. `confidence_reason_user_edited_recipe`
 
    English: Based on the recipe as you edited it.
 
@@ -1339,7 +1357,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-133. `confidence_reason_weak_source_record`
+135. `confidence_reason_weak_source_record`
 
    English: The source record for this food rests on few samples or on a label.
 
@@ -1348,7 +1366,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-134. `confidence_reason_substitute_food_record`
+136. `confidence_reason_substitute_food_record`
 
    English: The nearest record is a similar food, not this one.
 
@@ -1357,7 +1375,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-135. `confidence_reason_low_asr_confidence`
+137. `confidence_reason_low_asr_confidence`
 
    English: Speech recognition was unsure of what it heard. Check the words.
 
@@ -1368,7 +1386,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-136. `confidence_reason_uncorrected_camera_guess`
+138. `confidence_reason_uncorrected_camera_guess`
 
    English: A camera guess that has not been confirmed by you.
 
@@ -1381,7 +1399,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
 
 A checklist screen for the team before a demo: every model present or absent, its size, whether it loads; permissions; the interface and speech languages. Not for the person using the app.
 
-137. `preflight_title`
+139. `preflight_title`
 
    English: Pre-flight check
 
@@ -1390,7 +1408,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-138. `preflight_intro`
+140. `preflight_intro`
 
    English: What this phone has and what it is missing, read now. Nothing here is estimated.
 
@@ -1399,7 +1417,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-139. `preflight_app`
+141. `preflight_app`
 
    English: App
 
@@ -1408,7 +1426,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-140. `preflight_device`
+142. `preflight_device`
 
    English: Device
 
@@ -1417,7 +1435,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-141. `preflight_locale`
+143. `preflight_locale`
 
    English: Locale
 
@@ -1426,7 +1444,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-142. `preflight_mic`
+144. `preflight_mic`
 
    English: Microphone permission
 
@@ -1435,7 +1453,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-143. `preflight_camera`
+145. `preflight_camera`
 
    English: Camera permission
 
@@ -1444,7 +1462,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-144. `preflight_models_dir`
+146. `preflight_models_dir`
 
    English: Models folder
 
@@ -1453,7 +1471,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-145. `preflight_free_space`
+147. `preflight_free_space`
 
    English: Free space
 
@@ -1462,7 +1480,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-146. `preflight_voices`
+148. `preflight_voices`
 
    English: Voices available
 
@@ -1471,7 +1489,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-147. `preflight_residency`
+149. `preflight_residency`
 
    English: Model memory
 
@@ -1480,7 +1498,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-148. `preflight_models_title`
+150. `preflight_models_title`
 
    English: Models
 
@@ -1489,7 +1507,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-149. `preflight_present`
+151. `preflight_present`
 
    English: Present, %1$s
 
@@ -1498,7 +1516,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-150. `preflight_absent`
+152. `preflight_absent`
 
    English: MISSING
 
@@ -1507,7 +1525,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-151. `preflight_load`
+153. `preflight_load`
 
    English: Load
 
@@ -1516,7 +1534,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-152. `preflight_loading`
+154. `preflight_loading`
 
    English: Loading…
 
@@ -1525,7 +1543,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-153. `preflight_refresh`
+155. `preflight_refresh`
 
    English: Refresh
 
@@ -1534,7 +1552,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-154. `preflight_yes`
+156. `preflight_yes`
 
    English: granted
 
@@ -1543,7 +1561,7 @@ A checklist screen for the team before a demo: every model present or absent, it
    Correct Telugu (leave blank if the line above is right):
 
 
-155. `preflight_no`
+157. `preflight_no`
 
    English: NOT granted
 
@@ -1556,7 +1574,7 @@ A checklist screen for the team before a demo: every model present or absent, it
 
 A banner the team switches on to feed the app a scripted sentence during a rehearsal, and its switch. Not for the person using the app.
 
-156. `demo_switch_title`
+158. `demo_switch_title`
 
    English: Scripted demo feed
 
@@ -1565,7 +1583,7 @@ A banner the team switches on to feed the app a scripted sentence during a rehea
    Correct Telugu (leave blank if the line above is right):
 
 
-157. `demo_switch_hint`
+159. `demo_switch_hint`
 
    English: Feeds the screens scripted events instead of the real pipeline. For building and photographing screens only. Every figure it shows is script.
 
@@ -1574,7 +1592,7 @@ A banner the team switches on to feed the app a scripted sentence during a rehea
    Correct Telugu (leave blank if the line above is right):
 
 
-158. `demo_banner`
+160. `demo_banner`
 
    English: SCRIPTED DEMO FEED. Nothing on this screen is a real result.
 
@@ -1583,7 +1601,7 @@ A banner the team switches on to feed the app a scripted sentence during a rehea
    Correct Telugu (leave blank if the line above is right):
 
 
-159. `demo_absent`
+161. `demo_absent`
 
    English: Not in this build. The demo build carries no scripted feed.
 
@@ -1596,7 +1614,7 @@ A banner the team switches on to feed the app a scripted sentence during a rehea
 
 A developer screen listing what is built. It will be replaced before the demo. Lowest priority: do these last, or skip them.
 
-160. `status_screen_subtitle`
+162. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
@@ -1605,7 +1623,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-161. `status_line`
+163. `status_line`
 
    English: %1$s: %2$s
 
@@ -1616,7 +1634,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-162. `state_not_implemented`
+164. `state_not_implemented`
 
    English: Not implemented
 
@@ -1625,7 +1643,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-163. `pipeline_voice_logging`
+165. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
@@ -1634,7 +1652,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-164. `pipeline_nutrition_lookup`
+166. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
@@ -1643,7 +1661,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-165. `pipeline_timeline_query`
+167. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
@@ -1652,7 +1670,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-166. `pipeline_lab_report_scan`
+168. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
@@ -1661,7 +1679,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-167. `pipeline_adaptive_suggestions`
+169. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
@@ -1670,7 +1688,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-168. `pipeline_dish_first_guess`
+170. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
@@ -1679,7 +1697,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-169. `pipeline_exercise_form`
+171. `pipeline_exercise_form`
 
    English: Exercise form check
 
@@ -1690,7 +1708,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
 
 ### UNPLACED: ask Vedant where this appears
 
-170. `speak_in_label`
+172. `speak_in_label`
 
    English: Speak in
 
@@ -1699,7 +1717,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-171. `stop_speaking`
+173. `stop_speaking`
 
    English: Stop
 
@@ -1773,6 +1791,32 @@ advice words the app treats as "not a meal": `क्या कितना क�
 कहाँ कहां क्यों क्यूं चाहिए चाहिये करूँ करूं करू सकता सकती सकते हूँ हूं रहा रही रहे अभी बताओ
 बताइए बताइये अच्छा बेहतर सही ठीक सुझाव ऐड जोड़ बदल हटा डिलीट`, and the phrases `खा रहा`, `खा रही`,
 `खा रहे`, `के लिए`, `खाना चाहिए`.
+
+**Words that say a food was NOT eaten.** A sentence with one of these is never written into the
+diary, whatever else it contains ("no rice today", "didn't eat lunch"); the one exception is a
+correction of a count, "two rotis no, three rotis". The same question as above, the other way
+round: does each of these mean *not* / *did not eat*, and could it mean something else?
+
+| # | Word | Meant as | Means not / did not eat? (yes/no) | Could mean something else? | Missing form? |
+| --- | --- | --- | --- | --- | --- |
+| N1 | `nahi` | Hindi, not / no | | | |
+| N2 | `nahin` | Hindi, not, long spelling | | | |
+| N3 | `nai` | Hindi, not, short spelling (also "new"?) | | | |
+| N4 | `nahee` | Hindi, not, long-vowel spelling | | | |
+| N5 | `mat` | Hindi, don't | | | |
+| N6 | `bina` | Hindi, without | | | |
+| N7 | `ledu` | Telugu, is not / did not | | | |
+| N8 | `ledhu` | Telugu, is not, dh- spelling | | | |
+| N9 | `kadu` | Telugu, not (that) | | | |
+| N10 | `kaadu` | Telugu, not, long-vowel spelling | | | |
+| N11 | `tinaledu` | Telugu, did not eat | | | |
+| N12 | `thinaledu` | Telugu, did not eat, th- spelling | | | |
+
+English on the same list: `no`, `not`, `never`, `nothing`, `none`, `without`, `skip`, `skipped`,
+`skipping`, and the stems of "didn't", "don't", "doesn't", "hadn't", "haven't", "wasn't", "couldn't"
+(`didn` `didnt` `don` `dont` `doesn` `doesnt` `hadn` `hadnt` `haven` `havent` `wasn` `wasnt` `couldn` `couldnt`).
+Devanagari, for Vedant: `नहीं`, `नही`, `बिना`, `छोड़`, `छोड़ा`, `छोड़ी`. Telugu script, generated, unreviewed:
+`లేదు`, `కాదు`, `తినలేదు`.
 
 #### The words that make the app ask instead
 

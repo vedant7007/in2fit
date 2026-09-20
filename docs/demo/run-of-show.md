@@ -59,7 +59,7 @@ aloud, ticking, at the table, before the first sentence. Ten minutes.
 | --- | --- | --- | --- |
 | 1 | Models staged on the phone: the LLM, the Hindi ASR model and its `tokens.txt`, the TTS voice, checksums verified. | Rao | staged 19 Sep (`COORDINATION.md`); re-verify after every reinstall, uninstalling wipes them (`0012`) |
 | 1a | **The platform voice data, DAYS BEFORE, ON A NETWORK** (Meera, 16:51): Settings → System → Languages & input → Text-to-speech output (some skins: Accessibility → Text-to-speech output), or `adb shell am start -a com.android.settings.TTS_SETTINGS`; preferred engine Speech Services by Google → gear → Install voice data → Hindi (India) and English (India), download both. Then airplane mode ON and `TtsVoiceProbeTest`: the report must show a `hi-IN` and an `en-IN` voice with `network=false` and a WAV with an RTF. Only then does the platform voice exist on that phone; otherwise the bundled Piper voice speaks. On the realme now, on the iQOO the hour it arrives. | whoever holds the phone; Meera reads the probe | not done on any phone |
-| 1b | **Which phone.** Every measurement is on the realme; the deck says a loaner iQOO nobody has held. Decided by Vedant; `docs/demo/countdown.md` has it as the risk above every other row. | Vedant | undecided at 20:20 |
+| 1b | **Which phone.** The demo runs on the loaner iQOO, handed over on site on the day the event starts and staged in hour one of thirty (`docs/demo/countdown.md`, the hour-one list: USB toggle, install, `tools/stage-models.ps1`, pre-flight card, voice data on the venue network, then airplane mode, the probes and a full rehearsal). Every rehearsal this week is on the realme, which is the rehearsal and fallback-video device, not the demo device. Row 1a's voice-data step happens on the realme this week and on the iQOO in hour one. | Vedant, whoever holds the cable | ruled 20:25 and 20:45 |
 | 2 | The demo build installed: `demo` flavour, permission check green in the build log. | Rao | every assemble asserts it |
 | 3 | Profile: name, Hindi speech, English interface, a declared context if beat 5 is attempted. | Arjun / Rao | no in-app picker yet; the interface language is the system's per-app setting (path in row 10 of the device checklist). One line gives the app a button that opens that page directly: `startActivity(Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.parse("package:" + packageName)))`, API 33+, and the phone is 35. That is the cheapest toggle for Beat 5. |
 | 4 | **A meal already logged today**, the Beat 1 meal, so Beat 4's "Advise again on my last meal" has a meal. | presenter, at the table (row 9 above does it) | |
@@ -119,14 +119,38 @@ asked, P reads the stage aloud: "It's matching the foods against the database no
 
 **When the plate lands, P says:**
 
-> "Two rotis and a little dal. The numbers come from the USDA tables, looked up by code, not
-> written by the model. The word beside each figure is how far to trust it: I did not say how
-> much dal, so the app took a standard bowl and says so beside the figure, and that figure is the
-> one a person corrects."
+**"थोड़ी दाल" states no amount, and what the app does with that is hard problem 01 on the deck
+("when someone says 'some rice', the app asks what some means instead of inventing a figure").
+One of two things happens on stage; we choose which, and the presenter has a line for each.
+Vedant's preference: show the asking.**
 
-*(Check at Tuesday's rehearsal what the app actually shows beside the dal figure for "a little
-dal" and make this line say that; the log shows the dal resolved at a standard katori, and the
-band beside it is not in the log.)*
+**Branch A: it asks.** *(Preferred. NOT what the app does on 20 September: no path asks for a
+quantity, there is no asking card and no key for one. It needs two changes by Tuesday's
+rehearsal: the extraction leaves "थोड़ी / a little / some" as no quantity instead of the model's
+"1" (Priya, the prompt), and the Talk screen asks "How much dal?" with the household choices
+when a quantity is missing (Rao, the orchestrator event; Arjun, the card). Rao and Arjun say by
+Tuesday whether it exists; if it does, this is the branch.)*
+
+Screen: the rotis resolved with their figure; the dal named, with a question under it, "How
+much dal?", and the choices: a katori, a bowl, a spoon, grams. P taps "a katori".
+
+> "It stopped and asked. I said 'a little dal', and the app does not know what a little is, so it
+> will not invent it: it asks me, once, and remembers the answer. That is the safety rule in
+> three seconds: it never states a number it was not given, not even about my own plate."
+
+**Branch B: it resolves silently at one serving.** *(What the log shows today,
+`e2e-demo-condition-20sep.txt` row #1, `dal=1.0 none`: the model wrote quantity 1 for "a
+little"; the dish path then took 1 with no unit as one piece of an authored dish and marked it
+QUANTITY_STATED, so the plate reads one serving, 467.2 kcal, and the band beside it does not say
+Rough. A number the model invented was treated as a number the person said. If this is the
+branch, the asking exists only on a slide, and the line below must not claim the app says
+"approximate" beside the dal unless the band on the phone actually reads that.)*
+
+> "Two rotis and a little dal. The numbers come from the USDA tables, looked up by code, not
+> written by the model. The word beside each figure is how far to trust it; the dal is a standard
+> serving because I did not say how much, and that figure is the one a person corrects."
+
+*(Tuesday's rehearsal decides which branch is real; the other is struck.)*
 
 *(Ruled 18:40, Rao: the demo profile is PRE-SEEDED with the bundled utensil defaults from
 `household-units.csv`, katori 150 g for cooked pulses, grains and dairy, 100 g for a sabzi, plate
