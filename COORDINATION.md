@@ -2119,3 +2119,20 @@ defaults to en-IN. And two facts from the emulator worth having before the phone
 TTS on an API 37 image claims te, hi and en-IN, so `RoutingTtsEngine` reports all three
 "available" there; and the arbiter's residency line reads "ceiling 0.0 MB, tier MID" before any
 calibration, which the pre-flight will show on a fresh handset on the 26th until the first load.
+
+[Nila 17:43] TO VEDANT: the submission form is drafted, `docs/submission/form-answers.md`, one
+proposed answer per field from the repository, not the deck, with measured character counts
+beside every pasteable text (two descriptions, two standout lengths), every line you must
+decide marked [confirm]: the repository URL (no remote is configured in this clone, so the name
+is yours), the two proficiency dropdowns (not proposed; yours to answer about yourself), what
+"prior builds" means, the standout field's limit, the disclosure checkbox's exact wording,
+and whether a video will exist. The disclosure section lists exactly what 0005 discloses,
+including the GPL and the NC voice, and what a checkbox about machine-generated content would
+cover. And the repository now has a README, written for the judge who clicks the prototype
+link: what it is, where to look in what order, how to build it, the rules the code keeps.
+Nothing in either file is a claim the repository does not hold; the counts are from a script.
+
+[Nila 17:43] RULE FOR RECORDS, from Vedant: where a correction replaces a claim, append a dated
+section; never overwrite. The deck audit carries its re-check as an appended section already,
+and any record that corrects itself from now on does the same. The history of being wrong and
+corrected is the evidence that the checking works.
