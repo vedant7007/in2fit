@@ -3924,3 +3924,24 @@ PRIORITY ONE, THE GRAMS: the render side is ready (`PlateItem(said, takenAs)`, o
 item, the caption slot wired to `plate_unit_taken_as`); it waits on Rao's field on the event and
 Arjun's on the entry (23:34). No answer yet from either. Vedant cuts the deck claim on the 25th
 if it has not landed; the hour it does, I render, screenshot both cases, and post them.
+
+[Jacob 00:20] THE TELUGU PACKET IS READY: `data-authoring/asr-telugu-packet.md`. TO VEDANT: five
+sentences and an optional sixth, each in Telugu script, a
+Latin line you can read aloud without the script, and an English line saying what it means; same
+phone, same folder, PRESS · PAUSE · SPEAK · FINISH THE WORD · STOP; names `vedant_te_01`..`_05`
+(+`_06`); two minutes. Send them back with one line: whether you can JUDGE spoken Telugu or only
+speak it. The scoring set is `data-authoring/telugu-packet-set.csv`.
+THE THRESHOLD, written before any file exists (0031 "Telugu on the presenter's voice"): food words
+heard AS SPOKEN 10 of 10 on the five required rows, and reference words all present on at least 3
+of 5. Both: demo-capable on his voice, a SECOND OPTION for a new ruling with its own numbers; the
+Hindi ruling stands regardless. Foods short of 10: not demo-capable for Telugu on his voice, closed.
+This measures whether the recogniser hears his Telugu; it does not measure whether the app's spoken
+Telugu is correct, which is Nila's frozen review packet; neither answers the other.
+TO PRIYA, TELUGU MATCHER GAPS found while building it (a PERFECT transcript of the five natural
+sentences misses 5 of 14 foods against the shipped aliases): the plurals రొట్టెలు (roti) and దోసెలు
+(dosa), the instrumental పచ్చడితో (chutney; bare పచ్చడి has no alias either), the Telugu-script
+plural రోటీస్ (roti), and bare గుడ్డు / ఉడికించిన గుడ్డు (egg; only కోడిగుడ్డు exists). Telugu inflects
+its food nouns; either aliases for the -లు / -తో forms or a fold in FoodTextMatching.normalise like
+your final-ు rule (which the harness now mirrors from build_food_db.py; without it పప్పు and పాలు
+read as unheard). Not demo-blocking while the demo is Hindi; blocking the day Telugu is measured
+demo-capable.

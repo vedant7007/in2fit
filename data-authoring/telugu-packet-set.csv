@@ -1,0 +1,17 @@
+# The Telugu measurement packet, 21 Sep 2026 (docs/decisions/0031, "Telugu on the presenter's voice").
+# Rows 1-5 are the five Telugu sentences of data-authoring/asr-recording-script.md, unchanged. Row 6 is
+# OPTIONAL: the script's five do not contain egg, rice or curd, which the demo set needs, so one natural
+# sentence carries them; it is marked optional in the packet and its absence does not fail the measurement.
+# `spoken` is what the presenter reads (the packet also gives him a Latin transliteration and an English
+# gloss); `reference` is what the te checkpoint is expected to emit, Telugu script throughout, English
+# words included, because that is how the checkpoint writes them.
+# `food_tokens` are the food words AS SPOKEN in each sentence, one per expected food, same order: the
+# recogniser is scored on hearing those; whether the matcher then resolves a plural or an inflected form
+# (రొట్టెలు, దోసెలు, పచ్చడితో, గుడ్డు) is the matcher's question and is listed for Priya in 0031.
+id,beat,intent,language,spoken,reference,expected_foods,food_tokens
+1,1,LOG,te,నేను రెండు రొట్టెలు మరియు పప్పు తిన్నాను,నేను రెండు రొట్టెలు మరియు పప్పు తిన్నాను,roti;dal,రొట్టెలు;పప్పు
+2,1,LOG,te,"ఉదయం మూడు ఇడ్లీ, సాంబార్, కొబ్బరి పచ్చడి తిన్నాను","ఉదయం మూడు ఇడ్లీ సాంబార్ కొబ్బరి పచ్చడి తిన్నాను",idli;sambar;coconut chutney,ఇడ్లీ;సాంబార్;కొబ్బరి పచ్చడి
+3,1,LOG,te,"రాత్రి two rotis, dal fry, one glass milk తీసుకున్నాను",రాత్రి టూ రోటీస్ దాల్ ఫ్రై వన్ గ్లాస్ మిల్క్ తీసుకున్నాను,roti;dal;milk,రోటీస్;దాల్;మిల్క్
+4,3,RECOMMEND,te,"నాకు షుగర్ ఉంది, రాత్రి ఏం తినాలి?",నాకు షుగర్ ఉంది రాత్రి ఏం తినాలి,,
+5,1,LOG,te,"నేను ఒకటి... కాదు, రెండు దోసెలు తిన్నాను, పచ్చడితో",నేను ఒకటి కాదు రెండు దోసెలు తిన్నాను పచ్చడితో,dosa;chutney,దోసెలు;పచ్చడితో
+6,1,LOG,te,"ఒక ప్లేట్ అన్నం, పప్పు, ఒక కప్పు పెరుగు, ఒక ఉడికించిన గుడ్డు తిన్నాను",ఒక ప్లేట్ అన్నం పప్పు ఒక కప్పు పెరుగు ఒక ఉడికించిన గుడ్డు తిన్నాను,rice;dal;curd;egg,అన్నం;పప్పు;పెరుగు;గుడ్డు

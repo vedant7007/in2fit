@@ -156,20 +156,38 @@ def food_aliases():
     return _ALIASES
 
 
-def foods_heard(expected: str, hyp: str) -> tuple[int, int, list[str]]:
-    """How many of the `expected_foods` (English canonical names, ';'-separated) have SOME alias, in
-    any script, present as a whole word run in the hypothesis. Returns (heard, expected, missing)."""
+def matcher_norm(text: str) -> str:
+    """The database's own alias normalisation, copied from tools/build_food_db.py `norm()` so that
+    'was this food word heard' means what SqliteFoodLookup means by it: lower-cased, punctuation to
+    spaces, and a word-final Telugu ు folded to ్ (పాలు -> పాల్), which is how alias_norm is stored."""
+    import re
+    t = text.strip().lower()
+    t = re.sub(r"[^\wऀ-ॿఀ-౿ ]+", " ", t, flags=re.UNICODE)
+    t = re.sub(r"\s+", " ", t).strip()
+    return re.sub("ు(?= |$)", "్", t)
+
+
+def foods_heard(expected: str, hyp: str, tokens: str = "") -> tuple[int, int, list[str]]:
+    """How many of the `expected_foods` (English canonical names, ';'-separated) were heard: some
+    alias of the food, any script, present as a whole word run in the hypothesis, both sides under the
+    database's own normalisation; OR, when the manifest carries `food_tokens` (the food words AS THE
+    SPEAKER SAYS THEM, ';'-separated, in the same order as expected_foods), that spoken form present.
+    The spoken form matters because the recogniser's question is "did it hear రొట్టెలు", and whether
+    the matcher then resolves the plural is a different question with a different owner.
+    Returns (heard, expected, missing)."""
     names = [e.strip() for e in expected.split(";") if e.strip()]
     if not names:
         return 0, 0, []
+    spoken = [t.strip() for t in tokens.split(";")] if tokens.strip() else []
     aliases = food_aliases()
-    hyp_words = normalise(hyp)
-    hyp_text = " " + " ".join(hyp_words) + " "
+    hyp_text = " " + matcher_norm(hyp) + " "
     heard, missing = 0, []
-    for name in names:
+    for i, name in enumerate(names):
         keys = [k for k, al in aliases.items() if name.lower() in al]
         candidates = set().union(*(aliases[k] for k in keys)) if keys else {name.lower()}
-        if any((" " + " ".join(normalise(a)) + " ") in hyp_text for a in candidates if a):
+        if i < len(spoken) and spoken[i]:
+            candidates = candidates | {spoken[i]}
+        if any((" " + matcher_norm(a) + " ") in hyp_text for a in candidates if a):
             heard += 1
         else:
             missing.append(name)
@@ -263,7 +281,7 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
         ref_c, hyp_c = list("".join(ref_w)), list("".join(hyp_w))
         w_err, c_err = edit_distance(ref_w, hyp_w), edit_distance(ref_c, hyp_c)
         S, D, I = edit_ops(ref_w, hyp_w)
-        fh, fe, missing = foods_heard(r.get("expected_foods", ""), hyp)
+        fh, fe, missing = foods_heard(r.get("expected_foods", ""), hyp, r.get("food_tokens", "") or "")
         targets = [per_lang[lang]]
         if r["source"].lower().startswith("recorded") and "_" in r["path"].stem:
             targets.append(per_speaker[(r["path"].stem.split("_")[0], lang)])
@@ -784,11 +802,11 @@ def cmd_insertions(manifest: Path, engine: str = "indicconformer") -> None:
             x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
         clips.append((r, x))
 
-    def score(lang, x, reference, foods):
+    def score(lang, x, reference, foods, tokens=""):
         stream = recs[lang].create_stream(); stream.accept_waveform(16000, x); recs[lang].decode_stream(stream)
         hyp = stream.result.text
         S, D, I = edit_ops(normalise(reference), normalise(hyp))
-        fh, fe, missing = foods_heard(foods, hyp)
+        fh, fe, missing = foods_heard(foods, hyp, tokens)
         return hyp, S, D, I, fh, fe, missing
 
     print(f"engine: {engine}; {len(clips)} clips. SYNTHETIC only in the joining: the voice is the recorded speaker's.")
@@ -796,7 +814,7 @@ def cmd_insertions(manifest: Path, engine: str = "indicconformer") -> None:
     print(f"{'clip':22s} {'secs':>5s} {'ins':>4s} {'sub':>4s} {'del':>4s}   foods heard")
     points = []
     for r, x in clips:
-        hyp, S, D, I, fh, fe, missing = score(r["language"], x, r["reference"], r.get("expected_foods", ""))
+        hyp, S, D, I, fh, fe, missing = score(r["language"], x, r["reference"], r.get("expected_foods", ""), r.get("food_tokens", "") or "")
         foods = f"{fh}/{fe}" + (f"  missing {', '.join(missing)}" if missing else "") if fe else "(no food in the sentence)"
         print(f"{Path(r['path']).name:22s} {len(x) / 16000:5.1f} {I:4d} {S:4d} {D:4d}   {foods}")
         if fe:
@@ -881,7 +899,7 @@ def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
         sentences = {}
         with open(set_csv, encoding="utf-8", newline="") as f:
             for r in csv.DictReader(l for l in f if not l.startswith("#")):
-                sentences[(int(r["id"]), r["language"])] = (r["language"], r["reference"], r.get("expected_foods", ""))
+                sentences[(int(r["id"]), r["language"])] = (r["language"], r["reference"], r.get("expected_foods", ""), r.get("food_tokens", "") or "")
 
     pattern = re.compile(r"^(?P<speaker>[^_]+)_(?P<lang>te|hi|en)_(?P<n>\d{1,2})\.(?P<ext>[A-Za-z0-9]+)$")
     rows, skipped = [], []
@@ -896,7 +914,9 @@ def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
         if key not in sentences:
             skipped.append(f.name)
             continue
-        script_lang, reference, foods = sentences[key]
+        entry = sentences[key]
+        script_lang, reference, foods = entry[0], entry[1], entry[2]
+        tokens = entry[3] if len(entry) > 3 else ""
         if script_lang and script_lang != lang:
             print(f"note: {f.name} is sentence {n}, which the script prints as {script_lang}; keeping the file's {lang}")
         # The phone probe (AsrDeviceTest) reads 16-bit WAV only, so a phone recording gets a 16 kHz
@@ -908,10 +928,10 @@ def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
             if not wav.exists():
                 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(f), "-ac", "1", "-ar", "16000", "-sample_fmt", "s16", str(wav)], check=True)
             name = wav.name
-        rows.append((name, lang, "recorded-demo" if set_csv is not None else "recorded", reference, foods))
+        rows.append((name, lang, "recorded-demo" if set_csv is not None else "recorded", reference, foods, tokens))
     with open(folder / "manifest.csv", "w", encoding="utf-8", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["path", "language", "source", "reference", "expected_foods"])
+        w.writerow(["path", "language", "source", "reference", "expected_foods", "food_tokens"])
         w.writerows(rows)
     speakers = sorted({r[0].split("_")[0] for r in rows})
     blank = sum(1 for r in rows if not r[3])

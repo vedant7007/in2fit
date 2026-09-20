@@ -123,6 +123,41 @@ as he pressed record. Not a recogniser miss; the failure the push-to-talk PAUSE 
 seen on his own recorder. hi_10, he did not say "नाश्ते में"; "उसने" is most likely a clipped
 "मैंने" of the same kind. Foods 2/2 on that row either way.
 
+## Telugu on the presenter's voice: the packet, and the threshold written before the data
+
+The unverified premise above ends with a measurement, not a debate. `data-authoring/asr-telugu-packet.md`
+is everything Vedant needs to press record: the five Telugu sentences of the speaker script, each in
+Telugu script, a Latin transliteration he can read without knowing the script, and an English gloss;
+the same device, distance and PRESS · PAUSE · SPEAK · FINISH THE WORD · STOP beats; one file per
+sentence; the exact names `vedant_te_01`..`_05`, plus an optional `_06` because the script's five
+carry roti, dal, idli, sambar, coconut chutney, milk, dosa and chutney but not the demo's rice, curd
+or egg, and one natural sentence does. `data-authoring/telugu-packet-set.csv` is the set the harness
+scores against, with a `food_tokens` column: the food words AS SPOKEN.
+
+**Why "as spoken" and not "as the matcher resolves"**: scored against the shipped alias table, a
+PERFECT transcript of these natural sentences misses 5 of 14 food words, because the aliases hold the
+citation forms and Telugu inflects: రొట్టెలు and దోసెలు (plural -లు), పచ్చడితో (with chutney, -తో),
+రోటీస్ (Telugu-script "rotis"), bare గుడ్డు (the alias is కోడిగుడ్డు). Those are matcher gaps and they
+are Priya's, listed here; the recogniser's question is whether it heard రొట్టెలు, and that is what the
+column scores. The harness applies the database's own normalisation (`build_food_db.py norm()`,
+final ు -> ్) to both sides, without which even పప్పు and పాలు read as unheard.
+
+**The threshold, fixed before any file exists.** On the five required rows, through the `te`
+checkpoint: (1) food words heard as spoken **10 of 10**, because one lost food is the failure a demo
+cannot carry and Hindi scored 16 of 16 on this voice, a bar Telugu must match rather than approach;
+(2) reference words all present (exact or insertions only) on **at least 3 of 5**, the bar Hindi met
+(5 of 10). Both met: demo-capable on this voice, a SECOND OPTION for a new ruling with its own
+numbers; the Hindi ruling does not change on this. (1) met, (2) not: hears the foods, garbles the
+frame; not yet. (1) not met: not demo-capable for Telugu on this voice, and the question closes.
+Row 6 is reported, not required. Omnilingual is run beside it for comparison only.
+
+**This measures whether the recogniser can hear his Telugu. It does not measure whether the Telugu the
+app speaks back is correct; that is Nila's frozen review packet, and neither answers the other.** A
+good te number is not a licence to ship unreviewed Telugu wording.
+
+Five sentences, one non-native speaker whose Telugu is self-reported and unverified. Small sample,
+reported as one.
+
 ## Insertions: does "foods heard" survive a presenter who talks instead of reciting?
 
 He added words to the card in six of ten rows (35 insertions against 5 substitutions). On stage he
