@@ -90,13 +90,18 @@ paper handling: 2–3 minutes. Measure per beat; a single total is not a target.
 
 **P closes the shade. The Talk tab is showing, empty, "Say what you ate, or ask a question."**
 
-### Beat 1. Speak a meal. *(measured 20 Sep 19:41–19:44, thermal 3, USB-powered: this exact sentence, three foods, 28.7 s to the first figure, 39.3 s to the spoken sentence; the two-food sentence "two rotis and a katori of dal" 9.2 s / 19.0 s; the ten LOG rows ran 8.3–28.7 s / 15.2–39.3 s)*
+### Beat 1. Speak a meal. *(measured 20 Sep 19:41–19:44, thermal 3, USB-powered: this sentence 9.2 s to the first figure, 19.0 s to the spoken sentence; the ten LOG rows ran 8.3–28.7 s / 15.2–39.3 s)*
+
+**Ruled by Vedant, 20 Sep 20:30: Beat 1 is the TWO-FOOD sentence, row 1 of the utterance set.**
+The three-food spec sentence measured 28.7 s to its first figure and 39.3 s to the spoken
+sentence, the slowest of the ten; thirty-nine seconds is not a pause, it is the end of the demo.
+The sentence changed, not the system.
 
 **P brings the phone to the mouth (Jacob, 19:05: speak first, THEN show the screen; never both at
 arm's length), taps the microphone and says, exactly:**
 
-> **दो रोटी, एक कटोरी दाल, और दो चम्मच तेल**
-> *(English column: "Two rotis, a katori of dal, and I used two spoons of oil.")*
+> **मैंने दो रोटी और थोड़ी दाल खाई**
+> *(English column: "I had two rotis and a little dal.")*
 
 **What the judge sees, in order** (`0026`): the level meter moving while P speaks; the meter
 freezing into a flat line the instant P stops; the transcript appearing verbatim under "You";
@@ -106,20 +111,22 @@ seconds counter beside the live stage; then the plate: each food as said, the fi
 confidence band beside each, "Logged".
 
 **The wait:** measured end to end on 20 September (`e2e-demo-condition-20sep.txt`, Rao's
-worktree): this sentence took 28.7 s to its first figure and 39.3 s to the spoken sentence, on a
-phone at thermal status 3; "two rotis and a katori of dal" took 9.2 s and 19.0 s. **Decision for
-Vedant:** the three-food sentence is the spec's and it is the slowest of the ten; the two-food
-sentence halves the wait and still shows a katori. If the phone is cool the gap narrows; nobody
-has measured it cool yet. Speech recognition is not in these figures. The screen carries it: the stage list and the
+worktree, row #1 of the ten): 9.2 s to the first figure, 19.0 s to the spoken sentence, on a
+phone at thermal status 3. Speech recognition is not in these figures. Nobody has measured it
+cool yet; Tuesday's rehearsal is where Vedant stands through it himself. The screen carries it: the stage list and the
 counter are what P looks at, not the judge. **P says nothing during the wait unless asked**; if
 asked, P reads the stage aloud: "It's matching the foods against the database now."
 
 **When the plate lands, P says:**
 
-> "Two rotis, a katori of dal, two spoons of oil. The numbers come from the USDA tables, looked up
-> by code, not written by the model. The word beside each figure is how far to trust it: a katori
-> here is a standard 150-gram bowl, not mine, so it says approximate, and that figure is the one
-> a person corrects."
+> "Two rotis and a little dal. The numbers come from the USDA tables, looked up by code, not
+> written by the model. The word beside each figure is how far to trust it: I did not say how
+> much dal, so the app took a standard bowl and says so beside the figure, and that figure is the
+> one a person corrects."
+
+*(Check at Tuesday's rehearsal what the app actually shows beside the dal figure for "a little
+dal" and make this line say that; the log shows the dal resolved at a standard katori, and the
+band beside it is not in the log.)*
 
 *(Ruled 18:40, Rao: the demo profile is PRE-SEEDED with the bundled utensil defaults from
 `household-units.csv`, katori 150 g for cooked pulses, grains and dairy, 100 g for a sabzi, plate

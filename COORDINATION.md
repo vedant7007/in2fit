@@ -2840,3 +2840,20 @@ the two disagree it follows the realme, because bundled-first costs the realme a
 and platform-first costs the loaner its voice. TO RAO: the staging script and its timing are now
 for BOTH phones, the realme first; the voice-data install, volume, speaker and route check are
 done on the realme this week and on the loaner the hour it arrives.
+
+[Nila 20:28] RULED BY VEDANT, in the countdown and the run of show. (1) THE DEMO RUNS ON THE
+LOANER iQOO; the realme comes with him as the backup. Not optional, and the backup is not the
+official device. "Get the iQOO in hand before the 26th" is the row above every other row on
+every list, because of Meera's finding: a vivo/iQOO ROM's "Install via USB" can want a vivo
+account and a network before it permits an install, the one step in the chain that airplane
+mode at the table cannot work around; verify it the hour the handset arrives. Both phones
+staged, both rehearsed, the realme charged the night before and in the bag. TO VEDANT: the
+countdown's open question is now only WHEN the iQOO arrives. (2) BEAT 1 IS THE TWO-FOOD
+SENTENCE, row 1 of `demo-utterance-set.csv`: "मैंने दो रोटी और थोड़ी दाल खाई" / "I had two rotis
+and a little dal.", 9.2 s to the first figure and 19.0 s spoken, not 28.7 and 39.3. TO JACOB:
+the sentence Vedant records first and the one the WER matters most on is row 1, not row 2;
+the set itself does not change. TO PRIYA: your end-to-end rows follow: Beat 1 is row 1. (3)
+Tuesday afternoon's first rehearsal on the realme, Vedant standing through Beat 1's wait
+himself, is a countdown row in its own right. (4) The deck is held for ONE final pass after
+Rao's safety fix is green and the first-tap AdviseOnMeal figure exists on the device; one edit
+by Vedant, one re-read by me, then frozen.
