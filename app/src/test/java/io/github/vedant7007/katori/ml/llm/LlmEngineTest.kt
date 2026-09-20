@@ -247,7 +247,7 @@ class LlmEngineTest {
     )
 
     @Test fun `an answer quoting only the context it was given passes`() = runBlocking {
-        val (rt, e) = engine("Your meals this week show about 2.5 mg iron, and your report shows 9.8 g/dL, so adding vitamin C to a meal helps.")
+        val (rt, e) = engine("Your meals this week show about 2.5 mg iron, and your report shows 9.8 g/dL. Vitamin C taken with a meal increases the iron absorbed from plant foods.")
         val r = e.answer(answerRequest())
         assertTrue("$r", r is Outcome.Ok)
         val prompt = rt.prompts.single()
@@ -287,6 +287,37 @@ class LlmEngineTest {
         // The same word from nowhere is still refused.
         val bad = engine("Your report suggests hypertension.").second.answer(answerRequest())
         assertTrue("$bad", (bad as Outcome.Unavailable).detail!!.contains("hypertension"))
+    }
+
+    // --- the claim guard (ruled 20 Sep from the handset) -----------------------------------
+
+    @Test fun `a claim restated in the model's own words is refused, quoted verbatim it passes`() = runBlocking {
+        val request = RecommendRequest(
+            request = "what should I eat for iron", languageTag = "en-IN", declaredConditions = listOf("anaemia"), context = null,
+            constraints = emptyList(), triggerText = null, facts = listOf(fact), allowedFoodNames = listOf("chickpeas", "spinach"), referralFollows = false,
+        )
+        // The sentence from the phone: no invented number, no undeclared condition, and false.
+        val fused = engine("Chickpeas. They contain iron and are rich in vitamin C, which enhances iron absorption.").second.recommend(request)
+        assertTrue("$fused", (fused as Outcome.Unavailable).detail!!.contains("claim in its own words"))
+        // The same food, the row quoted as written: the model named, introduced, and quoted.
+        val quoted = engine("Try chickpeas with lemon. Vitamin C taken with a meal increases the iron absorbed from plant foods.").second.recommend(request)
+        assertTrue("$quoted", quoted is Outcome.Ok)
+        // Naming and connecting without a claim is fine.
+        val plain = engine("Chickpeas would suit you, with a squeeze of lemon.").second.recommend(request)
+        assertTrue("$plain", plain is Outcome.Ok)
+    }
+
+    @Test fun `an assertion about a day the diary does not carry is refused`() = runBlocking {
+        val request = answerRequest().copy(
+            question = "what did I eat last Tuesday",
+            figures = listOf(DisplayFigure("Saturday 20 Sep, 7:43 pm: plate of rice, dal, bowl of curd.")),
+        )
+        val invented = engine("You ate rice, dal and curd on Tuesday.").second.answer(request)
+        assertTrue("$invented", (invented as Outcome.Unavailable).detail!!.contains("Tuesday"))
+        val honest = engine("There is nothing logged for Tuesday; on Saturday you had rice, dal and curd.").second.answer(request)
+        assertTrue("$honest", (honest as Outcome.Unavailable).detail!!.contains("Tuesday"))
+        val grounded = engine("On Saturday you had rice, dal and curd.").second.answer(request)
+        assertTrue("$grounded", grounded is Outcome.Ok)
     }
 
     @Test fun `a recommendation may name a declared condition and nothing undeclared`() = runBlocking {

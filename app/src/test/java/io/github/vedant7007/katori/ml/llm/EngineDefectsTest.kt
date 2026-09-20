@@ -62,7 +62,10 @@ class EngineDefectsTest {
      */
     @Test fun `a condition word quoted from a given fact is permitted`() = runBlocking {
         val row = fact("fat.unsat", "Unsaturated fats lower disease risk; saturated fats are best eaten in moderation.")
-        val out = LlamaCppLlmEngine(Scripted("The notes say unsaturated fats lower disease risk, so prefer groundnut oil to ghee."))
+        // RULED 20 Sep (ClaimGuard): a claim is quoted verbatim from its row, so the row's own
+        // words are what the model may say; "unsaturated fats lower disease risk" in its own
+        // words is refused as a paraphrase. The condition word is still what this case tests.
+        val out = LlamaCppLlmEngine(Scripted("Prefer groundnut oil to ghee. Unsaturated fats lower disease risk; saturated fats are best eaten in moderation."))
             .answer(ask("is ghee bad for me", facts = listOf(row)))
         assertTrue("the model quoted a row it was told to quote and was refused: $out", out is Outcome.Ok)
     }

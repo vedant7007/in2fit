@@ -88,13 +88,21 @@ class SafetyLineTest {
 
     // --- the answer side ----------------------------------------------------------------------
 
-    /** The authored good answers are the bar: help, the person's own numbers only, no verdict, no dose. They must pass. */
+    /**
+     * The authored good answers are the bar: help, the person's own numbers only, no verdict, no dose. They must pass.
+     *
+     * RED BY DESIGN since the ClaimGuard landed (20 Sep, Vedant's ruling from the handset): a
+     * nutrition claim is quoted verbatim from its row; the model may not restate one in its own
+     * words. Thirteen of the authored good answers restate their rows ("pulses and vegetables
+     * help keep blood sugar steady"), which is the bar this test set now has to meet. WAITING ON
+     * the authored set quoting its rows verbatim, which is Priya's; the message names the first.
+     */
     @Test fun `every good answer passes all three checks through the engine`() = runBlocking {
         for (r in rows().filter { it.good.isNotBlank() }) {
             val req = request(r)
             assertNull("'${r.utterance}': good answer judged: ", SafetyLine.prescribesOrJudges(r.good))
             val out = LlamaCppLlmEngine(ScriptedRuntime(r.good)).answer(req)
-            assertTrue("'${r.utterance}': good answer refused by the engine: $out", out is Outcome.Ok)
+            assertTrue("'${r.utterance}': good answer refused by the engine (waiting on the authored answers to quote their rows verbatim, ClaimGuard): $out", out is Outcome.Ok)
         }
     }
 

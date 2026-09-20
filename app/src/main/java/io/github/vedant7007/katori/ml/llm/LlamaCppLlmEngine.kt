@@ -133,7 +133,7 @@ class LlamaCppLlmEngine(
         }
         val permitted = ConversationPrompts.permitted(request)
         val prompt = ConversationPrompts.answer(request, length)
-        return guarded(prompt, length.answerMaxTokens, permitted)
+        return guarded(prompt, length.answerMaxTokens, permitted, grounding = permitted - request.question)
     }
 
     override suspend fun recommend(request: RecommendRequest, length: AnswerLength): Outcome<PhrasedText> {
@@ -142,7 +142,7 @@ class LlamaCppLlmEngine(
         }
         val permitted = ConversationPrompts.permitted(request)
         val prompt = ConversationPrompts.recommend(request, length)
-        return guarded(prompt, length.recommendMaxTokens, permitted)
+        return guarded(prompt, length.recommendMaxTokens, permitted, grounding = permitted - request.request)
     }
 
     /**
@@ -159,7 +159,7 @@ class LlamaCppLlmEngine(
      * own question ("is 9.8 haemoglobin anaemia?", declined by name) is allowed; one from
      * nowhere is not (`0024`, finding 2).
      */
-    private suspend fun guarded(prompt: String, maxTokens: Int, permitted: List<String>): Outcome<PhrasedText> {
+    private suspend fun guarded(prompt: String, maxTokens: Int, permitted: List<String>, grounding: List<String>): Outcome<PhrasedText> {
         val raw = withContext(dispatcher) {
             runtime.generate(prompt, maxTokens, ConversationPrompts.CONVERSATION_STOPS)
         }
@@ -175,6 +175,11 @@ class LlamaCppLlmEngine(
         }
         SafetyLine.prescribesOrJudges(text)?.let { phrase ->
             return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model prescribed or judged: '$phrase'")
+        }
+        // The fourth post-condition (20 Sep): a nutrition claim, or an assertion about a day in
+        // the diary, must be verbatim from what the model was given. Paraphrase is deciding.
+        ClaimGuard.firstUngroundedClaim(text, grounding)?.let { claim ->
+            return Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model made a claim in its own words: '$claim'")
         }
         return Outcome.Ok(PhrasedText(text = text, numericGuardPassed = true))
     }
