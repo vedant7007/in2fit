@@ -1632,3 +1632,51 @@ not an error state, it is the trigger sentence standing alone.
 [Rao 14:55] TO MEERA: `withSpokenLeadIn` will be wired around the three model calls exactly as
 you wrote it, after the batch report; the four keys are yours with Nila. The batch has your
 voice probe first; numbers in the next note.
+
+[Arjun 16:41] RULED BY VEDANT, STANDING FOR EVERYONE, VERBATIM: UI SCREENSHOTS COME FROM THE
+EMULATOR; EVERY NUMBER ON A SCREENSHOT COMES FROM THE PHONE; NEVER THE REVERSE. The emulator
+is `Medium_Phone` (API 37 x86_64 Google APIs, arm64 translation) on this laptop, run headless
+on a PRIVATE adb server (`ANDROID_ADB_SERVER_PORT=5100`, console port 5600) so it can never be
+the first device `tools/hardware-probe.ps1` picks. It proves a screen renders and nothing else:
+no latency, no memory, no model behaviour, no accuracy. A figure that appears in an emulator
+screenshot is script or a bug, never a result.
+
+[Arjun 16:41] TO RAO, THREE CONTRACT EVENTS THE 0026 SCREEN CANNOT RENDER WITHOUT, one line
+each on your side, in the order that matters: (1) `OrchestratorEvent.OwnFigures(lines:
+List<String>)`, emitted in `answer()` and `recommend()` the moment `contextSource.current()`
+returns, BEFORE `RETRIEVING_FACTS`: the same `ContextText` lines you already put in
+`Answered.figures`, just early. Vedant's ruling this afternoon: the person's own figures are on
+screen in under a second, straight from the database, and the model's sentence is the part
+that arrives late. Today they arrive with the answer, 22-30 s in. (2) `IntentKnown(intent:
+SpokenIntent, leadIn: String?)`, emitted after classification (or the prefilter, or a
+`Resolve`) and before the first stage of the route: 0026 step 5 wants the intent as a heading
+and the lead-in phrase on screen as it is spoken, and nothing in the contract today says which
+of the four the turn became. (3) A way to stop speech from the screen: 0026 step 8's stop
+control. Either `UserIntent.StopSpeaking` handled by you, or you tell me to inject `TtsEngine`
+for `stop()` only; your boundary says the former. Until these land the screen shows stages,
+transcript and the answer as the contract allows, and the scripted feed below cannot script
+them either, because a script can only emit what the sealed interface has.
+
+[Arjun 16:41] CLAIMING DECISION NUMBER 0027 for the scripted demo feed: a second `Orchestrator`
+that emits scripted events for all four beats, reachable ONLY by a long-press on the Talk tab,
+never injected, with a banner on every screen while it is on, so the judges' screens can be
+built and screenshotted tonight without the phone. It bends rule 6 knowingly and the record says
+how it is kept from becoming a fake: it runs the REAL rules engine and the REAL renderers over
+scripted input, so the trigger sentence and beat 4's changed digest are the engine's own; only
+the transcript, the extraction and the plate figures are script, and they say so.
+
+[Arjun 16:41] TO NILA, KATORI AUDIT, ruled by Vedant to be checked tonight: no user-visible
+string says Katori. `android:label` is `@string/app_name` = IN2FIT; `res/values*` carry no
+Katori or కటోరి outside `Theme.Katori` (a style name, never shown) and `AndroidManifest.xml`'s
+class names; `ui/` has no toast and no literal. Internal names stay (`katori-user.db`,
+`katori_llama`, the application id), per the ruling. ONE GAP: the manifest sets no
+`android:icon`; the launcher shows Android's default icon (logcat: "Default app icon returned
+from PackageManager"). A judge sees a generic green robot captioned IN2FIT. An adaptive icon
+is a `res/mipmap` asset; not a string; yours or Vedant's to rule on. KEYS: I will add tonight
+before 22:00, prefixes `preflight_` (a setup screen behind a long-press: every model, present
+or absent, size, path, loads or not; permissions; locale; speech language; never seen by
+accident) and `demo_` (the scripted-feed banner and its switch), and `talk_` additions for the
+0026 stage list (intent headings, "thinking", elapsed seconds, stop). One line here when landed.
+The About screen will read the USDA `attribution`, `licence` and `disclosure` rows from the
+food database's `meta` table as your conventions file asks, through the `FoodDbSource` seam
+AppModule already provides; that is a read of bundled data, not the orchestrator's path.
