@@ -89,46 +89,70 @@ class OrchestratorDeviceTest {
         override suspend fun transcribe(clip: AudioClip, language: SpeechLanguage): Outcome<Transcript> = Outcome.NotImplemented("test")
     }
 
-    @Test
-    fun a_fourTurnsEndToEnd() {
-        report.delete()
-        say("=== end to end on ${android.os.Build.MODEL}, ${java.time.LocalDateTime.now()}, $THREADS threads ===")
-        val model = File(modelsDir, LLM_FILE)
-        assertTrue("stage the LLM at ${model.absolutePath}", model.length() > 0L)
-
+    /** The real orchestrator over an in-memory Room seeded with the demo person, and the real model. */
+    private inner class Rig(diet: String = "VEGETARIAN", conditions: List<String> = listOf("low iron")) {
         val db = Room.inMemoryDatabaseBuilder(ctx, KatoriDatabase::class.java).build()
         val foods = AndroidFoodDbSource.open(ctx)
-        val t0 = System.nanoTime()
-        val runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = THREADS)
-        say("model load ${(System.nanoTime() - t0) / 1_000_000} ms")
-        val engine = LlamaCppLlmEngine(runtime)
-        val lease = object : LlmLease {
-            override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> = Outcome.Ok(block(engine))
-        }
+        val runtime: LlamaCppRuntime
         val trigger = TriggerText(AndroidTriggerStrings(ctx))
-        val orchestrator = DefaultOrchestrator(
-            asr = NoAsr(), llm = lease, tts = Silent(), rules = DefaultRulesEngine(),
-            resolver = LookupMealResolver(SqliteFoodLookup(foods)), store = RoomMealStore(db),
-            advice = RoomAdviceStore(db), labs = RoomLabStore(db),
-            contextSource = RoomUserContextSource(db, foods),
-            knowledge = KnowledgeFacts.load { ctx.assets.open(KnowledgeFacts.ASSET_PATH) },
-            triggerText = trigger, contextText = ContextText(AndroidContextStrings(ctx), AndroidTriggerStrings(ctx)),
-        )
-        // The person: a hostel vegetarian who declared low iron and has one report on file.
-        runBlocking {
-            db.profileDao().upsert(ProfileEntity(1, 19, 62.0, 172.0, "MALE", "MAINTAIN", "HOSTEL_STUDENT", "VEGETARIAN", System.currentTimeMillis()))
-            db.conditionDao().upsert(ConditionEntity(name = "low iron", source = "USER_DECLARED", recorded_at_epoch_ms = System.currentTimeMillis()))
-            db.labValueDao().insertAll(listOf(LabValueEntity(test_name = "Haemoglobin", value = 9.8, unit = "g/dL", reference_low = 12.0, reference_high = 15.0, report_date = "2026-09-12", captured_at_epoch_ms = System.currentTimeMillis())))
-        }
-        val en = SpeechLanguageRef("en-IN")
+        val orchestrator: DefaultOrchestrator
         var mealId: Long? = null
+        /** Milliseconds from the turn's start to its first figure on screen, and to the spoken sentence. */
+        var firstFigureMs: Long? = null
+        var spokenMs: Long? = null
+        var intent: String? = null
+        var resolved: String? = null
+        var figures: List<String> = emptyList()
+        var extractTimings: LlamaCppRuntime.Timings? = null
+
+        init {
+            val model = File(modelsDir, LLM_FILE)
+            assertTrue("stage the LLM at ${model.absolutePath}", model.length() > 0L)
+            val t0 = System.nanoTime()
+            runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = THREADS)
+            say("model load ${(System.nanoTime() - t0) / 1_000_000} ms")
+            val engine = LlamaCppLlmEngine(runtime)
+            val lease = object : LlmLease {
+                override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> = Outcome.Ok(block(engine))
+            }
+            orchestrator = DefaultOrchestrator(
+                asr = NoAsr(), llm = lease, tts = Silent(), rules = DefaultRulesEngine(),
+                resolver = LookupMealResolver(SqliteFoodLookup(foods)), store = RoomMealStore(db),
+                advice = RoomAdviceStore(db), labs = RoomLabStore(db),
+                contextSource = RoomUserContextSource(db, foods),
+                knowledge = KnowledgeFacts.load { ctx.assets.open(KnowledgeFacts.ASSET_PATH) },
+                triggerText = trigger, contextText = ContextText(AndroidContextStrings(ctx), AndroidTriggerStrings(ctx)),
+            )
+            // The person: a hostel student who declared their condition and has one report on file.
+            runBlocking {
+                db.profileDao().upsert(ProfileEntity(1, 19, 62.0, 172.0, "MALE", "MAINTAIN", "HOSTEL_STUDENT", diet, System.currentTimeMillis()))
+                conditions.forEach { db.conditionDao().upsert(ConditionEntity(name = it, source = "USER_DECLARED", recorded_at_epoch_ms = System.currentTimeMillis())) }
+                db.labValueDao().insertAll(listOf(LabValueEntity(test_name = "Haemoglobin", value = 9.8, unit = "g/dL", reference_low = 12.0, reference_high = 15.0, report_date = "2026-09-12", captured_at_epoch_ms = System.currentTimeMillis())))
+            }
+        }
+
+        fun close() { runtime.close(); db.close() }
 
         fun turn(label: String, intent: UserIntent) {
             say(""); say("--- $label ---")
             val start = System.nanoTime()
-            fun at() = "%6d ms".format((System.nanoTime() - start) / 1_000_000)
+            fun ms() = (System.nanoTime() - start) / 1_000_000
+            fun at() = "%6d ms".format(ms())
+            firstFigureMs = null; spokenMs = null; this.intent = null; resolved = null; figures = emptyList(); extractTimings = null
             runBlocking {
                 orchestrator.handle(intent).collect { e ->
+                    when (e) {
+                        is OrchestratorEvent.IntentKnown -> this@Rig.intent = e.intent.name
+                        is OrchestratorEvent.OwnFigures -> { if (firstFigureMs == null && e.lines.isNotEmpty()) firstFigureMs = ms(); figures = e.lines }
+                        is OrchestratorEvent.MealResolved -> {
+                            if (firstFigureMs == null) firstFigureMs = ms()
+                            extractTimings = runtime.lastTimings()
+                            resolved = e.meal.items.joinToString("; ") { "${it.spokenName}=${it.quantity ?: "?"} ${it.unit ?: ""} -> ${it.matchedFoodCode}".trim() }
+                            figures = e.figures.filter { f -> f.total.nutrient.name in setOf("ENERGY", "PROTEIN", "IRON") }.map { f -> "${f.total.nutrient.name.lowercase()} ${"%.1f".format(f.total.amount)} ${f.total.unit.name.lowercase()} ${f.total.completeness.name.lowercase()}" }
+                        }
+                        is OrchestratorEvent.Advice, is OrchestratorEvent.Answered -> spokenMs = ms()
+                        else -> Unit
+                    }
                     when (e) {
                         is OrchestratorEvent.Progress -> say("${at()}  ${e.stage}")
                         is OrchestratorEvent.IntentKnown -> say("${at()}  intent ${e.intent}  lead-in \"${e.leadIn}\"")
@@ -151,7 +175,15 @@ class OrchestratorDeviceTest {
                 say("            last model call: prompt ${t.promptTokens} tok / ${"%.0f".format(t.promptMillis)} ms = ${"%.1f".format(t.promptTokensPerSecond)} tok/s   gen ${t.evalTokens} tok / ${"%.0f".format(t.evalMillis)} ms = ${"%.2f".format(t.evalTokensPerSecond)} tok/s")
             }
         }
+    }
 
+    @Test
+    fun a_fourTurnsEndToEnd() {
+        report.delete()
+        say("=== end to end on ${android.os.Build.MODEL}, ${java.time.LocalDateTime.now()}, $THREADS threads ===")
+        val rig = Rig()
+        val en = SpeechLanguageRef("en-IN")
+        with(rig) {
         turn("LOG: I had two rotis and a katori of dal", UserIntent.Type("I had two rotis and a katori of dal", en))
         turn("ANSWER: did I get enough iron this week", UserIntent.Type("did I get enough iron this week", en))
         turn("RECOMMEND: what should I eat for more iron", UserIntent.Type("what should I eat for more iron", en))
@@ -159,11 +191,42 @@ class OrchestratorDeviceTest {
         turn("SAVE LAB REPORT: fasting glucose 260 (regenerates the last meal's advice)", UserIntent.SaveLabReport(listOf(LabValue("Fasting glucose", 260.0, "mg/dL", 70.0, 100.0, LocalDate.of(2026, 9, 20)))))
         mealId?.let { turn("ADVISE ON MEAL $it again (after the report; expected instant, with the referral)", UserIntent.AdviseOnMeal(it)) }
         turn("SUGGEST: I'm having rice and palak paneer, what should I add", UserIntent.Type("I'm having rice and palak paneer, what should I add", en))
-
-        say(""); say("answer prompt length at SHORT, chars: ${ConversationPrompts.ANSWER_MAX_TOKENS} max gen tokens; see 'last model call' lines for prompt tokens")
-        runtime.close()
-        db.close()
+        }
+        say(""); say("SHORT caps generation at ${ConversationPrompts.ANSWER_MAX_TOKENS} tokens for ANSWER; see 'last model call' lines for prompt tokens")
+        rig.close()
         say("report written to ${report.absolutePath}")
+    }
+
+    /**
+     * THE TEN DEMO SENTENCES (`data-authoring/demo-utterance-set.csv`, the English column), in
+     * order, through the real orchestrator, one person, one diary. Per sentence: the intent the
+     * words or the model decided, the foods and quantities as resolved, the figures, and THE TWO
+     * NUMBERS THAT ARE THE PRODUCT: time to the first figure on screen, and time to the spoken
+     * sentence. The file is staged beside the models; a missing file fails, it does not skip.
+     */
+    @Test
+    fun b_tenDemoSentences() {
+        say(""); say("=== the ten demo sentences, English, ${java.time.LocalDateTime.now()}, $THREADS threads ===")
+        val file = File(modelsDir.parentFile, "demo-utterance-set.csv").takeIf { it.isFile }
+            ?: File(ctx.externalMediaDirs.first(), "demo-utterance-set.csv")
+        assertTrue("stage the demo set at ${file.absolutePath}", file.isFile)
+        val rows = io.github.vedant7007.katori.data.knowledge.Csv.parse(file.readText()).drop(1).filter { it.getOrNull(3) == "en" }
+        say("${rows.size} sentences")
+        val rig = Rig(conditions = listOf("anaemia"))
+        val en = SpeechLanguageRef("en-IN")
+        val summary = mutableListOf<String>()
+        for (r in rows) {
+            val (id, beat, expectIntent, _, spoken) = r
+            rig.turn("#$id beat $beat expect $expectIntent: $spoken", UserIntent.Type(spoken, en))
+            val et = rig.extractTimings
+            summary += "#%-2s %-9s -> %-9s  first figure %6s ms   spoken %6s ms   %s%s".format(
+                id, expectIntent, rig.intent ?: "-", rig.firstFigureMs ?: "-", rig.spokenMs ?: "-",
+                rig.resolved?.let { "[$it] " } ?: "", rig.figures.joinToString("; "),
+            ) + (et?.let { "   extract prompt ${it.promptTokens} tok ${"%.0f".format(it.promptMillis)} ms, gen ${it.evalTokens} tok ${"%.0f".format(it.evalMillis)} ms" } ?: "")
+        }
+        say(""); say("=== summary: the two numbers that are the product ===")
+        summary.forEach { say(it) }
+        rig.close()
     }
 
     companion object {

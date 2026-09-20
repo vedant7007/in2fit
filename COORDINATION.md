@@ -2297,3 +2297,31 @@ catch them on the phone is the measurement that does not exist yet.
 three English clips of the bundled voice (lead-in, a plate confirmation, an answer). Unlike the
 Hindi and Telugu files you can judge these yourself. One word back: acceptable on stage if the
 iQOO has no English voice of its own, yes or no.
+
+[Rao 18:40] THREE RULINGS FROM VEDANT on what the end-to-end run found, and one drop.
+1. CANDIDATES RANK PER SERVING, NEVER PER 100 g (landed, `02417a9`). Cumin, turmeric, bay leaf
+and fenugreek topping an iron list was the wrong denominator, not a missing exclusion list.
+`CandidateFood.servingGrams` is the serving the database models (a recipe's yield over its
+servings; the household unit a plain food's class is usually served in, from `unit_conversions`;
+100 g otherwise) and the engine scores nutrient per that. The spice/fat exclusion is gone. Spec
+4.3's per-context list stays unauthored and is PRIYA's.
+2. SHORT IS TOO TIGHT FOR RECOMMEND. PRIYA, the observation is mine, the number is yours: the
+RECOMMEND turn at SHORT (56 tokens cap) returned the bare words "Spices, cumin seed", 6 tokens,
+which is a broken answer, not a short one. RECOMMEND needs its own budget; SHORT is not to be
+reverted wholesale because one intent needs more room.
+3. CALIBRATE UNIT IS DESCOPED FOR THE BATTLE. ARJUN: stop holding a screen for it; nothing lands
+under `UserIntent.CalibrateUnit` this week. NILA: the run of show says the demo profile is
+PRE-SEEDED, and what with: the presenter's utensils are the bundled defaults in
+`household-units.csv` (katori 150 g for cooked pulses, grains and dairy, 100 g for a sabzi,
+plate 200 g of rice, glass 200 ml, spoon of oil 10 g, one roti 45 g from its recipe), so "one
+katori, your size" is on screen as a figure with `HOUSEHOLD_UNIT_DEFAULT` on it. The override
+read and write are post-battle work.
+DROPPED: KV-cache prefix reuse. Four seconds against a 688-token prompt; at 394-457 with
+precomputed RECOMMEND it is native work with real risk for a small return. After the battle.
+The remaining prompt lever is Priya's system block.
+
+[Rao 18:40] NEXT, in Vedant's order: (a) the demo-condition run the moment the phone is on USB,
+airplane mode on, idle, cool; (b) the ten demo sentences end to end on the handset
+(`OrchestratorDeviceTest.b_tenDemoSentences`, compiled, reads `demo-utterance-set.csv` staged
+beside the models, reports per sentence the intent, foods, quantities, figures, and time to
+first figure versus time to the spoken sentence); (c) 2d when Priya lands the tie-break test.
