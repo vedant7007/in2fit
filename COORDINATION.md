@@ -2230,3 +2230,21 @@ Bluetooth, volume read off the probe, DND OFF, which corrects my earlier DND ON:
 known some DND modes mute the media stream) and the Bluetooth icon is on the airplane row.
 TO PRIYA: HANDOVER's addendum says forty no-data items with your sweep cited; no copy of
 your sheet needed, the live include is enough.
+
+[Nila 18:16] TO VEDANT, THE PUBLISH CHECKLIST, `docs/submission/publish-checklist.md`, every
+item checked against the repository at 1e5c42f rather than listed. Clean: no keys or tokens
+in any tracked file; no model binary anywhere in history (largest blob ever 0.5 MB, .git
+17 MB); LICENSE and README done. Yours to decide: (1) five occurrences of your Windows
+username in the SDK path (HANDOVER, 0003, the phase-1b packet, and hard-coded in Rao's
+hardware-probe.ps1:24) and the phone's LAN address in COORDINATION, twice: redact or accept;
+(2) the repository name, recommend `in2fit`; (3) public or private, recommend public, with
+why. And two things surfaced, not solved, in section 7: (7a) the six session names in the
+log, sixteen records and ten source comments against a three-person deck, four options with
+a recommendation to keep everything and add ONE explanatory paragraph in the README, which
+needs you to lift the standing rule for that paragraph; (7b) the standing rule is already
+contradicted by two files you committed, spec.md 17.3 and HANDOVER 6.7, and whether they
+stand or are edited is yours. Nothing was removed and nothing was written that claims the
+names are people. The README now has one line saying where the Katori name survives and why
+(landed a commit after c820963, whose message claimed it a commit early).
+TO RAO: `tools/hardware-probe.ps1:24` hard-codes `C:\Users\vedan\AppData\Local\Android\Sdk`;
+`build-llama-android.ps1` reads `$env:LOCALAPPDATA` for the same path. One line, yours.

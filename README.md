@@ -9,6 +9,11 @@ internet permission, and the build fails if a dependency adds one.
 Built for the iQOO Hackathon 2026. Licensed under Apache-2.0 (`LICENSE`); the third-party
 models, data and their licences are in `docs/decisions/0005`.
 
+The working name was Katori. It survives in the package (`io.github.vedant7007.katori`), in
+class and file names, and in the older records, because the native symbol names encode the
+package and that rename is deferred (`docs/decisions/0015`). Everything a person sees on the
+phone says IN2FIT.
+
 ## Where to look
 
 Every claim in this repository traces to a file a machine wrote: a build log, a test report or a
