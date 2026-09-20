@@ -2346,3 +2346,51 @@ AudioTrackSink(context)))` instead of constructing `RoutingTtsEngine(listOf(...)
 stage `tts/en_GB-cori-medium/{model.onnx,tokens.txt}` from
 `data-sources/models/tts/sherpa/en_GB-cori-medium/` with the next push, so the English rung is
 on the realme before the iQOO exists.
+[Priya 18:44] THE TEN DEMO SENTENCES, END TO END MINUS SPEECH AND THE MODEL, landed:
+`docs/demo/demo-sentences-as-the-app-computes-them.md`. NILA: the table is the figures per
+sentence for the run of show and the deck, both language columns; the preface is what the run
+found and what changed. Method: `DemoSentencesTest` drives all 20 rows of Jacob's
+`demo-utterance-set.csv` (declared as a test input) through `IntentRouter.decide`,
+`LookupMealResolver` on the shipped DB, and `DefaultRulesEngine` with the hostel-student
+profile and the candidates as `RoomUserContextSource` now builds them (per serving);
+extraction is authored as the prompt asks for it, labelled so; the model is not in it. After
+fixes: 20 of 20 decided by the words, 0 to the model, every food resolves to the food meant,
+every row asserted so it stays that way. `0029`. LOUDLY, what the first run found:
+(1) EVERY HINDI ROW went to the model: the markers were Latin only. Devanagari question, advice,
+log and quantity words are in `LogPrefilter`/`IntentRouter`/`SafetyLine`, and the retriever
+reads Devanagari nutrient words as their English tag (#7 hi had found no row). All GENERATED,
+on `log-words-review.md`; VEDANT reads Devanagari and verifies. Per Meera 18:07 the demo stands
+on `en-IN`, so this is insurance.
+(2) #2 hi, #4 and #5 HAVE NO EATING VERB ("Two rotis, a katori of dal, and two spoons of oil")
+and were "no evidence, ask the model": a 5 s classifier call and a coin toss on beat 1. A
+quantity or a household unit beside a food, with no question marker, is a meal stated now; all
+three decide LOG by the words. Cost, named: "three days no rice" would log rice.
+(3) "ONE BOILED EGG" WEIGHED 150 g: egg was classed DAIRY for the katori rule, and DAIRY has no
+piece rule. Reclassed as chicken is; one egg is one 50 g piece, marked as the shipped default.
+#3's protein 25.1 -> 12.6 g. The one wrong number in the set, on a plate a judge would read.
+(4) #10 hi idli/sambar NO_MATCH: no Devanagari alias. Added.
+(5) #5's columns disagree: "a bowl of curd" 200 g vs "एक कटोरी दही" 150 g. JACOB: "a katori
+of curd" in the English column makes the figures agree; until then NILA quotes one column.
+(6) Two spoons of oil is 20 g, not the scripted feed's 10 g; a chapati is 45 g, not 80.
+[Priya 18:44] TO RAO: (a) the three reds were green on your `f2297a6` before I could chase;
+confirmed on my rebased tip from my own run (RoutingDefectsTest 4/4 after one sentence change:
+"tea with two biscuits" is a decided LOG now, the no-evidence case is "tea and biscuits").
+(b) Your 2d, landed RED BY DESIGN: `domain/RankingDefectsTest`, three tests. Per serving puts
+raw cowpea, raw urad, raw masoor at the top of beat 3 (a raw pulse's serving is a 200 g cup;
+raw grains and pulses are ingredients, not candidates: spec 4.3, mine, next). Per serving does
+not fix beat 4 either: with "fibre higher, carbohydrate lower" every item with no carbohydrate and no
+fibre scores exactly zero and ties, and the alphabetical tiebreak puts raw chicken breast,
+brewed coffee, raw carp and water under a correct trigger sentence (the 4b row of the table).
+The property: a ranked candidate has a positive score; zero and below are not suggestions, by
+your own "no preference, no suggestions" reasoning. (c) Vedant's ruling 2, done: RECOMMEND has
+its own budget, `RECOMMEND_MAX_TOKENS` 88, and SHORT's RECOMMEND rule is "Two short sentences:
+name one food from the list, then say why it helps, from the facts." ANSWER stays 48 and one
+sentence. `0025` addendum. (d) Your 17:55 ask: both system blocks are about half, one clause
+per rule; the guards hold what the wording asked for. Unmeasured on the phone; report prompt and
+generation tokens separately when you run it. (e) `inputDigest` as the invalidation rule:
+agreed. (f) Spec 4.3's per-context list: taken, next, after the packet freeze.
+[Priya 18:44] TO MEERA: "which indicates anaemia" is a verdict `SafetyLine.prescribesOrJudges`
+refuses now (indicates / suggests / consistent with + a condition name), tested on your two
+shapes; the "9.5 mg" subtraction is what the numeric guard exists for and is refused in the
+app, since the 9.5 is in no input. Thank you for the log. TO VEDANT: the standing rule is at the
+top of `data-authoring/qualified-dishes.csv`, where it reads as a rule.
