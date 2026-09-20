@@ -3445,3 +3445,34 @@ food words were lost. The exact column is the least informative of the three and
 lets it stand by itself. Desktop decode times on this run were on an un-starved laptop (hi 352 ms
 mean); still not phone numbers.
 [Nila 22:00] PACKET FROZEN at 22:00: docs/localisation/telugu-review-queue.md, 176 items, every Telugu line machine-generated and marked unreviewed, 0 to write. Keys landing after this line are English in the demo build by the freeze rule and wait for the next packet. values-te sha before/after regenerate: c4a9bc52bdeb3954ffed22734c1072d6191687e3 / c4a9bc52bdeb3954ffed22734c1072d6191687e3.
+[Priya 21:47] THE UNSTATED QUANTITY, RULED, MY HALF LANDED (`0035`). "थोड़ी दाल" reaches the
+resolver as `1.0` with no unit, and until tonight `LookupMealResolver.weigh` took a number with
+no unit on an authored dish as one STATED piece of the recipe at full confidence. Now: a number
+with no unit is a stated amount only for a COUNTED dish, read off the recipe's moisture class
+(a roti, a vada, an idli, a dosa, an omelette; and a plain food whose class unit is a piece, an
+egg): "two rotis" says how much. For anything SERVED (a gravy, a rice dish, a drink, a chutney,
+a plain food in a katori) the unit is ours: QUANTITY_INFERRED and HOUSEHOLD_UNIT_DEFAULT, band
+ROUGH, never QUANTITY_STATED, and the assumed quantity and unit are WRITTEN BACK onto the
+returned `ParsedItem` (`quantity = 1.0, unit = "katori"`) beside `snapshot.grams = 180`. It
+holds whichever way the model behaves: `1.0` and `null` read the same. `UnstatedQuantityTest`,
+seven tests on the shipped DB; `DemoSentencesTest` now models the model's `1.0` on Beat 1 in both
+languages and asserts the plate reads an assumed katori at Rough. The plate column of
+`docs/demo/demo-sentences-as-the-app-computes-them.md` reads as the card will:
+"dal → toor_dal_tadka 1 katori taken as 180 g rough"; "a katori of dal" (said) is
+"1 katori taken as 180 g approximate"; "two rotis" is "2 piece 90 g approximate".
+IRA, FOR THE CARD: the three fields are on `ResolvedMeal.parsed.items[i]` and `.items[i]`:
+`quantity` + `unit` (what was said, or what was assumed in its place), `snapshot.grams` (what it
+was taken as), and `confidence.reasons`: QUANTITY_INFERRED or HOUSEHOLD_UNIT_DEFAULT present means
+"taken as"; QUANTITY_STATED alone means the person said it. The unit word for a served dish is
+the one a person would say: katori for a gravy, plate for a rice dish, cup for chai, glass for
+chaas, spoon for a chutney. NILA: the band is emitted; the slide's sentence stays on the deck.
+RAO, YOUR HALF: the model must not write a quantity it was not given; this half does not depend
+on it. Note `ReferenceRecipe` gained `moistureClass` (default "", read from the recipes table)
+and the resolver's `one()` returns the assumption beside the item; `DefaultOrchestrator` needs
+nothing, the `ParsedItem` it receives back simply carries the assumed unit now.
+[Priya 21:47] THE SWEEP'S LIMIT IS A GATE NOW: `us-record-sweep.csv` names the eight nutrients it
+read on a `nutrients_swept:` line and the importer refuses to build when that line and its own
+list disagree, so a ninth nutrient cannot ship until every record is read again for it. The two
+disclosures read as facts about the data: "Iron not shown: the US record's iron is added by
+enrichment, which Indian bread does not have."
+[Priya 21:47] CLAIMING DECISION NUMBER 0035 for the unstated quantity, landed with this entry.
