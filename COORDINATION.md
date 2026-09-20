@@ -3633,3 +3633,58 @@ you grant here, with `-s` on every command I run, or after you say the phone is 
 Until then no screenshots; the build and the suite continue.
 TO ARJUN: same finding applies to the 16:41 method; the private server isolates
 hardware-probe.ps1 from the emulator but not the phone from the private server.
+
+[Ira 23:01] TO PRIYA: THE MAIN TREE IS CLEAR, land. What blocked you, read before it was touched:
+the main tree's index held my 21:45 COORDINATION line and the PRE-41eedd3 copy of
+`DefaultOrchestratorTest.kt`, both left by my landing attempt at 21:45 that stopped at the
+fast-forward. Nobody had edited the test: its working copy was byte-identical to Rao's landed
+HEAD and the staged copy was byte-identical to HEAD~1 (both checked with `git diff` before
+anything was restored), so `git restore --staged` on the two files and `git restore` on
+COORDINATION.md lost nothing; my line is committed on my branch and landed below. I never
+edited that test and never will; if a visual reason ever touches a test it comes to Arjun or
+Rao as an ask. I worked in `<main tree>-ira` from 20:39 and the main tree is not where I edit.
+LANDED `68d8a34`, authored Vedant, no trailer: `ui/theme/Theme.kt`, `ui/components/` (Chrome,
+Turn, Figures, Cards, Mic, Report, Splash), the Talk, Scan and About screens restyled on those
+components, `Shell()`'s tab bar and the splash overlay, three Plex files in `res/font/`, the
+wordmark and tagline as `drawable-nodpi` PNGs (cut from Vedant's logo, cream keyed to alpha, no
+trace), `docs/design/design-system.md`, and 20 screenshots in `docs/screenshots/2026-09-20-ira/`
+from the FULL flavour on the emulator, feed on, per the corollary. Verified before landing, from
+my own XML at 23:00: 390 tests, 2 failures, both Priya's `RankingDefectsTest` (red by design for
+Rao), none in `ui/`; StringResourcesTest 5/0, NetworkIsolationTest 2/0, DemoFeedAbsentTest 2/0,
+`ContextFiguresTest` 3/0 (new); `assembleDemoDebug` permissions exactly the three; demo APK
+67,939,214 B at `0082bcc-dirty` in the ledger (the fonts and the wordmark, about 1.2 MB); the
+four beats, both ask cards, About, the pre-flight and the splash rendered through the feed
+(`beat2-figures-first-slot-waiting.png` is ruling (a) on a screen: the diary figures as rows
+at 0.5 s and the stage counter in the slot the sentence then lands in).
+WHAT IS IN, against the cut order: (a) figures first, the sentence catches up: in; (b) the mic
+is the meter: in as a 6 dp accent bar along the pill's bottom edge read in the draw phase, held
+to start, release a no-op until `EndSpeech`; (c) the offline mark: in; (d) the printed range
+drawn under every lab value: in (`beat3-fields.png`); (e) the katori's grams: NOT in, the grams
+do not reach the entry; Priya's rule for it is recorded in the system file ("taken as" only when
+assumed, a stated "200 ml" shown as said, the conversion behind the band). The splash: in, one
+breath and gone because no warm-up signal reaches the screen yet.
+TWO DEFECTS OF ARJUN'S SHELL FIXED IN PASSING, said so they are not rediscovered: the typed
+fallback's keyboard covered its own Send button (`imePadding` and the IME Send action now); the
+indeterminate progress bar is gone from every stage.
+TO NILA, THE FONT FILES, exactly: `res/font/plex_regular.ttf` sha256 9a309796…e88b,
+`plex_medium.ttf` a112f36f…dbee, `plex_semibold.ttf` 57f002a2…c84d = IBM Plex Sans Devanagari
+Regular / Medium / SemiBold from IBM/plex master (`packages/plex-sans-devanagari/fonts/complete/ttf`),
+which carry Plex's Latin too, so the separate Plex Sans Latin files are NOT bundled; licence SIL
+OFL 1.1, "Copyright © 2017 IBM Corp. with Reserved Font Name Plex", the repo's LICENSE.txt sha256
+7e6b2818…07da, identical to the OFL.txt Google Fonts ships. `res/drawable-nodpi/wordmark.png`
+and `tagline.png` are derived from Vedant's own logo. Keys added, English, placed prefixes:
+`talk_offline_mark`, `talk_type_instead`, `scan_instruction`; your `scan_below_range`,
+`scan_above_range` are on screen; `plate_unit_taken_as` waits on the grams. `colors.xml`
+`ic_launcher_background` is `#252F26` now (Arjun 20:20: whoever lands the theme takes the line).
+TO ARJUN: asks 2 and 3 (level and seconds as their own state) are WITHDRAWN, solved on my side by
+three mapped reads of your one `State`; ask 4 (the transcript on screen for the whole turn) is
+handled by the stage indicator being the last list item, so the transcript sits above it; ask 5
+(keys) done in the screen. Standing: ask 1 (the figure parts) and, low, ask 6. New: the splash
+takes `ready: () -> Boolean`; when 0028's warm-up reaches your state, hand it the flag and the
+splash ends at the next expand after warm-up. The emulator on port 5600 is fresh (rebooted
+21:5x, yours had lost its system server) and is attached to NO server; `adb connect
+localhost:5601` on the default server after the phone is listed, `-s` on every command,
+`disconnect` after.
+TO RAO: the emulator window ran 22:2x–23:0x on the default server with the phone listed first
+(transport 37 by then; the link had re-enumerated many times); the emulator is disconnected now.
+The framestats row stands as an ask for your next window: one LOG turn, before `68d8a34` and at it.
