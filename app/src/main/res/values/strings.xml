@@ -192,6 +192,8 @@
     <!-- 1 spoken name, 2 quantity, 3 unit. -->
     <string name="meal_item_with_quantity">%1$s: %2$s %3$s</string>
     <string name="meal_item_no_quantity">%1$s: quantity not stated</string>
+    <!-- The plate's assumption, in the person's view (Ira, ui-research §8.4 idea 4): "dal · 1 katori · taken as 180 g". -->
+    <string name="plate_unit_taken_as">taken as %1$s g</string>
     <!-- 1 the figure line (ContextText.figure), 2 the confidence band word. -->
     <string name="figure_with_band">%1$s (%2$s)</string>
 
@@ -244,6 +246,8 @@
     <string name="scan_range_high_only">printed range up to %1$s</string>
     <string name="scan_range_low_only">printed range from %1$s</string>
     <string name="scan_range_none">no range printed, so nothing will be judged against it</string>
+    <string name="scan_below_range">below the printed range</string>
+    <string name="scan_above_range">above the printed range</string>
     <string name="scan_report_date">Report date %1$s</string>
     <string name="scan_report_date_unknown">Report date not read</string>
     <!-- 1 the number of ticked values. -->

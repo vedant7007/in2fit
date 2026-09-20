@@ -216,6 +216,8 @@
     <string name="meal_item_with_quantity">%1$s: %2$s %3$s</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="meal_item_no_quantity">%1$s: పరిమాణం చెప్పలేదు</string>
+    <!-- REVIEW: machine-generated, received via Nila (machine), 20 Sep 2026, unreviewed -->
+    <string name="plate_unit_taken_as">%1$s గ్రాములుగా తీసుకున్నాం</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="figure_with_band">%1$s (%2$s)</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
@@ -288,6 +290,10 @@
     <string name="scan_range_low_only">ముద్రించిన పరిధి %1$s నుండి</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="scan_range_none">పరిధి ముద్రించలేదు, కాబట్టి దేనితోనూ పోల్చడం జరగదు</string>
+    <!-- REVIEW: machine-generated, received via Nila (machine), 20 Sep 2026, unreviewed -->
+    <string name="scan_below_range">ముద్రించిన పరిధి కంటే తక్కువ</string>
+    <!-- REVIEW: machine-generated, received via Nila (machine), 20 Sep 2026, unreviewed -->
+    <string name="scan_above_range">ముద్రించిన పరిధి కంటే ఎక్కువ</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="scan_report_date">రిపోర్టు తేదీ %1$s</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->

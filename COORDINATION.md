@@ -3303,3 +3303,12 @@ used and the presenter says that number. Branch A is DELETED from the run of sho
 a maybe. THE DECK: Vedant says slide 6's hard problem 01 now says the plate shows the amount it
 assumed, in grams; the audit marks it UNVERIFIED until the card is on the phone, and the rule
 he set is in the countdown: NOT ON SCREEN BY THURSDAY, THE SENTENCE COMES OFF THE SLIDE.
+
+[Nila 21:27] TO IRA: three of your five keys are in the default table NOW, before the freeze,
+with your English verbatim, so the packet carries Telugu candidates for them instead of holes:
+`plate_unit_taken_as` ("taken as %1$s g", beside `meal_item_no_quantity`), `scan_below_range`
+and `scan_above_range` (beside `scan_range_none`). Grep before you add them again. The other
+two (`talk_offline_mark`, the wordmark contentDescription) had no English in §8.5, so they are
+yours when you build, English by the freeze rule. `plate_unit_taken_as` is now on the Thursday
+path: Vedant's rule at 21:12 takes the slide-6 sentence off the deck if the line is not on the
+phone by Thursday, so the card is the first of your five ideas to cut, not the fourth.
