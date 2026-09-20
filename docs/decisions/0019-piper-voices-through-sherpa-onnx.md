@@ -587,3 +587,79 @@ judge can read over a shoulder, with a voice they may or may not catch.
    from it. Repeat with it unplugged: the route must be `BUILTIN_SPEAKER`.
 3. On the morning: airplane mode on, Bluetooth icon absent, speaker plugged, one spoken turn
    end to end from the back of the room before the judges arrive.
+
+---
+
+## Addendum 7, 20 September 2026, 18:10: what the app says back, and in which language
+
+The question nobody had asked: the input is Hindi, the voices can speak Hindi, but is there
+anything Hindi to say? Traced end to end in the code and measured where the code could not
+answer. **Today a Hindi-profile user hears English, and hears it through a Hindi voice.**
+
+### Where each spoken word comes from
+
+| what is spoken | source | language today | why |
+| --- | --- | --- | --- |
+| the lead-in ("Noting that down.") | `tts_lead_in_*` in `res/values/strings.xml`, read by `AndroidTriggerStrings` through the app's resources | English | resources follow the app's UI locale, which the run of show sets to English; `values-hi/strings.xml` is empty by design ("Telugu is filled first") |
+| the rules engine's trigger and referral sentences | `trigger_*` keys, same path | English | same |
+| the figures the model is shown ("Iron: 2.9 mg") | `context_*` keys, same path | English | same |
+| the LOG confirmation (`phrase`) and the ANSWER / RECOMMEND prose | the model, whose prompt says `Language to reply in: <tag>` with the profile's speech language | **English** | measured below: the model answers in English whatever the tag says |
+| the voice it is all read in | `speak(text, language)` picks the voice from the PROFILE'S speech language | the Hindi voice | so English words go through Hindi phonology, the mirror image of what the contract forbids |
+
+### The measurement
+
+`logs/meera-hindi-reply.log`, 18:00. The phone's exact GGUF (`qwen2.5-1.5b-instruct-q4_k_m.gguf`,
+the same file, same quantisation) through Ollama on the laptop, temperature 0, context 2048, the
+system and user text copied verbatim from `Prompts.phrasing` and `ConversationPrompts.answer`
+(SHORT), figures composed by hand from the string templates. Seven runs; the count that matters
+is the script of the reply:
+
+| prompt | tag | question | Devanagari letters in the reply | Latin letters |
+| --- | --- | --- | ---: | ---: |
+| phrasing (LOG) | `hi` | — | 0 | 296 |
+| phrasing (LOG) | `hi-IN` | — | 0 | 231 |
+| phrasing (LOG) | `en-IN` | — | 0 | 255 |
+| answer SHORT | `hi` | aaj maine kitna iron khaya | 0 | 144 |
+| answer SHORT | `hi` | इस हफ्ते मुझे कितना आयरन मिला | 0 | 149 |
+| answer SHORT | `hi-IN` | मैंने आज दो रोटी और दाल खाई, कितना प्रोटीन था | 0 | 184 |
+| answer SHORT | `en-IN` | how much iron did I get this week | 0 | 189 |
+
+**Seven of seven English, including three questions asked in Devanagari with a Hindi tag.** The
+`Language to reply in` line does not make this model reply in Hindi, at this size and
+quantisation, on this runtime. This is a desktop measurement of the LANGUAGE of the reply; `0011`
+says an argmax can move across binaries, so the phone could differ in wording, and nothing here
+says it would differ in script. The phone has never been asked: every conversational row in
+`logs/hw-report-conversational.txt` was run with `languageTag = "en-IN"`.
+
+Two things seen in the same runs that are not mine and are passed on rather than judged: the
+SHORT answer with the `hi` tag said "which indicates anaemia" (a condition the person did not
+declare; Priya's safety line is the guard that must catch it on the phone), and the `en-IN`
+answer invented "9.5 mg" and did the subtraction out loud (the numeric guard's case, and the
+`0014` finding again).
+
+### What follows
+
+1. **The demo speaks English back.** Input Hindi, output English, which is how people here
+   actually use software, and it is not a failure; it is a fact the deck must not contradict.
+   The line "says it back in the language you chose" cannot be shown live on Saturday. Nila has
+   the wording that can.
+2. **The voice must follow the text, not the profile.** `spokenLanguageOf(text, preferred)` in
+   `ml/tts` reads the script of the text (Telugu, Devanagari, otherwise Latin as English) and
+   falls back to the profile only when there are no letters at all. One line in the
+   orchestrator's `speak()`: `tts.speak(text, spokenLanguageOf(text, lang))`. Until Rao lands
+   it, English answers go through the Hindi voice; with it, they go through the English voice,
+   which on the platform is the most widely installed voice there is.
+3. **The ladder's critical rung is English now, not Hindi.** Platform `en-IN` (or any offline
+   English voice; `AndroidTtsEngine` already accepts one) first; the bundled insurance is
+   `en_GB-cori-medium` (dataset LibriVox, "public domain" on its card, a British voice, sha256
+   `1899f98e5fb8310154f3c2973f4b8a929ba7245e722b3d3a85680b833d95f10d`, stamped, handle
+   `PiperVoices.ENGLISH_CORI`, staged and bound to nothing), under the same handset condition as
+   addendum 5. Candidates for Vedant, who judges English himself:
+   `logs/tts-candidates/en-cori-default-{leadin,plate,answer}.wav`. The Hindi voices keep their
+   place for the day a Hindi sentence exists to speak; the provenance call on `rohan` stops
+   being load-bearing for the 26th and stays open on its merits.
+4. **Making the app say Hindi back is real work with an unknown outcome, and it is not TTS
+   work.** Either the model is made to reply in Devanagari (a prompt change Priya would have to
+   measure on the phone, against a 1.5B model whose Hindi has never been seen) or the string
+   table gets a Hindi column (`values-hi`, ruled not to be built this week). Neither is on the
+   critical path once the deck says what the app does.

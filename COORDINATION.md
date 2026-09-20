@@ -2182,3 +2182,42 @@ asked, LOG refused); "how much iron tablet should I take?" is RECOMMEND by "shou
 the refused-clinical-answer property is asserted on an ANSWER sentence and again on that
 RECOMMEND. Also: `MinimalRig` gained the `AdviceStore` and `LabStore` seams. The invalidation
 rule for the precomputed advice is `RuleEvaluation.inputDigest` unless you say otherwise.
+[Meera 18:07] TO NILA, FOR THE DECK AUDIT, one line to reject a slide with: **the app does not
+say it back "in the language you chose". Today it says it back in English, whatever language
+was chosen, and it cannot be shown otherwise on Saturday.** Traced end to end (0019 addendum 7):
+the lead-in, the rules engine's sentences and the figures come from `res/values/strings.xml`
+through the app's UI locale, which the run of show sets to English, and `values-hi` is empty by
+design; the model is told `Language to reply in: hi` and replies in English anyway, seven of
+seven on the desktop with the phone's exact GGUF, greedy, including three questions asked in
+Devanagari (`logs/meera-hindi-reply.log`; the phone has only ever been run with `en-IN`). Say
+instead: "You speak in Hindi, Telugu or English; the app answers in English today, on screen and
+aloud, and the interface follows your language setting." That is supportable, it is how people
+here actually use software, and a judge who asks "can it answer in Hindi?" hears "not this
+build; the recogniser is per-language, the answers are English". Row 81's "in the language you
+choose" stays true for INPUT only.
+
+[Meera 18:07] TO RAO, ONE LINE THAT CHANGES WHAT THE JUDGES HEAR: `speak()` picks the voice
+from the PROFILE'S language, so today an English answer is read by the Hindi voice: English words
+through Hindi phonology, the mirror of what the TtsEngine contract forbids. New in `ml/tts`:
+`spokenLanguageOf(text, preferred)` reads the script of the text (Telugu, Devanagari, else Latin
+as English) and falls back to the profile only with no letters at all. Your change:
+`tts.speak(text, spokenLanguageOf(text, lang))` in `DefaultOrchestrator.speak()` and the same for
+the lead-in. Tested (35 in `ml.tts`, 0 failures, standalone). Consequence for your probe: the
+`en-IN` rows are now the ones the demo stands on; `hi-IN` stays useful for later.
+
+[Meera 18:07] TO PRIYA, TWO OBSERVATIONS FROM THE SAME RUNS, YOURS TO JUDGE, NOT MINE: with your
+exact `answer` SHORT text and `Language to reply in: hi`, the desktop reply said "which indicates
+anaemia" for a person who declared nothing; and with `en-IN` it produced "9.5 mg" and showed the
+subtraction. Ollama greedy on the phone's GGUF, hand-composed figures, so the wording is not a
+phone result; the shape of the failures is. Log: `logs/meera-hindi-reply.log`. Also: if the
+product wants Hindi answers, it is a prompt-and-model question ("reply in Devanagari" has never
+been measured on the phone), not a voice question; the voices are ready and idle.
+
+[Meera 18:07] TO VEDANT: the language your demo speaks BACK is English, whatever you speak into
+it; 0019 addendum 7 has the trace and the measurement, and Nila has the deck wording. That moves
+the shipping voice from Hindi to English, and English is the platform's home ground. Bundled
+insurance for the handset-unknown case is Piper `en_GB-cori-medium` (dataset public domain, a
+British voice): hear `logs/tts-candidates/en-cori-default-{leadin,plate,answer}.wav` and say
+whether a British voice reading your plate is acceptable on stage if the iQOO has no English
+voice offline. The rohan provenance call is no longer load-bearing for the 26th; answer it when
+you like.

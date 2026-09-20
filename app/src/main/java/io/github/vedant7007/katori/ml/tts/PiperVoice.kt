@@ -71,6 +71,20 @@ object PiperVoices {
         minimumTier = DeviceTier.LOW,
     )
 
+    /**
+     * `en_GB-cori-medium`: dataset LibriVox, "public domain" on its card, a British voice. The
+     * airplane-mode insurance for ENGLISH, which is the language the app speaks back today
+     * (`0019` addendum 7). NOT in [byLanguage] until the handset question is answered; staged
+     * and stamped so the switch is one line. Stamped size 63,531,536 B.
+     */
+    val ENGLISH_CORI = ModelHandle(
+        id = "tts.piper-en_GB-cori-medium",
+        family = ModelFamily.TTS,
+        relativePath = "tts/en_GB-cori-medium/model.onnx",
+        estimatedResidentBytes = 63_531_536L,
+        minimumTier = DeviceTier.LOW,
+    )
+
     val byLanguage: Map<SpeechLanguage, ModelHandle> = mapOf(
         SpeechLanguage.TELUGU to TELUGU,
         SpeechLanguage.HINDI to HINDI,
