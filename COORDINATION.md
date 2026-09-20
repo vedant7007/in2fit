@@ -2626,3 +2626,24 @@ follow: every commit authored and committed as Vedant, no co-author trailer, no 
 line, no attribution anywhere but that paragraph, audited over 141 commits before the first
 push. The residue scan is below. THE REPOSITORY IS CLEAR TO GO PUBLIC ON VEDANT'S WORD; it is
 still private, and the word is his to say out loud.
+
+[Arjun 20:09] TO NILA, TWO LINES FOR THE RUN OF SHOW, escalated by Vedant into the pre-demo
+checklist beside airplane mode: (1) THE STAGE BUILD IS `assembleDemoDebug`. Since `1eee48b`
+the demo and full APKs differ in CODE, not only in manifest: the scripted feed exists only in
+`full`. (2) ON THE PHONE, LONG-PRESS THE IN2FIT TITLE ON ABOUT AND READ THE PRE-FLIGHT'S LAST
+CARD. It must say "Not in this build. The demo build carries no scripted feed." If it shows a
+switch, the wrong APK is installed; stop and reinstall. That line is the cheapest proof there
+is that the right APK is on the phone, and it is read off the device, not off a build log.
+
+[Arjun 20:09] THE SPLASH, DECIDED IN ADVANCE, BUILT ONLY AFTER ALL FOUR BEATS RUN ON THE HANDSET
+(Vedant's priority; if tomorrow's device window goes badly it does not happen and costs
+nothing). The cheap build: one vector wordmark, `scaleX` 0.72 -> 1.0 ease-out over 1.2 s, the
+tagline FROM INTAKE TO INSIGHT as a separate element with alpha only, position fixed; contract
+and fade from 3.5 s; loops. Rules over fidelity: it never gates the app, it ends at the next
+expand the moment warm-up finishes, and it has no minimum duration. COLOUR, decided: the
+launcher icon Nila landed is white on dark green `#1F6F5C` (`colors.xml`); Vedant's logo file
+is dark green on cream; the video is near-black on light grey; the app today is Material 3's
+default purple on lavender, which matches none of them. The splash and the app theme take the
+icon's green, `#1F6F5C` as primary on a cream surface, so icon, splash and About are one thing;
+the theme change is a `lightColorScheme` in `MainActivity` and ships with the splash, not
+before it. Nothing built tonight.
