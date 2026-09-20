@@ -3817,3 +3817,24 @@ UI lands I tell Vedant in one line whether the caption is rendered. Not rendered
 evening of Thursday 25 September, Vedant cuts the caption from the mockups. Confirmed by him:
 the packet at 1a16705 is frozen and ships once; `mic_hold_hint` is English-only in the demo
 build; neither reopens tonight.
+[Priya 23:24] THE DECK'S NUMBERS ARE GUARDED: `DeckClaimsTest` (replaces `DeckPlateTest`), one test
+per numeric claim the deck makes about app behaviour, each on the real code path on the shipped
+DB, each writing claim / code / verdict to `logs/deck-plate.md` on every run. Four claims:
+(1) the plate for "rendu roti and one katori dal": MATCHES the corrected deck, 467 kcal, 20.9 g
+protein, no "taken as", all Approximate. (2) "How much protein today?" against a fixture diary
+of the demo's own three plates: the code produces "Today so far: protein: 48.8 g" on screen and
+to the model, with rows protein.rda_india and protein.cereal_based_needs_more; DIFFERS: the
+number is the diary's, not a fixed 58, and the TARGET IS NOT BUILT: no field, no rule, no
+template, and a target computed from the RDA row would be a number the numeric guard refuses.
+NILA: "about 40 g short of your target" comes off the slide. (3) 142 mg/dL fasting glucose and
+6.4 % HbA1c: the parse (`LabReportExtractor`) reads both values and both printed ranges from
+rows in the shapes the hardware returned, date included: MATCHES for the parse; the photograph
+step is device-only and measured once, on one haemoglobin row, so the two values are
+illustrative until the printed report used on the day is photographed: NOT MEASURED, not not
+built. (4) A stored out-of-range reading changes the suggestion for the same meal: before, no
+trigger and no suggestion; after, the engine's sentence "Your report from 2026-09-24 shows
+Fasting glucose at 142 mg/dL, above the 100 printed on it, so suggestions are ranked
+differently now." and the hostel list ranked fibre-higher, carbohydrate-lower, top: cooked
+moong dal, cooked chana dal, cooked toor dal, drumstick sambar, sambar: MATCHES the property;
+the slide's prose is the model's and is not asserted. Vedant changes the deck; the code was not
+touched. Stopping here; nothing new has landed for me.
