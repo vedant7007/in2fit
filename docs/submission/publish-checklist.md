@@ -1,8 +1,10 @@
 # Before the repository URL goes into the form
 
-Written 20 September 2026 (Nila). The prototype URL is the repository, and the repository exists
-today only on one laptop: no remote is configured in any clone. This is what must be true before a
-judge opens that link. Each item was CHECKED against the repository as it stood at `1e5c42f`,
+Written 20 September 2026 (Nila). The prototype URL is the repository. When this was written
+the repository existed only on one laptop; at 19:41 it was created as
+`https://github.com/vedant7007/in2fit`, PRIVATE, `master` pushed after the authorship audit
+below. This is what must be true before a judge opens that link, which is to say before it is
+made public. Each item was CHECKED against the repository as it stood at `1e5c42f`,
 not just listed; the state found is beside it. Items marked **[Vedant]** are his decisions.
 
 ## 1. Nothing secret, nothing personal beyond what Vedant chooses to publish
