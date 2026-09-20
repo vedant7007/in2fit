@@ -232,7 +232,15 @@ internal object ConversationPrompts {
      * its own, larger budgets for the text path.
      */
     const val ANSWER_MAX_TOKENS = 48
-    const val RECOMMEND_MAX_TOKENS = 56
+
+    /**
+     * RECOMMEND HAS ITS OWN BUDGET, ruled 20 September (Vedant, via the integrator's 18:40): at
+     * 56 the first phone run answered the anaemia question with the bare words "Spices, cumin
+     * seed", 6 tokens, a broken answer rather than a short one. SHORT is not reverted; this one
+     * intent gets room for a food name and its reason, two short sentences, about 9 s at the
+     * measured 9 tok/s. Unmeasured on the phone until the demo-condition run.
+     */
+    const val RECOMMEND_MAX_TOKENS = 88
     val CONVERSATION_STOPS = listOf("\n\n", "</s>", "<|im_end|>")
 }
 
@@ -261,9 +269,9 @@ enum class AnswerLength(
      * the token cap is the backstop, set so a runaway answer is cut at roughly the length of one
      * long sentence rather than three.
      */
-    // The RECOMMEND rule asks for a sentence in so many words: the first phone run (20 Sep)
+    // The RECOMMEND rule asks for the sentences in so many words: the first phone run (20 Sep)
     // answered "the one food to add and why" with the bare words "Spices, cumin seed".
-    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twenty words that names one food from the list and says why it helps.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
+    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "Two short sentences: name one food from the list, then say why it helps, from the facts.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
 }
 
 /** The four conversational intents of `0015`. Capture-shaped intents (scan, correct) are not spoken and are not routed here. */

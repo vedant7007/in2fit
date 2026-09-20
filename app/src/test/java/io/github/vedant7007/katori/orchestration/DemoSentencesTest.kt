@@ -129,20 +129,30 @@ class DemoSentencesTest {
     /** Placeholder with the shape the run of show describes; the number on the day is the paper's. */
     private val glucoseAboveRange = LabValue("Fasting glucose", 118.0, "mg/dL", 70.0, 100.0, LocalDate.of(2026, 9, 24))
 
-    /** Every bundled food and recipe, as RoomUserContextSource builds it for a profile with no diet type. */
+    /** Every bundled food and recipe, as RoomUserContextSource builds it for a profile with no diet type: per serving, since `02417a9`. */
     private fun candidates(): List<CandidateFood> {
         val everywhere = LifeContext.entries.toSet()
         fun nutrient(name: String) = runCatching { Nutrient.valueOf(name) }.getOrNull()
+        val usualUnit = mapOf(
+            "PULSE_COOKED" to "katori", "GRAIN_COOKED" to "katori", "VEGETABLE" to "katori", "DAIRY" to "katori",
+            "BEVERAGE" to "glass", "FAT_OIL" to "teaspoon", "SPICE" to "teaspoon",
+            "GRAIN_RAW" to "cup", "PULSE_RAW" to "cup", "COMPOSED_DISH" to "piece",
+        )
+        val servingByClass = db.query("SELECT unit, food_class, grams FROM unit_conversions")
+            .filter { it.str("unit") == usualUnit[it.str("food_class")] }
+            .associate { it.str("food_class") to it.dbl("grams") }
         val foodNutrients = db.query("SELECT food_key, nutrient, amount FROM food_nutrients WHERE state = 'MEASURED'")
             .groupBy({ it.str("food_key") }) { nutrient(it.str("nutrient"))?.let { n -> n to it.dbl("amount") } }
-        // spices and cooking fats are not candidates since the first end-to-end run (Rao, f2297a6)
-        val foods = db.query("SELECT food_key, display_name FROM foods WHERE food_class NOT IN ('SPICE', 'FAT_OIL')").map { r ->
-            CandidateFood(r.str("food_key"), r.str("display_name"), everywhere, foodNutrients[r.str("food_key")].orEmpty().filterNotNull().toMap())
+        val foods = db.query("SELECT food_key, display_name, food_class FROM foods").map { r ->
+            CandidateFood(r.str("food_key"), r.str("display_name"), everywhere, foodNutrients[r.str("food_key")].orEmpty().filterNotNull().toMap(),
+                servingGrams = servingByClass[r.str("food_class")] ?: 100.0)
         }
         val recipeNutrients = db.query("SELECT recipe_key, nutrient, amount_per_100g FROM recipe_nutrients WHERE state = 'MEASURED'")
             .groupBy({ it.str("recipe_key") }) { nutrient(it.str("nutrient"))?.let { n -> n to it.dbl("amount_per_100g") } }
-        val recipes = db.query("SELECT recipe_key, display_name FROM recipes").map { r ->
-            CandidateFood(r.str("recipe_key"), r.str("display_name"), everywhere, recipeNutrients[r.str("recipe_key")].orEmpty().filterNotNull().toMap())
+        val recipes = db.query("SELECT recipe_key, display_name, servings, yield_g FROM recipes").map { r ->
+            val servings = r.dbl("servings")
+            CandidateFood(r.str("recipe_key"), r.str("display_name"), everywhere, recipeNutrients[r.str("recipe_key")].orEmpty().filterNotNull().toMap(),
+                servingGrams = if (servings > 0.0) r.dbl("yield_g") / servings else 100.0)
         }
         return foods + recipes
     }

@@ -192,11 +192,12 @@ class ConversationPromptsTest {
         assertEquals(ConversationPrompts.answer(answer()), ConversationPrompts.answer(answer(), AnswerLength.SHORT))
         assertEquals(ConversationPrompts.recommend(recommend()), ConversationPrompts.recommend(recommend(), AnswerLength.SHORT))
         assertTrue(ConversationPrompts.answer(answer()).contains("one sentence of at most twenty words"))
-        assertTrue(ConversationPrompts.recommend(recommend()).contains("One sentence of at most twenty words"))
+        assertTrue(ConversationPrompts.recommend(recommend()).contains("Two short sentences"))
         assertEquals(ConversationPrompts.ANSWER_MAX_TOKENS, AnswerLength.SHORT.answerMaxTokens)
         assertEquals(ConversationPrompts.RECOMMEND_MAX_TOKENS, AnswerLength.SHORT.recommendMaxTokens)
-        // The point of the ruling: a runaway answer is cut at about one long sentence, ~5 s at 9 tok/s.
-        assertTrue(ConversationPrompts.ANSWER_MAX_TOKENS <= 64 && ConversationPrompts.RECOMMEND_MAX_TOKENS <= 64)
+        // The point of the ruling: a runaway answer is cut at about one long sentence, ~5 s at 9 tok/s;
+        // RECOMMEND has its own room for a food and its reason (ruled 20 Sep, 18:40), about two.
+        assertTrue(ConversationPrompts.ANSWER_MAX_TOKENS <= 64 && ConversationPrompts.RECOMMEND_MAX_TOKENS <= 96)
     }
 
     /** The long form stays reachable for a screen the person reads, with its own larger budgets. */

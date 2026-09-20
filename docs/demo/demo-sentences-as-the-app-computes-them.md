@@ -15,9 +15,9 @@ three deterministic stages of a turn, on the JVM:
    spoken name resolves to, the grams the household unit becomes, and the figures.
 3. `DefaultRulesEngine.evaluate` with the demo profile (22 years, 62 kg, 168 cm, hostel student,
    no diet type, nothing declared except in #9), the candidate list built as
-   `RoomUserContextSource` builds it (spices and cooking fats excluded since `f2297a6`), and for
-   beat 4 a placeholder lab value with the shape of the report (fasting glucose 118 mg/dL,
-   printed range 70 to 100).
+   `RoomUserContextSource` builds it (every food and recipe, scored per serving since
+   `02417a9`), and for beat 4 a placeholder lab value with the shape of the report (fasting
+   glucose 118 mg/dL, printed range 70 to 100).
 
 **Not in it:** speech (the reference column IS the transcript; the recogniser's real output is
 Jacob's measurement), and the model. The extraction is authored in the test as what the
@@ -62,15 +62,16 @@ standalone runner (`tools/jvm-tests-standalone.sh`); the table is also written t
 - **Two spoons of oil is 20 g** (a spoon is 10 g in the unit table), not the 10 g in the scripted
   feed. The scripted feed's figures are someone's memory; the ones below are the database's.
 - **Beat 3 and beat 4 rankings, loudly, for Rao.** Ranked by iron per 100 g the top candidates
-  for anaemia were cumin, turmeric and bay leaf; Rao's `f2297a6` excluded spices and fats, and
-  the top is now raw cowpea, raw urad, raw masoor: ingredients, per 100 g raw. With
-  "fibre higher, carbohydrate lower" (beat 4) the equal-weight integer score is dominated by
-  the carbohydrate term, so every zero-carbohydrate item ties at the top: chicken breast raw,
-  brewed coffee, carp raw, goat meat raw, water, then tea. The trigger sentence in beat 4 is
-  right; the candidates under it are not what anyone would put on a slide. The engine and the
-  candidate list are Rao's; the two smallest fixes are to rank recipes and as-eaten classes
-  only (drop `GRAIN_RAW`, `PULSE_RAW`), and to score per usual serving or per-nutrient
-  normalised so one term cannot swamp the other.
+  for anaemia were cumin, turmeric and bay leaf. Vedant ruled candidates rank per serving
+  (`02417a9`); the beat 3 row below is what that gives: raw cowpea, raw urad, raw masoor, because
+  a raw pulse's serving is a 200 g cup and nobody eats one. Raw grains and pulses are
+  ingredients, not candidates; that is spec 4.3's per-context list, unauthored, Priya's, next.
+  What per serving does not fix either is beat 4:
+  with "fibre higher, carbohydrate lower" every item with no carbohydrate and no fibre scores
+  exactly zero and ties, and the alphabetical tiebreak presents raw chicken breast, brewed
+  coffee, raw carp and water under a correct trigger sentence. `RankingDefectsTest` (domain/)
+  is RED ON MASTER BY DESIGN for Rao, his "2d": a ranked candidate has a positive score; zero
+  and below are not suggestions, by the engine's own "no preference, no suggestions" reasoning.
 
 ## The table
 

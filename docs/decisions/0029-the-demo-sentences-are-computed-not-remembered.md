@@ -49,11 +49,14 @@ the database's (a chapati serving is 45 g, a spoon of oil is 10 g, so two are 20
 ## What is not fixed here, and whose it is
 
 Ranked by nutrient per 100 g over the whole database, the beat 3 candidates for anaemia were
-cumin, turmeric and bay leaf; with spices and fats excluded (Rao, `f2297a6`) they are raw
-cowpea, raw urad and raw masoor. With "fibre higher, carbohydrate lower" (beat 4) the equal
-weight integer score is swamped by the carbohydrate term and every zero-carbohydrate item ties
-at the top: raw chicken breast, brewed coffee, raw carp, water, tea. The rules engine and the
-candidate list are the integrator's. The two smallest fixes are named in the table's preface.
+cumin, turmeric and bay leaf; Vedant ruled candidates rank per serving (`02417a9`), which puts
+raw cowpea, raw urad and raw masoor at the top: a raw pulse's serving is a 200 g cup. Raw grains
+and pulses are ingredients, not candidates; that is spec 4.3's per-context list, unauthored and
+Priya's. Per serving does not fix beat 4 either: with "fibre higher, carbohydrate lower" every item with no carbohydrate and
+no fibre scores exactly zero and ties, and the alphabetical tiebreak presents raw chicken breast,
+brewed coffee, raw carp and water under a correct trigger sentence. `RankingDefectsTest` is red
+on master by design for the integrator: a ranked candidate has a positive score, by the engine's
+own "no preference, no suggestions" reasoning.
 
 ## Measured
 

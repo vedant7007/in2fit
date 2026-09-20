@@ -40,3 +40,19 @@ its own trade-off against the "never context-free" rule in `0020`, and it is not
 Nothing about what the model writes in one sentence on the phone. The short answers scored are
 authored; the device run of the quality set against this default is the measurement, both
 thread counts, prompt and generation reported separately as `0014` does.
+
+## Addendum, 20 September, evening: RECOMMEND has its own budget; the prompt side is cut
+
+The first end-to-end run on the handset (Rao, 17:25) answered "I have anaemia, what should I eat
+for iron" at SHORT with the bare words "Spices, cumin seed", 6 tokens: a broken answer, not a
+short one. Ruled by Vedant (via Rao, 18:40): SHORT is not reverted; RECOMMEND gets its own room.
+`RECOMMEND_MAX_TOKENS` is 88 (about 9 s at 9 tok/s) and SHORT's RECOMMEND rule reads "Two short
+sentences: name one food from the list, then say why it helps, from the facts." ANSWER stays at
+48 and one sentence.
+
+The other half, "not touched here" above, is touched now: the integrator's trim of the request
+left 394 (RECOMMEND) and 457 (ANSWER) prompt tokens against a 250 budget, with the system block
+as the remainder. Both system blocks are about half their length, one clause per rule; the guards
+behind the model (numeric, condition, `SafetyLine`) hold what the longer wording only asked for.
+Unmeasured on the phone until the demo-condition run; the number to report is prompt tokens and
+generation tokens separately, as `0014` does.
