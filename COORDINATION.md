@@ -3967,3 +3967,39 @@ watch list in countdown.md beside the caption: the parse matches, the photograph
 (one ML Kit observation ever, a haemoglobin row); no photograph result by the evening of the
 25th, Vedant softens the moment slide. Team slide: waiting for the three lines from Vedant, not
 guessed. The four deck changes are audited when the PDF lands, against `logs/deck-plate.md`.
+[Priya 00:17] BEAT 3'S FIXTURE SET, WITH THE THRESHOLD WRITTEN BEFORE ANY RUN (`0036`).
+`app/src/androidTest/assets/lab-reports/`: SEVEN RENDERED SHEETS with sidecars in Arjun's
+`PhotographedReportProbeTest` format plus the row as printed (`tools/render_lab_report_fixtures.py`,
+deterministic): 01 one column, `70 - 100`; 02 two-column sheet; 03 unit glued (`142mg/dL`) and
+`70-100`, monospace; 04 reference column BEFORE result; 05 sheet 01 warped ~20 degrees and
+softened; 06 sheet 01 under a tungsten cast, half the page in shadow, a hot spot, grain, JPEG;
+07 H flags, `(70 - 100)`, `Glucose (Fasting)`, serif. ZERO PHOTOGRAPHS: nobody on this laptop has
+a camera or the sheet. A rendered image proves the extractor; only a photograph proves the demo,
+and the README says which three to take: print sheet 01, photograph it square-on, at ~20 degrees,
+and under the demo room's warm light with the demo phone, copy 01's sidecar beside each, rerun.
+THE THRESHOLD (README, first): (1) WRONG VALUE = 0 and WRONG RANGE = 0 on every fixture; a range
+read as NONE is silence (0018) and scored apart from a range read wrong; (2) nothing missed on
+the rendered sheets outside the two known ceilings (two-column, range-before-result); (3) both
+demo rows, value and printed range, on all three photographs, the date on the square one. All
+three: Beat 3 SAFE LIVE. Only the angled shot misses a demo row: safe SQUARE-ON ONLY, S holds the
+sheet flat, run of show says so. A wrong number on any photograph, or both demo rows missed: NOT
+SAFE, the pre-saved report (run of show item 7) and the camera points at nothing live.
+WHAT RAN HERE: `LabReportFixturesTest` (JVM): 7 sheets, 56 printed rows through the extractor
+alone: 48 read, 8 "no range" on the range-before-result sheet (the ceiling 0018 names), 0 wrong
+value, 0 wrong range; the demo's two rows read from sheet 01 with value and range;
+`logs/lab-report-fixtures.md`. That proves the extractor on every fixture and nothing about the
+camera.
+RAO, FOR YOUR MEASUREMENT SCRIPT: `LabReportOcrTest` (androidTest, `ml/vision`), DEVICE-ONLY,
+fixtures BUNDLED in the test APK, nothing staged:
+    adb shell am instrument -w -e class io.github.vedant7007.katori.ml.vision.LabReportOcrTest io.github.vedant7007.katori.test/androidx.test.runner.AndroidJUnitRunner
+It runs ML Kit then the extractor over every fixture, prints the table (sheet, kind, OCR ms,
+lines, rows, read, missed, no range, WRONG value, WRONG range, demo rows) to
+`katori-ocr-report.txt` and logcat `IN2FIT-OCR`, then the three thresholds as HOLDS / FAILS /
+NOT MEASURED and "Beat 3 safe to perform live: YES / NO / UNPROVEN (no photograph)". Written in
+the exact shape of Arjun's probe (same decode, same engine call, same sidecar parse) and NOT
+COMPILED HERE: no Android toolchain in my worktree; if it does not compile, the fix is a name,
+not a design. ARJUN: your probe counts a null range as WRONG RANGE; mine scores NO RANGE apart,
+since 0018 calls a null range the intended silence; yours to align or not. NILA: the run of show's
+Beat 3 has two branches and the threshold decides which one runs on the day; until a photograph
+exists, the honest line is "unmeasured on paper", not "works".
+Stopping; nothing new has landed for me.
