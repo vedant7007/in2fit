@@ -48,7 +48,7 @@ looks like a question. **A wrong word here is the dangerous kind.** For each wor
 | 17 | `taganu` | Telugu, I drank, short spelling | | | |
 | 18 | `thaganu` | Telugu, I drank, th- spelling | | | |
 
-English words on the same list, for completeness: `ate`, `had`, `drank`, `eaten`, `finished`,
+English words on the same list, for completeness: `ate`, `had`, `drank`, `eaten`, `finished`, `log`, `record`,
 and the phrases `breakfast was`, `lunch was`, `dinner was`, `snack was`, `tiffin was`.
 
 ## The words that make the app ask instead

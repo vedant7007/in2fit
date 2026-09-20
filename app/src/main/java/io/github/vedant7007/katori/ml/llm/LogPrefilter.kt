@@ -39,17 +39,22 @@ object LogPrefilter {
 
     /** True only when [transcript] is certainly a meal log. False means "let the model decide". */
     fun isCertainLog(transcript: String): Boolean {
-        if (transcript.contains('?') || transcript.contains('？')) return false
+        if (hasMarker(transcript)) return false
         val text = FoodTextMatching.normalise(transcript)
         if (text.isEmpty()) return false
         val words = text.split(' ')
-        if (words.first() in LEADING_MARKERS) return false
-        if (words.any { it in MARKERS }) return false
-        if (MULTI_WORD_MARKERS.any { FoodTextMatching.containsAsWords(text, it) }) return false
+        return words.any { it in LOG_WORDS } || MEAL_WAS.any { FoodTextMatching.containsAsWords(text, it) }
+    }
 
-        val hasLogWord = words.any { it in LOG_WORDS } ||
-            MEAL_WAS.any { FoodTextMatching.containsAsWords(text, it) }
-        return hasLogWord
+    /** True when anything in the utterance says it is a question or an ask: a question mark, a marker word, a marker phrase. */
+    fun hasMarker(transcript: String): Boolean {
+        if (transcript.contains('?') || transcript.contains('？')) return true
+        val text = FoodTextMatching.normalise(transcript)
+        if (text.isEmpty()) return false
+        val words = text.split(' ')
+        if (words.first() in LEADING_MARKERS) return true
+        if (words.any { it in MARKERS }) return true
+        return MULTI_WORD_MARKERS.any { FoodTextMatching.containsAsWords(text, it) }
     }
 
     /**
@@ -96,8 +101,8 @@ object LogPrefilter {
 
     /** Past-tense eating and drinking words. Positive evidence of a log. */
     internal val LOG_WORDS: Set<String> = setOf(
-        // English
-        "ate", "had", "drank", "eaten", "finished",
+        // English; "log" and "record" are the app's own verbs ("log two rotis")
+        "ate", "had", "drank", "eaten", "finished", "log", "record",
         // roman Hindi
         "khaya", "khayi", "khaye", "khaaya", "khai", "piya", "pi", "peeya",
         // roman Telugu
