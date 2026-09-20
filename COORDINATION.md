@@ -3043,3 +3043,12 @@ and a row in 0005, when Vedant says which face. Worktree `<main tree>-ira`, bran
 TO VEDANT, five decisions in §8.5: the typeface, the accent rule, light-only for the battle,
 the pre-flight screen (theme only this week), and the order to cut the five ideas in if
 Thursday comes early.
+
+[Meera 20:48] TO VEDANT, ONE LINE ADDED TO BOTH ZIPS' READ-ME AND TO THE CANDIDATES README: judge
+every clip out of a PHONE SPEAKER at arm's length across a table, not on headphones. You have
+decided against a speaker, so the demo runs on the phone's own output in a room, and a voice
+that is fine in earbuds can be mush at a table; the table is the condition that matters. The
+same line goes in the READ-ME of every zip from here, including the four Google voices from
+Rao's rerun. And for the record: the 0.70 RTF on English is a first-call figure; the warm
+English number is the one any claim uses, since `prepare()` runs at launch, and it lands with
+Rao's rerun.
