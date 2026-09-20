@@ -3444,3 +3444,4 @@ of 16 expected food words were heard; en's 21 substitutions are the recogniser m
 food words were lost. The exact column is the least informative of the three and the tool no longer
 lets it stand by itself. Desktop decode times on this run were on an un-starved laptop (hi 352 ms
 mean); still not phone numbers.
+[Nila 22:00] PACKET FROZEN at 22:00: docs/localisation/telugu-review-queue.md, 176 items, every Telugu line machine-generated and marked unreviewed, 0 to write. Keys landing after this line are English in the demo build by the freeze rule and wait for the next packet. values-te sha before/after regenerate: c4a9bc52bdeb3954ffed22734c1072d6191687e3 / c4a9bc52bdeb3954ffed22734c1072d6191687e3.

@@ -6,6 +6,8 @@ Generated 20 September 2026 from the app's English string table. 176 lines to ch
 
 Reviewer's name: ______________________
 
+**Frozen at 22:00 on 2026-09-20. This is the packet that ships; keys landing after this line are English in the demo build and wait for the next packet.**
+
 ## What the app is
 
 IN2FIT is a phone app for people in India who may not read English nutrition labels. A person says what they ate, in Telugu, Hindi or English; the app finds each food in its database and shows the nutrition, with a label saying how far to trust each figure. It can also read a printed lab report with the camera. It never diagnoses and never prescribes.
