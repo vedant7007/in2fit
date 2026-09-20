@@ -2,10 +2,10 @@
 Word and character error rate of the shipped ASR models, on the desktop, through the real runtime.
 
     python asr_eval.py synth <out-dir>            write the SYNTHETIC clips and their manifest
-    python asr_eval.py synth-mixed <out-dir>      write the SYNTHETIC code-mixed clips of 0022 (needs the Hindi voice)
+    python asr_eval.py synth-mixed <out-dir>      write the SYNTHETIC code-mixed clips of 0031 (needs the Hindi voice)
     python asr_eval.py wer   <manifest.csv> ...   transcribe every clip in the manifest(s), print WER/CER
     python asr_eval.py wer --engine omnilingual <manifest.csv> ...
-                                                  same, through Meta Omnilingual ASR CTC-300M (0022): one
+                                                  same, through Meta Omnilingual ASR CTC-300M (0031): one
                                                   model for every row, and the language column is then a label
     python asr_eval.py synth-csv <set.csv> <out-dir>
                                                   synthesise an authored set (data-authoring/demo-utterance-set.csv:
@@ -24,6 +24,10 @@ Word and character error rate of the shipped ASR models, on the desktop, through
                                                   distance (attenuation + synthetic reverb), and both together;
                                                   prints exact n/N per condition, and runs the energy endpointer on
                                                   the same audio to show where it stops seeing the end of a sentence
+    python asr_eval.py tail <manifest.csv>         push-to-talk's thumb question: cut each clip N ms after (or, negative, before) the last
+                                                  word (N = -300..1000), clean and in +15 dB babble, and
+                                                  print exact n/N per cut, so "let go a beat after the last word"
+                                                  has a number for the beat
     python asr_eval.py manifest <recordings-dir> [set.csv]
                                                   (two presenters? name the files <name>_hi_01 .. for each, same folder;
                                                   `wer` then prints a by-speaker table against the same references)
@@ -40,7 +44,7 @@ ffmpeg on PATH for phone recordings: libsndfile reads wav/flac/mp3/ogg, ffmpeg d
 
 Models: data-sources/models/asr/indicconformer/, as tools/fetch-models.ps1 lays them out, and for
 --engine omnilingual data-sources/models/asr/candidates/omnilingual-300m-ctc-int8/{model.int8.onnx,tokens.txt}
-(csukuangfj/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12, Apache-2.0; 0022).
+(csukuangfj/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12, Apache-2.0; 0031).
 
 THE MANIFEST is one CSV per test set, one row per clip:
 
@@ -110,7 +114,7 @@ def recognizer(lang: str, threads: int = 4, engine: str = "indicconformer"):
         d = REPO / "data-sources" / "models" / "asr" / "candidates" / "omnilingual-300m-ctc-int8"
         for f in (d / "model.int8.onnx", d / "tokens.txt"):
             if not f.is_file():
-                sys.exit(f"missing {f}; see docs/decisions/0022 for the source")
+                sys.exit(f"missing {f}; see docs/decisions/0031 for the source")
         return sherpa_onnx.OfflineRecognizer.from_omnilingual_asr_ctc(
             model=str(d / "model.int8.onnx"), tokens=str(d / "tokens.txt"), num_threads=threads,
         )
@@ -216,7 +220,7 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
     if any(src.endswith("-DEMO") or "DEMO" in src for src in sources):
         print("DEMO SET: report this as 'n of the ten demo sentences', never as a WER figure standing alone. These are ten")
         print("sentences we selected, tuned to the recogniser after it misheard one of them; the number is the accuracy of")
-        print("those sentences, on this audio, and says nothing about the system on arbitrary speech (0022).")
+        print("those sentences, on this audio, and says nothing about the system on arbitrary speech (0031).")
     print("extraction accuracy: NOT MEASURED HERE. It needs the LLM, which runs on the phone: AsrDeviceTest.")
 
 
@@ -267,10 +271,10 @@ def cmd_synth(out: Path) -> None:
 
 
 def cmd_synth_mixed(out: Path) -> None:
-    """The spliced code-mixed clips of 0022: Piper te for Telugu, Piper hi for Hindi, a Windows voice for
+    """The spliced code-mixed clips of 0031: Piper te for Telugu, Piper hi for Hindi, a Windows voice for
     English, joined with 250 ms gaps. A speaker change mid-sentence is NOT how a person code-mixes, and
-    the English parts have no Indian accent; the manifest says synthetic-mixed and 0022 says why they
-    overstate the English problem. They exist so the tables in 0022 can be regenerated."""
+    the English parts have no Indian accent; the manifest says synthetic-mixed and 0031 says why they
+    overstate the English problem. They exist so the tables in 0031 can be regenerated."""
     import io
     import subprocess
     import wave
@@ -603,7 +607,7 @@ def cmd_robustness(manifest: Path, engine: str = "indicconformer") -> None:
     print(f"machine: {platform.processor() or platform.machine()}, {platform.system()}; engine: {engine}; {len(clips)} clips, {len(pool)} babble talker clips")
     print("SYNTHETIC HALL: babble is 12 other synthetic voices at once; reverb is a textbook exponential tail; the")
     print("presenter's voice is a Windows/Piper voice, not a person. Report as 'n of the ten' per condition, never as")
-    print("a WER standing alone, and never as a claim about the hall itself: it says where THIS recogniser breaks (0022).\n")
+    print("a WER standing alone, and never as a claim about the hall itself: it says where THIS recogniser breaks (0031).\n")
     print(f"{'condition':46s} cut right  as heard   endpointer, open listening: no onset / clean end / ran on (mean end delay)")
     lead = int(2.0 * 16000)   # babble-only lead-in and 3 s tail, so the VAD has to find the sentence and its end
     tail = int(3.0 * 16000)
@@ -663,6 +667,54 @@ def cmd_robustness(manifest: Path, engine: str = "indicconformer") -> None:
     print("it runs to the 15 s cap and hands all of it over). Recogniser columns are on the correctly cut sentence, so")
     print("they show the model's floor; the endpointer columns show whether open listening would hand it that sentence.")
     print("Push-to-talk removes the endpointer from the question entirely.")
+
+
+def _last_word_end(x, frame=320, floor=0.01, hang_frames=10):
+    """Index of the end of the last speech frame (a negative tail then cuts inside the last word): the last frame whose RMS is above `floor` on a full
+    scale of 1, ignoring anything after a run of `hang_frames` quiet frames. TTS clips carry a quiet
+    tail; a person's recording carries breath and room. Good enough to place a cut, which is all the
+    thumb does."""
+    import numpy as np
+    rms = np.array([np.sqrt(np.mean(x[i:i + frame] ** 2)) for i in range(0, len(x) - frame, frame)])
+    loud = np.where(rms > floor)[0]
+    return int((loud[-1] + 1) * frame) if len(loud) else len(x)
+
+
+def cmd_tail(manifest: Path, engine: str = "indicconformer") -> None:
+    import numpy as np
+    rng = np.random.default_rng(20260920)
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8", newline="")))
+    langs = {r["language"] for r in rows}
+    recs = {lang: recognizer(lang, engine=engine) for lang in langs}
+    exclude = ["_hi.wav", "hi_pratham", "mix_"] if "hi" in langs else ["_te.wav", "te_padma", "mix_"]
+    pool = _babble_pool(exclude)
+    clips = []
+    for r in rows:
+        x, sr = load_audio(manifest.parent / r["path"])
+        if sr != 16000:
+            x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
+        clips.append((r, x, _last_word_end(x)))
+    tails = [-300, -200, -100, 0, 150, 300, 600, 1000]
+    print(f"{len(clips)} clips; the thumb lifts N ms after the last word; hi checkpoint; SYNTHETIC voice. Report as n of the ten.")
+    print(f"{'tail after last word':22s} {'clean':>8s} {'+15 dB babble':>14s}")
+    for tail in tails:
+        exact = {"clean": 0, "babble": 0}
+        for r, x, end in clips:
+            ref_w = normalise(r["reference"])
+            cut = x[: min(len(x), end + tail * 16)]
+            for cond in ("clean", "babble"):
+                y = cut
+                if cond == "babble":
+                    b = _babble(pool, len(cut), talkers=12, rng=rng)
+                    y = cut + b * (np.sqrt(np.mean(x[:end] ** 2)) / 10 ** (15 / 20))
+                y = np.clip(y, -1, 1).astype(np.float32)
+                stream = recs[r["language"]].create_stream(); stream.accept_waveform(16000, y); recs[r["language"]].decode_stream(stream)
+                exact[cond] += int(edit_distance(ref_w, normalise(stream.result.text)) == 0)
+        print(f"{tail:>6d} ms{'':14s} {exact['clean']:>5d}/{len(clips):<2d} {exact['babble']:>10d}/{len(clips):<2d}")
+    print("\nA cut at 0 ms is the thumb lifting on the last syllable. If a longer tail scores the same as 0, the")
+    print("recogniser does not need the beat and the instruction is only about the presenter's own habit; if 0 loses")
+    print("sentences that 300 or 600 recover, that many milliseconds is the beat, and the capture can add it as a")
+    print("release tail so the presenter does not have to remember.")
 
 def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
     import re
@@ -727,6 +779,8 @@ if __name__ == "__main__":
         cmd_synth_mixed(Path(args[1]))
     elif len(args) >= 2 and args[0] == "wer":
         cmd_wer([Path(p) for p in args[1:]], engine=engine)
+    elif len(args) >= 2 and args[0] == "tail":
+        cmd_tail(Path(args[1]), engine=engine)
     elif len(args) >= 2 and args[0] == "robustness":
         cmd_robustness(Path(args[1]), engine=engine)
     elif len(args) >= 2 and args[0] == "manifest":

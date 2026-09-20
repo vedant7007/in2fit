@@ -1,5 +1,5 @@
 # The sentences the presenter will actually say on stage, per beat (spec 7.1) and per intent (0015).
-# docs/decisions/0022 §"Demo language": the demo runs in the language the PRESENTER speaks. Vedant does
+# docs/decisions/0031 §"Demo language": the demo runs in the language the PRESENTER speaks. Vedant does
 # not speak Telugu, so every sentence is here in Hindi (Hinglish, the way it is really said) and in
 # Indian English; he picks one column of `language` and those rows become the best-measured sentences
 # in the repo. Telugu stays in the demo as the language picker and the reviewed strings, not as the

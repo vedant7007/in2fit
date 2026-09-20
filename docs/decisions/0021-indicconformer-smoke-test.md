@@ -171,6 +171,16 @@ phone number.** Rao's probe (`AsrDeviceTest`) produces the first one.
   on a 2+6 big.LITTLE part; whether ASR + LLM + TTS still fit with sherpa-onnx's feature extractor
   and decoder state resident (`0013`'s open floor).
 
+## First device figures, 20 September, from Rao's run of `AsrDeviceTest.b`
+
+Posted by Rao at 16:50 in COORDINATION; his run, his phone (realme RMX3780), the synthetic clips
+staged as they were: **en, 4 clips, 244-596 ms each, mean 339 ms at 4 threads, WER 25.0 %, CER
+16.5 %**, every error the shape the desktop predicted ("two rotees in Dal", "three idly and
+sombre", "two rutis and pap you", "two hundred ml"); **te, WER 8.3 %, CER 1.5 %, 1,279 ms per clip
+with the phone hot.** The `hi` and `en` checkpoints and their tokens are staged as of that note.
+These are the first ASR numbers from the device; the desktop rows above are now context for them,
+not substitutes. Cold-against-warm on the device is still to be read (`0032`).
+
 ## Revisit conditions
 
 - The recorded meal logs arrive: run `asr_eval.py wer` on their manifest, stage them for

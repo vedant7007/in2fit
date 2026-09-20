@@ -1,4 +1,4 @@
-# 0028. Warm-up: the first of everything is slow, and the first of everything is what the judges see
+# 0032. Warm-up: the first of everything is slow, and the first of everything is what the judges see
 
 Date: 20 September 2026. Status: SPEC for Rao (engine side) and Arjun (when it runs relative to
 the first screen), with the desktop evidence behind it. The device numbers it needs are named

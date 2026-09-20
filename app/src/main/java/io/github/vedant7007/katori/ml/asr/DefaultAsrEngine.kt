@@ -25,10 +25,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * ### Why one model per selected language, and not one model for everything
  *
- * `0022`, decided by Vedant on 20 Sep 2026. The user's profile language selects the checkpoint;
+ * `0031`, decided by Vedant on 20 Sep 2026. The user's profile language selects the checkpoint;
  * words from another language arrive transliterated into that language's script, and the food
  * matcher carries those renderings. No IndicConformer emits two scripts in one utterance, and the
- * one engine that does (Omnilingual, `0022` §3) chose the wrong Indic script on most mixed clips.
+ * one engine that does (Omnilingual, `0031` §3) chose the wrong Indic script on most mixed clips.
  * Reopened only if recorded speakers show this failing on natural code-mixed speech.
  *
  * ### Where the lease sits
@@ -70,7 +70,7 @@ class DefaultAsrEngine(
 
     /**
      * Load AND warm: admit the model and run one throwaway decode of [WARM_UP_MS] of silence inside
-     * the lease, so the first real utterance is not also the runtime's first pass. `0028`: the cold
+     * the lease, so the first real utterance is not also the runtime's first pass. `0032`: the cold
      * cost is the load (seconds for a 197 MB model on the desktop) and the first decode after it
      * pays ONNX Runtime's lazy set-up as well; both belong at app start, not on the presenter's
      * first sentence. The lease ends on return, leaving the model resident and unpinned, which is

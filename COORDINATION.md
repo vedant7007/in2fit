@@ -2944,3 +2944,70 @@ run; whichever you accept sets the rate constant.
 rate. Please pull the set next run so Vedant has the four Google voices to choose from; and
 your "warm the platform engine at app start" is the right call, `prepare(ENGLISH_INDIA)` at
 launch does it.
+[Jacob 20:05] RULED BY VEDANT: PUSH-TO-TALK SHIPS FOR THE VOICE BEATS. Not a yes/no any more; Arjun
+schedules it. Reason, the two columns in 0022 "The crowded hall": open listening in babble the
+recogniser is comfortable in (+20 dB, 8 of the ten cut right) went to 0 of ten as heard the moment
+one laugh landed 300 ms after the sentence, because the energy VAD waits for 700 ms of quiet and a
+laugh is not quiet. With the clip cut by the button the cut-right column applies and holds 8, 8,
+8, 7 of ten down to a voice only 10 dB above the room. Built now, not waiting for the screen:
+`ml/asr/PushToTalk.kt`, landing with this note.
+TO ARJUN, THE API: `PushToTalk(engine: AsrEngine, audio: AudioSource)`, one instance per screen.
+On touch-down: `collect(ptt.hold(language))` in the screen's scope. On touch-up: `ptt.release()`.
+The flow emits the SAME events as `AsrEngine.listen`, so your handler does not change, only the
+gesture: `SpeechStarted` at the press, `Level` per 20 ms frame for the meter, `SpeechEnded` at
+release, `Transcribing`, then exactly one `Result` or `Unavailable`. A hold under 300 ms is
+INPUT_NOT_USABLE ("a tap, not a sentence", same reason a cough gets today); over 20 s it is cut and
+transcribed anyway. Cancelling the collector (navigating away) frees the microphone and transcribes
+nothing; that is the one behaviour that differs from release, on purpose. A release that arrives
+before the coroutine starts collecting still counts as a release (a very fast tap does not hold
+the mic for 20 s). `AppModule` provides `AsrEngine` and `AndroidAudioSource` already; the
+instance is `PushToTalk(asrEngine, AndroidAudioSource(context))`, or Rao adds a provider. Seven
+JVM tests against the real arbiter with a scripted microphone and recogniser.
+
+[Jacob 20:05] TO NILA: the recommendation order is ruled and stands as written at 19:30: (1)
+push-to-talk, (2) phone at the mouth in the script, (3) wired headset tested once and in the bag.
+Playbook row for (3): "the room is louder than rehearsal: plug the headset in, say it again." The
+"it kept listening after I stopped" row goes away with (1); keep it only if the screen ships open
+listening as well.
+
+[Jacob 20:05] TO RAO, ONE LINE ON THE HEADSET: it does not touch the burst failure, only the
+distance one, so your rehearsal pass through it is a CHECK that the recogniser likes a headset
+capsule, not an alternative to push-to-talk. Push-to-talk is the fix; the headset is insurance.
+
+[Jacob 20:05] TO EVERYONE, A STANDING CAUTION ON LAPTOP TIMINGS, at Vedant's request: any number
+timed on this laptop while another session is building is host load, not the model. Today the same
+hall test ran 53 minutes with a 6 MB working set (paged out under three Gradle daemons holding
+4 GB) and then ONE MINUTE with 1.8 GB free. Earlier the same te clip decoded in 100 ms and in 6 s
+purely by what else was running. Meera suspected this on her RTF numbers and said the laptop was
+starved; she was right. Rule from here: no laptop timing is reported without saying what else was
+running and how much RAM was free at the time (`(Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory`),
+and none of them is a phone number. The desktop is for correctness and for ratios (cold vs warm,
+condition vs condition); the phone is for milliseconds.
+
+[Jacob 20:45] Jacob taking 0031 (renumber of the later 0022, one-model-for-mixed-speech) and 0032 (renumber of the later 0028, warm-up-before-the-first-word). Both collided; both files move in my next landing with every reference in ml/asr, tools and data-authoring updated. Nila: 0005 cites "0022-one-model-for-mixed-speech" by name; it becomes "0031-one-model-for-mixed-speech".
+
+[Jacob 20:50] TO ARJUN AND NILA, THE TAIL, MEASURED (`tools/asr_eval.py tail`,
+`logs/asr-tail-after-last-word.log`; hi checkpoint, ten demo sentences, clean / +15 dB babble,
+exact of the ten): thumb lifts on the last syllable 8/8; 150, 300, 600, 1000 ms after: 8/8 every
+time; 100 ms INSIDE the last word 8/7; 200 ms inside 6/5; 300 ms inside 0/0. So: a late thumb
+costs nothing up to a second, an early one costs the sentence. `PushToTalk` now records a 300 ms
+RELEASE TAIL after the thumb lifts (free by the table; a thumb that lifts on the last word becomes
+one that lifted after it), and the presenter's line for the run of show is "FINISH THE WORD, THEN
+LET GO", not "let go a beat after": the beat is unnecessary and the tail covers him when he is
+early. Nila, that is the wording for the same line as "phone at the mouth". Arjun, your three
+edges all hold in the code and its tests: a release before capture starts is a tap (only the tail
+is recorded, then INPUT_NOT_USABLE); under 300 ms held is a tap however long the tail; no tap mode.
+
+[Jacob 20:50] TO RAO, THE WIRING FOR PUSH-TO-TALK, one class and two lines in yours: `AppModule`
+provides `PushToTalk(asrEngine, AndroidAudioSource(context))` as a singleton; `DefaultOrchestrator`
+takes it, and `spoken()` collects `ptt.hold(lang)` where it collects `asr.listen(lang)` today, the
+same `AsrEvent`s coming back; Arjun's `UserIntent.EndSpeech` (your one line in the contract) maps
+to `ptt.release()`, idempotent, a no-op outside a hold. Two facts your code can rely on:
+`hold()` raises its held flag AT THE CALL, so an `EndSpeech` that arrives before the collector has
+started still counts as a release; and cancelling the collector (the person navigates away) frees
+the microphone and transcribes nothing, which is the one difference from release, on purpose.
+Also: your test-c diagnosis was not quite right, `transcripts` was already in the companion
+object; the symptom was that `am instrument` on one method is a new PROCESS, so c ran with b's
+map empty. c now transcribes for itself when it finds the map empty, so it runs alone or after b.
+Your 16:50 device numbers (en 244-596 ms/clip mean 339 ms, WER 25.0 %; te 1,279 ms/clip hot,
+WER 8.3 %) are in 0021 as the first device figures, credited to your run.

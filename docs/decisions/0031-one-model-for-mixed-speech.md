@@ -1,4 +1,4 @@
-# 0022. One model for code-mixed speech: what exists, measured, and the decision it leaves Vedant
+# 0031. One model for code-mixed speech: what exists, measured, and the decision it leaves Vedant
 
 Date: 20 September 2026. Status: **DECIDED by Vedant, 20 September 2026: Option A.** The evidence
 below was gathered before the decision and is unchanged by it. Nothing here ran on a phone; every
@@ -204,10 +204,33 @@ the variable, and it is the one we control.
    microphone; the ten sentences must be run once on the phone through it before the day, because
    a headset capsule and its gain are a different signal from the handset's array.
 
-Recommended: 1 and 2 for the demo; 3 tested once and carried as the fallback the failure playbook
-reaches for when the hall is louder than rehearsal. If the Talk screen cannot carry a hold gesture
-by the day, 2 and 3 together are the floor, and the playbook needs the row "it kept listening
-after I stopped: bring it to the mouth and say it again."
+**The thumb question, measured** (escalated by Vedant via Arjun): with push-to-talk the sentence
+ends where the thumb lifts, so how late or early may it lift? `tools/asr_eval.py tail` cuts each of
+the ten hi demo clips N ms after (negative: inside) the last word, clean and in +15 dB babble
+(`logs/asr-tail-after-last-word.log`), exact of the ten:
+
+| cut relative to the last word | clean | +15 dB babble |
+| --- | ---: | ---: |
+| 300 ms inside the word | 0 | 0 |
+| 200 ms inside | 6 | 5 |
+| 100 ms inside | 8 | 7 |
+| on the last syllable (0 ms) | 8 | 8 |
+| 150 / 300 / 600 / 1,000 ms after | 8 / 8 / 8 / 8 | 8 / 8 / 8 / 8 |
+
+A late thumb costs nothing up to a second; an early one costs the sentence by 300 ms inside the
+word. So `PushToTalk` records a **300 ms release tail** after the thumb lifts (free by the table,
+and it turns a thumb that lifted on the last word into one that lifted after it), and the
+presenter's instruction is **"finish the word, then let go"**, not "wait a beat": the beat is not
+needed and the tail covers the times he is early anyway.
+
+**RULED by Vedant, 20 September: push-to-talk ships for the voice beats**, on the burst rows: 8 of
+ten to 0 of ten on one laugh, in babble the recogniser is otherwise comfortable in, is not a risk
+to mitigate but a thing that will happen in a room full of teams demonstrating and judges
+reacting. Order of the mitigations as above: 1, then 2 in the script, then 3 tested once and in
+the bag. The headset does not touch the burst failure, only the distance one, so it is insurance
+and push-to-talk is the fix. `ml/asr/PushToTalk.kt` implements it against the existing
+`AsrEngine.transcribe()` with the same events as open listening, so the Talk screen changes its
+gesture and nothing else; the frozen `AsrEngine` interface is untouched.
 
 ## "I didn't catch that": the path where a wrong-language sentence is not logged
 

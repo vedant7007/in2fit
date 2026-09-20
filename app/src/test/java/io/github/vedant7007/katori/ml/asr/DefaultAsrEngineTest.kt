@@ -1,16 +1,9 @@
 package io.github.vedant7007.katori.ml.asr
 
-import io.github.vedant7007.katori.domain.DefaultModelArbiter
-import io.github.vedant7007.katori.domain.DeviceMemory
-import io.github.vedant7007.katori.domain.MeasurementLog
-import io.github.vedant7007.katori.domain.MeasurementRow
-import io.github.vedant7007.katori.domain.ModelHandle
 import io.github.vedant7007.katori.domain.ModelLoader
 import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.domain.model.UnavailableReason
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
@@ -31,56 +24,9 @@ import org.junit.Test
  */
 class DefaultAsrEngineTest {
 
-    // --- doubles ------------------------------------------------------------------------------
+    // Doubles are shared with PushToTalkTest: AsrTestDoubles.kt.
 
-    private class ScriptedDecoder(var next: AsrDecoder.Decoded) : AsrDecoder {
-        val clips = mutableListOf<Pair<ShortArray, Int>>()
-        var closed = false
-        override fun decode(samples: ShortArray, sampleRateHz: Int): AsrDecoder.Decoded {
-            clips += samples to sampleRateHz
-            return next
-        }
-        override fun close() { closed = true }
-    }
-
-    private class ScriptedLoader(val decoder: ScriptedDecoder, val failWith: String? = null) : ModelLoader {
-        val loaded = mutableListOf<ModelHandle>()
-        override suspend fun load(handle: ModelHandle): Any {
-            if (failWith != null) throw IllegalStateException(failWith)
-            loaded += handle
-            return decoder
-        }
-        override fun unload(handle: ModelHandle, native: Any) { (native as AsrDecoder).close() }
-    }
-
-    private class FakeAudio(val permitted: Boolean = true, val frames: List<ShortArray>, val hang: Boolean = false) : AudioSource {
-        var requestedRate = -1
-        var requestedFrameMs = -1
-        override fun canRecord() = permitted
-        override fun frames(sampleRateHz: Int, frameMs: Int): Flow<ShortArray> {
-            requestedRate = sampleRateHz; requestedFrameMs = frameMs
-            return if (hang) flow { frames.forEach { emit(it) }; awaitCancellation() } else frames.asFlow()
-        }
-    }
-
-    private object EightGigabytes : DeviceMemory {
-        override fun totalBytes() = 8L shl 30
-        override fun availableBytes() = 3L shl 30
-        override fun lowMemoryThresholdBytes() = 432L shl 20
-        override fun processPssBytes() = 126L shl 20
-    }
-
-    private class NoLog : MeasurementLog {
-        override fun append(row: MeasurementRow) = Unit
-        override fun rows() = emptyList<MeasurementRow>()
-    }
-
-    private fun arbiter(loader: ModelLoader) = DefaultModelArbiter(EightGigabytes, loader, NoLog(), buildTag = "test", clockMs = { 0L })
-
-    // 20 ms frames at 16 kHz = 320 samples. Level 0 is digital silence; 6000 is about 0.18 rms.
-    private fun frame(amplitude: Int) = ShortArray(320) { if (it % 2 == 0) amplitude.toShort() else (-amplitude).toShort() }
-    private fun quiet(n: Int) = List(n) { frame(0) }
-    private fun loud(n: Int) = List(n) { frame(6_000) }
+    private fun arbiter(loader: io.github.vedant7007.katori.domain.ModelLoader) = testArbiter(loader)
 
     private val speechDecoded = AsrDecoder.Decoded("నేను రెండు రొట్టెలు తిన్నాను", List(22) { "p$it" })
     private val endpointer = { EnergyEndpointer(frameMs = 20, calibrationMs = 200, onsetMs = 60, hangoverMs = 400, maxWaitMs = 4_000) }

@@ -131,7 +131,7 @@ class AsrDeviceTest {
             val language = SpeechLanguage.entries.first { it.tag.substringBefore('-') == row.language }
             val clip = readWav(File(testSetDir, row.path))
             if (language !in warmed) {
-                // COLD AGAINST WARM, the number 0028's warm-up spec rests on. The first clip of each
+                // COLD AGAINST WARM, the number 0032's warm-up spec rests on. The first clip of each
                 // language is decoded three times: once truly cold (model not resident), once after
                 // prepare(), and once more warm. Only the last counts in the WER table's timing.
                 val t0 = System.nanoTime()
@@ -197,7 +197,21 @@ class AsrDeviceTest {
         say(""); say("=== ASR -> LLM: foods recovered from the transcripts ===")
         val llmFile = File(modelsDir, LLM_FILE)
         assertTrue("stage the LLM at ${llmFile.absolutePath}", llmFile.length() > 0L)
-        assertTrue("run test b first; no transcripts to extract from", transcripts.isNotEmpty())
+        if (transcripts.isEmpty()) {
+            // Test b did not run in THIS process: `am instrument` on one method is a fresh process, so
+            // the companion map is empty however b went. Transcribe here rather than depend on order.
+            say("test b did not run in this process; transcribing the staged clips first")
+            val engine = DefaultAsrEngine(arbiter(), NoMicrophone)
+            for (row in manifest()) {
+                val language = SpeechLanguage.entries.first { it.tag.substringBefore('-') == row.language }
+                when (val o = runBlocking { engine.transcribe(readWav(File(testSetDir, row.path)), language) }) {
+                    is Outcome.Ok -> transcripts[row.path] = o.value.text
+                    is Outcome.Unavailable -> say("  ${row.path}: UNAVAILABLE ${o.reason} ${o.detail}")
+                    is Outcome.NotImplemented -> fail("not built: ${o.component}")
+                }
+            }
+        }
+        assertTrue("no clip transcribed; read the UNAVAILABLE lines above", transcripts.isNotEmpty())
         val rows = manifest().filter { it.path in transcripts }
 
         val runtime = LlamaCppRuntime.load(llmFile, contextTokens = 2048, threads = THREADS)
@@ -329,7 +343,11 @@ class AsrDeviceTest {
         private const val THREADS = 4
         private const val LLM_FILE = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
 
-        /** Test b's transcripts for test c; JUnit makes a new instance per method. */
+        /**
+         * Test b's transcripts for test c, when both run in one process. JUnit makes a new instance
+         * per method, hence the companion; a separate `am instrument` per method is a new PROCESS,
+         * hence test c filling it for itself when it finds it empty.
+         */
         private val transcripts = linkedMapOf<String, String>()
 
         private val report: File by lazy {
