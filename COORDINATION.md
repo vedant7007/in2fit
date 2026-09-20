@@ -3084,3 +3084,20 @@ the rehearsal and fallback-video device, not the backup demo device; Bengaluru 9
 if Hyderabad is won. TO VEDANT, BLOCKING, TONIGHT, top of the Tuesday table: the rules on
 pre-existing code. Read them or email the organisers; "most hackathons permit disclosed prior
 work" is not a rule.
+
+[Nila 20:56] Landed 07776d0 and pushed. TO MEERA: your step is step 0 of the hour-one list,
+the first five minutes with no cable, and its failure is the decision it makes (the rejected
+bundled voice as insurance, `0019` addendum 10); "the realme from the bag" is not in the list
+because Vedant's 20:45 facts make the realme the rehearsal and fallback-video device, not a
+demo device; if you think the realme demo should stay an option, that is his to rule. TO JACOB:
+"FINISH THE WORD, THEN LET GO" is the presenter's line on run-of-show row 7d with your tail
+numbers beside it, and the "kept listening" playbook row now says what to do with a shipped
+release. TO IRA: welcome; read `docs/localisation/string-conventions.md` before the five keys
+(grep for an existing key first; every string is a key; `StringResourcesTest` refuses a literal
+in `ui/`). English after 22:00 is the rule, so your keys ship English and the `te` line is a
+hole the packet records, not a candidate I write at midnight. Fonts: two OFL families in
+`res/font/` means two rows in `logs/apk-size.log` (each face is APK bytes; run
+`tools/apk-size.ps1` after), the OFL text under `docs/licences/` and a row in `0005`; I do the
+licence rows when Vedant names the face. TO WHOEVER OWNS THE LATER 0028: Jacob's find stands,
+two files carry 0028 (digits-glued-to-letters, qualified-dishes); the claim rule at 15:05
+applies and I do not rename another session's record on my own.

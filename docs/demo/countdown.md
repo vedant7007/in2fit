@@ -26,16 +26,17 @@ table, is the good news.
 
 | # | in hour one, on site, on the venue network | who | evidence it worked |
 | --- | --- | --- | --- |
+| 0 | **First five minutes, no cable, on whatever network the hall has (Meera, 20:39)**: Settings → (System →) Languages & input → Text-to-speech output → Speech Services by Google → gear → Install voice data → English (India) and Hindi (India). If it cannot be installed there and then, the TTS decision is made in those five minutes, not on stage: the bundled English voice Vedant rejected is the insurance path (`0019` addendum 10). | whoever holds the phone; Meera's step | both voices listed as installed |
 | 1 | **The vivo/iQOO ROM's "Install via USB"** and "USB debugging (Security settings)" switched on. Some of those ROMs want a vivo account and a network for this: the venue network is there, and this is why it is first. Developer options via Build number ×7, USB debugging on, USB mode "File transfer", the RSA prompt accepted. | whoever holds the cable | `adb devices` shows `device`, not `unauthorized` |
 | 2 | Free space: at least 2 GB (`adb shell df /sdcard`). | same | the number, written down |
 | 3 | `adb install -r app-demo-debug.apk` (the `assembleDemoDebug` build), opened once. | same | install "Success"; the app opens |
 | 4 | **The models: `powershell -File tools\stage-models.ps1`.** Chunked push with per-chunk retry and an on-device `sha256sum`, written from `0012`; 1.6 GB; at the realme's measured 6.3 MB/s about 4.3 minutes of pure transfer if nothing drops. Rao verifies the script's three tunables in his next realme cable session, before the day. | same; Rao (the verification) | the script's `OK ... sha256` line per file and its total seconds |
 | 5 | **The pre-flight card**: long-press the IN2FIT title on About; the last card must read "Not in this build. The demo build carries no scripted feed." | same | read off the device |
-| 6 | **Voice data, on the venue network**: Speech Services by Google → Install voice data → English (India) and Hindi (India). | same | both listed as installed |
-| 7 | **Airplane mode ON, Bluetooth icon absent. Then the probes**: `TtsVoiceProbeTest` must show `en-IN` and `hi-IN` voices with `network=false`; `OrchestratorDeviceTest` once for the four beats' timings on THIS phone. | Rao (or whoever holds the cable, from the run of show) | the probe reports; every timing on the run of show re-read against them |
+| 6 | Voice data checked once more if step 0 was interrupted; otherwise nothing. | same | step 0's evidence |
+| 7 | **Airplane mode ON, Bluetooth icon absent. Then the probes**: `TtsVoiceProbeTest`'s "-- ENGLISH_INDIA" block must show an `en-in-x-*-local` line with `network=false` and a written WAV with an RTF, and the `hi-IN` voice likewise; `OrchestratorDeviceTest` once for the four beats' timings on THIS phone. | Rao (or whoever holds the cable, from the run of show) | the probe reports; every timing on the run of show re-read against them |
 | 8 | **A full rehearsal on the iQOO**, the run of show end to end, the device checklist aloud. | Vedant (P), S | timed per beat, written beside the run of show's realme figures |
 
-After 8, the iQOO is the demo phone in every sense, and the rest of the thirty hours is the
+After 8 (step 0 first, because it needs no cable and its failure changes the plan), the iQOO is the demo phone in every sense, and the rest of the thirty hours is the
 build event. **If step 1 fails and the venue network cannot satisfy the ROM**, that is the one
 failure the plan has no answer for on the iQOO; the organisers are asked in hour one, not at
 hour twenty-nine.
@@ -72,7 +73,7 @@ against the code since 14:07); the team slide; the form's `[confirm]` lines answ
 
 | must be true | by | owner | state Sunday 20:20 |
 | --- | --- | --- | --- |
-| **Hour one on site, steps 1 to 8 above, in order, on the venue network, before airplane mode** | 26 Sep, hour one | whoever holds the cable; Rao; Vedant | the list exists; `tools/stage-models.ps1` exists and is unverified on a phone |
+| **Hour one on site, steps 0 to 8 above, in order, on the venue network, before airplane mode** | 26 Sep, hour one | whoever holds the cable; Rao; Vedant | the list exists; `tools/stage-models.ps1` exists and is unverified on a phone |
 | **`tools/stage-models.ps1` verified by Rao on the realme**, its three tunables confirmed, so the person holding the cable on the 26th runs a script that has run before | Wednesday | Rao | written 20 Sep from `0012`; not yet run |
 | **The realme: rehearsal device and fallback-video device**, staged, charged the night before, in the bag on the 26th | Friday | Rao (staging), Vedant (the bag) | staged as of 19 Sep |
 | The demo APK cut on Friday: `assembleDemoDebug`, permission check green, the file copied to the laptop that goes on site (and to a second place: a USB stick), its sha256 written in the log | Friday | Rao | not cut |
@@ -128,7 +129,7 @@ copied twice. The bag packed against the checklist: two reports, speaker, headse
 charger, the realme, the laptop with `data-sources/models` and the APK on it, a USB stick with
 both. Nothing new lands after Friday noon.
 
-**Saturday 26, hour one.** The eight steps above, on site, on the venue network, in order. Then
+**Saturday 26, hour one.** The nine steps above, step 0 first, on site, on the venue network, in order. Then
 the thirty hours are what the rules say they are for. **The demo**, at the end: the device
 checklist aloud, one spoken turn from the back of the room, the run of show, and nothing else.
 
@@ -157,7 +158,7 @@ checklist aloud, one spoken turn from the back of the room, the run of show, and
 | **The second person at the table (S)**: holds the backup phone, the report, the checklist, mirrors the screen | The run of show is written for two people | Vedant names them |
 | **The wired speaker and the wired headset**: who buys, by Wednesday | Meera's probe needs the hardware to name | Vedant names a buyer, or does it |
 | **The backup phone** | spec 7.4 | which phone, who stages it |
-| **The person who holds the cable in hour one** and runs steps 1 to 8; they dry-run it on the realme on Wednesday | hour one is theirs | Vedant names them |
+| **The person who holds the cable in hour one** and runs steps 0 to 8; they dry-run it on the realme on Wednesday | hour one is theirs | Vedant names them |
 
 ## How this page is kept
 
