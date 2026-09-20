@@ -45,10 +45,21 @@ class ReferralDefectsTest {
     /** 0015: a referral comes ALONGSIDE help, never instead of it, and never nothing. */
     @Test fun `a guard failure on a clinical ANSWER shows the referral, not Failed`() {
         val llm = FakeLlm(answered = Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model invented the number '60'"))
-        val events = run(llm, "how much iron tablet should I take?")
+        val events = run(llm, "is 7 haemoglobin dangerous, how much iron did I get this week?")
         assertTrue("the turn ended in Failed and the person got nothing: $events", events.none { it is OrchestratorEvent.Failed })
         val answered = events.filterIsInstance<OrchestratorEvent.Answered>().single()
         assertNotNull("the fixed referral line is what survives a refused answer", answered.referral)
+        assertEquals(OrchestratorEvent.Completed, events.last())
+    }
+
+    /** The same property on RECOMMEND, where "should I take" routes a dose question by the words. */
+    @Test fun `a guard failure on a clinical RECOMMEND shows the referral beside the engine's own list`() {
+        val llm = FakeLlm(recommended = Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model invented the number '60'"))
+        val events = run(llm, "how much iron tablet should I take?")
+        assertTrue("$events", events.none { it is OrchestratorEvent.Failed })
+        val advice = events.filterIsInstance<OrchestratorEvent.Advice>().single()
+        assertNull("the prose is what is lost", advice.phrased)
+        assertNotNull("the fixed referral line stands", advice.referral)
         assertEquals(OrchestratorEvent.Completed, events.last())
     }
 

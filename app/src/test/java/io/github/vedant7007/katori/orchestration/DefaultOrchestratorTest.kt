@@ -277,8 +277,11 @@ class DefaultOrchestratorTest {
     @Test fun `a certain log skips the classifier, a question never does`() {
         val r = rig(FakeLlm(intent = Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "must not be consulted")))
         assertTrue(r.run(UserIntent.Type("I had rice and dal", en)).any { it is OrchestratorEvent.MealLogged })
+        // A question about what they ate is decided ANSWER by the words (0027); the model is
+        // not consulted, and nothing more is written.
         val asked = r.run(UserIntent.Type("I had rice and dal, was that enough iron?", en))
-        assertEquals("a marker sends it to the model, whose failure ends the turn", OrchestratorEvent.Failed(UnavailableReason.INTERNAL_ERROR, "must not be consulted"), asked.last())
+        assertTrue("$asked", asked.any { it == OrchestratorEvent.IntentKnown(SpokenIntent.ANSWER, "Let me check your records.") })
+        assertTrue(asked.any { it is OrchestratorEvent.Answered })
         assertEquals(1, r.store.saved.size)
     }
 
@@ -324,11 +327,11 @@ class DefaultOrchestratorTest {
         val events = r.run(UserIntent.Type("did I get enough iron this week", en))
         val known = events.indexOfFirst { it is OrchestratorEvent.IntentKnown }
         val own = events.indexOfFirst { it is OrchestratorEvent.OwnFigures }
-        val classifying = events.indexOfFirst { it == OrchestratorEvent.Progress(Stage.CLASSIFYING) }
         val retrieving = events.indexOfFirst { it == OrchestratorEvent.Progress(Stage.RETRIEVING_FACTS) }
         val answered = events.indexOfFirst { it is OrchestratorEvent.Answered }
-        // MEASURED 20 Sep: the classifier alone is 6-8 s, so the figures go out before it.
-        assertTrue("$events", own in 0 until classifying && classifying < known && known < retrieving && retrieving < answered)
+        // MEASURED 20 Sep: the classifier alone is 6-8 s, so the figures go out before the
+        // intent is known, whether the words decided it or the model did.
+        assertTrue("$events", own in 0 until known && known < retrieving && retrieving < answered)
         assertEquals(OrchestratorEvent.IntentKnown(SpokenIntent.ANSWER, "Let me check your records."), events[known])
         val lines = (events[own] as OrchestratorEvent.OwnFigures).lines
         assertTrue("the number they asked for is in the first lines: $lines", lines.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })

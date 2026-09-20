@@ -73,6 +73,10 @@ class ScriptedOrchestrator(
             is UserIntent.Resolve -> turn(intent.text, intent.intent)
             is UserIntent.AdviseOnMeal -> adviseAgain()
             UserIntent.ScanLabReport -> { emit(Progress(Stage.SAVING)); delay(400); emit(OrchestratorEvent.Completed) }
+            // The two intents the contract gained on 20 Sep; the scripted feed treats the save as
+            // its scan and has no voice to stop. Arjun's to script if the beats need them.
+            is UserIntent.SaveLabReport -> { emit(Progress(Stage.SAVING)); delay(400); emit(OrchestratorEvent.LabReportSaved(intent.values.size, null)); emit(OrchestratorEvent.Completed) }
+            UserIntent.StopSpeaking -> emit(OrchestratorEvent.Completed)
             is UserIntent.CorrectValue, is UserIntent.ScanPackagedLabel, is UserIntent.CheckExerciseForm ->
                 { emit(OrchestratorEvent.NotImplemented("demo." + intent::class.simpleName)); emit(OrchestratorEvent.Completed) }
         }

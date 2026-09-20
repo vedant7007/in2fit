@@ -28,7 +28,9 @@ class RoutingDefectsTest {
     /** The misroute from the phone, made impossible: a question the model calls LOG never reaches the diary. */
     @Test fun `a question the model calls LOG is refused and the person is asked`() {
         val llm = FakeLlm().apply { intent = Outcome.Ok(Intent.LOG) }
-        val events = run(llm, "how many rotis have I eaten today")
+        // "how many rotis have I eaten today" is decided ANSWER by the words and never reaches
+        // the model; the refusal is exercised where the evidence conflicts and the model is asked.
+        val events = run(llm, "I'm having rice now, what did I eat yesterday?")
         assertEquals("a question was written into the diary: ${MinimalRig.lastStore.saved}", 0, MinimalRig.lastStore.saved.size)
         assertTrue("a question was resolved as a plate: $events", events.none { it is OrchestratorEvent.MealLogged || it is OrchestratorEvent.MealResolved })
         assertTrue("the person must be asked which they meant: $events", events.any { it is OrchestratorEvent.NeedsIntent })
