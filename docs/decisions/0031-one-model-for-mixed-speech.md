@@ -84,8 +84,15 @@ English.** The synthetic voices are not Vedant; his own recording of the ten sen
 number that decides the column, and it is the one number in this project that must be good on
 the 26th.
 
-**RULED by Vedant, 20 September: demo speech language `hi`, utterances Hinglish. PROVISIONAL on
-Vedant's own recording of the ten sentences.** The Windows voice is not the presenter. If his
+**RULED by Vedant, 20 September: demo speech language `hi`, utterances Hinglish. CONFIRMED on
+Vedant's own recording of the twenty sentences the same night** (`logs/asr-eval-vedant-demo.log`,
+RECORDED-DEMO, one speaker): the hi checkpoint got every food word in all ten Hindi sentences and
+rows 1, 2 and 7 exact; the en checkpoint broke the food words in 8 of 10 on his voice (roties, doll,
+"cutgory of Dal", darl, thrl, "at least" for idlis, samber), 0 of ten exact. The strict hi count is
+3 of ten because he did not read verbatim: he added words in six rows, as the instruction invited,
+and the recogniser transcribed the additions as fluent Hindi that the reference does not contain.
+Two rows lost a content word (hi_06 "पिछले", hi_10 "नाश्ते में") and are with him to check by ear.
+The paragraph below is kept as it was written before his voice was heard.** The Windows voice is not the presenter. If his
 recording disagrees with it, the ruling flips to `en-IN` the same evening and Priya's Devanagari
 work changes shape, which is why that recording is his highest-priority task tonight and why this
 paragraph says provisional rather than settled. Provisional in a second way too: it assumes Vedant

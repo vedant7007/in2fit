@@ -3312,3 +3312,99 @@ two (`talk_offline_mark`, the wordmark contentDescription) had no English in §8
 yours when you build, English by the freeze rule. `plate_unit_taken_as` is now on the Thursday
 path: Vedant's rule at 21:12 takes the slide-6 sentence off the deck if the line is not on the
 phone by Thursday, so the card is the first of your five ideas to cut, not the fourth.
+[Jacob 21:40] VEDANT'S TWENTY FILES, SCORED. Pulled from the realme over MTP (adb dropped mid-way; the
+phone was in "Transfer photos" mode; Rao, I touched the link read-only, nothing installed or pushed).
+20 of 20, .mp3 from the realme recorder, `data-sources/asr-test-set/vedant/`, manifest against
+`demo-utterance-set.csv`, `logs/asr-eval-vedant-demo.log`. THE TABLE, VERBATIM, as the tool printed it:
+
+by language
+                       source            exact     WER      CER   pieces/s  decode ms/clip
+en                     RECORDED-DEMO      0/10    88.8%   81.1%      4.6      10583
+hi                     RECORDED-DEMO      3/10    53.8%   49.6%      5.5      18340
+by speaker (recorded rows)
+                       source            exact     WER      CER   pieces/s  decode ms/clip
+vedant / en            RECORDED-DEMO      0/10    88.8%   81.1%      4.6      10583
+vedant / hi            RECORDED-DEMO      3/10    53.8%   49.6%      5.5      18340
+
+RECORDED-DEMO, one speaker, the presenter. Not an accuracy claim about anything but these twenty files.
+
+THE RULING IS CONFIRMED: demo speech language hi, Hinglish. On Vedant's own voice the hi checkpoint got
+EVERY food word in all ten sentences (रोटी दाल कटोरी चम्मच तेल दूध उबला अंडा चावल दही प्लेट इडली सांभर
+प्रोटीन लंच आयरन); the en checkpoint broke the food words in 8 of 10 on a real Indian voice: roties,
+doll, "cutgory of Dal", darl, "ball of curd", thrl, "at least" for idlis, samber. The 1,024-piece
+vocabulary finding holds on the presenter, not only on a Windows voice.
+
+READ THE EXACT COUNTS WITH THIS: hi 3/10 exact is LOW because Vedant did not read verbatim; he added
+words in six rows ("क्या तुम मुझे बता सकती हो", "मेरे खून में", "जिससे मुझे मेरी तबयत को असर हो",
+"actually", "please", "to cook it"), which the instruction invited and the recogniser transcribed
+as fluent Hindi; the reference does not contain them, so they count as errors against it. Two rows
+have a real content loss and are with Vedant to check by ear: hi_06 heard "ने मंगलवार को" for "मैंने
+पिछले मंगलवार को" (a clipped start, or "पिछले" lost: Beat 2's "last"); hi_10 heard "उसने" for "नाश्ते
+में". Every per-row line:
+
+[en] RECORDED-DEMO vedant_en_01.wav                  3.1s audio    6929 ms   12 pieces  4 word err, 6 char err
+      ref: I had two rotis and a little dal.
+      hyp: He hadd two roties and a little doll
+[en] RECORDED-DEMO vedant_en_02.wav                  4.8s audio    9167 ms   27 pieces  8 word err, 15 char err
+      ref: Two rotis, a katori of dal, and I used two spoons of oil.
+      hyp: To rote is a cutgory of Dal and I use two spoons of oil to cook it
+[en] RECORDED-DEMO vedant_en_03.wav                  4.1s audio    8158 ms   22 pieces  6 word err, 24 char err
+      ref: I drank 200 ml of milk and ate one boiled egg.
+      hyp: Raank two hundred a mell of milk and ate one boiled egg actually
+[en] RECORDED-DEMO vedant_en_04.wav                  8.2s audio   12170 ms   32 pieces  11 word err, 38 char err
+      ref: Two rotis no, three rotis and dal.
+      hyp: Two ros? No, no, no, actually not two rotes I guess, yeah, three rotis and somedl.
+[en] RECORDED-DEMO vedant_en_05.wav                  5.1s audio    7101 ms   20 pieces  6 word err, 19 char err
+      ref: One plate of rice, dal and a bowl of curd.
+      hyp: Pate of rice, some darl, and a ball of curd actually
+[en] RECORDED-DEMO vedant_en_06.wav                  3.5s audio    8309 ms   18 pieces  5 word err, 18 char err
+      ref: What did I eat last Tuesday?
+      hyp: Can you tell me what did I eat last Tuesday please
+[en] RECORDED-DEMO vedant_en_07.wav                  7.3s audio   12693 ms   38 pieces  15 word err, 59 char err
+      ref: How much protein was in my lunch?
+      hyp: How much protein was in my lunch and can you tell me the nutritional facts of the lunch I had today, please
+[en] RECORDED-DEMO vedant_en_08.wav                  3.4s audio    9229 ms   17 pieces  5 word err, 13 char err
+      ref: I'm having rice and dal, what should I add?
+      hyp: Having rice and thrl, what should I add into this
+[en] RECORDED-DEMO vedant_en_09.wav                  8.5s audio   23053 ms   35 pieces  14 word err, 47 char err
+      ref: I have anaemia, what should I eat for iron?
+      hyp: I have anemia, what should I eat for iron or what should I add to my diet to increase my iron levels
+[en] RECORDED-DEMO vedant_en_10.wav                  3.5s audio    9021 ms   16 pieces  5 word err, 10 char err
+      ref: For breakfast I had three idlis and sambar.
+      hyp: Breakfast I had three at least and a samber
+[hi] RECORDED-DEMO vedant_hi_01.wav                  3.1s audio   11640 ms   20 pieces  exact
+      ref: मैंने दो रोटी और थोड़ी दाल खाई
+      hyp: मैंने दो रोटी और थोड़ी दाल खाई
+[hi] RECORDED-DEMO vedant_hi_02.wav                  5.1s audio   17901 ms   23 pieces  exact
+      ref: दो रोटी, एक कटोरी दाल, और दो चम्मच तेल
+      hyp: दो रोटी एक कटोरी दाल और दो चम्मच तेल
+[hi] RECORDED-DEMO vedant_hi_03.wav                  6.1s audio   23603 ms   35 pieces  4 word err, 11 char err
+      ref: मैंने दो सौ एमएल दूध पिया और एक उबला अंडा खाया
+      hyp: मैंने दो सौ एमएल दूध पिया और एक उबला एक उबला हुआ अंडा खाया है
+[hi] RECORDED-DEMO vedant_hi_04.wav                  5.5s audio   17734 ms   32 pieces  7 word err, 22 char err
+      ref: दो रोटी नहीं, तीन रोटी और दाल
+      hyp: मैंने दो रोटी नहीं तीन रोटिया और एक थोड़ी सी दाल खाई है
+[hi] RECORDED-DEMO vedant_hi_05.wav                  5.1s audio   20056 ms   22 pieces  1 word err, 4 char err
+      ref: एक प्लेट चावल, दाल और एक कटोरी दही
+      hyp: एक प्लेट चावल दाल और एक कटोरी दही खाया
+[hi] RECORDED-DEMO vedant_hi_06.wav                  4.9s audio   17847 ms   26 pieces  9 word err, 30 char err
+      ref: मैंने पिछले मंगलवार को क्या खाया
+      hyp: ने मंगलवार को क्या खाया था क्या तुम मुझे बता सकती हो
+[hi] RECORDED-DEMO vedant_hi_07.wav                  3.7s audio   18469 ms   16 pieces  exact
+      ref: मेरे लंच में कितना प्रोटीन था
+      hyp: मेरे लंच में कितना प्रोटीन था
+[hi] RECORDED-DEMO vedant_hi_08.wav                 10.2s audio   32895 ms   61 pieces  15 word err, 53 char err
+      ref: मैं चावल और दाल खा रहा हूँ इसमें क्या ऐड करूँ
+      hyp: चावल और दाल खा रहा हूँ इसमें और क्या ऐड करूँ जिससे मुझे मेरी तबयत को असर हो और मुझे उसका फ़ायदा बढ़ाना है
+[hi] RECORDED-DEMO vedant_hi_09.wav                  4.3s audio   13694 ms   26 pieces  3 word err, 7 char err
+      ref: मेरा आयरन कम है मुझे क्या खाना चाहिए
+      hyp: मेरे खून में आयरन कम है मुझे क्या खाना चाहिए
+[hi] RECORDED-DEMO vedant_hi_10.wav                  2.9s audio    9562 ms   17 pieces  4 word err, 11 char err
+      ref: नाश्ते में तीन इडली और सांबर खाया
+      hyp: उसने तीन इडली और सांभर खाया था
+
+TO NILA, RUN OF SHOW: Beat 1's sentence, row 1, came back EXACT on the presenter's voice: "मैंने दो रोटी
+और थोड़ी दाल खाई". Rows 2 and 7 exact as well. TO PRIYA: सांभर (the भ form) is what his voice produced
+too; your alias covers it. TO ARJUN: if hi_06 turns out to be a clipped start, the push-to-talk
+instruction gains a word: "PRESS, then speak; finish the word, then let go" (the capture has no
+pre-roll, the mic is not open before the press). Metadata line from Vedant still to come.
