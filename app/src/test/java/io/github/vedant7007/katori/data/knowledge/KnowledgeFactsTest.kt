@@ -128,6 +128,35 @@ class KnowledgeFactsTest {
         assertTrue(shipped.find("zzqx plorf").isEmpty())
     }
 
+    // --- select: the rows the engine actually used -----------------------------------------------
+
+    @Test fun `select returns at most two rows, every one touching something the engine decided`() {
+        val engine = KnowledgeFacts.nutrientTerms("IRON") + listOf("anaemia", "thotakura", "sprouted moong")
+        val rows = shipped.select(engine, "what should I eat for more iron")
+        assertEquals(KnowledgeFacts.SELECT_LIMIT, rows.size)
+        val engineText = engine.joinToString(" ")
+        rows.forEach { f -> assertTrue("${f.id} touches nothing the engine decided", f.tags.any { engineText.contains(it) }) }
+    }
+
+    /** A row that touches only the question is not what the engine used, while a used row exists. */
+    @Test fun `a question-only row loses to an engine row`() {
+        val rows = shipped.select(listOf("protein"), "I have anaemia, what should I eat for more protein and iron")
+        rows.forEach { assertTrue("${it.id} is not a protein row", "protein" in it.tags) }
+    }
+
+    /** The engine decided nothing: a general question is answered from the question itself. */
+    @Test fun `with no engine terms select falls back to the question`() {
+        val rows = shipped.select(emptyList(), "does tea reduce iron absorption")
+        assertEquals(shipped.find("does tea reduce iron absorption", KnowledgeFacts.SELECT_LIMIT), rows)
+        assertTrue(rows.any { "tea" in it.tags })
+    }
+
+    @Test fun `select is deterministic and honours the limit`() {
+        val a = shipped.select(listOf("iron"), "iron", limit = 1)
+        val b = shipped.select(listOf("iron"), "iron", limit = 1)
+        assertEquals(a, b); assertEquals(1, a.size)
+    }
+
     @Test fun `byId finds a row and misses an unknown id`() {
         assertEquals("iron.tea_timing", shipped.byId("iron.tea_timing")?.id)
         assertEquals(null, shipped.byId("no.such.row"))

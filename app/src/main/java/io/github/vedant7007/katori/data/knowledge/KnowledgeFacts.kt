@@ -81,9 +81,64 @@ class KnowledgeFacts(val facts: List<KnowledgeFact>) {
 
     fun byId(id: String): KnowledgeFact? = facts.firstOrNull { it.id == id }
 
+    /**
+     * The one or two rows the rules engine ACTUALLY USED, for the prompt.
+     *
+     * The measured conversational turn (`0025`) put the cost in the prompt: 591 to 779 tokens,
+     * six retrieved rows among them, 17 s. The integrator is cutting the rows to the one or two
+     * the engine used, and this is what "used" means, so that it is a rule and not a guess:
+     *
+     * A row was used when one of its tags is a term the ENGINE decided on, which are the
+     * nutrients its `PreferNutrient` constraints name ([nutrientTerms]), the conditions the
+     * person declared, and the foods it ranked at the top. Among those rows, the ones that also
+     * touch the question rank first; ties keep file order. A row that touches only the question
+     * and nothing the engine decided was not used by the engine, and is not selected while any
+     * used row exists. When the engine decided nothing, as on a general question ("does tea
+     * reduce iron absorption"), the question is all there is, and [find] over it with the same
+     * limit is the fallback.
+     *
+     * Two rows is roughly 50 prompt tokens against 150 for six. The prompt still says "use only
+     * the facts given", so a row not selected is a claim the model cannot make; that is the
+     * intended trade, and the quality set's "traces" criterion is what measures it.
+     */
+    fun select(engineTerms: Collection<String>, question: String, limit: Int = SELECT_LIMIT): List<KnowledgeFact> {
+        val engine = FoodTextMatching.normalise(engineTerms.joinToString(" "))
+        val q = FoodTextMatching.normalise(question)
+        val used = facts.asSequence()
+            .map { f ->
+                val engineHits = if (engine.isEmpty()) 0 else f.tags.count { FoodTextMatching.containsAsWords(engine, it) }
+                val questionHits = if (q.isEmpty()) 0 else f.tags.count { FoodTextMatching.containsAsWords(q, it) }
+                Triple(f, engineHits, questionHits)
+            }
+            .filter { it.second > 0 }
+            .sortedWith(compareByDescending<Triple<KnowledgeFact, Int, Int>> { it.second * 2 + it.third }) // stable: file order breaks ties
+            .map { it.first }
+            .take(limit)
+            .toList()
+        return used.ifEmpty { find(question, limit) }
+    }
+
     companion object {
         const val DEFAULT_LIMIT = 6
+        /** [select]'s limit: the one or two rows the engine used. */
+        const val SELECT_LIMIT = 2
         const val ASSET_PATH = "knowledge/facts.csv"
+
+        /**
+         * The everyday words a nutrient the engine prefers is tagged by in the file. Keyed on the
+         * `Nutrient` enum's NAME, as a string, so this package does not import `domain`.
+         */
+        fun nutrientTerms(nutrientName: String): List<String> = when (nutrientName.uppercase()) {
+            "IRON" -> listOf("iron")
+            "PROTEIN" -> listOf("protein")
+            "FIBRE", "FIBER" -> listOf("fibre", "fiber")
+            "SODIUM" -> listOf("sodium", "salt")
+            "VITAMIN_B12" -> listOf("b12", "vitamin b12")
+            "FAT" -> listOf("fat", "oil")
+            "CARBOHYDRATE" -> listOf("carbohydrate", "carbs", "glycaemic")
+            "ENERGY" -> listOf("calories", "energy")
+            else -> listOf(nutrientName.lowercase().replace('_', ' '))
+        }
 
         private val HEADER = listOf("id", "topic", "tags", "fact", "source", "source_url", "accessed", "note")
 

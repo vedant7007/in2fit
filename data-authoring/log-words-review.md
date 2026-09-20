@@ -109,8 +109,12 @@ words for the same things. Every one was GENERATED, most from the recogniser's o
 synthetic voice (`logs/asr-codemix-renderings.log`), by someone who does not read either script.
 A wrong one here logs the wrong food, so please check each: does it say what the third column
 says, and would a person actually write or say it that way? Cross out any that are wrong or
-nonsense; the ones marked "as the model garbled it" are deliberate copies of a machine's
-mistakes and only need a yes if a real speaker could plausibly produce them too.
+nonsense.
+
+**A garbled row needs a yes only if a real speaker could plausibly produce it.** The rows marked
+"as the model garbled it" are deliberate copies of a machine's mistakes, kept so that the app
+copes with them. You are not obliged to fix nonsense: a no is a complete answer, and you do not
+need to write what it should have been.
 
 | # | Written | Script | Meant as | Points to | Origin | OK? |
 | --- | --- | --- | --- | --- | --- | --- |
