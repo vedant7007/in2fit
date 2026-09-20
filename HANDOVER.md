@@ -35,6 +35,11 @@ question it cares most about: whether anything has run on a phone. Something has
 >   BEFORE `tools/3-build.bat`, because the build now refuses to start without the sherpa-onnx
 >   AAR that step 4 fetches (with its sha256 checked). The numbers were not changed; the
 >   dependency is stated here and in `app/build.gradle.kts`'s preBuild message.
+> - The `demo` and `full` flavours now have source sets of their own: `app/src/demo/java`,
+>   `app/src/full/java`, `src/testDemo`, `src/testFull` (Arjun, 20 Sep, no Gradle change; AGP
+>   picks them up). The scripted screen feed exists ONLY in `full`; the demo build says "Not in
+>   this build" where its switch would be, so a screenshot with the feed on is never from the
+>   demo APK. The first `assembleFullDebug` in this project's life built at 18:34.
 > - Six sessions now work in one worktree each; see `COORDINATION.md` 03:19 and
 >   `tools/new-worktree.ps1`. The "logs on one laptop" risk in §7 is unchanged.
 >

@@ -2,7 +2,7 @@
 
 **If you only do one part, do Part 1.** Those nine lines decide whether the app speaks Telugu at all.
 
-Generated 20 September 2026 from the app's English string table. 169 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
+Generated 20 September 2026 from the app's English string table. 171 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
 
 Reviewer's name: ______________________
 
@@ -1583,11 +1583,20 @@ A banner the team switches on to feed the app a scripted sentence during a rehea
    Correct Telugu (leave blank if the line above is right):
 
 
+159. `demo_absent`
+
+   English: Not in this build. The demo build carries no scripted feed.
+
+   Telugu, as written, unreviewed: ఈ బిల్డ్‌లో లేదు. డెమో బిల్డ్‌లో స్క్రిప్ట్ చేసిన ఫీడ్ లేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
 ### TEMPORARY: the build-status screen
 
 A developer screen listing what is built. It will be replaced before the demo. Lowest priority: do these last, or skip them.
 
-159. `status_screen_subtitle`
+160. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
@@ -1596,7 +1605,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-160. `status_line`
+161. `status_line`
 
    English: %1$s: %2$s
 
@@ -1607,7 +1616,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-161. `state_not_implemented`
+162. `state_not_implemented`
 
    English: Not implemented
 
@@ -1616,7 +1625,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-162. `pipeline_voice_logging`
+163. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
@@ -1625,7 +1634,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-163. `pipeline_nutrition_lookup`
+164. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
@@ -1634,7 +1643,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-164. `pipeline_timeline_query`
+165. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
@@ -1643,7 +1652,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-165. `pipeline_lab_report_scan`
+166. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
@@ -1652,7 +1661,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-166. `pipeline_adaptive_suggestions`
+167. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
@@ -1661,7 +1670,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-167. `pipeline_dish_first_guess`
+168. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
@@ -1670,7 +1679,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-168. `pipeline_exercise_form`
+169. `pipeline_exercise_form`
 
    English: Exercise form check
 
@@ -1681,7 +1690,16 @@ A developer screen listing what is built. It will be replaced before the demo. L
 
 ### UNPLACED: ask Vedant where this appears
 
-169. `stop_speaking`
+170. `speak_in_label`
+
+   English: Speak in
+
+   Telugu, as written, unreviewed: ఈ భాషలో మాట్లాడండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+171. `stop_speaking`
 
    English: Stop
 
@@ -1744,8 +1762,17 @@ looks like a question. **A wrong word here is the dangerous kind.** For each wor
 | 17 | `taganu` | Telugu, I drank, short spelling | | | |
 | 18 | `thaganu` | Telugu, I drank, th- spelling | | | |
 
-English words on the same list, for completeness: `ate`, `had`, `drank`, `eaten`, `finished`, `log`, `record`,
+English words on the same list, for completeness: `ate`, `had`, `drank`, `eaten`, `finished`, `used`, `log`, `record`,
 and the phrases `breakfast was`, `lunch was`, `dinner was`, `snack was`, `tiffin was`.
+
+Devanagari, as the Hindi recogniser writes them (Vedant reads Devanagari; these are for him):
+ate/drank `खाया`, `खाई`, `खाए`, `खायी`, `खाये`, `पिया`, `पी`. A number or a household unit beside a
+food, with nothing that looks like a question, also counts as a meal: `एक दो तीन चार पाँच पांच छह
+सात आठ नौ दस आधा आधी कटोरी कटोरा प्लेट गिलास ग्लास कप चम्मच एमएल ग्राम`. Hindi question and
+advice words the app treats as "not a meal": `क्या कितना कितनी कितने कैसे कैसा कौन कौनसा कौनसी कब
+कहाँ कहां क्यों क्यूं चाहिए चाहिये करूँ करूं करू सकता सकती सकते हूँ हूं रहा रही रहे अभी बताओ
+बताइए बताइये अच्छा बेहतर सही ठीक सुझाव ऐड जोड़ बदल हटा डिलीट`, and the phrases `खा रहा`, `खा रही`,
+`खा रहे`, `के लिए`, `खाना चाहिए`.
 
 #### The words that make the app ask instead
 

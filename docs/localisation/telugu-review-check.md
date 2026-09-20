@@ -344,60 +344,60 @@ Machine-generated lines received via Nila; every line below is marked for review
    Telugu: అది మీరు తిన్న భోజనమా, ఒక ప్రశ్నా, ఇప్పుడు తినబోయే ప్లేటా, లేదా ఏమి తినాలో అడుగుతున్నారా?
 
 
-47. `intent_heading_log`
-
-   English: Logging
-
-   Telugu: నమోదు చేస్తున్నాను
-
-
-48. `intent_heading_answer`
-
-   English: Answering
-
-   Telugu: జవాబు ఇస్తున్నాను
-
-
-49. `intent_heading_suggest`
-
-   English: Suggesting
-
-   Telugu: సూచిస్తున్నాను
-
-
-50. `intent_heading_recommend`
-
-   English: Recommending
-
-   Telugu: సిఫారసు చేస్తున్నాను
-
-
-51. `intent_log`
+47. `intent_log`
 
    English: I ate this
 
    Telugu: నేను ఇది తిన్నాను
 
 
-52. `intent_answer`
+48. `intent_answer`
 
    English: A question
 
    Telugu: ఒక ప్రశ్న
 
 
-53. `intent_suggest`
+49. `intent_suggest`
 
    English: About to eat this
 
    Telugu: ఇది తినబోతున్నాను
 
 
-54. `intent_recommend`
+50. `intent_recommend`
 
    English: What should I eat
 
    Telugu: నేను ఏమి తినాలి
+
+
+51. `intent_heading_log`
+
+   English: Logging
+
+   Telugu: నమోదు చేస్తున్నాను
+
+
+52. `intent_heading_answer`
+
+   English: Answering
+
+   Telugu: జవాబు ఇస్తున్నాను
+
+
+53. `intent_heading_suggest`
+
+   English: Suggesting
+
+   Telugu: సూచిస్తున్నాను
+
+
+54. `intent_heading_recommend`
+
+   English: Recommending
+
+   Telugu: సిఫారసు చేస్తున్నాను
 
 
 ## When the plate could not be understood
@@ -1135,21 +1135,28 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The scripted-feed banner
 
-156. `demo_switch_title`
+156. `demo_absent`
+
+   English: Not in this build. The demo build carries no scripted feed.
+
+   Telugu: ఈ బిల్డ్‌లో లేదు. డెమో బిల్డ్‌లో స్క్రిప్ట్ చేసిన ఫీడ్ లేదు.
+
+
+157. `demo_switch_title`
 
    English: Scripted demo feed
 
    Telugu: స్క్రిప్ట్ చేసిన డెమో ఫీడ్
 
 
-157. `demo_switch_hint`
+158. `demo_switch_hint`
 
    English: Feeds the screens scripted events instead of the real pipeline. For building and photographing screens only. Every figure it shows is script.
 
    Telugu: నిజమైన పైప్‌లైన్‌కు బదులుగా స్క్రీన్‌లకు స్క్రిప్ట్ చేసిన ఈవెంట్‌లను ఇస్తుంది. స్క్రీన్‌లను నిర్మించడానికి, ఫోటో తీయడానికి మాత్రమే. ఇది చూపించే ప్రతి అంకె స్క్రిప్ట్ మాత్రమే.
 
 
-158. `demo_banner`
+159. `demo_banner`
 
    English: SCRIPTED DEMO FEED. Nothing on this screen is a real result.
 
@@ -1158,70 +1165,70 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## TEMPORARY: the build-status screen
 
-159. `status_screen_subtitle`
+160. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
    Telugu: ఫేజ్ 1B ప్రాథమిక నిర్మాణం. అవసరమైన ఒప్పందాలు నిర్వచించబడ్డాయి; ఇంకా ఏ పైప్‌లైన్ నిర్మించబడలేదు.
 
 
-160. `status_line`
+161. `status_line`
 
    English: %1$s: %2$s
 
    Telugu: %1$s: %2$s
 
 
-161. `state_not_implemented`
+162. `state_not_implemented`
 
    English: Not implemented
 
    Telugu: ఇంకా అమలు చేయలేదు
 
 
-162. `pipeline_voice_logging`
+163. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
    Telugu: వాయిస్ లాగింగ్ (ASR, LLM ఎక్స్‌ట్రాక్ట్, TTS)
 
 
-163. `pipeline_nutrition_lookup`
+164. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
    Telugu: పోషక విలువల శోధన
 
 
-164. `pipeline_timeline_query`
+165. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
    Telugu: టైమ్‌లైన్ మరియు వాయిస్ ప్రశ్న
 
 
-165. `pipeline_lab_report_scan`
+166. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
    Telugu: ల్యాబ్ రిపోర్ట్ స్కాన్
 
 
-166. `pipeline_adaptive_suggestions`
+167. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
    Telugu: అనుకూల సూచనలు
 
 
-167. `pipeline_dish_first_guess`
+168. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
    Telugu: కెమెరాతో వంటకం మొదటి అంచనా
 
 
-168. `pipeline_exercise_form`
+169. `pipeline_exercise_form`
 
    English: Exercise form check
 
@@ -1230,7 +1237,14 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## UNPLACED: ask Vedant where this appears
 
-169. `stop_speaking`
+170. `speak_in_label`
+
+   English: Speak in
+
+   Telugu: ఈ భాషలో మాట్లాడండి
+
+
+171. `stop_speaking`
 
    English: Stop
 
@@ -1243,4 +1257,4 @@ Machine-generated lines received via Nila; every line below is marked for review
 - 10. `tab_talk` and 15. `mic_speak`
 - 12. `tab_about` and 85. `about_title`
 - 37. `meal_item_with_quantity` and 75. `scan_field_line` and 90. `context_figure`
-- 94. `context_period` and 160. `status_line`
+- 94. `context_period` and 161. `status_line`

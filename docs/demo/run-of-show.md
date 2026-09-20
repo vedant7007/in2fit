@@ -44,6 +44,8 @@ aloud, ticking, at the table, before the first sentence. Ten minutes.
 | 7 | **Brightness full; media volume 15 of 15, READ off the probe, not trusted from the volume key.** `TtsVoiceProbeTest` prints "stream 3 at N of MAX"; N must be the max. From a laptop: `adb shell cmd media_session volume --stream 3 --set 15`. | The lead-in phrase and the spoken answer must be heard from the back of the room. |
 | 7a | **The wired speaker plugged in: USB-C or 3.5 mm. NEVER Bluetooth.** Bluetooth is a radio and shows an icon beside the airplane one. Run `TtsVoiceProbeTest`: its "routed to" line must name the wired device and the tone must come from it. Unplug, run again: "BUILTIN_SPEAKER". (Meera, 17:24.) | The hall eats sound; the screen carries the answer regardless (`0026`), but the voice is the demo's second channel. |
 | 7b | **One spoken turn heard from the back of the room before the judges arrive.** | The only test of the speaker that counts. |
+| 7c | **A wired headset or lapel microphone in the bag**, rehearsed once through a full turn (Jacob, 19:05). Wired: a cable costs nothing on the airplane-mode claim; anything Bluetooth is a radio. | In a loud hall the microphone must be at the mouth whatever the hand is doing. |
+| 7d | **Push-to-talk, if the Talk screen carries a hold gesture by the day** (Jacob's offer, Arjun's call, 19:05): press, speak, release; the endpointer never has to find the end of a sentence in a room full of sentences. If not, open listening stays and row 7c and the phone-at-the-mouth rule do the work. **[Arjun]** | `b4e30e2` measured the recogniser and the endpointer in a synthetic crowded hall and named the threshold to prepare against. |
 | 8 | **Storage: at least 2 GB free.** | The phone was 98–100% full on 19 September; the app copies assets on first run and writes its log. |
 | 9 | **App WARM, not cold.** Open IN2FIT and run one full Beat 1 sentence to the answer, then leave it open on the Talk tab. | Cold model load reads 5.4–8.5 s on this phone; warm is under a second (`logs/hw-report-*.txt`). Spec 7.4: warm every model before the demo begins. |
 | 10 | **Speech language = Hindi; interface = English.** Two settings, two places. SPEECH: the profile's speech language, which the Talk screen must send to the recogniser; on 20 September `TalkViewModel.kt:75` still sends `te` as a constant, and that is Arjun's one-line change TONIGHT, because on the day it would break the demo silently (a Hindi sentence through the Telugu checkpoint comes back transliterated). INTERFACE: the phone's per-app language, Settings > System > Languages & input > App languages > IN2FIT (Android 13+; the app declares `localeConfig`, so IN2FIT is listed). On this realme the menu may sit under "Additional settings"; Rao confirms the path once, and it goes here. English for the demo, Telugu only in Beat 5. | See "Language" above. |
@@ -59,7 +61,7 @@ aloud, ticking, at the table, before the first sentence. Ten minutes.
 | 3 | Profile: name, Hindi speech, English interface, a declared context if beat 5 is attempted. | Arjun / Rao | no in-app picker yet; the interface language is the system's per-app setting (path in row 10 of the device checklist). One line gives the app a button that opens that page directly: `startActivity(Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.parse("package:" + packageName)))`, API 33+, and the phone is 35. That is the cheapest toggle for Beat 5. |
 | 4 | **A meal already logged today**, the Beat 1 meal, so Beat 4's "Advise again on my last meal" has a meal. | presenter, at the table (row 9 above does it) | |
 | 5 | **A week of history**, so a "last Tuesday" question has an answer. | Rao (seed) | spec 7.4; Beat 2 below uses "my lunch" so this is a nice-to-have |
-| 6 | **The printed lab report**, on paper, with a fasting glucose ABOVE the range printed on the same sheet, in someone's bag. Plus a second copy. | Vedant | the trigger fires only on a value outside the range printed beside it (`0018`) |
+| 6 | **The printed lab report**, on paper, with FERRITIN (and haemoglobin) BELOW the range printed on the same sheet, in someone's bag. Plus a second copy. The scripted report used for the screenshots reads ferritin 8.2 ng/mL against a printed 15 and haemoglobin below its range too. | Vedant | the trigger fires only on a value outside the range printed beside it (`0018`); with two values out of range the engine leads with the alphabetically first test name, so ferritin, and Vedant ruled the presenter says what the app says (Arjun, 18:46) |
 | 7 | **The same report already scanned and saved** in the app, as the fallback if the camera will not read it on the day. | presenter, at the table | Beat 4 then still fires |
 | 8 | The ten sentences recorded in Vedant's voice, in the room, and scored. | Vedant, Jacob | not yet; this decides Hindi vs English |
 | 9 | Telugu Part 1 confirmed by a fluent speaker, if the toggle is to be shown. | Vedant | packet frozen 22:00 20 Sep; unconfirmed = do not show the toggle |
@@ -87,7 +89,8 @@ paper handling: 2–3 minutes. Measure per beat; a single total is not a target.
 
 ### Beat 1. Speak a meal. *(measured extraction 10.6–10.7 s; whole turn budget 15 s)*
 
-**P taps the microphone and says, exactly:**
+**P brings the phone to the mouth (Jacob, 19:05: speak first, THEN show the screen; never both at
+arm's length), taps the microphone and says, exactly:**
 
 > **दो रोटी, एक कटोरी दाल, और दो चम्मच तेल**
 > *(English column: "Two rotis, a katori of dal, and I used two spoons of oil.")*
@@ -162,13 +165,13 @@ eat last Tuesday?")
 
 **Screen:** "Capturing", "Reading the text" with the counter; then each value read off the sheet
 beside the row it came from, with "printed range … to …" under each value that had one, the report
-date, and "Save N values". **P ticks fasting glucose (and HbA1c if it read) and taps Save.**
+date, and "Save N values". **P ticks ferritin and haemoglobin and taps Save.**
 
 **P says:**
 
-> "Fasting glucose, and the range the sheet itself prints beside it. The app does not carry
-> ranges of its own; it reads the lab's. It will not say what that means for my health. It will
-> change what it suggests."
+> "Ferritin, and the range the sheet itself prints beside it. The app does not carry ranges of
+> its own; it reads the lab's. It will not say what that means for my health. It will change
+> what it suggests."
 
 *Optional, if time allows and the turn is under 20 s:* **मेरा iron कम है, मुझे क्या खाना चाहिए?**
 ("I have anaemia, what should I eat for iron?") shows a RECOMMEND answering from declared
@@ -181,8 +184,13 @@ conditions and the knowledge file, with the referral sentence set apart beneath 
 **Screen:** "Checking your records" with the counter, then the advice: the trigger sentence
 first, verbatim from the rules engine, then the candidates:
 
-> "Your report from [date] shows Glucose at [value] mg/dL, above the [bound] printed on it, so
+> "Your report from 2026-09-12 shows Ferritin at 8.2 ng/mL, below the 15 printed on it, so
 > suggestions are ranked differently now."
+
+*(The date, value and bound are whatever the printed report carries; these are the scripted
+report's. With two values below range the engine leads with the alphabetically first test name:
+ferritin before haemoglobin. That rule is arbitrary and is flagged to Rao; until it changes, the
+presenter says what the app says.)*
 
 **P says:**
 
@@ -227,7 +235,9 @@ apology. Rehearse each branch twice.
 | **A model fails to load** ("The model could not start" / "not loaded on this phone yet") | "It said so rather than pretending. Ten seconds." | Closes the app from Recents, reopens it, waits for the Talk tab, tries once. If it fails a second time, S hands over the backup phone, already warm, and P repeats the beat from the top of it. |
 | **The phone froze while the screen was off** (the app is blank or stale after the screen came back) | "The phone put it to sleep. One moment." | Wakes the screen, swipes the app away, reopens. Then checks the screen-timeout row of the checklist was actually done. |
 | **The judges ask for a language nobody on the team speaks** (Telugu, on stage) | *If Part 1 confirmed:* "The interface is in Telugu; here." *(toggle)* "The recogniser has a Telugu model too. I will not read Telugu at you badly, so that part I demonstrate on screen, not aloud." *If not confirmed:* "There is a Telugu model and a Telugu string table, and Telugu speakers are reviewing every health sentence in it this week. I will not show wording on a health screen before a speaker has read it." | Shows the picker exists (system Settings > Apps > IN2FIT > Language, or the in-app picker when it lands). Does not switch to unreviewed Telugu. |
-| **A notification or call lands on screen** | Nothing. | Swipes it away. Checks DND next time. |
+| **It heard nothing** (no transcript, or "That could not be used") in a loud room | "Loud room. Once more, closer." | Brings the phone to the mouth, or plugs the wired headset in, and repeats the sentence. |
+| **It kept listening after P stopped** (the meter does not freeze) | "It is waiting for the room to go quiet. I'll help it." | Stops speaking, covers the microphone with a hand for a second so the endpointer sees silence; if push-to-talk is built, this branch does not exist. |
+| **A notification or call lands on screen** | Nothing. | Swipes it away. |
 | **The answer contains a number that looks wrong** | "That figure came from the database row for that food; if it is off, the row is off, and the row is public and correctable. The model did not make it up: it cannot." | Taps the confidence label to show the reason. Moves on. |
 | **The whole device is dead** | "We recorded this run last night, on this phone, in airplane mode." | S plays the video. P narrates it with the same lines above. |
 
@@ -247,3 +257,5 @@ number; every failure state on screen is a sentence the app chose to show. Read 
 | The interface toggle: the system per-app setting is the decision; a one-line button that opens it is the nice-to-have. Rao confirms the realme menu path. | Arjun, Rao |
 | Telugu Part 1 confirmed, or Beat 5 cut. | Vedant |
 | The seeded week of history, if the "last Tuesday" alternate is wanted. | Rao |
+| The trigger sentence's choice between two out-of-range values (alphabetical today; furthest outside its range is the principled rule). Known and arbitrary until changed. | Rao |
+| Push-to-talk on the Talk screen, or the decision to stay with open listening. | Arjun, Jacob |

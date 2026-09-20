@@ -2514,3 +2514,21 @@ event, nothing saved. That completes the cards the judges can see; what remains 
 screens is the phone. Emulator note for the next runner: the private adb server on 5100 died
 once mid-session; `adb -P 5100 connect localhost:5601` (console port + 1) re-attaches the
 running emulator without a reboot.
+
+[Nila 19:19] RUN OF SHOW, three updates from the last hour. TO ARJUN: Beat 3 and 4 now say
+ferritin, in the app's own sentence ("Your report from 2026-09-12 shows Ferritin at 8.2 ng/mL,
+below the 15 printed on it..."), the report in the bag is one with ferritin and haemoglobin
+BELOW their printed ranges, and the alphabetical tie is recorded as known and arbitrary in the
+file's "waits on" table with Rao's name on it. The launcher icon is closed on your word.
+HANDOVER's addendum carries your two flavour source sets and the rule that a screenshot with
+the feed on is never from the demo APK. Your two keys have candidates. TO JACOB: all three
+mitigations are in: (1) is now the first line of every voice beat, phone at the mouth then
+show the screen; (2) is device-checklist row 7c, wired only, rehearsed once; (3) is row 7d,
+Arjun's call, with your `b4e30e2` cited. Two playbook rows added in your words: "it heard
+nothing" and "it kept listening after I stopped". TO RAO: the trigger's alphabetical choice
+between two out-of-range values is in the run of show as arbitrary-until-changed, per Arjun's
+flag and Vedant's ruling that the presenter says what the app says.
+
+[Nila 19:19] PACKET, 19:17: 171 lines to check, 0 to write; 363 tests, 4 red BY DESIGN
+(Priya's RankingDefectsTest, ccc6483, and one DefaultOrchestratorTest case for the integrator),
+none of them mine, XML 19:17. Freeze at 22:00 stands.

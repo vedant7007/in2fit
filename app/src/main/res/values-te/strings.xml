@@ -163,6 +163,8 @@
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="talk_hint">మీరు ఏమి తిన్నారో చెప్పండి, లేదా ఒక ప్రశ్న అడగండి.</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="speak_in_label">ఈ భాషలో మాట్లాడండి</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="mic_speak">మాట్లాడండి</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="mic_listening">వింటున్నాను…</string>
@@ -362,4 +364,6 @@
     <string name="demo_switch_hint">నిజమైన పైప్‌లైన్‌కు బదులుగా స్క్రీన్‌లకు స్క్రిప్ట్ చేసిన ఈవెంట్‌లను ఇస్తుంది. స్క్రీన్‌లను నిర్మించడానికి, ఫోటో తీయడానికి మాత్రమే. ఇది చూపించే ప్రతి అంకె స్క్రిప్ట్ మాత్రమే.</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="demo_banner">స్క్రిప్ట్ చేసిన డెమో ఫీడ్. ఈ స్క్రీన్‌లో ఏదీ నిజమైన ఫలితం కాదు.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="demo_absent">ఈ బిల్డ్‌లో లేదు. డెమో బిల్డ్‌లో స్క్రిప్ట్ చేసిన ఫీడ్ లేదు.</string>
 </resources>
