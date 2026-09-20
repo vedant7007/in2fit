@@ -61,7 +61,9 @@ class RoutingDefectsTest {
     /** Where the words are silent, the model still decides, as before. */
     @Test fun `a sentence with no evidence still goes to the model`() {
         val llm = FakeLlm().apply { intent = Outcome.Ok(Intent.SUGGEST) }
-        val events = run(llm, "tea with two biscuits")
+        // no eating word, no quantity, no marker: "tea with two biscuits" was this case until a
+        // quantity beside a food became a meal stated (the Beat 1 sentence has no verb)
+        val events = run(llm, "tea and biscuits")
         assertTrue("$events", events.any { it is OrchestratorEvent.Progress && (it as OrchestratorEvent.Progress).stage.name == "CLASSIFYING" })
     }
 }

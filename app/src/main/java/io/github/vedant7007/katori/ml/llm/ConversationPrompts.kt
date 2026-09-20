@@ -85,13 +85,13 @@ internal object ConversationPrompts {
      * the same as RECOMMEND's: only what they told us, in their words.
      */
     fun answer(request: AnswerRequest, length: AnswerLength = AnswerLength.SHORT): String {
+        // HALVED on 20 Sep, same reason as the RECOMMEND block below: 457 prompt tokens measured
+        // for an ANSWER turn against a 250 budget, and the system block was the part left to cut.
         val system = """
-            You answer a person's question about their food diary or about nutrition. Use only what is listed below.
-
-            Rules:
-            - Use ONLY the figures and facts given, with numbers exactly as written. Never calculate, total, convert or estimate. If the answer needs a figure that is not listed, say you do not have that figure.
-            - Say what the data shows. You may mention only the conditions they have told us about, in their words. Never suggest they have any other condition, never diagnose, never tell them to take, stop or change any medicine or supplement.
-            - Plain words, ${length.answerRule} No greeting, no sign-off, no markdown, no list.
+            You answer a person's question about their food diary or nutrition, from what is listed below only.
+            - Numbers only as written. Never calculate, total or estimate; if a figure is not listed, say you do not have it.
+            - Name only conditions they told us; never diagnose, never advise on medicines.
+            - Plain words, ${length.answerRule} No greeting, no list.
         """.trimIndent()
 
         val user = buildString {
@@ -140,15 +140,17 @@ internal object ConversationPrompts {
      * (spec 4.3), and the UI renders suggestions from the list, not from the prose.
      */
     fun recommend(request: RecommendRequest, length: AnswerLength = AnswerLength.SHORT): String {
+        // HALVED on 20 Sep at the integrator's measurement: 394 prompt tokens for a RECOMMEND after
+        // his trim of the request, and 250 is the budget; the system block was the rest. Each rule
+        // is one clause now. The guards behind the model (numeric, condition, SafetyLine) hold
+        // what the longer wording only asked for. Unmeasured on the phone until his next run.
         val system = """
-            You help a person choose what to eat, using only the facts and foods listed below.
-
-            Rules:
-            - Use ONLY the facts given, with numbers exactly as written. Never calculate, convert or estimate a number. Do not add a figure from memory.
-            - Suggest only foods from the allowed list. Explain briefly why, from the facts.
-            - You may mention only the conditions they have told us about, in their words. Never suggest they have any other condition, never diagnose, never tell them to take, stop or change a medicine or supplement. If a report line is given, repeat it only as written.
-            - Respect every "never suggest" line without exception.
-            - Be encouraging and practical. ${length.recommendRule} No greeting, no sign-off, no markdown, no list.
+            You help a person choose what to eat, from the facts and foods below only.
+            - Numbers only as written in the facts; never calculate or add one from memory.
+            - Suggest only foods from the list, and say why, from the facts.
+            - Name only conditions they told us; never diagnose, never advise on medicines.
+            - Obey every "never suggest" line.
+            - ${length.recommendRule} Plain prose, no greeting, no list.
         """.trimIndent()
 
         val user = buildString {
@@ -259,7 +261,9 @@ enum class AnswerLength(
      * the token cap is the backstop, set so a runaway answer is cut at roughly the length of one
      * long sentence rather than three.
      */
-    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twenty words: the one food to add and why.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
+    // The RECOMMEND rule asks for a sentence in so many words: the first phone run (20 Sep)
+    // answered "the one food to add and why" with the bare words "Spices, cumin seed".
+    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twenty words that names one food from the list and says why it helps.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
 }
 
 /** The four conversational intents of `0015`. Capture-shaped intents (scan, correct) are not spoken and are not routed here. */

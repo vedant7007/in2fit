@@ -238,7 +238,8 @@ class DemoSentencesTest {
                 }
             } else {
                 // ANSWER and RECOMMEND: what the engine and retrieval hand the model
-                val declared = if (r.id == 9) listOf(DeclaredCondition(if (r.lang == "hi") "iron kam hai" else "anaemia", ConditionSource.USER_DECLARED)) else emptyList()
+                // the declared condition is the profile's, in whichever language it was typed; the same in both columns
+                val declared = if (r.id == 9) listOf(DeclaredCondition("anaemia", ConditionSource.USER_DECLARED)) else emptyList()
                 val eval = evaluation(null, declared, emptyList())
                 rulesCol = describe(eval) + (if (clinical) " | REFERRAL follows (question)" else "")
                 val terms = eval.constraints.filterIsInstance<Constraint.PreferNutrient>().flatMap { KnowledgeFacts.nutrientTerms(it.nutrient.name) } + declared.map { it.name }
