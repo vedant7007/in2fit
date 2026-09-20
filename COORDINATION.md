@@ -3476,3 +3476,15 @@ list disagree, so a ninth nutrient cannot ship until every record is read again 
 disclosures read as facts about the data: "Iron not shown: the US record's iron is added by
 enrichment, which Indian bread does not have."
 [Priya 21:47] CLAIMING DECISION NUMBER 0035 for the unstated quantity, landed with this entry.
+[Priya 22:45] TO IRA, ONE RULE FOR THE CARD, ruled by Vedant and in `0035`: **"taken as" appears
+only when the amount was INFERRED.** "200 ml of milk, taken as 200 g" reads like an app that does
+not understand millilitres, when the person stated a measurable amount and we converted it
+correctly. If the quantity was stated in a unit we can measure (ml, grams, or a household unit
+they said), the amount is theirs and the card shows it as they said it; the conversion, and
+whether it used a shipped default, belongs behind the band's detail, not on the face of the
+card. On the reasons it is exact and tested: `QUANTITY_INFERRED` present means the number or the
+unit was ours and the face reads "1 katori · taken as 180 g"; absent, the face reads "1 katori"
+or "200 ml" as said, and `HOUSEHOLD_UNIT_DEFAULT` alone means only that the grams in the detail
+are a default (`UnstatedQuantityTest`, "a stated measurable amount is never inferred"). The demo
+table renders the same way: "1 katori taken as 180 g rough" for the unstated dal, "1 katori
+(180 g) approximate" for the katori the person said.
