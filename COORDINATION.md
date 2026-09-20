@@ -2763,3 +2763,50 @@ stage the full set above from scratch with your chunked procedure, stopwatch run
 `adb devices` to the last `sha256sum` match, and paste the time and the drop count. And please
 commit the chunked push as `tools/stage-models.ps1` (Nila's directory; say so in the message as
 the others have): on the 26th it is run by whoever holds the cable, and that may not be you.
+
+[Arjun 20:20] TO JACOB, A MEASUREMENT, not a note, escalated by Vedant: hold-to-speak moves the
+truncation failure from the endpointer to the presenter's thumb, because the sentence now ends
+where the thumb lifts. With your ten sentences: is a 300 ms tail after the last word enough for
+the recogniser to close the final syllable, and if not, what is? Two columns would settle it,
+"exact of ten" with the clip cut 300 ms after the last word and with 600 ms, on the hi
+checkpoint at the mouth, clean and at +15 dB. Whatever the number is becomes the presenter's
+instruction and the release padding, if your capture wants to add one.
+[Arjun 20:20] TO NILA, RUN OF SHOW, in these words on the same line as "phone at the mouth":
+"let go a beat after the last word". Both are things the presenter does with his hands and
+both are learnable in one rehearsal. Jacob's tail measurement above says how long the beat is.
+
+[Arjun 20:20] TO IRA, WELCOME, AND THE SPLIT, to agree here before either of us commits tomorrow
+(Vedant's instruction). YOU take appearance and motion: the design system, the type and spacing
+scales, the components, the splash. I keep state, navigation, the events and the boundary to
+Rao. Concretely, so we do not collide in the same file:
+MINE: `ui/*ViewModel.kt` (all state; every `State` and `Entry` type), `ui/Sentences.kt` (enum ->
+string key), `ui/MainActivity.kt` (tabs, the pre-flight route, the banner's condition), `ui/demo/`
+in `src/full`, `src/demo`, and `PreflightScreen.kt` (a diagnostics screen; leave it plain).
+YOURS: `ui/theme/` (make it: colours, type, spacing; the brand is `#252F26` on cream `#ECEBE6`,
+sampled by Vedant from the logo, not the icon's `#1F6F5C`), `ui/components/` (make it), the
+splash (see my 20:09 line for the motion Vedant read off the frames and the three rules that
+outrank fidelity: never gates the app, ends at the next expand when warm-up finishes, no minimum
+duration), and, once your components exist, the four screen composables `TalkScreen.kt`,
+`ScanScreen.kt`, `AboutScreen.kt`, `MainActivity.kt`'s `Shell()` layout. Until then I hold them;
+say the hour you take each and I stop touching it that hour.
+THE RULE BETWEEN US: a visual idea that needs new state or a new event comes to me and I build
+it; you never add a field to a `State` or a case to an `Entry`. What a screen shows, in what
+order, from which event, is fixed by 0026 and the contract; how it looks is yours entirely.
+RULES THAT APPLY TO YOU AS TO ME: emulator for screenshots, phone for numbers, never the reverse
+(feed screenshots from the FULL flavour only); all four beats keep working after every commit;
+no network, no remote font, no remote image, no library that needs the network (the demo build
+has no INTERNET permission and a test fails the build if a dependency adds one; Google Fonts as
+a downloadable font is a network call, so a font ships as an asset or it is the system font);
+the screen carries the full answer as text before anything is spoken; no literal in a
+composable (`StringResourcesTest` refuses `Text("...")`; every string is a key in
+`res/values/strings.xml`, English-only after tonight's 22:00 freeze); no number on any screen
+the pipeline did not produce; the 15.3 safety line stays on every advice surface; one worktree
+per session, `tools\new-worktree.ps1 -Name ira`, land with `tools\land.ps1`. Read `0026`, `0027`
+and `docs/localisation/string-conventions.md` before the first composable.
+
+[Arjun 20:20] THE LOGO IS A PNG ONLY (Vedant). Ruled: no trace. An icon built from a traced
+raster would look soft beside everything else, so the launcher icon stays Nila's bowl, in the
+brand colour: `ic_launcher_background` `#1F6F5C` -> `#252F26` in `res/values/colors.xml`, one
+line, and I take it in the same commit as the theme unless Ira or Nila lands it first. The "2"
+figure icon waits for an SVG, if one ever exists. The splash's wordmark can be the PNG itself
+scaled, since on a splash it is large and lossy is invisible; Ira's call on that.
