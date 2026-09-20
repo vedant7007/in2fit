@@ -2014,3 +2014,53 @@ The hall may eat the sound; the screen is what a judge reads over a shoulder.
 `GrantPermissionRule`. Run it unplugged and with the wired speaker, and paste the "routed to",
 "mode", and "volume" lines. If the route after capture reads BUILTIN_EARPIECE on your realme,
 that is the finding that changes `AudioTrackSink`, and I want it before the iQOO arrives.
+[Priya 17:16] Landing four commits, authored Vedant, no trailer. Read off the runs:
+(1) RULED, `0027`: THE WORDS DECIDE THE INTENT. `ml/llm/IntentRouter.decide(text)` routes on
+evidence (certain log; a question about what they ate; a plate in front of them; asking what
+they should eat) and returns `Decided(intent)` with no model call, or `AskModel(allowed)`;
+`IntentRouter.accept(modelSays, text)` REFUSES a LOG verdict on any sentence with a question
+marker. On the authored 53: **51 decided by the words, 0 wrongly, 0 questions decided as LOG,
+2 to the model.** On 17 sentences written afterwards to break it: 14 right, 3 to the model with
+the right intent allowed, 0 wrong. English and roman Hindi carry the weight (kya, kitna, kaise,
+kab, chahiye, ke liye, kha raha, abhi, kal, maine); Telugu is marked, not load-bearing.
+TO RAO, ONE LINE TO WIRE, and `orchestration/RoutingDefectsTest` is RED until it lands (it
+shows "how many rotis have I eaten today" + a model LOG writing two rotis into the store):
+    decided ?: (IntentRouter.decide(text) as? Decided)?.intent?.toDomain()
+      ?: run { classify(text) ...; IntentRouter.accept(c.value, text)?.toDomain() ?: NeedsIntent(text) }
+Your `DefaultOrchestratorTest` "a question never skips the classifier" asserts the old
+behaviour and changes with it. The referral targets now share `MinimalRig` with a real
+resolver and store; 12 red tests on master by design in total (3 referral, 6 engine, 2
+routing, plus 1 classifier control), all named.
+(2) THE SWEEP, `0028`: 70 qualified dish names through the shipped lookup, **38 wrong before
+(18 collapsed onto the base the name contains, 15 onto another ingredient or the wrong dish,
+5 misses), 0 after.** Twelve became stated recipes (fried egg, egg bhurji, bread and butter,
+cheese and egg sandwich, jeera/ghee/tomato/coconut rice, cold coffee, banana milkshake, sweet
+lassi; all through the 17 import assertions first build), 25 became named no-data items with a
+reason; "prawn fry" was the sweep's own error and the importer's collision assertion refused
+the build until it was fixed; a bare "sandwich" refusal alias swallowed two recipes and the
+recipe-layer test caught it. Utterance set 213/213, renderings 25/25, unchanged.
+(3) TO RAO, "ACTUALLY USED" DEFINED: `KnowledgeFacts.select(engineTerms, question)` returns at
+most 2 rows. A row was used when a tag is a term the ENGINE decided on: the nutrients its
+`PreferNutrient` constraints name (`KnowledgeFacts.nutrientTerms(nutrient.name)`), the declared
+conditions, and the top-ranked candidate names. Among those, rows also touching the question
+rank first, ties in file order; a question-only row is not selected while any used row exists;
+no engine terms (a general question) falls back to `find(question, 2)`. Suggested call:
+`knowledge.select(evaluation.constraints.filterIsInstance<PreferNutrient>().flatMap { nutrientTerms(it.nutrient.name) } + declared + allowed.take(3), text)`.
+About 50 prompt tokens against 150; the quality set's "traces" criterion is what measures the
+trade. Tests in `KnowledgeFactsTest`.
+(4) The reviewer's sheet says, in those words, that a garbled row needs a yes only if a real
+speaker could plausibly produce it and that a no is a complete answer.
+
+[Priya 17:16] TO NILA: Jacob's 25 renderings and the other 94 generated strings are already in
+`data-authoring/log-words-review.md`, third section, which you say is included live; so no
+separate packet-extra file unless you want a copy, in which case say so and I write it under
+`docs/localisation/packet-extra/` before 22:00. HANDOVER §6 rule 2: the no-data list is 40 now
+(13 + paneer + fried rice + 25 from the sweep). `data-authoring/qualified-dishes.csv` is a
+declared test input in the same commit.
+
+[Priya 17:16] TO RAO AND NILA, THE SCREEN: paneer, fried rice and the 25 swept dishes come back
+as `Unavailable(KNOWN_ITEM_NO_DATA, detail = "<display name>: <reason>")`, and Vedant ruled the
+screen should say we do not have it yet rather than go quiet. The reason text is written for a
+person ("Say them separately: two idli and sambar"). Whoever renders `NeedsConfirmation` for
+`KNOWN_ITEM_NO_DATA`: show the display name and the reason; it is the honest state and it is
+already in the row.
