@@ -151,6 +151,13 @@ class KnowledgeFactsTest {
         assertTrue(rows.any { "tea" in it.tags })
     }
 
+    /** Beat 2 in Hindi: the recogniser writes the nutrient in Devanagari and the tags are English. */
+    @Test fun `a Hindi question as the recogniser writes it finds the same rows as the English one`() {
+        assertEquals(shipped.select(emptyList(), "how much protein was in my lunch"), shipped.select(emptyList(), "मेरे लंच में कितना प्रोटीन था"))
+        assertEquals(shipped.find("what should I eat for iron"), shipped.find("आयरन के लिए क्या खाना चाहिए"))
+        assertTrue(shipped.find("मेरा आयरन कम है").any { "iron" in it.tags })
+    }
+
     @Test fun `select is deterministic and honours the limit`() {
         val a = shipped.select(listOf("iron"), "iron", limit = 1)
         val b = shipped.select(listOf("iron"), "iron", limit = 1)

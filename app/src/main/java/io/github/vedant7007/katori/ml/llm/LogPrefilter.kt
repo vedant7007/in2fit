@@ -43,7 +43,8 @@ object LogPrefilter {
         val text = FoodTextMatching.normalise(transcript)
         if (text.isEmpty()) return false
         val words = text.split(' ')
-        return words.any { it in LOG_WORDS } || MEAL_WAS.any { FoodTextMatching.containsAsWords(text, it) }
+        return words.any { it in LOG_WORDS } || MEAL_WAS.any { FoodTextMatching.containsAsWords(text, it) } ||
+            words.any { it in QUANTITY_WORDS || it.all { c -> c.isDigit() } }
     }
 
     /** True when anything in the utterance says it is a question or an ask: a question mark, a marker word, a marker phrase. */
@@ -79,6 +80,11 @@ object LogPrefilter {
         "kya", "kitna", "kitni", "kitne", "kaise", "kaun", "kaunsa", "kaunsi", "kab", "kahan", "kyun", "kyon",
         "chahiye", "karun", "karoon", "karu", "sakta", "sakti", "sakte", "hoon", "raha", "rahi", "rahe",
         "abhi", "batao", "bataye", "bataiye", "accha", "achha", "behtar", "sahi", "theek",
+        // Devanagari, the script the hi recogniser emits (demo-utterance-set.csv). Generated from the
+        // roman forms above; Vedant reads Devanagari and verifies these himself.
+        "क्या", "कितना", "कितनी", "कितने", "कैसे", "कैसा", "कौन", "कौनसा", "कौनसी", "कब", "कहाँ", "कहां", "क्यों", "क्यूं",
+        "चाहिए", "चाहिये", "करूँ", "करूं", "करू", "सकता", "सकती", "सकते", "हूँ", "हूं", "रहा", "रही", "रहे",
+        "अभी", "बताओ", "बताइए", "बताइये", "अच्छा", "बेहतर", "सही", "ठीक", "सुझाव", "ऐड", "जोड़", "जोड़ूँ", "बदल", "बदलो", "हटा", "हटाओ", "डिलीट",
         // roman Telugu
         "emi", "em", "enti", "entha", "enni", "ela", "ekkada", "eppudu", "evaru", "endhuku", "enduku",
         "tinali", "tinaali", "thinali", "cheyali", "cheyyali", "kavali", "kavaali", "cheppu", "cheppandi",
@@ -97,16 +103,38 @@ object LogPrefilter {
     internal val MULTI_WORD_MARKERS: List<String> = listOf(
         "was there", "is there", "are there", "about to", "going to", "kha raha", "kha rahi", "kha rahe",
         "hai to", "hai toh", "ke liye", "kosam",
+        "खा रहा", "खा रही", "खा रहे", "के लिए", "खाना चाहिए",
     )
 
     /** Past-tense eating and drinking words. Positive evidence of a log. */
     internal val LOG_WORDS: Set<String> = setOf(
         // English; "log" and "record" are the app's own verbs ("log two rotis")
-        "ate", "had", "drank", "eaten", "finished", "log", "record",
+        "ate", "had", "drank", "eaten", "finished", "used", "log", "record",
         // roman Hindi
         "khaya", "khayi", "khaye", "khaaya", "khai", "piya", "pi", "peeya",
+        // Devanagari, as the hi recogniser writes them; Vedant verifies
+        "खाया", "खाई", "खाए", "खायी", "खाये", "पिया", "पी",
         // roman Telugu
         "tinnanu", "tinnaanu", "thinnanu", "tinna", "thinna", "tinnam", "tinnaam", "tagaanu", "taganu", "thaganu",
+    )
+
+    /**
+     * A quantity beside a food, with no marker anywhere, is the statement of a meal: "two rotis,
+     * a katori of dal, and two spoons of oil" has no eating verb and is the Beat 1 sentence. In a
+     * food diary nothing else is said that way. Number words, household units and digits; the
+     * article "a" is deliberately absent, since "a friend told me to eat rice" would log rice.
+     * ponytail: "three days no rice" would log rice; negation is not read. The recorded
+     * speakers say whether that shape occurs.
+     */
+    internal val QUANTITY_WORDS: Set<String> = setOf(
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "half", "quarter", "dozen",
+        "katori", "bowl", "bowls", "plate", "plates", "glass", "glasses", "cup", "cups", "spoon", "spoons", "teaspoon", "teaspoons",
+        "tablespoon", "tablespoons", "piece", "pieces", "slice", "slices", "ml", "gram", "grams", "kg", "litre", "liter",
+        // roman Hindi ("do" only mid-sentence: leading "do" is the English question word, checked first)
+        "ek", "do", "teen", "char", "paanch", "panch", "chhe", "saat", "aath", "nau", "das", "aadha", "adha", "katori", "chammach", "gilas", "plate",
+        // Devanagari, as the hi recogniser writes them; Vedant verifies
+        "एक", "दो", "तीन", "चार", "पाँच", "पांच", "छह", "सात", "आठ", "नौ", "दस", "आधा", "आधी",
+        "कटोरी", "कटोरा", "प्लेट", "गिलास", "ग्लास", "कप", "चम्मच", "एमएल", "ग्राम",
     )
 
     /**

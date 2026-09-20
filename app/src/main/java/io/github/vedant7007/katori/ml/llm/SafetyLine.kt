@@ -81,8 +81,9 @@ object SafetyLine {
         // events and symptoms, which are outside a food diary's competence
         "attack", "stroke", "cancer", "kidney", "liver", "pregnant", "pregnancy", "fever", "dizzy", "dizziness",
         "faint", "fainting", "pain", "chest", "vomiting", "bleeding",
-        // roman Hindi
+        // roman Hindi, then Devanagari as the hi recogniser writes it; Vedant verifies
         "dawai", "dawa", "goli", "goliyan", "bimari", "bimar", "khatra", "khatarnak", "ilaj",
+        "दवाई", "दवा", "गोली", "गोलियाँ", "बीमारी", "बीमार", "खतरा", "खतरनाक", "इलाज", "डॉक्टर",
         // roman Telugu
         "mandu", "mandulu", "matra", "jabbu", "rogam", "pramadam", "pramadakaram", "vaidyam",
     )
@@ -93,7 +94,8 @@ object SafetyLine {
         "is it ok", "is it okay", "should i stop", "should i take", "can i stop", "can i take", "how much should i take",
         "what is wrong", "whats wrong", "something wrong", "at risk", "under control", "gone away", "go away",
         "get better", "getting worse", "what dose", "how many tablets", "instead of",
-        "hai kya", "kya hai", "kya mujhe", "mujhe kya hua", "unda", "vachinda", "tagginda", "perigindha",
+        "hai kya", "kya hai", "kya mujhe", "mujhe kya hua", "है क्या", "क्या है", "क्या मुझे", "मुझे क्या हुआ",
+        "unda", "vachinda", "tagginda", "perigindha",
     )
 
     /** A lab test name next to a bare number in the question is a reading the person is asking about. */
@@ -121,6 +123,11 @@ object SafetyLine {
         Regex("""\byou (have|are|do not have|don't have|are not|aren't) (a |an |not )?(diabetes|diabetic|anaemia|anemia|anaemic|anemic|hypertension|hypertensive|deficiency|deficient|disease|disorder|infection|at risk|fine|safe|cured|healthy|normal)\b"""),
         Regex("""\b(is|isn't|is not|are|aren't|are not|looks|sounds|seems) (very |quite |not |now )?(dangerous|life.threatening|cured|reversed|abnormal|under control)\b"""),
         Regex("""\bnothing to worry\b"""),
+        // A diagnosis read off a figure. Meera's desktop run of the SHORT answer prompt (20 Sep,
+        // `logs/meera-hindi-reply.log`) said "which indicates anaemia" to a person who declared
+        // nothing; the engine's condition check catches the undeclared name, and this catches the
+        // same verdict on a condition the person DID declare ("your figure indicates anaemia").
+        Regex("""\b(indicates|indicating|suggests|suggesting|points to|consistent with|a sign of|confirms) (a |an |mild |severe |possible )?(diabetes|anaemia|anemia|hypertension|deficiency|disease|disorder|infection)\b"""),
         // the same verdicts and doses in roman Hindi and Telugu, the forms a code-mixed reply would take
         Regex("""\b(aapko|tumhe|tumko|aapki|tumhari|meeku|neeku|miku) (\S+ )?(sugar|diabetes|anaemia|anemia|bp|thyroid|cancer|bimari|jabbu) (hai|hain|undi|unnadi|undhi)\b"""),
         Regex("""\b(goli|goliyan|dawai|dawa|tablets?|mandu|mandulu|matra) (roz |daily |rozana |rojoo )?(lo|lena|le lo|lijiye|veskondi|veyandi|thesukondi|teesukondi)\b"""),

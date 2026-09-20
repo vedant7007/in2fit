@@ -137,6 +137,10 @@ class SafetyLineTest {
         assertNotNull(SafetyLine.prescribesOrJudges("Your sugar is under control now."))
         assertNotNull(SafetyLine.prescribesOrJudges("You are not at risk."))
         assertNotNull(SafetyLine.prescribesOrJudges("No need to see a doctor for this."))
+        // Meera's desktop run, 20 Sep: a diagnosis read off a figure, on a declared condition or not.
+        assertNotNull(SafetyLine.prescribesOrJudges("Your iron intake was 6.1 mg, which indicates anaemia."))
+        assertNotNull(SafetyLine.prescribesOrJudges("That reading is consistent with mild diabetes."))
+        assertNull(SafetyLine.prescribesOrJudges("Iron from meat is absorbed better, which helps with anaemia."))
     }
 
     @Test fun `condition names alone do not make a question clinical`() {

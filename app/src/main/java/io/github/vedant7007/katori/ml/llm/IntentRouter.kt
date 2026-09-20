@@ -17,7 +17,7 @@ import io.github.vedant7007.katori.data.food.FoodTextMatching
  * happen whatever the model says.
  *
  * THE EVIDENCE, in precedence order:
- *   1. a certain log ([LogPrefilter.isCertainLog]): a past-tense eating word and no marker.
+ *   1. a certain log ([LogPrefilter.isCertainLog]): an eating word or a quantity, and no marker.
  *   2. HISTORY: a question about what they ate (a question marker with a past-tense eating word,
  *      or a diary word: today, yesterday, this week, my lunch, kal, aaj) -> ANSWER.
  *   3. PLATE NOW: a plate in front of them (having, eating, about to, kha raha, ippudu) -> SUGGEST.
@@ -45,7 +45,7 @@ object IntentRouter {
     }
 
     fun decide(transcript: String): Decision {
-        if (LogPrefilter.isCertainLog(transcript)) return Decision.Decided(Intent.LOG, "past-tense eating word, no marker")
+        if (LogPrefilter.isCertainLog(transcript)) return Decision.Decided(Intent.LOG, "a meal stated: an eating word or a quantity, no marker")
         val text = FoodTextMatching.normalise(transcript)
         if (text.isEmpty()) return Decision.AskModel(Intent.entries.toSet(), "empty")
         val words = text.split(' ')
@@ -101,8 +101,8 @@ object IntentRouter {
         // ("what should I eat today") as the last one, and a question about today's meals
         // carries "did I" or a past-tense eating word, which is caught above.
         "yesterday", "logged", "diary", "history", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
-        // roman Hindi: yesterday, the day before
-        "kal", "parso",
+        // roman Hindi: yesterday, the day before; then Devanagari as the hi recogniser writes it
+        "kal", "parso", "कल", "परसों", "पिछले", "पिछला", "पिछली",
         // roman Telugu, generated: today, yesterday, this week
         "ninna", "monna",
     )
@@ -110,14 +110,15 @@ object IntentRouter {
         "did i", "have i", "had i", "i ate", "i had", "what did i", "this week", "last week", "this morning", "this month", "so far",
         "my lunch", "my breakfast", "my dinner", "my meals", "my meal", "my snack", "my diary",
         "maine kya", "maine kitna", "maine kitni", "kya khaya", "kitna khaya", "kya piya",
+        "मैंने क्या", "मैंने कितना", "मैंने कितनी", "क्या खाया", "कितना खाया", "क्या पिया", "मेरे लंच", "मेरे नाश्ते", "मेरे खाने", "मेरे डिनर",
         "ee roju", "ee vaaram", "em tinnanu", "enti tinnanu", "entha tinnanu",
     )
 
     // --- SUGGEST: a plate in front of them -------------------------------------------------------
     internal val PLATE_NOW: Set<String> = setOf(
         "having", "eating", "making", "cooking", "ordering",
-        // roman Hindi: now, eating (present)
-        "abhi",
+        // roman Hindi: now, eating (present); then Devanagari
+        "abhi", "अभी",
         // roman Telugu, generated: now, eating
         "ippudu", "tintunna", "tintunnanu", "tintunnam", "chestunna", "chestunnanu",
     )
@@ -125,6 +126,7 @@ object IntentRouter {
         "about to", "going to eat", "going to have", "in front of me", "on my plate", "lunch is", "dinner is", "breakfast is", "snack is",
         "should i add", "can i add", "what goes with", "serve it with", "serve with", "go with", "along with this",
         "kha raha", "kha rahi", "kha rahe", "bana raha", "bana rahi", "khane wala", "khane wali", "add karun", "kya add",
+        "खा रहा", "खा रही", "खा रहे", "बना रहा", "बना रही", "क्या ऐड", "ऐड करूँ", "ऐड करूं", "इसमें क्या", "क्या जोड़ूँ", "क्या जोड़ूं",
         "add cheyali", "inka emi",
     )
 
@@ -144,6 +146,7 @@ object IntentRouter {
         // roman Hindi
         "kya khana chahiye", "kya khaun", "kya khau", "kya khayein", "kya khaye", "kya lena chahiye", "kya lu", "kya loon",
         "ke liye", "badhane", "kam karne", "mere liye", "mujhe kya", "kya khana",
+        "क्या खाना चाहिए", "क्या खाऊँ", "क्या खाऊं", "क्या लूँ", "क्या लूं", "के लिए", "बढ़ाने", "कम करने", "मेरे लिए", "मुझे क्या", "क्या खाना",
         // "kha sakta hoon" is "can I eat", not "ate": listed here so the HISTORY reading of "pi"
         // and "kha" as past tense becomes a conflict for the model rather than a wrong ANSWER.
         "kha sakta", "kha sakti", "pi sakta", "pi sakti", "le sakta", "le sakti",

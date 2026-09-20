@@ -68,7 +68,7 @@ class KnowledgeFacts(val facts: List<KnowledgeFact>) {
      * generated token but is still paid on every call (`0014`); six rows is roughly 150 tokens.
      */
     fun find(text: String, limit: Int = DEFAULT_LIMIT): List<KnowledgeFact> {
-        val query = FoodTextMatching.normalise(text)
+        val query = inEnglish(FoodTextMatching.normalise(text))
         if (query.isEmpty()) return emptyList()
         return facts.asSequence()
             .map { it to it.tags.count { tag -> FoodTextMatching.containsAsWords(query, tag) } }
@@ -80,6 +80,16 @@ class KnowledgeFacts(val facts: List<KnowledgeFact>) {
     }
 
     fun byId(id: String): KnowledgeFact? = facts.firstOrNull { it.id == id }
+
+    /**
+     * The tags are English. A Hindi question as the recogniser writes it ("मेरे लंच में कितना
+     * प्रोटीन था") found no row in the demo-sentence run, so the nutrient words it can carry
+     * are read as their English tag. Most are the English word in Devanagari letters. GENERATED
+     * by someone who does not read Hindi; Vedant reads Devanagari and verifies.
+     */
+    private fun inEnglish(normalised: String): String =
+        if (normalised.none { Character.UnicodeBlock.of(it) == Character.UnicodeBlock.DEVANAGARI }) normalised
+        else normalised.split(' ').joinToString(" ") { DEVANAGARI_NUTRIENT_WORDS[it] ?: it }
 
     /**
      * The one or two rows the rules engine ACTUALLY USED, for the prompt.
@@ -103,7 +113,7 @@ class KnowledgeFacts(val facts: List<KnowledgeFact>) {
      */
     fun select(engineTerms: Collection<String>, question: String, limit: Int = SELECT_LIMIT): List<KnowledgeFact> {
         val engine = FoodTextMatching.normalise(engineTerms.joinToString(" "))
-        val q = FoodTextMatching.normalise(question)
+        val q = inEnglish(FoodTextMatching.normalise(question))
         val used = facts.asSequence()
             .map { f ->
                 val engineHits = if (engine.isEmpty()) 0 else f.tags.count { FoodTextMatching.containsAsWords(engine, it) }
@@ -141,6 +151,15 @@ class KnowledgeFacts(val facts: List<KnowledgeFact>) {
         }
 
         private val HEADER = listOf("id", "topic", "tags", "fact", "source", "source_url", "accessed", "note")
+
+        internal val DEVANAGARI_NUTRIENT_WORDS: Map<String, String> = mapOf(
+            "प्रोटीन" to "protein", "आयरन" to "iron", "लोहा" to "iron", "खून" to "blood", "हीमोग्लोबिन" to "haemoglobin",
+            "एनीमिया" to "anaemia", "कैल्शियम" to "calcium", "फाइबर" to "fibre", "रेशा" to "fibre", "विटामिन" to "vitamin",
+            "बी12" to "b12", "कार्ब" to "carbs", "कार्ब्स" to "carbs", "कार्बोहाइड्रेट" to "carbohydrate", "सोडियम" to "sodium",
+            "नमक" to "salt", "चीनी" to "sugar", "शुगर" to "sugar", "वसा" to "fat", "फैट" to "fat", "तेल" to "oil",
+            "कैलोरी" to "calories", "एनर्जी" to "energy", "ऊर्जा" to "energy", "पानी" to "water", "दूध" to "milk",
+            "दही" to "curd", "अंडा" to "egg", "चाय" to "tea", "कॉफी" to "coffee", "चावल" to "rice", "दाल" to "dal", "रोटी" to "roti",
+        )
 
         /** Reads the CSV from a stream and closes it. Throws on a malformed file: a bad row is a build defect, not a runtime condition. */
         fun load(open: () -> InputStream): KnowledgeFacts =

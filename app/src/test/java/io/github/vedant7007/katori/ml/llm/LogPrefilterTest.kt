@@ -79,11 +79,23 @@ class LogPrefilterTest {
     }
 
     /** No positive evidence means the model decides, even when nothing looks like a question. */
-    @Test fun `no eating word means the model decides`() {
-        assertFalse(LogPrefilter.isCertainLog("a plate of vegetable biryani and some raita"))
+    @Test fun `no eating word and no quantity means the model decides`() {
+        assertFalse(LogPrefilter.isCertainLog("rice and dal"))
         assertFalse(LogPrefilter.isCertainLog("ideas for lunch"))
+        assertFalse(LogPrefilter.isCertainLog("a friend told me to eat rice"))
         assertFalse(LogPrefilter.isCertainLog(""))
         assertFalse(LogPrefilter.isCertainLog("   "))
+    }
+
+    /** A quantity beside a food with no marker is the statement of a meal: the Beat 1 sentence has no verb. */
+    @Test fun `a quantity or a household unit with no marker is a log`() {
+        assertTrue(LogPrefilter.isCertainLog("Two rotis, a katori of dal, and two spoons of oil."))
+        assertTrue(LogPrefilter.isCertainLog("दो रोटी, एक कटोरी दाल, और दो चम्मच तेल"))
+        assertTrue(LogPrefilter.isCertainLog("One plate of rice, dal and a bowl of curd."))
+        assertTrue(LogPrefilter.isCertainLog("a plate of vegetable biryani and some raita"))
+        assertTrue(LogPrefilter.isCertainLog("tea with two biscuits"))
+        assertFalse("a question with a quantity is still a question", LogPrefilter.isCertainLog("how much protein in two rotis"))
+        assertFalse("a request with a quantity is still a request", LogPrefilter.isCertainLog("I need two rotis"))
     }
 
     /** Not in the case set: sentences with a log word that are not about adding a meal. */

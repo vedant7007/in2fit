@@ -1,3 +1,11 @@
+# THE RULE (standing, ruled by Vedant on 20 September 2026): every new dish alias is asked two
+# questions before it is added, and the answers go in this file:
+#   1. What does the name CONTAIN? If it contains an ingredient's name, it collapses onto that
+#      ingredient through containment unless a recipe or a no-data row holds it.
+#   2. What happens if the dish is NOT in the tables? The answer must be a refusal by name, a
+#      recipe, or an honest miss; never a base ingredient's figures under the dish's name.
+# A dish alias that is not in this file has not been asked, and does not ship.
+#
 # Qualified dish names, swept for the bug class found in 0026: a dish name that CONTAINS a base
 # ingredient's name collapses onto that ingredient through the matcher's containment stage, and
 # the oil, the other ingredients and the dish's own figures are silently dropped. "fried rice"

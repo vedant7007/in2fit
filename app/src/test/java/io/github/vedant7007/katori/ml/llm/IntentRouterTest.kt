@@ -72,8 +72,10 @@ class IntentRouterTest {
 
     @Test fun `a model verdict outside what the words allow is refused, inside it is accepted`() {
         // No evidence at all: the model may say anything.
-        assertEquals(Intent.LOG, IntentRouter.accept(Intent.LOG, "a plate of vegetable biryani and some raita"))
-        assertEquals(Intent.SUGGEST, IntentRouter.accept(Intent.SUGGEST, "tea with two biscuits"))
+        assertEquals(Intent.LOG, IntentRouter.accept(Intent.LOG, "rice and dal"))
+        assertEquals(Intent.SUGGEST, IntentRouter.accept(Intent.SUGGEST, "rice and dal"))
+        // A quantity beside a food decided LOG; the model's SUGGEST does not override the words.
+        assertEquals(Intent.LOG, IntentRouter.accept(Intent.SUGGEST, "tea with two biscuits"))
         // The words decided: the model's opinion does not override them.
         assertEquals(Intent.ANSWER, IntentRouter.accept(Intent.RECOMMEND, "how much protein did I eat today"))
         assertEquals(Intent.RECOMMEND, IntentRouter.accept(Intent.ANSWER, "what should I eat for more iron"))
