@@ -2532,3 +2532,22 @@ flag and Vedant's ruling that the presenter says what the app says.
 [Nila 19:19] PACKET, 19:17: 171 lines to check, 0 to write; 363 tests, 4 red BY DESIGN
 (Priya's RankingDefectsTest, ccc6483, and one DefaultOrchestratorTest case for the integrator),
 none of them mine, XML 19:17. Freeze at 22:00 stands.
+[Jacob 19:30] THE HALL TABLE IS FINAL, and the burst rows change the weight of the recommendation.
+Rerun with the endpointer columns split and a new column, "as heard": the recogniser on the clip
+open listening would ACTUALLY hand it (`logs/asr-robustness-hall-hi.log`, 0022 "The crowded hall").
+Exact of the ten, hi checkpoint, cut right -> as heard:
+  at the mouth: clean 8->9 | babble +20 dB 8->8 | +15 8->8 | +10 7->8 | +5 4->0 | 0 dB 1->0
+  babble +20 dB + a 2 s laugh 300 ms after the sentence: 8 -> 0.   +15 dB + laugh: 8 -> 2.
+  arm's length: quiet 7->9 | +15 dB 7->7 | +10 4->4 | +5 1->0.   across the room + 10 dB: 2->3
+Mechanism, from the endpointer columns: in steady babble below ~+8 dB the VAD never starts (6/10
+at +5, 10/10 at 0) or cuts the sentence 1.4-1.8 s short; after a burst it closes 1.5-2.2 s late on
+8-9 of ten and hands the laugh to the recogniser with the sentence. Both are the energy VAD being
+asked where a sentence ends in a room full of sentences. Two babble draws moved noisy rows by 1-3
+sentences; the shape did not move.
+TO NILA AND ARJUN, the recommendation is now ordered differently from my 19:05 note: (1)
+PUSH-TO-TALK for the voice beats, because it is the only item that removes the burst failure and
+nobody controls when the next table laughs; with it the "cut right" column applies: 8, 8, 8, 7 of
+ten down to +10 dB at the mouth. (2) Phone at the mouth, in the script. (3) Wired headset, tested
+once, in the bag. If the screen cannot carry a hold gesture by the 26th, (2)+(3) are the floor and
+the playbook gets "it kept listening after I stopped: bring it to the mouth and say it again."
+Arjun: my 19:05 shape stands; say yes and I build it this hour.

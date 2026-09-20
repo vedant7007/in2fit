@@ -604,11 +604,11 @@ def cmd_robustness(manifest: Path, engine: str = "indicconformer") -> None:
     print("SYNTHETIC HALL: babble is 12 other synthetic voices at once; reverb is a textbook exponential tail; the")
     print("presenter's voice is a Windows/Piper voice, not a person. Report as 'n of the ten' per condition, never as")
     print("a WER standing alone, and never as a claim about the hall itself: it says where THIS recogniser breaks (0022).\n")
-    print(f"{'condition':46s} exact   WER    endpointer on the same audio, open listening: no onset / clean end / ran on (mean end delay)")
+    print(f"{'condition':46s} cut right  as heard   endpointer, open listening: no onset / clean end / ran on (mean end delay)")
     lead = int(2.0 * 16000)   # babble-only lead-in and 3 s tail, so the VAD has to find the sentence and its end
     tail = int(3.0 * 16000)
     for name, snr, dist, burst in conditions:
-        exact = 0; w_err = 0; w_ref = 0; no_onset = 0; ends = 0; ran_on = 0; delays = []
+        exact = 0; w_err = 0; w_ref = 0; heard_exact = 0; no_onset = 0; ends = 0; ran_on = 0; delays = []
         for r, x in clips:
             speech = x.copy()
             if dist is not None:
@@ -642,10 +642,21 @@ def cmd_robustness(manifest: Path, engine: str = "indicconformer") -> None:
                 ends += 1; delays.append(end - true_end_ms)
             else:
                 ran_on += 1
+            # "as heard": what open listening would actually hand the recogniser. No onset = nothing at all;
+            # otherwise the clip from 200 ms before the onset (the engine's pre-roll) to the detected end, or
+            # to the end of the audio when it ran on. Scored exact-or-not against the same reference.
+            if onset is not None:
+                a = max(0, (onset - 200) * 16)
+                b = (end + 700) * 16 if end is not None else len(padded)
+                stream = recs[r["language"]].create_stream(); stream.accept_waveform(16000, padded[a:b]); recs[r["language"]].decode_stream(stream)
+                heard_exact += int(edit_distance(ref_w, normalise(stream.result.text)) == 0)
         n = len(clips)
         delay = f"{np.mean(delays):+.0f} ms" if delays else "-"
-        print(f"{name:46s} {exact:2d}/{n:<3d} {100.0 * w_err / max(1, w_ref):5.1f}%   no onset {no_onset}/{n}, clean end {ends}/{n}, ran on {ran_on}/{n} ({delay})")
-    print("\nendpointer columns, open listening with 2 s of hall before the sentence and 3 s after: 'no onset' = the VAD")
+        print(f"{name:46s} {exact:2d}/{n:<3d}      {heard_exact:2d}/{n:<3d}     no onset {no_onset}/{n}, clean end {ends}/{n}, ran on {ran_on}/{n} ({delay})")
+    print("\n'cut right' = exact of N with the sentence cut at its true edges, the recogniser's own floor; 'as heard' = exact of N")
+    print("on the clip the open-listening endpointer would actually hand over (nothing when it never started; the")
+    print("sentence plus whatever hall it kept when it closed late; the tail it dropped when it closed early).")
+    print("endpointer columns, open listening with 2 s of hall before the sentence and 3 s after: 'no onset' = the VAD")
     print("never started, the app says it heard nothing; 'clean end' = it closed on the 700 ms hangover, with the mean")
     print("delay of that close against the true end of speech (a positive delay is that much hall audio handed to the")
     print("recogniser along with the sentence); 'ran on' = it had not closed 3 s after the sentence ended (on the phone")

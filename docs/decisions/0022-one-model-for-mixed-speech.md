@@ -140,66 +140,74 @@ true of the database I first read and is not true now, and the claim is withdraw
 Every clip before this section was clean audio at the microphone. The battle is a hall: other
 teams demonstrating, a PA, judges talking over each other, and a presenter holding a phone at
 arm's length. Measured on the laptop, `tools/asr_eval.py robustness` on the ten hi demo rows
-(`logs/asr-robustness-hall-hi-run1.log`): babble is twelve other synthetic voices at once at a
-fixed conversational level, so the SNR is set by how loud the presenter is at the microphone;
-distance is attenuation plus a textbook exponential reverb tail (arm's length: -12 dB, direct-to-
-reverberant 0 dB, RT60 0.6 s; across the room: -20 dB, -5 dB, 0.8 s). **Synthetic hall, synthetic
-presenter. This says where THIS recogniser breaks, not what the hall will be.**
+(`logs/asr-robustness-hall-hi.log`; run 1 and run 2 kept beside it): babble is twelve other
+synthetic voices at once at a fixed conversational level, so the SNR is set by how loud the
+presenter is at the microphone; distance is attenuation plus a textbook exponential reverb tail
+(arm's length: -12 dB, direct-to-reverberant 0 dB, RT60 0.6 s; across the room: -20 dB, -5 dB,
+0.8 s); a "burst" is one louder voice, 10 dB over the babble, for 2 s starting 300 ms after the
+sentence ends: a laugh, a PA line. The endpointer is a faithful port of `EnergyEndpointer` with
+2 s of hall before the sentence and 3 s after. **Synthetic hall, synthetic presenter. This says
+where THIS recogniser and THIS endpointer break, not what the hall will be.** Between two runs
+with different babble draws the noisy rows moved by one to three sentences; the shape did not.
 
-| condition | recogniser, exact of the ten | open-listening endpointer |
-| --- | ---: | --- |
-| clean, phone at the mouth | 8 | starts and ends every sentence cleanly |
-| babble, voice 20 dB above it, at the mouth | 8 | clean |
-| babble, +15 dB, at the mouth | 8 | clean |
-| babble, +10 dB, at the mouth | 7 | clean |
-| babble, +5 dB, at the mouth | 5 | **starts on only 4 of 10**: the voice is under 3x the babble floor, so the VAD mostly never triggers and the app reports it heard nothing |
-| babble, 0 dB, at the mouth | 4 | **never starts, 0 of 10** |
-| arm's length, quiet room | 6 | clean |
-| across the room, quiet room | 5 | clean |
-| arm's length + babble +15 dB | 6 | clean |
-| arm's length + babble +10 dB | 3 | clean |
-| arm's length + babble +5 dB | 2 | starts on 3 of 10 |
-| across the room + babble +10 dB | 1 | clean |
+Two columns matter. **"Cut right"** is the recogniser on the sentence at its true edges: the
+floor of the model, and what push-to-talk would hand it. **"As heard"** is the recogniser on the
+clip open listening would actually hand over: nothing when the VAD never started, the sentence
+plus the hall it kept when it closed late, minus the tail it dropped when it closed early.
 
-**Where it breaks.** At the mouth, the recogniser holds its clean score down to a voice 15 dB
-above the babble and loses one sentence at +10; it breaks between +10 and +5 (7 -> 5 of ten).
-**Distance costs more than moderate babble**: arm's length in a quiet room already costs two
-sentences (8 -> 6), and arm's length in babble the voice is only 10 dB above is 3 of ten. The
-endpointer has a separate cliff: in steady babble it stops STARTING below about +8 dB, because
-speech has to be three times the adaptive floor and the floor has become the babble. Bursts (a
-laugh, a PA line right after the sentence) are the other failure, running the utterance on into
-the noise; that row is being measured and is added when the laptop has the memory to run it.
+| condition | cut right, of ten | as heard, of ten | endpointer, open listening |
+| --- | ---: | ---: | --- |
+| clean, phone at the mouth | 8 | 9 | starts and ends every sentence |
+| babble, voice 20 dB above it, at the mouth | 8 | 8 | clean |
+| babble, +15 dB, at the mouth | 8 | 8 | clean |
+| babble, +10 dB, at the mouth | 7 | 8 | clean; closes 0.6 s early on average |
+| babble, +5 dB, at the mouth | 4 | **0** | **never starts on 6 of ten**; cuts the other four 1.4 s short |
+| babble, 0 dB, at the mouth | 1 | **0** | **never starts, 10 of ten** |
+| babble +20 dB **+ a burst after the sentence** | 8 | **0** | closes 2.2 s late on 8 of ten (the laugh goes to the recogniser), runs on past 3 s on 2 |
+| babble +15 dB **+ a burst after the sentence** | 8 | **2** | closes 1.5 s late on 9 of ten, runs on 1 |
+| arm's length, quiet room | 7 | 9 | clean |
+| across the room, quiet room | 5 | 5 | clean |
+| arm's length + babble +15 dB | 7 | 7 | clean |
+| arm's length + babble +10 dB | 4 | 4 | one never starts; closes 0.7 s early |
+| arm's length + babble +5 dB | 1 | 0 | never starts on 5; cuts the rest 1.8 s short |
+| across the room + babble +10 dB | 2 | 3 | clean; closes 0.8 s early |
 
-The physics behind the table is the whole mitigation: a voice at 5 cm is roughly 20 dB louder at
-the microphone than the same voice at 60 cm. Babble at conversational level a metre or two away
-is a fixed level. So the SAME hall is "+20 dB, 8 of ten" with the phone at the mouth and "+0 dB,
-4 of ten with the VAD never starting" at arm's length. **Microphone distance is the variable, and
-it is the one we control.**
+**Where it breaks, in three sentences.** At the mouth, open listening holds the clean score in
+steady babble down to a voice 10 dB above the room (8 of ten as heard) and collapses to 0 of ten
+at +5 dB: the energy VAD needs speech three times its adaptive floor, the floor has become the
+babble, and it either never starts or cuts the sentence a second short. **A single burst after
+the sentence collapses it in babble the recogniser is comfortable in: +20 dB, 8 of ten cut
+right, 0 of ten as heard**, because the VAD waits for 700 ms of quiet and a laugh 300 ms after the
+last word is not quiet, so the laugh is transcribed with the sentence. **Distance costs more than
+moderate babble**: arm's length in a quiet room costs one to two sentences, and a voice at 60 cm
+is roughly 20 dB quieter at the microphone than at 5 cm, so the same hall is "+20 dB, 8 of ten"
+with the phone at the mouth and "0 dB, nothing heard" at arm's length. Microphone distance is
+the variable, and it is the one we control.
 
 **What we do about it, all cheap, all decided before the day, not on it:**
 
-1. **The phone is held at the mouth when speaking, and the run of show says so.** Not at arm's
-   length, not held up for the judges to see the screen while speaking: speak, then show. If the
-   screen must be visible while speaking, a second person mirrors it or the phone is angled after
-   the sentence.
-2. **A wired headset or lapel microphone.** It puts the microphone at the mouth whatever the hand
-   does, and it is a cable, so it costs nothing on the airplane-mode claim, unlike anything
-   Bluetooth. `AndroidAudioSource` records from `VOICE_RECOGNITION`, which follows the connected
-   wired microphone automatically; the ten sentences must be run once on the phone through that
-   microphone before the day, because a headset capsule and its gain are a different signal from
-   the handset's array.
-3. **Push-to-talk instead of open listening.** The endpointer's two hall failures, never starting
-   in loud babble and running on through a burst, both come from asking an energy detector where
-   a sentence ends in a room full of other sentences. A button answers that: press, speak,
-   release; the clip between press and release goes to `AsrEngine.transcribe()`, which already
-   exists and is the path `AsrDeviceTest` and the harness use. Open listening stays for the
-   quiet case. This changes the Talk screen (Arjun) and adds a small capture class in `ml/asr`
-   (a `Flow` of levels while held, one `transcribe` on release); it does not touch the frozen
-   `AsrEngine` interface.
+1. **Push-to-talk for the voice beats, not open listening.** It is the only mitigation on this
+   list that removes the burst failure, which is the failure a hall actually produces: nobody
+   controls when the next table laughs. Press, speak, release; the clip between press and release
+   goes to `AsrEngine.transcribe()`, which already exists and is the path `AsrDeviceTest` and the
+   harness use; the "cut right" column is then the column that applies. It changes the Talk
+   screen's gesture (Arjun) and adds a small capture class in `ml/asr` (a `Flow` of levels while
+   held, one `transcribe` on release, minimum hold 300 ms refused as INPUT_NOT_USABLE like a cough
+   is today); it does not touch the frozen `AsrEngine` interface and the screen's event handling
+   is unchanged.
+2. **The phone is held at the mouth when speaking, and the run of show says so.** Speak, then
+   show; never both at arm's length. If the screen must be seen while speaking, a second person
+   mirrors it. This is what turns "0 dB" into "+20 dB" and it costs a sentence in the script.
+3. **A wired headset or lapel microphone in the bag.** Microphone at the mouth whatever the hand
+   does; a cable, so it costs nothing on the airplane-mode claim, unlike anything Bluetooth.
+   `AndroidAudioSource` records from `VOICE_RECOGNITION`, which follows a connected wired
+   microphone; the ten sentences must be run once on the phone through it before the day, because
+   a headset capsule and its gain are a different signal from the handset's array.
 
-Recommended for the demo: 1 always; 3 unless Arjun's screen cannot carry a hold gesture by the
-day; 2 tested once on the phone and carried in the bag as the fallback the failure playbook can
-reach for when the hall is louder than rehearsal.
+Recommended: 1 and 2 for the demo; 3 tested once and carried as the fallback the failure playbook
+reaches for when the hall is louder than rehearsal. If the Talk screen cannot carry a hold gesture
+by the day, 2 and 3 together are the floor, and the playbook needs the row "it kept listening
+after I stopped: bring it to the mouth and say it again."
 
 ## "I didn't catch that": the path where a wrong-language sentence is not logged
 
