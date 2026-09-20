@@ -4050,3 +4050,63 @@ server is still listening on 5100 (pid 29108). Per your own 5bd5458 rule, no sec
 while the phone is on USB: I am stopping 29108 now and running the measurement pass. The
 emulator is attached to the default server as 127.0.0.1:5601 for my dry run; I will use -s on
 every command and say here when the phone is off USB again.
+
+[Rao 00:55] THE MEASUREMENT PASS RAN ON THE REALME, ALL FIVE STAGES, ONE FILE:
+`logs/measurement-pass-20260921-003815.txt` (logs/ is ignored; the file is on this laptop and the
+numbers below are copied from it verbatim). Commit fc5dec5 + the pass test, build installed
+00:21:57, USB, airplane on, Wi-Fi off, 8 threads, thermal 0 at the start and 3 (SEVERE) by the
+three-food LOGs, 1 after. Raw figures, no means; the deck cites 20 Sep, so each line says what moved.
+STAGE 2, THE OWED NUMBER. AdviseOnMeal FIRST TAP after a LOG, precomputed, no model call:
+486 / 513 / 519 ms (three taps); after the lab report: 510 / 527 / 425 ms. The e2e run at 00:33
+read 521 ms on the same path with the digest identical to the LOG's (8661b774fd26). "Instant on
+the first tap" is now measured post-ea75984 and claimable. The save itself (a model call) was
+8,841 ms in the e2e (the pass wrote save_ms=null: harness gap, fixed in the commit below).
+STAGE 1, ANSWER "did I get enough iron this week": first figure 621 ms cold, 584 / 629 / 605 ms
+warm; spoken 9,818 ms cold, 9,740 / 10,177 / 9,980 ms warm (prompt 388 tok at ~50 tok/s, 7
+generated). 20 Sep: 0.55 s / 9.2 s. MOVED: spoken is +0.5 to +1.0 s; "about 9 to 11 s" holds.
+STAGE 3, LOG: two foods ("two rotis and a katori of dal") plate 15,934 / 9,029 ms, spoken 29,278
+/ 21,916 ms; three foods ("one plate of rice, dal and a bowl of curd") plate 23,936 / 24,233 ms,
+spoken 37,014 / 36,584 ms, the three-food pair under thermal 3. 20 Sep: 14.9 s / 24.7 s (two
+foods). MOVED: the first two-food LOG was +1.0 / +4.6 s, the second faster than the deck; the
+three-food plate is 24 s, which is the deck's Beat 1 sentence (20 Sep's ten-sentence run read
+28.7 / 39.3 s under thermal 3 for it). Nila: the presenter talks over the plate; 24 s, not 15.
+STAGE 4, MEMORY: peak PSS 2,092,234 kB (2.09 GB) during the whole pass, 1,988,957 kB right after
+the model loads (115,519 kB before), ceiling 4,394,228,326 B (4.39 GB) of 7.99 GB RAM; model load
+5,544 ms at 8 threads.
+STAGE 5, JACOB'S ROW, two fresh processes: en COLD (load + first decode) 2,222 / 1,980 ms, WARM
+171 / 169 ms, 175 / 171 ms per clip; te COLD 1,507 / 1,354 ms, WARM 319 / 316 ms. The set on the
+phone is the 8-clip synthetic set staged 20 Sep (WER 25.0 % en / 8.3 % te, circular, not a
+claim); the recorded vedant set is not on the phone.
+HAZARDS TONIGHT, for the run of show: (1) the phone came back with loadavg 24 and a model call
+that sat at 0 % CPU for four minutes; reboot cleared it (the rule held: reboot, do not debug);
+(2) ColorOS's athena "prockill" swept 15 processes at 00:35:49 and took the pass with them 7 s
+after the model loaded (2.0 GB PSS, fg, no activity); the retry ran clean. On the day: reboot the
+phone before the demo, open the app once, nothing else running. (3) Ira's private adb server on
+5100 was up again at 00:35 (pid 25440) and the pass refused to start until I stopped it; that is
+the third time tonight. (4) `adb install` hung 29 minutes on a half-dead link; every adb call in
+the script now has a hard timeout and the install three tries.
+E2E AT 00:33 (`logs/e2e-20260921-0033.txt`), the same six turns as 20 Sep: RECOMMEND spoke
+NOTHING (phrased=null) and so did SUGGEST; the ADVICE events carried the trigger and the ranked
+list only. On 20 Sep RECOMMEND spoke at 9.4 s. PRIYA: this is the SHORT budget / guard refusal you
+own; the ranked list was Peppermint, Chickpeas, Drumstick leaves, whole-wheat bread. And the LOG
+phrasing came back as the figure list read aloud ("Chapati / roti, Dal tadka, energy: 467.2 kcal,
+protein: 20.9 g, ..."), a list, not a sentence.
+PRIYA, BEAT 3 ON THE DEVICE: `LabReportOcrTest` compiled first time and ran on the realme at
+00:48 (`logs/ocr-report-20260921.txt`, 24 KB). Threshold 1 FAILS: 2 wrong values, sheet 02
+(two-column) read Fasting Glucose as HbA1c's 6.4 % 4.0..5.6, sheet 03 read TSH 2.1 as 2.0.
+Threshold 2 FAILS: 10 missed; sheet 05 (angled) reads 0 of 8 rows, both demo rows NEITHER; sheet
+04 reads 0 with 7 no-range. Sheets 01, 06 (warm light) and 07 read the demo rows. Threshold 3 NOT
+MEASURED, no photograph. Verdict line: "Beat 3 safe to perform live: UNPROVEN (no photograph)".
+OCR 400 to 682 ms per sheet. Yours and Arjun's from here; the square-on branch is the only one
+the numbers support tonight.
+IRA: `MealResolved.grams: List<Double?>` LANDED (this commit), one per `meal.items` in order, null
+where the database has nothing, from `resolved.items[i].snapshot.grams`, emitted at the same line;
+default `emptyList()` so the scripted feed compiles until Arjun fills it. The gfxinfo framestats
+row needs the app's UI on the phone through a real LOG turn, which no instrumentation here drives;
+not tonight. The phone is still on USB on the default server; it is yours or Jacob's from here,
+say so before you take it, and no second adb server while it is.
+LANDED: `tools/measurement-pass.ps1` + `MeasurementPassTest` (five stages, refuses without
+airplane mode + Wi-Fi off + default-server ownership + no second server; hard timeouts; install
+retried; runner verdict per stage; NOT CLAIMABLE on an emulator). The emulator cannot run the
+native libraries (sherpa-onnx SIGSEGV under x86 translation; the model killed at 2.29 GB on 4 GB),
+so its dry run proves the harness only. JVM after the rebase onto 8985fe8: 410 tests, 0 failures, 0 errors, 45 XML files from my own run at 00:50.
