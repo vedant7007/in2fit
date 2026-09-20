@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.ui.theme.In2fitColors
+import io.github.vedant7007.katori.ui.theme.LocalReduceMotion
 import io.github.vedant7007.katori.ui.theme.Space
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,11 +42,13 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun Splash(ready: () -> Boolean, onFinished: () -> Unit) {
-    val scaleX = remember { Animatable(0.72f) }
-    val tagline = remember { Animatable(0f) }
+    val reduceMotion = LocalReduceMotion.current
+    val scaleX = remember { Animatable(if (reduceMotion) 1f else 0.72f) }
+    val tagline = remember { Animatable(if (reduceMotion) 1f else 0f) }
     val veil = remember { Animatable(1f) }
     LaunchedEffect(Unit) {
-        while (true) {
+        // Reduce motion: the end state, no breathing, gone as soon as the app is ready.
+        while (!reduceMotion) {
             launch { tagline.animateTo(1f, tween(900, delayMillis = 200, easing = LinearOutSlowInEasing)) }
             scaleX.animateTo(1f, tween(1200, easing = LinearOutSlowInEasing))
             if (ready()) break
@@ -53,7 +56,8 @@ fun Splash(ready: () -> Boolean, onFinished: () -> Unit) {
             launch { tagline.animateTo(0f, tween(600)) }
             scaleX.animateTo(0.72f, tween(600, easing = FastOutSlowInEasing))
         }
-        veil.animateTo(0f, tween(250))
+        if (reduceMotion) { while (!ready()) delay(100) }
+        veil.animateTo(0f, tween(if (reduceMotion) 0 else 250))
         onFinished()
     }
     Box(

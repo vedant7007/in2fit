@@ -180,14 +180,61 @@ Three reads of the one `State`: the layout (a copy with `level` and `elapsedSeco
 seconds as a `State<Int>` read only in the stage indicator. So a level or a tick never recomposes
 the list.
 
-## Motion
+## Motion (`ui/theme/Motion.kt`)
 
-- The level bar: real data, draw phase, only while recording.
-- The counter: one `Text`, once a second.
-- Nothing else moves during a turn. No indeterminate indicator exists in the app any more.
-- A new entry appears with no animation; the list scrolls to it with the platform's default.
-- Springs, when something does move (later: the splash's expand): Material Standard spatial
-  700 / 0.9; fades: effects 1600 / 1.0. Never a spatial spring on alpha or colour.
+The inventory first, decided on paper: every moment state changes on screen across the four
+beats, and whether motion clarifies what just happened or decorates it.
+
+| moment | verdict | what it does |
+| --- | --- | --- |
+| mic pressed | clarifies "held" | scale 1 → 0.97 on the spatial spring, back on release; haptic; the level bar (real data) |
+| level bar while recording | real data | `drawBehind`, read in the draw phase, frozen at the endpoint |
+| stage advancing, tick and dot | during inference | **no motion**; the list changes with no layout animation |
+| counter ticking | a number | none, one `Text`, once a second |
+| diary figures at 0.5 s | numbers | **none**; the number never waits a frame |
+| plate card resolving | numbers | **none** |
+| transcript, intent heading, ask, confirm, failed, advice, answer | words arriving | `arrive()`: alpha 0 → 1 and 8 dp of rise on the effects spring, once per item, `graphicsLayer` only |
+| the sentence landing in the slot | words arriving after inference | the same entrance; the stage indicator leaves as the answer arrives |
+| tab change, chip, "Type instead", Stop label | repeated actions | instant (Kowalski's rule: never animate the repeated thing) |
+| splash → Talk | the one handoff | 250 ms veil fade; the breathing is `graphicsLayer` scale and alpha |
+| reduce motion on | — | `LocalReduceMotion`: every entrance and the press off, the splash at its end state and gone as soon as the app is ready |
+
+Tokens: `Motion.spatial` = spring 700 / 0.9 (Material Standard), `Motion.effects` = spring
+1600 / 1.0. Both interruptible; nothing blocks input; nothing delays a figure.
+
+### Measured on the emulator, 21 September, feed on (`logs/gfx-*.txt` in the ira tree)
+
+`Medium_Phone`, API 37, x86_64 host running arm64 under translation, `swiftshader_indirect`
+software GPU. `dumpsys gfxinfo <pkg> reset` before each beat, the summary and `framestats` after.
+
+| window | frames drawn | jank by the 16.7 ms bar | 50th / 90th percentile | worst frame, where |
+| --- | ---: | ---: | --- | --- |
+| Talk idle, 10 s | **0** | — | — | nothing drawn: a static screen costs nothing |
+| Beat 1, LOG turn, 22 s | 39 | 35 (90 %) | 105 / 250 ms | 688 ms at t+1.7 s, 645 of it in the renderer; worst UI-thread frame 229 ms at t+2.6 s: transcript + heading + stage list arriving |
+| Beat 2, ANSWER turn, 22 s | 40 | 39 (98 %) | 73 / 150 ms | 403 ms at t+3.1 s, 336 of it UI thread (206 draw-record): the eight diary rows composing at once |
+| Beat 3, Scan with the report, 15 s | 35 | 35 | 109 / 150 ms | the camera preview and the five report cards |
+| Beat 3, save, 8 s | 12 | 12 | 200 / 350 ms | the saved line and the cards re-laid |
+| Beat 4, advise again, 12 s | 39 | 20 (51 %) | 38 / 133 ms | the advice card arriving |
+| cold start with the splash, 40 s | 23 | 14 | 65 / 500 ms | the first frame of the app |
+| cold start, reduce motion on | **4** | 4 | — | the splash at its end state, straight to Talk |
+
+What these numbers do say: the UI draws only on events. A turn of 22 s draws about 40 frames,
+which is the level bar's twelve updates while recording, the stage changes, the entrances, and
+the counter once a second; between events nothing is drawn. The worst frames are the arrivals
+of many text nodes at once (the plate's nine rows, the diary's eight), which the figures-first
+rule requires to appear together; the counter's tick is a single frame of 13–55 ms UI-thread
+time here.
+
+What they do not say: anything about the 8.3 ms or 16.7 ms budget on a phone. Every frame is
+"janky" by that bar because the software renderer alone takes about 40 ms a frame and the UI
+thread is arm64 code under translation; the medians are the emulator's cost, not the design's.
+Whether a dropped frame coincides with inference cannot be measured here at all: the feed runs no
+model. Both belong to the device pass (`dumpsys gfxinfo framestats` on the realme over one real
+LOG turn, before `68d8a34` and at the current commit), asked of Rao.
+
+One consequence worth carrying to the device pass: the plate card is nine `FigureRow`s of two
+to three `Text` nodes each. If the device's worst frame is the plate's arrival, the row collapses
+to one `Text` with an inline span; not before a number says so.
 
 ## Not yet in the system
 

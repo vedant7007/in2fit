@@ -27,6 +27,7 @@ import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.ui.theme.In2fitColors
 import io.github.vedant7007.katori.ui.theme.In2fitText
 import io.github.vedant7007.katori.ui.theme.Space
+import io.github.vedant7007.katori.ui.theme.arrive
 
 /**
  * The person's words, verbatim, in their script, on the one dark block on the screen. 20 sp at
@@ -35,7 +36,7 @@ import io.github.vedant7007.katori.ui.theme.Space
  */
 @Composable
 fun SaidBlock(text: String, doubtful: Boolean = false, modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.fillMaxWidth(), color = In2fitColors.person, shape = MaterialTheme.shapes.medium) {
+    Surface(modifier = modifier.fillMaxWidth().arrive(), color = In2fitColors.person, shape = MaterialTheme.shapes.medium) {
         Column(Modifier.padding(Space.l)) {
             Text(stringResource(R.string.said_by_you), style = In2fitText.label, color = In2fitColors.onPerson.copy(alpha = 0.7f))
             Text(text, style = In2fitText.transcript, color = In2fitColors.onPerson, modifier = Modifier.padding(top = Space.xs))
@@ -47,7 +48,7 @@ fun SaidBlock(text: String, doubtful: Boolean = false, modifier: Modifier = Modi
 /** 0026 step 5: which of the four the turn became, 28 sp, with the lead-in as it is spoken. */
 @Composable
 fun IntentHeading(title: String, leadIn: String?, modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth().padding(top = Space.s)) {
+    Column(modifier.fillMaxWidth().arrive().padding(top = Space.s)) {
         Text(title, style = In2fitText.title)
         if (leadIn != null) Text(leadIn, style = In2fitText.bodySmall, color = In2fitColors.inkSecondary)
     }

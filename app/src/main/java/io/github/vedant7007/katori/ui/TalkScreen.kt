@@ -59,6 +59,7 @@ import io.github.vedant7007.katori.ui.components.IntentHeading
 import io.github.vedant7007.katori.ui.components.MicButton
 import io.github.vedant7007.katori.ui.components.OfflineMark
 import io.github.vedant7007.katori.ui.components.PlateCard
+import io.github.vedant7007.katori.ui.components.PlateItem
 import io.github.vedant7007.katori.ui.components.Prose
 import io.github.vedant7007.katori.ui.components.SafetyLine
 import io.github.vedant7007.katori.ui.components.SaidBlock
@@ -206,14 +207,17 @@ private fun EntryView(entry: Entry, onResolve: (String, SpokenIntent) -> Unit) {
         is Entry.Said -> SaidBlock(entry.text)
         is Entry.Heading -> IntentHeading(stringResource(Sentences.intent(entry.intent)), entry.leadIn)
         // The person's own lines, straight from the store, before any model call: the answer itself.
-        is Entry.Figures -> Prose(stringResource(R.string.answer_from_diary)) { ContextLines(entry.lines) }
+        is Entry.Figures -> Prose(stringResource(R.string.answer_from_diary), arrives = false) { ContextLines(entry.lines) }
         is Entry.Plate -> PlateCard(
             status = when {
                 entry.hypothetical -> stringResource(R.string.meal_hypothetical)
                 entry.logged -> stringResource(R.string.meal_logged)
                 else -> null
             },
-            items = entry.items.map { itemLine(it) },
+            // The "taken as" caption (0035) needs the grams, which do not reach the entry yet
+            // (COORDINATION 23:34, asked of Rao and Arjun). Until then no caption; the hour
+            // `Entry.Plate.grams` lands, this is `entry.grams[i]` and the QUANTITY_INFERRED check.
+            items = entry.items.map { PlateItem(said = itemLine(it), takenAs = null) },
             figures = entry.figures.map { (line, band) -> FigureLine.fromRendered(line, band) },
         )
         is Entry.Advice -> AdviceCard(

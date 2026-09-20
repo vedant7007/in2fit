@@ -86,23 +86,38 @@ fun FigureList(figures: List<FigureLine>, hero: FigureLine? = null, modifier: Mo
 }
 
 /**
+ * One item on the plate: the amount as said or as assumed, and, only when the amount was ASSUMED
+ * (`QUANTITY_INFERRED`, 0035), the "taken as N g" caption. A stated amount shows as said and its
+ * grams stay behind the band (Vedant, 20 Sep). [takenAs] is null until the grams reach the entry.
+ */
+data class PlateItem(val said: String, val takenAs: String?)
+
+/**
  * The plate as the deck promised it (research §3): the energy as the hero figure, the items as
- * said on one line, the other figures as aligned rows, the band once. [status] is the "Logged" or
- * "not logged" line the entry carries; [items] are the item lines as the screen renders them.
+ * said, one per line, the other figures as aligned rows, the band once. [status] is the "Logged"
+ * or "not logged" line the entry carries.
  */
 @Composable
-fun PlateCard(status: String?, items: List<String>, figures: List<FigureLine>, modifier: Modifier = Modifier) {
+fun PlateCard(status: String?, items: List<PlateItem>, figures: List<FigureLine>, modifier: Modifier = Modifier) {
     val energyWord = stringResource(R.string.nutrient_energy)
     val hero = figures.firstOrNull { it.name == energyWord }
     Raised(modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(Space.m)) {
             if (status != null) Label(status)
-            if (items.isNotEmpty()) Text(items.joinToString("  ·  "), style = In2fitText.bodySmall, color = In2fitColors.inkSecondary)
+            if (items.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(Space.xs)) {
+                    items.forEach { item ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(item.said, style = In2fitText.bodySmall, color = In2fitColors.inkSecondary)
+                            if (item.takenAs != null) Text(item.takenAs, style = In2fitText.label, modifier = Modifier.padding(start = Space.m))
+                        }
+                    }
+                }
+            }
             FigureList(figures.filter { it !== hero }, hero = hero)
         }
     }
 }
-
 /**
  * A line the store writes for the model and the screen (`ContextText`): a period line is
  * "<heading>: <name>: <value>; <name>: <value>; …" and becomes a heading over figure rows. A lab
@@ -137,3 +152,4 @@ fun ContextLines(lines: List<String>, modifier: Modifier = Modifier) {
         }
     }
 }
+

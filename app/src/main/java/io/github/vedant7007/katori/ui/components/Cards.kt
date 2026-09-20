@@ -27,11 +27,16 @@ import androidx.compose.ui.unit.dp
 import io.github.vedant7007.katori.ui.theme.In2fitColors
 import io.github.vedant7007.katori.ui.theme.In2fitText
 import io.github.vedant7007.katori.ui.theme.Space
+import io.github.vedant7007.katori.ui.theme.arrive
 
-/** A prose block on the ground: a label, then text. For what the app says, as opposed to a plate. */
+/**
+ * A prose block on the ground: a label, then text. For what the app says, as opposed to a plate.
+ * It arrives with the entrance unless [arrives] is false, which a caller sets when the block
+ * carries a figure: a number appears at once (the figures-first ruling).
+ */
 @Composable
-fun Prose(label: String?, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(modifier.fillMaxWidth().padding(vertical = Space.s), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
+fun Prose(label: String?, modifier: Modifier = Modifier, arrives: Boolean = true, content: @Composable () -> Unit) {
+    Column(modifier.fillMaxWidth().then(if (arrives) Modifier.arrive() else Modifier).padding(vertical = Space.s), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
         if (label != null) Label(label)
         content()
     }
@@ -61,7 +66,7 @@ fun AdviceCard(
     candidates: List<String>,
     modifier: Modifier = Modifier,
 ) {
-    Raised(modifier) {
+    Raised(modifier.arrive()) {
         Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
             Label(label)
             Text(trigger, style = In2fitText.body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium))
@@ -81,7 +86,7 @@ fun AdviceCard(
 /** The model's sentence, or the fixed refusal over the person's own figures. */
 @Composable
 fun AnswerCard(label: String, text: String, referral: String?, figures: List<String>, modifier: Modifier = Modifier) {
-    Prose(label, modifier) {
+    Prose(label, modifier, arrives = figures.isEmpty()) {
         if (figures.isNotEmpty()) ContextLines(figures, modifier = Modifier.padding(bottom = Space.s))
         Text(text, style = In2fitText.body)
         if (referral != null) Referral(referral)
@@ -94,7 +99,7 @@ fun AnswerCard(label: String, text: String, referral: String?, figures: List<Str
  */
 @Composable
 fun AskCard(question: String, options: List<Pair<String, () -> Unit>>, modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.fillMaxWidth(), color = In2fitColors.raised, shape = MaterialTheme.shapes.medium) {
+    Surface(modifier = modifier.fillMaxWidth().arrive(), color = In2fitColors.raised, shape = MaterialTheme.shapes.medium) {
         Column {
             Text(question, style = In2fitText.bodySmall, color = In2fitColors.inkSecondary, modifier = Modifier.padding(Space.l))
             options.forEach { (word, act) ->

@@ -11,6 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import io.github.vedant7007.katori.ui.theme.LocalReduceMotion
+import io.github.vedant7007.katori.ui.theme.Motion
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -45,6 +52,10 @@ fun MicButton(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
+    val reduceMotion = LocalReduceMotion.current
+    val scope = rememberCoroutineScope()
+    // The press: 1 → 0.97 on the spatial spring, read in the draw lambda only; off under reduce motion.
+    val press = remember { Animatable(1f) }
     val fill = when {
         stop != null -> In2fitColors.ink
         enabled || active -> In2fitColors.ink
@@ -58,8 +69,10 @@ fun MicButton(
             detectTapGestures(onPress = {
                 if (enabled) {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (!reduceMotion) scope.launch { press.animateTo(0.97f, Motion.spatial) }
                     onPress()
                     tryAwaitRelease()
+                    if (!reduceMotion) scope.launch { press.animateTo(1f, Motion.spatial) }
                     onRelease()
                 }
             })
@@ -69,6 +82,7 @@ fun MicButton(
         modifier
             .fillMaxWidth()
             .height(72.dp)
+            .graphicsLayer { scaleX = press.value; scaleY = press.value }
             .clip(CircleShape)
             .drawBehind {
                 drawRect(fill)
