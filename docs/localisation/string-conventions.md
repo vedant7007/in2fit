@@ -22,7 +22,9 @@ are not caught, and should not be in `ui/` anyway.
 ## Where a new key goes
 
 `res/values/strings.xml`, the DEFAULT table, in English, in the group it belongs to, under
-that group's comment. That file is the only place a key is born. Never add a key to
+that group's comment. That file is the only place a key is born. **Grep it for the name first:**
+two definitions of one key is a duplicate-resource error for everyone at the next merge, and
+it happened once on 20 September. Never add a key to
 `values-te/` or `values-hi/` yourself: those files are written by `tools/import_review_queue.py`
 from a reviewer's reply and nothing else, and a missing key there falls back to English at
 runtime, visibly, which is the honest state.
@@ -61,8 +63,9 @@ format-only strings like `status_line` (`%1$s: %2$s`), because word order is the
 
 ## Slots, numbers, health
 
-- Positional slots only: `%1$s`, `%2$s`. Never `%s`, never `%d`; the app formats numbers and
-  dates itself and passes strings, so a translation can reorder freely.
+- Positional slots only: `%1$s`, `%2$s`, or `%1$d` for a plain count. Never bare `%s` or
+  `%d`; the app formats figures and dates itself and passes strings, so a translation can
+  reorder freely.
 - **No string carries a number the app did not supply.** Not "2", not "1 katori", not
   "100 g". A test renders every health template and fails on a digit the evidence did not
   supply; the same rule applies to every string by intent.
@@ -78,9 +81,8 @@ for a new group: the reviewer packet's notes are written from those comments.
 
 ## The About screen, ready to build
 
-Keys exist: `about_licences_title` ("Data sources and open-source licences") and
-`licence_notice_iitm_tts` (verbatim, bound only if an IITM-derived voice ships). The screen
-must show, from `0002` and `0005`:
+The screen exists (`AboutScreen.kt`, keys `about_*`, Arjun, 20 Sep) and already lists most of
+this. What it still owes, from `0002` and `0005`:
 
 1. The USDA attribution, licence and disclosure. These are rows in the food database's `meta`
    table (`attribution`, `licence`, `disclosure`, `sr_legacy_release`, `foundation_release`),
@@ -93,5 +95,8 @@ must show, from `0002` and `0005`:
 5. The IITM notice, only if a voice under that licence ships.
 6. Any ASR model attribution `0021` names (the English ASR model is NVIDIA's, CC-BY-4.0).
 
-Items 2 to 6 need keys; say where the screen lives and Nila writes them the same day. They are
-`translatable="false"` bodies with translatable labels.
+Of these the screen shows 2, 3 (without the source pointer yet), 4 and 6 in `about_components`,
+and 5 has its key (`licence_notice_iitm_tts`) ready to bind. Missing is 1: the USDA line names
+the source but not the citation `0002` asks for nor the disclosure ("values are based on foods
+sampled in the United States ... estimates, not measurements of your own food"); both are rows
+in the database's `meta` table, read them from there.

@@ -52,7 +52,7 @@ ANSWER = re.compile(r"^\s*(?:Correct )?(?P<lang>Telugu|Hindi)(?: \([^)]*\))?:\s*
 CURRENT = re.compile(r"^\s*(?:Telugu|Hindi), as written, unreviewed:\s*(?P<text>.*)$")
 ENGLISH = re.compile(r"^\s*English:\s*(?P<text>.*)$")
 NUMBERED = re.compile(r"^\s*(\d+)\s*[.):\-]\s+(.*\S)\s*$")
-SLOT = re.compile(r"%\d+\$s")
+SLOT = re.compile(r"%\d+\$[sd]")
 
 
 # --- the sheet ------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ def slot_problem(english: str, answer: str):
     want, got = set(SLOT.findall(english)), set(SLOT.findall(answer))
     if want != got:
         return f"slots differ: English has {sorted(want) or 'none'}, reply has {sorted(got) or 'none'}"
-    bare = re.sub(r"%\d+\$s|%%", "", answer).count("%")
+    bare = re.sub(r"%\d+\$[sd]|%%", "", answer).count("%")
     if bare:
         return "a bare % that is not a slot; write %% for a percent sign"
     return None

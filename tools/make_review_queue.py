@@ -35,8 +35,42 @@ PLACES = [
      "living situation, or a pattern over days. THESE MATTER MOST. Each must say only what the "
      "data says, never that the person has an illness, never what to take. The slots (%1$s and "
      "so on) are filled by the app with names and numbers; what each slot holds is in the note."),
+    ("tab_", "The three tabs at the bottom of the screen", "One word each."),
+    ("talk_", "The Talk screen, where the person speaks or types",
+     "The main screen. The person says or types what they ate, or asks a question."),
+    ("mic_", "The Talk screen, where the person speaks or types", ""),
+    ("type_", "The Talk screen, where the person speaks or types", ""),
+    ("send", "The Talk screen, where the person speaks or types", ""),
+    ("said_by_", "The Talk screen, where the person speaks or types", ""),
+    ("advise_", "The Talk screen, where the person speaks or types", ""),
+    ("stage_", "Progress lines while the app works",
+     "Shown one after another while the app is busy, instead of a spinner, so a ten-second "
+     "wait reads as work. Each is a short phrase in the present tense: what it is doing now."),
+    ("meal_", "A plate, after the app has understood it",
+     "The foods as the person said them, with the figures. 'Logged' means written into their "
+     "food history; the other line means the plate was only asked about."),
+    ("figure_", "A plate, after the app has understood it", ""),
+    ("advice_", "The reply",
+     "What the app says back: a sentence from its rules, then foods a person could consider."),
+    ("answer_", "The reply", ""),
+    ("ask_intent", "When the app is not sure what the person meant",
+     "It asks rather than guesses: was that a meal eaten, a question, a plate about to be "
+     "eaten, or a request for what to eat. The four short lines are the four answers."),
+    ("intent_", "When the app is not sure what the person meant", ""),
+    ("confirm_", "When the plate could not be understood",
+     "Nothing was saved. The app says so and asks the person to say it another way."),
+    ("unavailable_", "When something cannot be done",
+     "One sentence for each thing that can stop the app. Each states a limitation of the app "
+     "or the phone, never a number, never a guess."),
+    ("not_built", "When a part of the app does not exist yet",
+     "Shown instead of a made-up result. %1$s is the name of the missing part."),
+    ("scan_", "The Scan screen, for a printed lab report",
+     "The camera, then each value read off the report beside where it came from, with the "
+     "range printed on the report if there was one. The person ticks what to save."),
+    ("camera_", "The Scan screen, for a printed lab report", ""),
     ("about_", "The About screen",
-     "Where the app says where its numbers come from and which open-source parts it contains."),
+     "Where the app says it runs offline, where its numbers come from and which open-source "
+     "parts it contains. The legal notices themselves are not translated."),
     ("context_", "Lines the app writes for its own language model, not for the screen",
      "Not shown on a screen. When the person asks a question, the app writes their own meals, "
      "lab values and diet into a few lines like these and gives them to its language model, in "
@@ -75,10 +109,12 @@ PARTS = [
      "fluent speaker before the demo build is made, the app ships without Telugu. If you only "
      "have ten minutes, do these nine and stop.",
      ("safety_", "trigger_")),
-    (2, "PART 2. NEW LINES THAT ARRIVED TODAY",
+    (2, "PART 2. THE SCREENS THE DEMO SHOWS, AND THE NEW LINES THAT ARRIVED TODAY",
      "Written by a machine as a starting point so the app has no holes; every one needs your "
-     "eye. Correct or confirm each.",
-     ("about_", "context_", "tts_lead_in_")),
+     "eye. Correct or confirm each. These are the words on screen during the demo.",
+     ("tab_", "talk_", "mic_", "type_", "send", "said_by_", "advise_", "stage_", "meal_",
+      "figure_", "advice_", "answer_", "ask_intent", "intent_", "confirm_", "unavailable_",
+      "not_built", "scan_", "camera_", "about_", "context_", "tts_lead_in_")),
     (3, "PART 3. THE REST OF THE SCREEN TEXT",
      "Labels, explanations and the words dropped into sentences. Same rules.",
      ()),

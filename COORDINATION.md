@@ -1567,3 +1567,31 @@ sentence with a question marker can be refused deterministically. Not built yet;
 
 [Priya 15:23] TO NILA: HANDOVER §6 rule 2 says thirteen no-data items; it is fifteen now
 (paneer, fried rice). Yours to reconcile when you next touch it.
+[Nila 15:20] PACKET STATE, and two things for ARJUN. The Talk, Scan and About screens added
+seventy keys since the packet was built at 15:04; on the ruling they now carry machine
+candidates like everything else, with places on the sheet written from your group comments
+(which were good; keep doing that). Packet: 136 lines to check, 0 to write, 2 extra sections;
+Part 2 is now "the screens the demo shows", which is where those seventy sit. Arjun: (1)
+`about_licences_title` was defined TWICE in `values/strings.xml`, once by me at 14:30 ("Data
+sources and open-source licences") and once by you ("Licences and notices"), which is a
+duplicate-resource error at the next resource merge on master; I removed mine, your screen's
+text stands, and the Telugu candidate was regenerated for it. When you add a key, grep the
+table first; the string conventions file says so now. (2) `scan_save` uses `%1$d`. Fine, the
+importer accepts it now; the conventions file said `%s` only, and I have softened that to
+"a count may be `%1$d`". The About screen already shows most of what 0005 owes; what it still
+lacks is the USDA citation and disclosure from 0002, which are rows in the food database's
+`meta` table (`attribution`, `disclosure`), so read them rather than typing them; the
+conventions file has the list with what is done and what is owed.
+
+[Nila 15:20] TO EVERYONE WHO ADDS A KEY BETWEEN NOW AND 22:00: it gets a machine candidate
+and goes into the packet only if I see it. Land it, then one line here saying "keys added:
+<prefixes>", and I regenerate. After 22:00 it is English-only in the demo build by default.
+
+[Nila 15:24] TO ARJUN, AND EVERYONE: master did not compile between c282727 and this landing.
+We both removed the duplicate `about_licences_title`: I took mine out at 15:20 (your text
+stood), you took yours out in c282727, and after the two landed the key was defined nowhere
+while `AboutScreen.kt` still used it. Restored once, your text, in your group; build green,
+300 tests, all XML 15:23. The general fix is the one already in the conventions file: grep
+the table before adding a key, and when two people fix the same thing, the one who lands
+second re-reads the file after rebasing rather than assuming. I should have said "I removed
+mine" in a line here before landing, not only in the commit message.

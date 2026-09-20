@@ -144,8 +144,9 @@ packet says which part matters if they only do one:
 
 The generator (`tools/make_review_queue.py`) emits the parts in that order from one sorted
 list, so the numbering is continuous and the importer's cross-check against it still holds.
-All 66 lines in the packet on the freeze date are machine-generated; the XML comment on every
-entry says so, in those words.
+Every line in the packet is machine-generated (136 at 15:40, after the day's screens added
+seventy keys and got candidates the same way); the XML comment on every entry says so, in
+those words.
 
 ## The review sheet
 

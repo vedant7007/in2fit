@@ -2,7 +2,7 @@
 
 **If you only do one part, do Part 1.** Those nine lines decide whether the app speaks Telugu at all.
 
-Generated 20 September 2026 from the app's English string table. 66 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
+Generated 20 September 2026 from the app's English string table. 136 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
 
 Reviewer's name: ______________________
 
@@ -132,19 +132,689 @@ One of these is shown when something in the person's data changes what the app s
    Correct Telugu (leave blank if the line above is right):
 
 
-## PART 2. NEW LINES THAT ARRIVED TODAY
+## PART 2. THE SCREENS THE DEMO SHOWS, AND THE NEW LINES THAT ARRIVED TODAY
 
-Written by a machine as a starting point so the app has no holes; every one needs your eye. Correct or confirm each.
+Written by a machine as a starting point so the app has no holes; every one needs your eye. Correct or confirm each. These are the words on screen during the demo.
+
+### The three tabs at the bottom of the screen
+
+One word each.
+
+10. `tab_talk`
+
+   English: Talk
+
+   Telugu, as written, unreviewed: మాట్లాడండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+11. `tab_scan`
+
+   English: Scan report
+
+   Telugu, as written, unreviewed: రిపోర్టు స్కాన్
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+12. `tab_about`
+
+   English: About
+
+   Telugu, as written, unreviewed: గురించి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### The Talk screen, where the person speaks or types
+
+The main screen. The person says or types what they ate, or asks a question.
+
+13. `talk_hint`
+
+   English: Say what you ate, or ask a question.
+
+   Telugu, as written, unreviewed: మీరు ఏమి తిన్నారో చెప్పండి, లేదా ఒక ప్రశ్న అడగండి.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+14. `mic_speak`
+
+   English: Speak
+
+   Telugu, as written, unreviewed: మాట్లాడండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+15. `mic_listening`
+
+   English: Listening…
+
+   Telugu, as written, unreviewed: వింటున్నాను…
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+16. `mic_permission_needed`
+
+   English: Microphone permission was not granted. You can type instead.
+
+   Telugu, as written, unreviewed: మైక్రోఫోన్ అనుమతి ఇవ్వలేదు. బదులుగా టైప్ చేయవచ్చు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+17. `type_hint`
+
+   English: Type what you ate, or a question
+
+   Telugu, as written, unreviewed: మీరు ఏమి తిన్నారో, లేదా ఒక ప్రశ్న టైప్ చేయండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+18. `send`
+
+   English: Send
+
+   Telugu, as written, unreviewed: పంపండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+19. `said_by_you`
+
+   English: You
+
+   Telugu, as written, unreviewed: మీరు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+20. `advise_again`
+
+   English: Advise again on my last meal
+
+   Telugu, as written, unreviewed: నా చివరి భోజనంపై మళ్ళీ సలహా ఇవ్వండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### Progress lines while the app works
+
+Shown one after another while the app is busy, instead of a spinner, so a ten-second wait reads as work. Each is a short phrase in the present tense: what it is doing now.
+
+21. `stage_recording`
+
+   English: Listening
+
+   Telugu, as written, unreviewed: వింటున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+22. `stage_transcribing`
+
+   English: Writing down what you said
+
+   Telugu, as written, unreviewed: మీరు చెప్పింది రాస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+23. `stage_classifying`
+
+   English: Working out what you meant
+
+   Telugu, as written, unreviewed: మీ ఉద్దేశం తెలుసుకుంటున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+24. `stage_extracting`
+
+   English: Picking out the foods
+
+   Telugu, as written, unreviewed: ఆహారాలను గుర్తిస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+25. `stage_matching_foods`
+
+   English: Matching the foods
+
+   Telugu, as written, unreviewed: ఆహారాలను సరిపోలుస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+26. `stage_computing`
+
+   English: Adding up the figures
+
+   Telugu, as written, unreviewed: అంకెలను కూడుతున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+27. `stage_saving`
+
+   English: Saving
+
+   Telugu, as written, unreviewed: సేవ్ చేస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+28. `stage_evaluating_rules`
+
+   English: Checking your records
+
+   Telugu, as written, unreviewed: మీ రికార్డులు చూస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+29. `stage_retrieving_facts`
+
+   English: Looking up facts
+
+   Telugu, as written, unreviewed: వివరాలు చూస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+30. `stage_phrasing`
+
+   English: Writing the reply
+
+   Telugu, as written, unreviewed: జవాబు రాస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+31. `stage_speaking`
+
+   English: Speaking
+
+   Telugu, as written, unreviewed: చెబుతున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+32. `stage_capturing`
+
+   English: Capturing
+
+   Telugu, as written, unreviewed: ఫోటో తీస్తున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+33. `stage_reading_text`
+
+   English: Reading the text
+
+   Telugu, as written, unreviewed: అక్షరాలు చదువుతున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### A plate, after the app has understood it
+
+The foods as the person said them, with the figures. 'Logged' means written into their food history; the other line means the plate was only asked about.
+
+34. `meal_logged`
+
+   English: Logged
+
+   Telugu, as written, unreviewed: నమోదు చేశాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+35. `meal_hypothetical`
+
+   English: A plate you asked about. Not logged.
+
+   Telugu, as written, unreviewed: మీరు అడిగిన ప్లేటు. నమోదు చేయలేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+36. `meal_item_with_quantity`
+
+   English: %1$s: %2$s %3$s
+
+   Telugu, as written, unreviewed: %1$s: %2$s %3$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+37. `meal_item_no_quantity`
+
+   English: %1$s: quantity not stated
+
+   Telugu, as written, unreviewed: %1$s: పరిమాణం చెప్పలేదు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+38. `figure_with_band`
+
+   English: %1$s (%2$s)
+
+   Telugu, as written, unreviewed: %1$s (%2$s)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### The reply
+
+What the app says back: a sentence from its rules, then foods a person could consider.
+
+39. `advice_title`
+
+   English: Advice
+
+   Telugu, as written, unreviewed: సలహా
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+40. `advice_no_rule`
+
+   English: Nothing in your records changes this.
+
+   Telugu, as written, unreviewed: మీ రికార్డుల్లో దీన్ని మార్చేది ఏమీ లేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+41. `advice_candidates_title`
+
+   English: You could consider
+
+   Telugu, as written, unreviewed: మీరు పరిశీలించవచ్చు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+42. `answer_title`
+
+   English: Answer
+
+   Telugu, as written, unreviewed: జవాబు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### When the app is not sure what the person meant
+
+It asks rather than guesses: was that a meal eaten, a question, a plate about to be eaten, or a request for what to eat. The four short lines are the four answers.
+
+43. `ask_intent_question`
+
+   English: Was that a meal you ate, a question, a plate you are about to eat, or a request for what to eat?
+
+   Telugu, as written, unreviewed: అది మీరు తిన్న భోజనమా, ఒక ప్రశ్నా, ఇప్పుడు తినబోయే ప్లేటా, లేదా ఏమి తినాలో అడుగుతున్నారా?
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+44. `intent_log`
+
+   English: I ate this
+
+   Telugu, as written, unreviewed: నేను ఇది తిన్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+45. `intent_answer`
+
+   English: A question
+
+   Telugu, as written, unreviewed: ఒక ప్రశ్న
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+46. `intent_suggest`
+
+   English: About to eat this
+
+   Telugu, as written, unreviewed: ఇది తినబోతున్నాను
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+47. `intent_recommend`
+
+   English: What should I eat
+
+   Telugu, as written, unreviewed: నేను ఏమి తినాలి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### When the plate could not be understood
+
+Nothing was saved. The app says so and asks the person to say it another way.
+
+48. `confirm_title`
+
+   English: Not logged yet
+
+   Telugu, as written, unreviewed: ఇంకా నమోదు కాలేదు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+49. `confirm_hint`
+
+   English: Say it differently, or type it.
+
+   Telugu, as written, unreviewed: వేరే విధంగా చెప్పండి, లేదా టైప్ చేయండి.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### When something cannot be done
+
+One sentence for each thing that can stop the app. Each states a limitation of the app or the phone, never a number, never a guess.
+
+50. `unavailable_model_not_loaded`
+
+   English: The model is not loaded on this phone yet.
+
+   Telugu, as written, unreviewed: ఈ ఫోన్‌లో మోడల్ ఇంకా లోడ్ కాలేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+51. `unavailable_model_load_failed`
+
+   English: The model could not start.
+
+   Telugu, as written, unreviewed: మోడల్ ప్రారంభం కాలేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+52. `unavailable_insufficient_memory`
+
+   English: Not enough memory free to do this now.
+
+   Telugu, as written, unreviewed: ఇప్పుడు దీనికి సరిపడా మెమరీ ఖాళీగా లేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+53. `unavailable_no_match`
+
+   English: I do not know a food in that.
+
+   Telugu, as written, unreviewed: అందులో నాకు తెలిసిన ఆహారం ఏదీ లేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+54. `unavailable_known_item_no_data`
+
+   English: I know that food and hold no figures for it.
+
+   Telugu, as written, unreviewed: ఆ ఆహారం నాకు తెలుసు, కానీ దానికి అంకెలు నా దగ్గర లేవు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+55. `unavailable_below_confidence_threshold`
+
+   English: I am not sure enough of what you said.
+
+   Telugu, as written, unreviewed: మీరు చెప్పింది నాకు సరిగ్గా అర్థం కాలేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+56. `unavailable_permission_denied`
+
+   English: A permission was not granted.
+
+   Telugu, as written, unreviewed: ఒక అనుమతి ఇవ్వలేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+57. `unavailable_hardware_unsupported`
+
+   English: This phone cannot run this.
+
+   Telugu, as written, unreviewed: ఈ ఫోన్ దీన్ని నడపలేదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+58. `unavailable_input_not_usable`
+
+   English: That could not be used. Please try again.
+
+   Telugu, as written, unreviewed: అది ఉపయోగించలేకపోయాను. దయచేసి మళ్ళీ ప్రయత్నించండి.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+59. `unavailable_cancelled`
+
+   English: Cancelled.
+
+   Telugu, as written, unreviewed: రద్దు చేయబడింది.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+60. `unavailable_schema_validation_failed`
+
+   English: The reply could not be read. Please try again.
+
+   Telugu, as written, unreviewed: జవాబు చదవలేకపోయాను. దయచేసి మళ్ళీ ప్రయత్నించండి.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+61. `unavailable_internal_error`
+
+   English: Something went wrong inside the app.
+
+   Telugu, as written, unreviewed: యాప్ లోపల ఏదో తప్పు జరిగింది.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### When a part of the app does not exist yet
+
+Shown instead of a made-up result. %1$s is the name of the missing part.
+
+62. `not_built`
+
+   English: Not built yet: %1$s
+
+   Telugu, as written, unreviewed: ఇంకా నిర్మించలేదు: %1$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### The Scan screen, for a printed lab report
+
+The camera, then each value read off the report beside where it came from, with the range printed on the report if there was one. The person ticks what to save.
+
+63. `scan_title`
+
+   English: Scan a lab report
+
+   Telugu, as written, unreviewed: ల్యాబ్ రిపోర్టు స్కాన్ చేయండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+64. `scan_capture`
+
+   English: Capture
+
+   Telugu, as written, unreviewed: ఫోటో తీయండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+65. `scan_retake`
+
+   English: Retake
+
+   Telugu, as written, unreviewed: మళ్ళీ తీయండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+66. `scan_reading`
+
+   English: Reading the report…
+
+   Telugu, as written, unreviewed: రిపోర్టు చదువుతున్నాను…
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+67. `scan_no_fields`
+
+   English: No test values could be read. Try a sharper, straighter photo.
+
+   Telugu, as written, unreviewed: పరీక్ష విలువలు ఏవీ చదవలేకపోయాను. మరింత స్పష్టమైన, నిటారుగా ఉన్న ఫోటో ప్రయత్నించండి.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+68. `scan_field_line`
+
+   English: %1$s: %2$s %3$s
+
+   Telugu, as written, unreviewed: %1$s: %2$s %3$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+69. `scan_range_both`
+
+   English: printed range %1$s to %2$s
+
+   Telugu, as written, unreviewed: ముద్రించిన పరిధి %1$s నుండి %2$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+70. `scan_range_high_only`
+
+   English: printed range up to %1$s
+
+   Telugu, as written, unreviewed: ముద్రించిన పరిధి %1$s వరకు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+71. `scan_range_low_only`
+
+   English: printed range from %1$s
+
+   Telugu, as written, unreviewed: ముద్రించిన పరిధి %1$s నుండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+72. `scan_range_none`
+
+   English: no range printed, so nothing will be judged against it
+
+   Telugu, as written, unreviewed: పరిధి ముద్రించలేదు, కాబట్టి దేనితోనూ పోల్చడం జరగదు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+73. `scan_report_date`
+
+   English: Report date %1$s
+
+   Telugu, as written, unreviewed: రిపోర్టు తేదీ %1$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+74. `scan_report_date_unknown`
+
+   English: Report date not read
+
+   Telugu, as written, unreviewed: రిపోర్టు తేదీ చదవలేదు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+75. `scan_save`
+
+   English: Save %1$d values
+
+   Telugu, as written, unreviewed: %1$d విలువలను సేవ్ చేయండి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+76. `camera_permission_needed`
+
+   English: Camera permission is needed to scan a report.
+
+   Telugu, as written, unreviewed: రిపోర్టు స్కాన్ చేయడానికి కెమెరా అనుమతి అవసరం.
+
+   Correct Telugu (leave blank if the line above is right):
+
 
 ### The About screen
 
-Where the app says where its numbers come from and which open-source parts it contains.
+Where the app says it runs offline, where its numbers come from and which open-source parts it contains. The legal notices themselves are not translated.
 
-10. `about_licences_title`
+77. `about_title`
 
-   English: Data sources and open-source licences
+   English: About
 
-   Telugu, as written, unreviewed: డేటా మూలాలు మరియు ఓపెన్ సోర్స్ లైసెన్సులు
+   Telugu, as written, unreviewed: గురించి
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+78. `about_licences_title`
+
+   English: Licences and notices
+
+   Telugu, as written, unreviewed: లైసెన్సులు మరియు నోటీసులు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+79. `about_offline`
+
+   English: IN2FIT runs entirely on this phone. The demo build has no internet permission: nothing you say, scan or log leaves the device.
+
+   Telugu, as written, unreviewed: IN2FIT పూర్తిగా ఈ ఫోన్‌లోనే నడుస్తుంది. డెమో బిల్డ్‌కు ఇంటర్నెట్ అనుమతి లేదు: మీరు చెప్పేది, స్కాన్ చేసేది లేదా నమోదు చేసేది ఏదీ ఫోన్ బయటకు వెళ్ళదు.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+80. `about_notices_pending`
+
+   English: The verbatim copyright notice for the voice models is being prepared and will appear here.
+
+   Telugu, as written, unreviewed: వాయిస్ మోడల్స్ కాపీరైట్ నోటీసు యథాతథంగా సిద్ధం చేస్తున్నాము; అది ఇక్కడ కనిపిస్తుంది.
 
    Correct Telugu (leave blank if the line above is right):
 
@@ -153,7 +823,7 @@ Where the app says where its numbers come from and which open-source parts it co
 
 Not shown on a screen. When the person asks a question, the app writes their own meals, lab values and diet into a few lines like these and gives them to its language model, in the person's language, before it answers; the answer may repeat them back. Plain and literal, no advice in them: every slot is a name, a number or a date the app fills in.
 
-11. `context_figure`
+81. `context_figure`
 
    English: %1$s: %2$s %3$s
 
@@ -164,7 +834,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-12. `context_figure_partial`
+82. `context_figure_partial`
 
    English: %1$s: at least %2$s %3$s (no value for %4$s)
 
@@ -175,7 +845,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-13. `context_figure_none`
+83. `context_figure_none`
 
    English: %1$s: not known
 
@@ -186,7 +856,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-14. `context_meal`
+84. `context_meal`
 
    English: %1$s: %2$s. %3$s
 
@@ -197,7 +867,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-15. `context_period`
+85. `context_period`
 
    English: %1$s: %2$s
 
@@ -208,7 +878,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-16. `context_period_today`
+86. `context_period_today`
 
    English: Today so far
 
@@ -217,7 +887,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-17. `context_period_last_seven_days`
+87. `context_period_last_seven_days`
 
    English: The last seven days
 
@@ -226,7 +896,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-18. `context_lab`
+88. `context_lab`
 
    English: %1$s: %2$s %3$s (report dated %4$s)
 
@@ -237,7 +907,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-19. `context_lab_with_range`
+89. `context_lab_with_range`
 
    English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
 
@@ -248,7 +918,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-20. `context_never_suggest_vegetarian`
+90. `context_never_suggest_vegetarian`
 
    English: meat, fish or eggs (vegetarian)
 
@@ -259,7 +929,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-21. `context_never_suggest_vegan`
+91. `context_never_suggest_vegan`
 
    English: meat, fish, eggs, milk or any dairy (vegan)
 
@@ -268,7 +938,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-22. `context_never_suggest_eggetarian`
+92. `context_never_suggest_eggetarian`
 
    English: meat or fish (eggetarian)
 
@@ -277,7 +947,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
    Correct Telugu (leave blank if the line above is right):
 
 
-23. `context_never_suggest_jain`
+93. `context_never_suggest_jain`
 
    English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
 
@@ -290,7 +960,7 @@ Not shown on a screen. When the person asks a question, the app writes their own
 
 The app says one of these aloud while it is thinking, so a ten-second wait sounds like work and not like silence. One or two seconds long when spoken. No health content.
 
-24. `tts_lead_in_log`
+94. `tts_lead_in_log`
 
    English: Noting that down.
 
@@ -299,7 +969,7 @@ The app says one of these aloud while it is thinking, so a ten-second wait sound
    Correct Telugu (leave blank if the line above is right):
 
 
-25. `tts_lead_in_answer`
+95. `tts_lead_in_answer`
 
    English: Let me check your records.
 
@@ -308,7 +978,7 @@ The app says one of these aloud while it is thinking, so a ten-second wait sound
    Correct Telugu (leave blank if the line above is right):
 
 
-26. `tts_lead_in_suggest`
+96. `tts_lead_in_suggest`
 
    English: Let me think about what fits.
 
@@ -317,7 +987,7 @@ The app says one of these aloud while it is thinking, so a ten-second wait sound
    Correct Telugu (leave blank if the line above is right):
 
 
-27. `tts_lead_in_recommend`
+97. `tts_lead_in_recommend`
 
    English: Let me see what suits you.
 
@@ -334,7 +1004,7 @@ Labels, explanations and the words dropped into sentences. Same rules.
 
 Single words dropped into the sentences above and shown next to figures, so they should read naturally mid-sentence.
 
-28. `nutrient_energy`
+98. `nutrient_energy`
 
    English: energy
 
@@ -343,7 +1013,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-29. `nutrient_protein`
+99. `nutrient_protein`
 
    English: protein
 
@@ -352,7 +1022,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-30. `nutrient_carbohydrate`
+100. `nutrient_carbohydrate`
 
    English: carbohydrate
 
@@ -361,7 +1031,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-31. `nutrient_fat`
+101. `nutrient_fat`
 
    English: fat
 
@@ -370,7 +1040,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-32. `nutrient_fibre`
+102. `nutrient_fibre`
 
    English: fibre
 
@@ -379,7 +1049,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-33. `nutrient_iron`
+103. `nutrient_iron`
 
    English: iron
 
@@ -388,7 +1058,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-34. `nutrient_vitamin_b12`
+104. `nutrient_vitamin_b12`
 
    English: vitamin B12
 
@@ -397,7 +1067,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-35. `nutrient_sodium`
+105. `nutrient_sodium`
 
    English: sodium
 
@@ -410,7 +1080,7 @@ Single words dropped into the sentences above and shown next to figures, so they
 
 Dropped into the sentence 'Suggestions are limited to what is realistic for ...' in place of the slot, so each phrase should complete that sentence.
 
-36. `life_context_hostel_student`
+106. `life_context_hostel_student`
 
    English: hostel and canteen food
 
@@ -419,7 +1089,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-37. `life_context_pg_own_cooking`
+107. `life_context_pg_own_cooking`
 
    English: cooking for yourself with limited time
 
@@ -428,7 +1098,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-38. `life_context_field_or_manual_worker`
+108. `life_context_field_or_manual_worker`
 
    English: long physical shifts and eating out
 
@@ -437,7 +1107,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-39. `life_context_desk_professional`
+109. `life_context_desk_professional`
 
    English: a desk day with a full kitchen
 
@@ -446,7 +1116,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-40. `life_context_homemaker`
+110. `life_context_homemaker`
 
    English: cooking for the household
 
@@ -459,7 +1129,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
 
 The heading of the screen where the person picks Telugu, Hindi or English.
 
-41. `language_picker_title`
+111. `language_picker_title`
 
    English: Language
 
@@ -472,7 +1142,7 @@ The heading of the screen where the person picks Telugu, Hindi or English.
 
 A one-word label next to every nutrition figure saying how far to trust it. Good means the food and the amount were both clear; Approximate means something was assumed, such as a standard bowl size; Rough means the figure could be far off.
 
-42. `confidence_band_good`
+112. `confidence_band_good`
 
    English: Good
 
@@ -481,7 +1151,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
    Correct Telugu (leave blank if the line above is right):
 
 
-43. `confidence_band_approximate`
+113. `confidence_band_approximate`
 
    English: Approximate
 
@@ -490,7 +1160,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
    Correct Telugu (leave blank if the line above is right):
 
 
-44. `confidence_band_rough`
+114. `confidence_band_rough`
 
    English: Rough
 
@@ -503,7 +1173,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
 
 Shown when the person taps the confidence label. One sentence explaining it.
 
-45. `confidence_reason_exact_food_match`
+115. `confidence_reason_exact_food_match`
 
    English: Matched exactly to a food in the database.
 
@@ -512,7 +1182,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-46. `confidence_reason_fuzzy_food_match`
+116. `confidence_reason_fuzzy_food_match`
 
    English: Matched to the closest name in the database; check it is the food you meant.
 
@@ -521,7 +1191,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-47. `confidence_reason_category_level_match`
+117. `confidence_reason_category_level_match`
 
    English: Matched only to a food category, not a specific food.
 
@@ -530,7 +1200,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-48. `confidence_reason_quantity_stated`
+118. `confidence_reason_quantity_stated`
 
    English: You gave the quantity in a unit we can convert.
 
@@ -539,7 +1209,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-49. `confidence_reason_household_unit_default`
+119. `confidence_reason_household_unit_default`
 
    English: A household measure was converted with a standard weight. Tap to correct the grams.
 
@@ -550,7 +1220,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-50. `confidence_reason_quantity_inferred`
+120. `confidence_reason_quantity_inferred`
 
    English: You did not say how much, so this quantity is a guess. Tap to correct it.
 
@@ -559,7 +1229,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-51. `confidence_reason_authored_reference_recipe`
+121. `confidence_reason_authored_reference_recipe`
 
    English: Based on a reference recipe. Edit it to match how you cook.
 
@@ -570,7 +1240,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-52. `confidence_reason_user_edited_recipe`
+122. `confidence_reason_user_edited_recipe`
 
    English: Based on the recipe as you edited it.
 
@@ -579,7 +1249,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-53. `confidence_reason_weak_source_record`
+123. `confidence_reason_weak_source_record`
 
    English: The source record for this food rests on few samples or on a label.
 
@@ -588,7 +1258,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-54. `confidence_reason_substitute_food_record`
+124. `confidence_reason_substitute_food_record`
 
    English: The nearest record is a similar food, not this one.
 
@@ -597,7 +1267,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-55. `confidence_reason_low_asr_confidence`
+125. `confidence_reason_low_asr_confidence`
 
    English: Speech recognition was unsure of what it heard. Check the words.
 
@@ -608,7 +1278,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-56. `confidence_reason_uncorrected_camera_guess`
+126. `confidence_reason_uncorrected_camera_guess`
 
    English: A camera guess that has not been confirmed by you.
 
@@ -621,7 +1291,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
 
 A developer screen listing what is built. It will be replaced before the demo. Lowest priority: do these last, or skip them.
 
-57. `status_screen_subtitle`
+127. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
@@ -630,7 +1300,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-58. `status_line`
+128. `status_line`
 
    English: %1$s: %2$s
 
@@ -641,7 +1311,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-59. `state_not_implemented`
+129. `state_not_implemented`
 
    English: Not implemented
 
@@ -650,7 +1320,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-60. `pipeline_voice_logging`
+130. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
@@ -659,7 +1329,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-61. `pipeline_nutrition_lookup`
+131. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
@@ -668,7 +1338,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-62. `pipeline_timeline_query`
+132. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
@@ -677,7 +1347,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-63. `pipeline_lab_report_scan`
+133. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
@@ -686,7 +1356,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-64. `pipeline_adaptive_suggestions`
+134. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
@@ -695,7 +1365,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-65. `pipeline_dish_first_guess`
+135. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
@@ -704,7 +1374,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-66. `pipeline_exercise_form`
+136. `pipeline_exercise_form`
 
    English: Exercise form check
 
@@ -827,8 +1497,15 @@ keeps this sheet and the log-word list in step, so a word you flag is changed in
 ### Two things to listen to, and one sentence to write (from Meera, the voice)
 
 This is about the app's VOICE, not its text. Vedant will send you a few short audio files with
-this packet; they are named like `te-padmavathi-default-A.wav`. Each is the same two Telugu words
-said by a different synthetic voice.
+this packet; they are named like `te-padmavathi-default-A.wav`. Each says the same two Telugu
+words (ఇడ్లీ సాంబార్) in a different synthetic voice, and the files ending in `-B` say the same
+five food names. The set is:
+
+- `te-padmavathi-default-A.wav` and `te-venkatesh-default-A.wav`: two voices of the same kind
+- `te-padmavathi-noise0.5_length1.15-A.wav`: the first voice, slowed a little and smoothed
+- `te-mms-facebook-default-A.wav`: a third voice
+- `te-pocket-tts-syspin_female-int4-OURS-A.wav`: a fourth voice, newer
+- `platform-te-...-A.wav`, if present: the phone's own built-in Telugu voice
 
 1. **Rank them.** Which sounds most like a person speaking Telugu, and which least? A rough order
    is enough: best to worst, by file name. If the phone's own built-in Telugu voice is among
