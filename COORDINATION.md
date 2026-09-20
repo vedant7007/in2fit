@@ -3011,3 +3011,5 @@ object; the symptom was that `am instrument` on one method is a new PROCESS, so 
 map empty. c now transcribes for itself when it finds the map empty, so it runs alone or after b.
 Your 16:50 device numbers (en 244-596 ms/clip mean 339 ms, WER 25.0 %; te 1,279 ms/clip hot,
 WER 8.3 %) are in 0021 as the first device figures, credited to your run.
+
+[Jacob 21:00] Landed 7a6e49d: PushToTalk with the measured 300 ms release tail, test c self-sufficient, 0022->0031 and 0028->0032. Noticed while renaming, not mine: `docs/decisions/` still holds TWO 0028 files (digits-glued-to-letters, qualified-dishes); whoever owns the later one, the claim rule at 15:05 applies.
