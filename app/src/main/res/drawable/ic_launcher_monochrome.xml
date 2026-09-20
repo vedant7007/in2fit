@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The themed-icon layer (API 33+): the same bowl as one silhouette with the rim's inside cut out,
+     so the launcher can tint it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+        android:pathData="M26,47 C26,64 38,75 54,75 C70,75 82,64 82,47 Z M26.0,47.0 C26.0,41.477000000000004 38.5356,37.0 54.0,37.0 C69.4644,37.0 82.0,41.477000000000004 82.0,47.0 C82.0,52.522999999999996 69.4644,57.0 54.0,57.0 C38.5356,57.0 26.0,52.522999999999996 26.0,47.0 Z M32.0,47.0 C32.0,43.96235 41.8494,41.5 54.0,41.5 C66.1506,41.5 76.0,43.96235 76.0,47.0 C76.0,50.03765 66.1506,52.5 54.0,52.5 C41.8494,52.5 32.0,50.03765 32.0,47.0 Z M44,75 L64,75 L61,81 L47,81 Z" />
+</vector>

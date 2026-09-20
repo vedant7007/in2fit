@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A katori: a bowl seen slightly from above. The 108 dp adaptive canvas keeps the centre
-     66 dp safe from masking, so the glyph sits inside that. -->
+<!-- The launcher icon's foreground: a katori, seen slightly from above, in the brand cream on the
+     brand green (ruled 20 Sep: the bowl in #252F26; the wordmark's "2" is a ligature and mushes
+     below 96 px). Drawn inside the 66 dp safe zone of the 108 dp adaptive canvas; the same
+     numbers generate the monochrome layer and the density PNGs (tools/ has no script for it; the
+     generator is in the commit message's file list, docs/design/design-system.md § Icon). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <!-- the bowl -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M28,50 L80,50 C80,66 70,76 54,76 C38,76 28,66 28,50 Z" />
-    <!-- the rim, seen from above -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M54,42 C68,42 82,45 82,50 C82,55 68,58 54,58 C40,58 26,55 26,50 C26,45 40,42 54,42 Z" />
-    <!-- the inside of the rim, in the background colour -->
-    <path
-        android:fillColor="#FF1F6F5C"
-        android:pathData="M54,45 C65,45 76,47 76,50 C76,53 65,55 54,55 C43,55 32,53 32,50 C32,47 43,45 54,45 Z" />
-    <!-- the foot -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M44,76 L64,76 L62,82 L46,82 Z" />
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#ECEBE6" android:pathData="M26,47 C26,64 38,75 54,75 C70,75 82,64 82,47 Z" />
+    <path android:fillColor="#ECEBE6" android:pathData="M26.0,47.0 C26.0,41.477000000000004 38.5356,37.0 54.0,37.0 C69.4644,37.0 82.0,41.477000000000004 82.0,47.0 C82.0,52.522999999999996 69.4644,57.0 54.0,57.0 C38.5356,57.0 26.0,52.522999999999996 26.0,47.0 Z" />
+    <path android:fillColor="#252F26" android:pathData="M32.0,47.0 C32.0,43.96235 41.8494,41.5 54.0,41.5 C66.1506,41.5 76.0,43.96235 76.0,47.0 C76.0,50.03765 66.1506,52.5 54.0,52.5 C41.8494,52.5 32.0,50.03765 32.0,47.0 Z" />
+    <path android:fillColor="#ECEBE6" android:pathData="M44,75 L64,75 L61,81 L47,81 Z" />
 </vector>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The launcher icon. Without one the phone shows Android's default robot captioned IN2FIT
-     (Arjun's logcat, 20 Sep: "Default app icon returned from PackageManager"). An adaptive
-     icon: a plain background colour and a bowl glyph. A designed icon replaces these two
-     files and nothing else. -->
+<!-- The launcher icon: the brand green as the background layer, the katori as the foreground,
+     the silhouette as the monochrome layer for themed icons. Every density below API 26 is not
+     needed (minSdk 26); the mipmap PNGs exist for launchers that read the legacy icon. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@color/ic_launcher_background" />
     <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
 </adaptive-icon>
