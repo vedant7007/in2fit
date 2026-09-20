@@ -23,6 +23,10 @@ question it cares most about: whether anything has run on a phone. Something has
 >   this date; see the commit that added this addendum.
 > - The product is now IN2FIT (`0015`). Display strings only; the package stays `katori`.
 > - `onnxruntime-android` is now `androidTestImplementation` (`0016`).
+> - §3 and §6 rule 2 count thirteen no-data items and 81 ingredients; on 20 September the
+>   corpus is 93 ingredients, 626 aliases, 52 recipes and FIFTEEN no-data items, paneer and
+>   fried rice added (`0026-code-mixed-food-words`, `logs/food-db-build.log`). The rule is
+>   unchanged: none of the fifteen may resolve to a food.
 > - The command order in §2 is stale for a fresh clone: `tools/4-fetch-models.bat` must run
 >   BEFORE `tools/3-build.bat`, because the build now refuses to start without the sherpa-onnx
 >   AAR that step 4 fetches (with its sha256 checked). The numbers were not changed; the

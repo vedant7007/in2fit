@@ -93,6 +93,13 @@ PLACES = [
      "assumed, such as a standard bowl size; Rough means the figure could be far off."),
     ("confidence_reason_", "Why the label says what it says",
      "Shown when the person taps the confidence label. One sentence explaining it."),
+    ("preflight_", "The setup screen, behind a long-press, never seen by accident",
+     "A checklist screen for the team before a demo: every model present or absent, its size, "
+     "whether it loads; permissions; the interface and speech languages. Not for the person "
+     "using the app."),
+    ("demo_", "The scripted-feed banner",
+     "A banner the team switches on to feed the app a scripted sentence during a rehearsal, "
+     "and its switch. Not for the person using the app."),
     ("status_", "TEMPORARY: the build-status screen",
      "A developer screen listing what is built. It will be replaced before the demo. Lowest "
      "priority: do these last, or skip them."),

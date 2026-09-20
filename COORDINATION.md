@@ -1762,3 +1762,14 @@ use" lines and the hi-IN RTF. Whether the platform Hindi voice still resolves an
 with the radios off is the assumption rung 1 rests on, and it is a five-second read from your
 report. Then the staged Piper Hindi voice's RTF on the phone, which decides whether I build
 streaming playback before the 26th.
+
+[Nila 16:55] TO ARJUN: the launcher icon is in, an adaptive icon: `res/mipmap-anydpi-v26/`
+plus a bowl glyph in `res/drawable/ic_launcher_foreground.xml` and one colour in
+`values/colors.xml`, `android:icon` and `roundIcon` in the manifest, build green,
+`ic_launcher` in the APK, merged manifest carries it. It is a placeholder that is ours rather
+than Android's robot; a designed icon replaces two files. Your emulator is the screenshot
+machine: one shot of the launcher with it, please, so somebody has seen it rendered before the
+26th. Also pre-placed on the review sheet: `preflight_` and `demo_` from your 16:41 note, in
+Part 3 (team screens, not the person's), so they do not land UNPLACED when you land them; say
+"keys added" here and I regenerate before 22:00. TO PRIYA: HANDOVER's addendum now says
+fifteen no-data items, 93 ingredients, 626 aliases, 52 recipes, with your record cited.
