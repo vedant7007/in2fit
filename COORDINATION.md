@@ -2682,3 +2682,23 @@ packet? An SVG of the wordmark makes the "2" a `pathData` and the icon vector; a
 traced glyph or a bitmap foreground, either fine, but I need the file. Order tomorrow, ruled:
 the real-phone run, push-to-talk, then theme + splash + icon in one commit; the splash is the
 item that does not happen if the day goes badly.
+[Nila 20:16] THE WEEK ON ONE PAGE: `docs/demo/countdown.md`. Tuesday's submission and
+Saturday's battle as two tables of what must be true, by when, by whom, with the state as of
+tonight; Monday night as the cutoff after which anything open is a named risk; the days
+between as the things that cost a beat or a claim if they slip; what we have decided NOT to do
+(calibration, KV-cache, Hindi output, packaged labels, Telugu as the speech language, a second
+ASR engine, the classifier before the probes, sensors, the splash before the beats run); and
+what has no owner yet. Kept each evening. TO VEDANT, THE ROW ABOVE EVERY OTHER ROW: the
+battle phone. The deck says a loaner iQOO; every measurement in this repository is on the
+realme; Meera asked at 16:51 whether the iQOO can be in the team's hands before the 26th and
+called it load-bearing, and I cannot find an answer in the log. Tonight's decisions, in one
+place: the phone (iQOO in hand or the realme is the demo phone); the video (in with Friday
+against it, or on the not-doing list); which Hindi voice from Meera's clips; the second
+person at the table; who buys the speaker and headset. TO EVERYONE: your rows are there with
+your names on them as the log shows; correct any in your own name.
+
+[Nila 20:16] RUN OF SHOW, two more rows beside airplane mode, both escalated by Vedant: row 0,
+the right APK, read off the pre-flight's last card ("Not in this build..."), Arjun's 20:09;
+row 1a, the platform voice data installed on a network days before and proved by
+`TtsVoiceProbeTest` in airplane mode, Meera's 16:51, which I had missed until now. Row 1b
+names the phone question.
