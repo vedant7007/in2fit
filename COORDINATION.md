@@ -2857,3 +2857,54 @@ Tuesday afternoon's first rehearsal on the realme, Vedant standing through Beat 
 himself, is a countdown row in its own right. (4) The deck is held for ONE final pass after
 Rao's safety fix is green and the first-tap AdviseOnMeal figure exists on the device; one edit
 by Vedant, one re-read by me, then frozen.
+[Priya 20:31] SPEC 4.3 IS AUTHORED, ruled top of my list by Vedant: `data-authoring/candidates.csv`,
+every food and recipe in the database exactly once (157; the importer refuses a missing or
+duplicated key), with the life contexts it is AVAILABLE in from the spec 4.2 table, the name a
+suggestion shows ("Boiled egg", not "Egg, whole, raw") and, where the class unit is wrong for a
+helping, what a helping weighs (roasted peanuts 30 g, a glass of milk 200). THE RULE, at the top
+of the file and in `0030`: a key with no context is an INGREDIENT; the engine never ranks it and
+the model never names it. Raw grains and pulses never have a context. 105 of 157 may be
+suggested somewhere: hostel 58, field 54, PG 91, home 105. In the DB as table `candidates`,
+seven importer assertions. RAO, THE ONE LINE: `data/food/CandidateCatalogue.load(foods, ::allowed)`
+returns the engine's `CandidateFood`s with contexts, names and servings from the table, applying
+your diet predicate to a food and to every ingredient of a recipe exactly as your `candidates()`
+does today; the body of `RoomUserContextSource.candidates()` becomes that call and your
+`USUAL_UNIT` map moves out (it is in the catalogue, `internal`). Compiled and tested standalone
+(`CandidateCatalogueTest`, 7 tests) against the shipped DB; the demo run already uses it, so the
+beat 3 and beat 4 rows of `docs/demo/demo-sentences-as-the-app-computes-them.md` are what the
+engine gives WITH the list: beat 3 top is now cooked chana dal, palakura pappu, thotakura pappu, chana masala, dal tadka
+(a slice of bread, not a katori of it: US white bread is iron-enriched, and that is in the
+shipped disclosure now beside milk's vitamin D); beat 4 is still water, boiled egg, fried egg,
+because every zero-carb item ties at zero and every real food is negative, the carbohydrate
+term being ten times the fibre term per serving. YOUR `RankingDefectsTest` GREW A FOURTH TEST,
+green today: "positive scores only" under the additive scoring leaves beat 4 EMPTY, so the fix
+is a per-nutrient rank or normalisation within the candidate set; with a percentile per
+nutrient the hostel list gives fresh coconut, cooked moong dal, carrot, beetroot, chicken curry.
+NILA: until that lands, beat 4 reads the trigger sentence aloud and not the candidates.
+[Priya 20:31] THE NEGATION COUNTERWEIGHT, ruled with the quantity rule: a negation near the
+food blocks the LOG regardless, from the words (`LogPrefilter.NEGATIONS`: no, not, never,
+nothing, skipped, didn't/don't stems, nahi/nahin/nai/mat/bina, नहीं/नही/बिना/छोड़, ledu/kaadu/
+tinaledu, లేదు/కాదు/తినలేదు) and from the model (`IntentRouter.accept` refuses a LOG on a
+denied food; `decide` takes LOG out of what the model may say). The one exception is a
+correction of the count, which the demo's #4 IS ("two rotis no, three rotis and dal", "दो रोटी
+नहीं, तीन रोटी और दाल"): a negation followed directly by a quantity does not block. Tested on
+eleven denials and the three corrections; the roman forms are on the reviewer's sheet with the
+same question as the log words, the other way round.
+[Priya 20:31] TO VEDANT, DIRECTLY, per your ruling: `data-authoring/devanagari-words-for-vedant.md`
+is every Devanagari word and phrase I put into the routing lists tonight (142 rows: markers,
+log words, quantity words, negations, the router's history/plate/recommend phrases, the clinical
+words, the nutrient words the retriever reads as English, and the idli/sambar/egg aliases),
+each with what I meant it to mean and a column for you. The list it sits in says what a wrong
+entry costs; the dangerous direction is LOG_WORDS and QUANTITY_WORDS. Five minutes, no reviewer.
+[Priya 20:31] TO JACOB, ruled: change the English column of #5 in `demo-utterance-set.csv` to
+"One plate of rice, dal and a katori of curd." so both columns produce the same figures (a bowl
+is 200 g in the unit table, a katori 150). The sentence changes, not the unit table.
+TO NILA, ruled: until Jacob's change lands, the run of show quotes ONE column's number for #5
+(the Hindi column's: curd 150 g, energy 589.4 kcal, protein 25.1 g); after it, the columns agree.
+The rest of the table stands as landed at 18:44, except beats 3 and 4 whose "top" rows now
+carry the spec 4.3 list (above).
+[Priya 20:31] TO RAO, FOR YOUR NEXT WINDOW, per Vedant: RECOMMEND's 88-token budget and the
+halved system blocks are desktop numbers until you run them. On the demo-condition run, please
+report for one RECOMMEND turn and one ANSWER turn: prompt tokens, generation tokens, and the
+text, so the budget is a phone number by tonight. If the RECOMMEND text is still a bare food
+name at 88, the number is wrong, not the ruling; say so and I move it.
