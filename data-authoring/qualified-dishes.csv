@@ -10,7 +10,7 @@
 # ingredient's name collapses onto that ingredient through the matcher's containment stage, and
 # the oil, the other ingredients and the dish's own figures are silently dropped. "fried rice"
 # resolved to plain cooked rice. This file is every such name the sweep tried, with what each
-# must do. docs/decisions/0028.
+# must do. docs/decisions/0034.
 #
 # AUTHORED, by one hand, from the dishes a demo speaker plausibly names: the utterance set's
 # dishes, Jacob's code-mix list, and the common canteen and home plates. It is the regression

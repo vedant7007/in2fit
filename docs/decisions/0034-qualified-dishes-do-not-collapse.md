@@ -1,4 +1,4 @@
-# 0028. A qualified dish name does not collapse onto the ingredient it contains
+# 0034. A qualified dish name does not collapse onto the ingredient it contains
 
 Date: 20 September 2026. Status: accepted for the data and the guard. Ruled by Vedant: the
 "fried rice" finding of `0026` is a bug class, not an instance, and is swept rather than noted.

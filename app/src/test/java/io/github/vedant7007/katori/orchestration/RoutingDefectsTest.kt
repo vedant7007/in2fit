@@ -11,7 +11,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * TARGET FOR THE INTEGRATOR, FAILING BY DESIGN until the wiring lands: the router of `0027`.
+ * TARGET FOR THE INTEGRATOR, FAILING BY DESIGN until the wiring lands: the router of `0033`.
  *
  * On the phone the classifier sent three questions to LOG, and a LOG writes a meal into the
  * diary; in the demo, beat 2 corrupts beat 1. `IntentRouter` makes the words decide where they

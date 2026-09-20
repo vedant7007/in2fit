@@ -1,0 +1,115 @@
+# The US-record sweep, 20 September 2026: every shipped USDA record, read for a value that
+# depends on US fortification, enrichment or processing that Indian production does not have,
+# in the eight nutrients we ship (energy, protein, carbohydrate, fat, fibre, iron, B12, sodium).
+#
+# Found by the demo run: a "katori" of white bread topped the iron list, and the iron was US
+# enrichment. Ruled by Vedant: go through every record; correct it, disclose it beside the
+# figure, or mark it no-data, and report the count. If a judge asks "why does your app think
+# Indian bread has American iron in it", the answer is "it does not; here is the list of records
+# we checked and what we did about each".
+#
+# THE RULE: every food in ingredients.csv is in this file exactly once (the importer refuses
+# otherwise), so a record added later is swept or the build fails.
+#
+# action    KEEP      nothing US-specific among the eight, or the unenriched record was chosen
+#           SWAPPED   the fdc_id in ingredients.csv was changed to an honest record
+#           UNSHIP    the named nutrients are NOT shipped for this food (they read Unknown, a
+#                     named floor, never a number), and the disclosure shows beside its figures
+#           DISCLOSE  the figures ship, with the disclosure beside them
+#           RECIPE    the record is replaced by an authored recipe (the row stays for the record)
+# unship    '|'-separated nutrient names, for UNSHIP
+# disclosure  the sentence shown beside the figure, for UNSHIP and DISCLOSE
+key,us_specific,action,unship,disclosure,note
+bread_white,"Enriched flour: iron 3.61 mg per 100 g is US enrichment (unenriched all-purpose flour, 169761, is 1.17; the enriched flour, 168894, is 4.64). No unenriched white bread record exists; Indian bread is not enriched.",UNSHIP,IRON,No iron figure: the US record's iron is enrichment Indian bread does not have.,"Iron reads Unknown for white bread and for the three sandwich recipes made from it; a floor, named, not a wrong number. The alternative, a recipe from unenriched flour, cannot be an ingredient of other recipes."
+curd,"The record was low-fat yogurt with added milk solids (170886): protein 5.25, fat 1.55 per 100 g. Home-set curd is whole-milk yogurt, 171284: protein 3.47, fat 3.25.",SWAPPED,,,Swapped to 171284 on 20 Sep; the demo's katori of curd lost 2.7 g of protein it never had.
+milk_whole,"The record was the vitamin-D fortified twin (171265). The unfortified record, 172217, ships the same eight figures; the description is now honest without a disclosure.",SWAPPED,,,"3.25% fat is toned milk; Indian full-cream is 6%. A product note, not a fortification one."
+cheese_processed,"US pasteurized process American cheese: emulsifying salts, sodium 1671 mg per 100 g. Indian processed cheese (the cube and the slice) is the same kind of product with comparable salt.",DISCLOSE,,US processed cheese; the Indian cube is the same kind of product.,
+buttermilk,"US cultured buttermilk is undiluted fermented milk, 62 kcal per 100 g. Indian chaas / majjiga is curd thinned with two to three parts water and salt, about a third of that.",RECIPE,,,"Replaced by the chaas recipe: curd 60 g, water 139 g, salt 1 g per 200 ml glass. The USDA record is no longer shipped."
+apple,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
+ash_gourd,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+atta,Whole-grain flour is not enriched in the US; iron 3.6 is the grain's own.,KEEP,,,Confirmed on the 20 Sep sweep.
+banana,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
+bay_leaf,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+beetroot,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+besan,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
+biscuit_marie,Record 171867 carries iron 0.0 and B12 0.19: no enrichment in it. Sodium 370.,KEEP,,,Checked 20 Sep.
+bitter_gourd,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+black_pepper,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+bottle_gourd,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+bread_brown,"Commercial US whole-wheat loaf. Whole-wheat flour is not enriched; iron 2.47 is about 70% of whole-grain flour's 3.6, which is the flour share of a loaf. Sodium 455 matches an Indian brown loaf.",KEEP,,,Checked 20 Sep.
+brinjal,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+butter,"Fat; nothing among the eight is added in the US. (India mandates vitamin A and D in packaged oils, the reverse case; neither is shipped.)",KEEP,,,Checked 20 Sep.
+cabbage,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+cardamom,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+carrot,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+cashew,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+cauliflower,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+chana_dal,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+chana_dal_cooked,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+chicken,"Chosen the plain record (171077), not 171509 which has an added sodium solution.",KEEP,,,Confirmed on the 20 Sep sweep.
+cinnamon,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+cloves,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+coconut_dried,Chosen the UNSWEETENED desiccated record (170170); the default US record is sweetened.,KEEP,,,Confirmed on the 20 Sep sweep.
+coconut_fresh,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+coffee_brewed,Brewed with tap water; nothing added.,KEEP,,,Checked 20 Sep.
+colocasia,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+coriander_leaves,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+coriander_seed,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+cowpea,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+cumin,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+drumstick_leaves,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+drumstick_pod,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+egg,Raw animal food; no US additive in the record.,KEEP,,,Checked 20 Sep.
+fenugreek_seed,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+fish_carp,Raw animal food; no US additive in the record.,KEEP,,,Checked 20 Sep.
+french_beans,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+garlic,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+ghee,"Fat; nothing among the eight is added in the US. (India mandates vitamin A and D in packaged oils, the reverse case; neither is shipped.)",KEEP,,,Checked 20 Sep. Ghee's label-derived record is already banded WEAK_SOURCE_RECORD.
+ginger,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+goat_meat,Raw animal food; no US additive in the record.,KEEP,,,Checked 20 Sep.
+gongura,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+green_chilli,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+green_peas,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+groundnut_oil,"Fat; nothing among the eight is added in the US. (India mandates vitamin A and D in packaged oils, the reverse case; neither is shipped.)",KEEP,,,Checked 20 Sep.
+jowar,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
+juice_generic,"Same record as orange juice, raw.",KEEP,,,Confirmed on the 20 Sep sweep.
+mango_juice,"Canned nectar: pulp, sugar, water, as the Indian tetra-pack mango drink is. Vitamin C may be added in the US; not shipped.",KEEP,,,Checked 20 Sep.
+masoor_dal,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+mint,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+moong_dal,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+moong_dal_cooked,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+mustard_oil,"Fat; nothing among the eight is added in the US. (India mandates vitamin A and D in packaged oils, the reverse case; neither is shipped.)",KEEP,,,Checked 20 Sep.
+mustard_seed,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+okra,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+onion,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+orange_juice,"Chosen RAW juice (169098); US retail orange juice is often calcium and vitamin-D fortified, neither shipped.",KEEP,,,Confirmed on the 20 Sep sweep.
+palakura,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+peanuts_raw,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+peanuts_roasted,Chosen dry-roasted WITHOUT salt (173806); the salted record would attribute US salting to a paper cone of peanuts.,KEEP,,,Confirmed on the 20 Sep sweep.
+poha,Derived from the UNENRICHED raw rice record (169756).,KEEP,,,Confirmed on the 20 Sep sweep.
+potato,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+prawn,Raw animal food; no US additive in the record.,KEEP,,,Checked 20 Sep.
+raw_banana,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+red_chilli_powder,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+rice_cooked,"Chosen UNENRICHED (169757); the enriched cooked rice, 168878, carries US iron and B vitamins.",KEEP,,,Confirmed on the 20 Sep sweep.
+rice_flour,Chosen UNENRICHED (169714).,KEEP,,,Confirmed on the 20 Sep sweep.
+rice_raw,"Chosen UNENRICHED (169756), not 168877 (enriched, iron 4.31).",KEEP,,,Confirmed on the 20 Sep sweep.
+ridge_gourd,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+salt,US table salt is iodised; so is Indian. Sodium is identical.,KEEP,,,Checked 20 Sep.
+sesame_oil,"Fat; nothing among the eight is added in the US. (India mandates vitamin A and D in packaged oils, the reverse case; neither is shipped.)",KEEP,,,Checked 20 Sep.
+sesame_seeds,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+sooji,Chosen UNENRICHED (168933); enriched semolina carries US iron.,KEEP,,,Confirmed on the 20 Sep sweep.
+sprouted_moong,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+sugar,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
+sunflower_oil,"Fat; nothing among the eight is added in the US. (India mandates vitamin A and D in packaged oils, the reverse case; neither is shipped.)",KEEP,,,Checked 20 Sep.
+tamarind,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
+tea_brewed,Brewed with tap water; nothing added.,KEEP,,,Checked 20 Sep.
+thotakura,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+tomato,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.
+toor_dal_cooked,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+toor_dal_raw,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+turmeric,"Whole or ground spice, or raw nut; nothing added.",KEEP,,,Checked 20 Sep.
+urad_dal,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+urad_dal_cooked,"Boiled without salt, or raw; nothing added.",KEEP,,,Checked 20 Sep.
+water,"US tap water, sodium 4 mg per 100 ml; a rounding matter.",KEEP,,,Checked 20 Sep.
+yam,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.

@@ -305,7 +305,7 @@ class SqliteFoodLookup(
 
     private fun toFoodMatch(hit: FoodTextMatching.Candidate): FoodMatch {
         val row = db.query(
-            "SELECT fdc_id, source, display_name, food_class, band_reason FROM foods WHERE food_key = ?",
+            "SELECT fdc_id, source, display_name, food_class, band_reason, disclosure FROM foods WHERE food_key = ?",
             listOf(hit.key),
         ).first()
 
@@ -322,6 +322,7 @@ class SqliteFoodLookup(
             foodClass = FoodClass.valueOf(row.str("food_class")),
             matchKind = kindOf(hit.strength),
             confidence = ConfidenceRules.of(reasons),
+            disclosure = row.strOrNull("disclosure"),
         )
     }
 

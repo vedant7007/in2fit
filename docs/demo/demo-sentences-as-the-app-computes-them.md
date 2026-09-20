@@ -61,6 +61,14 @@ standalone runner (`tools/jvm-tests-standalone.sh`); the table is also written t
   curd", which is what the presenter would say anyway.
 - **Two spoons of oil is 20 g** (a spoon is 10 g in the unit table), not the 10 g in the scripted
   feed. The scripted feed's figures are someone's memory; the ones below are the database's.
+- **The curd was American low-fat yogurt with added milk solids** (found by the US-record sweep
+  that the bread started, `data-authoring/us-record-sweep.csv`, 93 records, 5 acted on): protein
+  5.25 and fat 1.55 per 100 g where home-set curd is 3.47 and 3.25. #5's katori of curd lost
+  2.7 g of protein it never had; the row below is the whole-milk record. The milk record is now
+  the unfortified twin (same figures). White bread ships no iron figure (its US iron is
+  enrichment) and says so beside its figures; buttermilk is the chaas recipe (curd thinned with
+  water), a third of the US cultured record's energy. If a judge asks why the app thinks Indian
+  bread has American iron in it: it does not, and the sweep file is the list of what was checked.
 - **Beat 3 and beat 4 rankings.** Ranked by iron per 100 g over the whole database the top
   candidates for anaemia were cumin, turmeric and bay leaf; per serving (`02417a9`), raw cowpea,
   raw urad and raw masoor. Ruled: raw grains and pulses are ingredients, not candidates. Spec

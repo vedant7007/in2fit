@@ -6,7 +6,7 @@ import io.github.vedant7007.katori.data.food.FoodTextMatching
  * Routes an utterance to LOG, ANSWER, SUGGEST or RECOMMEND deterministically where the words
  * decide it, and to the model only where they do not.
  *
- * WHY THE MODEL IS SECOND, ruled by Vedant on 20 September (`0027`). The classifier prompt
+ * WHY THE MODEL IS SECOND, ruled by Vedant on 20 September (`0033`). The classifier prompt
  * scored 23 of 53 on the phone, and three of its misroutes sent a QUESTION to LOG, which writes
  * a meal the person never ate into their diary: in the demo, beat 2 corrupts beat 1. Four
  * intents in a food-logging app is a decision, and the design claim of this product is that the

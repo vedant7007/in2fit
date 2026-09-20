@@ -148,3 +148,32 @@ ghee, the drumstick and gourd records, ridge gourd, and tamarind.
 Do not imply USDA endorses the app. Their documentation states that reference to a product
 or method by name "does not imply recommendation, endorsement, or approval by, or an
 association with, the U.S. Department of Agriculture".
+
+## Addendum, 20 September 2026: the sweep, and four corrections to rule 4's table
+
+Rule 4 was applied by hand when the table above was written, and it missed four records. The
+demo-sentence run found the first: a "katori" of white bread topped the iron list for anaemia,
+and the iron was US enrichment. Ruled by Vedant: go through every shipped record for a value
+that depends on US fortification, enrichment or processing that Indian production does not
+have; correct it, disclose it beside the figure, or mark it no-data; report the count.
+
+The sweep is `data-authoring/us-record-sweep.csv`: **93 records read, 5 acted on, 88 kept**,
+one row per record with the finding and the action, and the importer refuses a shipped record
+that is not in it, so a record added later is swept or the build fails. The corrections, dated,
+replacing the rows above:
+
+| Food | Was | Now | Why |
+| --- | --- | --- | --- |
+| Yogurt, plain | 170886, low fat | **171284, whole milk** | 170886 is low-fat yogurt with added milk solids (protein 5.25, fat 1.55 per 100 g); home-set curd is 3.47 and 3.25. The demo's katori of curd carried 2.7 g of protein it never had. |
+| Milk, whole | 171265, with added vitamin D | **172217, without added A and D** | Same eight figures; the record no longer needs a disclosure. 3.25% fat is toned milk. |
+| Bread, white | 174924, iron shipped | 174924, **iron NOT shipped**, disclosed | Enriched flour: 3.61 mg against 1.17 in unenriched flour. No unenriched white bread record exists. Iron reads Unknown for it and for the three sandwich recipes made from it: a named floor, never a number. |
+| Milk, buttermilk, whole | 172225 | **the `chaas` recipe**: curd 60 g, water 139 g, salt 1 g per glass | US cultured buttermilk is undiluted fermented milk at 62 kcal per 100 g; chaas is a third of that. |
+| Cheese, processed | 171290 | 171290, **disclosed** | US process American cheese; the Indian cube is the same kind of product. |
+
+Confirmed on the same sweep as deliberate unenriched or unsweetened choices: rice raw and
+cooked, poha, rice flour, sooji, atta, dried coconut, dry-roasted unsalted peanuts, plain
+chicken breast, raw orange juice. Everything else among the eight shipped nutrients is raw
+produce, meat, pulses, spices or fat with nothing added.
+
+`foods.disclosure` carries the sentence for the screen; `FoodMatch.disclosure` carries it to
+the resolver. The shipped `meta.disclosure` says what the sweep did in one sentence.

@@ -114,7 +114,40 @@ def main():
     recipes = load_authored("recipes.csv")
     recipe_ings_raw = load_authored("recipe-ingredients.csv")
     candidates = load_authored("candidates.csv")
-    log(f"authored: {len(ingredients)} ingredients, {len(nodata)} no-data items, {len(units)} unit rows, {len(candidates)} candidate rows")
+    sweep = load_authored("us-record-sweep.csv")
+    log(f"authored: {len(ingredients)} ingredients, {len(nodata)} no-data items, {len(units)} unit rows, {len(candidates)} candidate rows, {len(sweep)} swept records")
+
+    # ---- the US-record sweep (20 Sep): what each shipped record carries that India does not ----
+    # Every ingredient is swept exactly once or the build fails; an UNSHIP row drops the named
+    # nutrients so they read Unknown (a named floor), and a disclosure travels with the food.
+    SWEEP_ACTIONS = {"KEEP", "SWAPPED", "UNSHIP", "DISCLOSE", "RECIPE"}
+    sweep_by_key = {}
+    sweep_fail = []
+    for r in sweep:
+        k = r["key"].strip()
+        if k in sweep_by_key:
+            sweep_fail.append(f"{k} swept twice")
+        sweep_by_key[k] = r
+        if r["action"] not in SWEEP_ACTIONS:
+            sweep_fail.append(f"{k}: unknown action {r['action']!r}")
+        if not r["us_specific"].strip():
+            sweep_fail.append(f"{k}: no finding recorded")
+        if r["action"] in ("UNSHIP", "DISCLOSE") and not r["disclosure"].strip():
+            sweep_fail.append(f"{k}: {r['action']} without a disclosure to show")
+        if r["action"] == "UNSHIP" and not r["unship"].strip():
+            sweep_fail.append(f"{k}: UNSHIP names no nutrient")
+        for nk in [x.strip() for x in r["unship"].split("|") if x.strip()]:
+            if nk not in WANTED:
+                sweep_fail.append(f"{k}: unship names {nk}, not a shipped nutrient")
+    ingredient_keys = {r["key"] for r in ingredients}
+    unswept = ingredient_keys - set(sweep_by_key)
+    if unswept:
+        sweep_fail.append(f"shipped records never swept for US fortification: {sorted(unswept)}")
+    for k, r in sweep_by_key.items():
+        if k not in ingredient_keys and r["action"] != "RECIPE":
+            sweep_fail.append(f"{k} is swept but is not a shipped record")
+    unshipped = {k: {x.strip() for x in r["unship"].split("|") if x.strip()} for k, r in sweep_by_key.items() if r["action"] == "UNSHIP"}
+    disclosure_of = {k: r["disclosure"].strip() for k, r in sweep_by_key.items() if r["disclosure"].strip()}
 
     wanted_ids = {int(r["fdc_id"]) for r in ingredients}
 
@@ -219,7 +252,9 @@ def main():
         usda_description TEXT NOT NULL,
         food_class TEXT NOT NULL,
         band_reason TEXT,
-        note TEXT
+        note TEXT,
+        -- shown beside the figures: what this US record carries that Indian production does not
+        disclosure TEXT
     );
     CREATE TABLE food_nutrients (
         food_key TEXT NOT NULL,
@@ -312,10 +347,12 @@ def main():
         key = r["key"]
         id_to_key[fid] = key
         src = sr_food.get(fid) or ff_food.get(fid)
-        c.execute("INSERT INTO foods VALUES (?,?,?,?,?,?,?,?)", (
+        c.execute("INSERT INTO foods VALUES (?,?,?,?,?,?,?,?,?)", (
             key, fid, r["source"], r["display_name"], src["description"],
-            r["food_class"], r["band_reason"] or None, r["note"] or None))
+            r["food_class"], r["band_reason"] or None, r["note"] or None, disclosure_of.get(key)))
         for nk, (state, amount) in nutrients.get(fid, {}).items():
+            if nk in unshipped.get(key, ()):
+                continue  # US enrichment: reads Unknown, a named floor, never a number
             c.execute("INSERT INTO food_nutrients VALUES (?,?,?,?,?)",
                       (key, nk, state, amount, WANTED[nk]["unit"]))
         seen = set()
@@ -434,9 +471,11 @@ def main():
                         "FoodData Central. fdc.nal.usda.gov"),
         "licence": "USDA FoodData Central data are in the public domain, published under CC0 1.0 Universal.",
         "disclosure": ("Values are based on foods sampled in the United States and may differ from "
-                       "Indian-grown produce and Indian preparation. US milk is vitamin-D fortified "
-                       "and US bread flour is iron-enriched; Indian milk and bread are not, so those "
-                       "two figures read high. They are estimates, not measurements of your own food."),
+                       "Indian-grown produce and Indian preparation. Every record was read for a "
+                       "nutrient that US fortification or processing adds and Indian production does "
+                       "not: the unenriched or unfortified record is used where one exists, and "
+                       "where none does (white bread's enriched-flour iron) the figure is not shown. "
+                       "They are estimates, not measurements of your own food."),
     }.items():
         c.execute("INSERT INTO meta VALUES (?,?)", (k, v))
 
@@ -661,6 +700,7 @@ def main():
         "DRY_FRY":       (58, 88),   # vepudu: a vegetable dish cooked down but not dried out
         "CHUTNEY":       (38, 88),   # ranges from coconut to a thin tomato pachadi
         "THIN_SOUP":     (80, 95),   # rasam
+        "THIN_DRINK":    (90, 98),   # chaas: curd thinned with two parts water; almost all water
         "EGG":           (60, 85),
         "RAW_SALAD":     (78, 95),
     }
@@ -695,6 +735,18 @@ def main():
                         "The yield is the number to check first:\n  " + "\n  ".join(off))
     else:
         log(f"RECIPE ok: implied moisture is plausible for all {len(rows)} recipes")
+
+    # ---- the sweep's own assertions -------------------------------------------------------
+    if sweep_fail:
+        failures.append("SWEEP: " + "; ".join(sweep_fail))
+    else:
+        for k, nks in unshipped.items():
+            for nk in nks:
+                if c.execute("SELECT 1 FROM food_nutrients WHERE food_key=? AND nutrient=?", (k, nk)).fetchone():
+                    failures.append(f"SWEEP: {k}.{nk} was to be unshipped and is in the table")
+        acted = sum(1 for r in sweep if r["action"] != "KEEP")
+        log(f"SWEEP ok: {len(sweep)} US records read for fortification and processing; {acted} acted on, "
+            f"{len(unshipped)} with a nutrient unshipped, {len(disclosure_of)} with a disclosure beside the figure")
 
     # ---- candidates (spec 4.3) -----------------------------------------------------------
     # Every food and recipe is listed exactly once, with or without contexts, so the sweep is

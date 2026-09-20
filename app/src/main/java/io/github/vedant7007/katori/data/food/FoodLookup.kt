@@ -92,6 +92,13 @@ data class FoodMatch(
     val foodClass: FoodClass,
     val matchKind: MatchKind,
     val confidence: Confidence,
+    /**
+     * What this US record carries that Indian production does not, in one sentence for the
+     * screen beside the figures; null for the records the sweep found clean
+     * (`data-authoring/us-record-sweep.csv`). White bread: its iron is enrichment, so no iron
+     * figure is shown for it.
+     */
+    val disclosure: String? = null,
 )
 
 enum class MatchKind { EXACT, FUZZY, CATEGORY }

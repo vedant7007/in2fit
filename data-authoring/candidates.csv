@@ -22,15 +22,15 @@ key,suggest_as,serving_g,contexts,note
 egg,Boiled egg,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Spec 4.2's own hostel example. One egg is the 50 g piece; the canteen boils them.
 curd,Curd,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,Spec 4.2's own PG example: add curd to lunch for protein. Sold everywhere; a katori.
 milk_whole,Milk,200,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass, 200 ml, not the dairy katori. Every mess and shop."
-buttermilk,Buttermilk,200,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass. Cheap, sold at stalls, holds a morning without a fridge."
+chaas,Chaas (buttermilk),,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass. Cheap, sold at stalls, holds a morning without a fridge. The recipe, since the US-record sweep: curd thinned with water."
 cheese_processed,Processed cheese,20,DESK_PROFESSIONAL|HOMEMAKER,A slice. Fridge and a moderate budget; not a canteen or tiffin food.
 banana,Banana,100,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,One banana; the cheapest fruit at every canteen and stall.
 apple,Apple,150,PG_OWN_COOKING|DESK_PROFESSIONAL|HOMEMAKER,One apple. Moderate price; not a canteen fruit.
 peanuts_roasted,Roasted peanuts,30,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A handful, 30 g, not the spice-class teaspoon. Sold in paper cones at every corner."
 sprouted_moong,,,,"Classed PULSE_RAW, so the rule keeps it out; the sprouts salad recipe is the candidate, with the dressing that makes it a helping."
-tea_brewed,Black tea,150,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,A cup without milk; the with-milk version is the chai recipe.
-coffee_brewed,Black coffee,150,DESK_PROFESSIONAL|HOMEMAKER,A cup without milk. Brewed coffee is a home or office thing; the canteen serves it with milk (coffee_milk).
-water,Water,200,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,"A glass. Named so the engine can suggest it when nothing else fits, never as an answer to a nutrient question."
+tea_brewed,,,,"Black tea has nothing of the eight nutrients, so under any 'lower' preference it scores as the best food there is. Not a suggestion; the chai recipe is the cup people drink."
+coffee_brewed,,,,"Same as black tea: nothing of the eight, so it wins every 'lower' preference. Not a suggestion; coffee_milk is the cup."
+water,,,,"""You should drink more water"" as our answer to an iron question ends the pitch more efficiently than a crash would (Vedant, 20 Sep). Water scores as the best food under any 'lower' preference because it has nothing of anything; it is not a suggestion."
 orange_juice,Orange juice,200,DESK_PROFESSIONAL|HOMEMAKER,A glass. Packaged juice is a moderate-budget item.
 mango_juice,Mango juice,200,DESK_PROFESSIONAL|HOMEMAKER,A glass. Packaged; moderate budget.
 rice_cooked,Cooked rice,,HOSTEL_STUDENT|PG_OWN_COOKING|FIELD_OR_MANUAL_WORKER|DESK_PROFESSIONAL|HOMEMAKER,A katori of plain rice; on every plate in every context.

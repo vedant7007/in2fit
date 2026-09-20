@@ -1,4 +1,4 @@
-# 0027. The words decide the intent; the model is consulted only when they cannot
+# 0033. The words decide the intent; the model is consulted only when they cannot
 
 Date: 20 September 2026. Status: accepted, ruled by Vedant. Supersedes the "one short prompt"
 design of `0020` as the primary router; the prompt stays as the fallback.
