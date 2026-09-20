@@ -3013,3 +3013,33 @@ Your 16:50 device numbers (en 244-596 ms/clip mean 339 ms, WER 25.0 %; te 1,279 
 WER 8.3 %) are in 0021 as the first device figures, credited to your run.
 
 [Jacob 21:00] Landed 7a6e49d: PushToTalk with the measured 300 ms release tail, test c self-sufficient, 0022->0031 and 0028->0032. Noticed while renaming, not mine: `docs/decisions/` still holds TWO 0028 files (digits-glued-to-letters, qualified-dishes); whoever owns the later one, the claim rule at 15:05 applies.
+[Ira 20:46] PHASE 1 LANDED, NOTHING BUILT: `docs/design/ui-research.md`. What ships on Android in
+2026 (M3's numbers, M3 Expressive's spring tokens read from androidx source, Linear, Gemini Live,
+ChatGPT voice, Cronometer, MyFitnessPal's 2025 redesign), voice-first patterns (WhatsApp's
+hold-to-record as the gesture India already has), food logging, India (mixed script, string
+width, one-handed reach, the LCD in a bright hall), motion (Android 15 ARR, springs vs durations,
+Compose draw-phase reads), typography for numbers, and the fourteen screenshots critiqued one by
+one with dp, sp and the line of code that drew them. Vedant reads it before Phase 2 starts.
+THE FACT THAT OUTRANKS TASTE, computed: `#E5522D` on `#ECEBE6` is 3.15:1 and white on `#E5522D`
+is 3.77:1, both below AA for body text; the accent carries marks and text at 24 sp or larger,
+never a filled button with a 14 sp label. `#252F26` on cream is 11.63:1. THE DECK on disk (14:07)
+is set in IBM Plex Sans; recommendation is to bundle Plex Sans + Plex Sans Devanagari as assets
+(Telugu on the system's Noto), rendered against Hind + Hind Guntur on the emulator before the
+type file is committed. Details, the five product-specific ideas and the asks are in §8.
+TO ARJUN: the split at 20:20/20:23 is AGREED as written. I take no screen file yet; `ui/theme/`
+and `ui/components/` are mine from now. Six asks in §8.5, all fields or state, none changes what
+a screen does: figure parts beside the rendered line (name, formatted number, unit, band),
+`level` and `elapsedSeconds` as their own state so the meter reads in the draw phase, the
+transcript kept on screen for the whole turn (0026 step 3; `beat2-turn-in-progress.png` shows it
+scrolled away), stable keys on the entries, and, low priority, the ASR confidence on `Said`.
+Your `PreflightScreen.kt` stays plain: it takes the theme through `MaterialTheme` and nothing else.
+TO RAO, via Arjun's yes only: `ContextText.figureParts()` and `AsrConfidence` on `Transcribed`.
+And one row when the Talk screen lands: `dumpsys gfxinfo` framestats over one LOG turn on the
+phone, before and after, so "animation does not compete with the model" is a number.
+TO NILA: five keys when I build, all English by the freeze rule: `scan_below_range`,
+`scan_above_range`, `talk_offline_mark`, `plate_unit_taken_as`, and a contentDescription for the
+wordmark; and two OFL font families in `res/font/` with their licence texts in `docs/licences/`
+and a row in 0005, when Vedant says which face. Worktree `<main tree>-ira`, branch `ira`.
+TO VEDANT, five decisions in §8.5: the typeface, the accent rule, light-only for the battle,
+the pre-flight screen (theme only this week), and the order to cut the five ideas in if
+Thursday comes early.
