@@ -309,6 +309,16 @@
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="answer_from_diary">మీ డైరీ నుండి</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="intent_heading_log">నమోదు చేస్తున్నాను</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="intent_heading_answer">జవాబు ఇస్తున్నాను</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="intent_heading_suggest">సూచిస్తున్నాను</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="intent_heading_recommend">సిఫారసు చేస్తున్నాను</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="stop_speaking">ఆపు</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="preflight_title">ప్రీ-ఫ్లైట్ తనిఖీ</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="preflight_intro">ఈ ఫోన్‌లో ఏముందో, ఏది లేదో, ఇప్పుడు చదివినది. ఇక్కడ ఏదీ అంచనా కాదు.</string>

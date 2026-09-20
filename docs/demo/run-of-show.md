@@ -108,8 +108,15 @@ asked, P reads the stage aloud: "It's matching the foods against the database no
 **When the plate lands, P says:**
 
 > "Two rotis, a katori of dal, two spoons of oil. The numbers come from the USDA tables, looked up
-> by code, not written by the model. The word beside each figure is how far to trust it: the
-> katori is my bowl, so it says approximate until I tell it my bowl's size."
+> by code, not written by the model. The word beside each figure is how far to trust it: a katori
+> here is a standard 150-gram bowl, not mine, so it says approximate, and that figure is the one
+> a person corrects."
+
+*(Ruled 18:40, Rao: the demo profile is PRE-SEEDED with the bundled utensil defaults from
+`household-units.csv`, katori 150 g for cooked pulses, grains and dairy, 100 g for a sabzi, plate
+200 g of rice, glass 200 ml, a spoon of oil 10 g, one roti 45 g from its recipe. "One katori,
+your size" is on screen as a figure carrying `HOUSEHOLD_UNIT_DEFAULT`. Calibrating a utensil is
+descoped for the battle; P does not offer to.)*
 
 ### Beat 2. Ask about your own history. *(budget 25 s; measured turn 30.7 s at STANDARD length, SHORT not yet measured)*
 
@@ -120,7 +127,10 @@ asked, P reads the stage aloud: "It's matching the foods against the database no
 
 **Screen:** meter, transcript, "Working out what you meant", the lead-in ("Let me check your
 records."), then "Checking your records", "Looking up facts", "Writing the reply" with the
-counter; then the answer, one sentence, on screen BEFORE it is spoken; then spoken.
+counter; then the answer, one sentence, on screen BEFORE it is spoken; then spoken. **The answer
+is in English, on screen and aloud, whatever language P spoke in** (Meera, 18:07, traced end to
+end; `values-hi` is empty by design and the model replies in English regardless). P does not
+claim otherwise; if asked, "it answers in English in this build."
 
 **The wait:** the first measured conversational turn was 30.7 s at the old answer length
 (`0025`, `logs/hw-report-conversational.txt`); one-sentence answers are now the default, which by
@@ -133,6 +143,10 @@ was just logged answering from the plate on screen, and P says so.
 > "That is my own record answering, not an article. The protein figure in that sentence is the one
 > the database produced; the model is not allowed to state a number it was not handed, and there
 > is a test for that."
+
+*(The test is a JVM test. Whether the guard holds on the phone in the demo's own ANSWER turns is
+Rao's ten-sentence device run, read by a person; until then this line claims the test, not the
+device. Audit, 18:45.)*
 
 *Alternate, only if a week of history was seeded:* **मैंने पिछले मंगलवार को क्या खाया?** ("What did I
 eat last Tuesday?")

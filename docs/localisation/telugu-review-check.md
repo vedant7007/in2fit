@@ -98,18 +98,18 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The Talk screen, where the person speaks or types
 
-13. `talk_elapsed_seconds`
-
-   English: %1$d s
-
-   Telugu: %1$d సె
-
-
-14. `talk_hint`
+13. `talk_hint`
 
    English: Say what you ate, or ask a question.
 
    Telugu: మీరు ఏమి తిన్నారో చెప్పండి, లేదా ఒక ప్రశ్న అడగండి.
+
+
+14. `talk_elapsed_seconds`
+
+   English: %1$d s
+
+   Telugu: %1$d సె
 
 
 15. `mic_speak`
@@ -314,25 +314,25 @@ Machine-generated lines received via Nila; every line below is marked for review
    Telugu: మీరు పరిశీలించవచ్చు
 
 
-43. `answer_refused`
+43. `answer_title`
+
+   English: Answer
+
+   Telugu: జవాబు
+
+
+44. `answer_refused`
 
    English: I can\'t put a number or a judgement on that. Here is what your diary shows.
 
    Telugu: దానిపై నేను ఒక సంఖ్య గానీ తీర్పు గానీ చెప్పలేను. మీ డైరీ చూపిస్తున్నది ఇదిగో.
 
 
-44. `answer_from_diary`
+45. `answer_from_diary`
 
    English: From your diary
 
    Telugu: మీ డైరీ నుండి
-
-
-45. `answer_title`
-
-   English: Answer
-
-   Telugu: జవాబు
 
 
 ## When the app is not sure what the person meant
@@ -344,28 +344,56 @@ Machine-generated lines received via Nila; every line below is marked for review
    Telugu: అది మీరు తిన్న భోజనమా, ఒక ప్రశ్నా, ఇప్పుడు తినబోయే ప్లేటా, లేదా ఏమి తినాలో అడుగుతున్నారా?
 
 
-47. `intent_log`
+47. `intent_heading_log`
+
+   English: Logging
+
+   Telugu: నమోదు చేస్తున్నాను
+
+
+48. `intent_heading_answer`
+
+   English: Answering
+
+   Telugu: జవాబు ఇస్తున్నాను
+
+
+49. `intent_heading_suggest`
+
+   English: Suggesting
+
+   Telugu: సూచిస్తున్నాను
+
+
+50. `intent_heading_recommend`
+
+   English: Recommending
+
+   Telugu: సిఫారసు చేస్తున్నాను
+
+
+51. `intent_log`
 
    English: I ate this
 
    Telugu: నేను ఇది తిన్నాను
 
 
-48. `intent_answer`
+52. `intent_answer`
 
    English: A question
 
    Telugu: ఒక ప్రశ్న
 
 
-49. `intent_suggest`
+53. `intent_suggest`
 
    English: About to eat this
 
    Telugu: ఇది తినబోతున్నాను
 
 
-50. `intent_recommend`
+54. `intent_recommend`
 
    English: What should I eat
 
@@ -374,14 +402,14 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## When the plate could not be understood
 
-51. `confirm_title`
+55. `confirm_title`
 
    English: Not logged yet
 
    Telugu: ఇంకా నమోదు కాలేదు
 
 
-52. `confirm_hint`
+56. `confirm_hint`
 
    English: Say it differently, or type it.
 
@@ -390,84 +418,84 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## When something cannot be done
 
-53. `unavailable_model_not_loaded`
+57. `unavailable_model_not_loaded`
 
    English: The model is not loaded on this phone yet.
 
    Telugu: ఈ ఫోన్‌లో మోడల్ ఇంకా లోడ్ కాలేదు.
 
 
-54. `unavailable_model_load_failed`
+58. `unavailable_model_load_failed`
 
    English: The model could not start.
 
    Telugu: మోడల్ ప్రారంభం కాలేదు.
 
 
-55. `unavailable_insufficient_memory`
+59. `unavailable_insufficient_memory`
 
    English: Not enough memory free to do this now.
 
    Telugu: ఇప్పుడు దీనికి సరిపడా మెమరీ ఖాళీగా లేదు.
 
 
-56. `unavailable_no_match`
+60. `unavailable_no_match`
 
    English: I do not know a food in that.
 
    Telugu: అందులో నాకు తెలిసిన ఆహారం ఏదీ లేదు.
 
 
-57. `unavailable_known_item_no_data`
+61. `unavailable_known_item_no_data`
 
    English: I know that food and hold no figures for it.
 
    Telugu: ఆ ఆహారం నాకు తెలుసు, కానీ దానికి అంకెలు నా దగ్గర లేవు.
 
 
-58. `unavailable_below_confidence_threshold`
+62. `unavailable_below_confidence_threshold`
 
    English: I am not sure enough of what you said.
 
    Telugu: మీరు చెప్పింది నాకు సరిగ్గా అర్థం కాలేదు.
 
 
-59. `unavailable_permission_denied`
+63. `unavailable_permission_denied`
 
    English: A permission was not granted.
 
    Telugu: ఒక అనుమతి ఇవ్వలేదు.
 
 
-60. `unavailable_hardware_unsupported`
+64. `unavailable_hardware_unsupported`
 
    English: This phone cannot run this.
 
    Telugu: ఈ ఫోన్ దీన్ని నడపలేదు.
 
 
-61. `unavailable_input_not_usable`
+65. `unavailable_input_not_usable`
 
    English: That could not be used. Please try again.
 
    Telugu: అది ఉపయోగించలేకపోయాను. దయచేసి మళ్ళీ ప్రయత్నించండి.
 
 
-62. `unavailable_cancelled`
+66. `unavailable_cancelled`
 
    English: Cancelled.
 
    Telugu: రద్దు చేయబడింది.
 
 
-63. `unavailable_schema_validation_failed`
+67. `unavailable_schema_validation_failed`
 
    English: The reply could not be read. Please try again.
 
    Telugu: జవాబు చదవలేకపోయాను. దయచేసి మళ్ళీ ప్రయత్నించండి.
 
 
-64. `unavailable_internal_error`
+68. `unavailable_internal_error`
 
    English: Something went wrong inside the app.
 
@@ -476,7 +504,7 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## When a part of the app does not exist yet
 
-65. `not_built`
+69. `not_built`
 
    English: Not built yet: %1$s
 
@@ -485,105 +513,105 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The Scan screen, for a printed lab report
 
-66. `scan_saved`
-
-   English: Saved %1$d values from this report.
-
-   Telugu: ఈ రిపోర్టు నుండి %1$d విలువలు సేవ్ చేశాను.
-
-
-67. `scan_title`
+70. `scan_title`
 
    English: Scan a lab report
 
    Telugu: ల్యాబ్ రిపోర్టు స్కాన్ చేయండి
 
 
-68. `scan_capture`
+71. `scan_capture`
 
    English: Capture
 
    Telugu: ఫోటో తీయండి
 
 
-69. `scan_retake`
+72. `scan_retake`
 
    English: Retake
 
    Telugu: మళ్ళీ తీయండి
 
 
-70. `scan_reading`
+73. `scan_reading`
 
    English: Reading the report…
 
    Telugu: రిపోర్టు చదువుతున్నాను…
 
 
-71. `scan_no_fields`
+74. `scan_no_fields`
 
    English: No test values could be read. Try a sharper, straighter photo.
 
    Telugu: పరీక్ష విలువలు ఏవీ చదవలేకపోయాను. మరింత స్పష్టమైన, నిటారుగా ఉన్న ఫోటో ప్రయత్నించండి.
 
 
-72. `scan_field_line`
+75. `scan_field_line`
 
    English: %1$s: %2$s %3$s
 
    Telugu: %1$s: %2$s %3$s
 
 
-73. `scan_range_both`
+76. `scan_range_both`
 
    English: printed range %1$s to %2$s
 
    Telugu: ముద్రించిన పరిధి %1$s నుండి %2$s
 
 
-74. `scan_range_high_only`
+77. `scan_range_high_only`
 
    English: printed range up to %1$s
 
    Telugu: ముద్రించిన పరిధి %1$s వరకు
 
 
-75. `scan_range_low_only`
+78. `scan_range_low_only`
 
    English: printed range from %1$s
 
    Telugu: ముద్రించిన పరిధి %1$s నుండి
 
 
-76. `scan_range_none`
+79. `scan_range_none`
 
    English: no range printed, so nothing will be judged against it
 
    Telugu: పరిధి ముద్రించలేదు, కాబట్టి దేనితోనూ పోల్చడం జరగదు
 
 
-77. `scan_report_date`
+80. `scan_report_date`
 
    English: Report date %1$s
 
    Telugu: రిపోర్టు తేదీ %1$s
 
 
-78. `scan_report_date_unknown`
+81. `scan_report_date_unknown`
 
    English: Report date not read
 
    Telugu: రిపోర్టు తేదీ చదవలేదు
 
 
-79. `scan_save`
+82. `scan_save`
 
    English: Save %1$d values
 
    Telugu: %1$d విలువలను సేవ్ చేయండి
 
 
-80. `camera_permission_needed`
+83. `scan_saved`
+
+   English: Saved %1$d values from this report.
+
+   Telugu: ఈ రిపోర్టు నుండి %1$d విలువలు సేవ్ చేశాను.
+
+
+84. `camera_permission_needed`
 
    English: Camera permission is needed to scan a report.
 
@@ -592,165 +620,165 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The About screen
 
-81. `about_usda_title`
-
-   English: Nutrition data
-
-   Telugu: పోషక విలువల డేటా
-
-
-82. `about_title`
+85. `about_title`
 
    English: About
 
    Telugu: గురించి
 
 
-83. `about_licences_title`
+86. `about_licences_title`
 
    English: Licences and notices
 
    Telugu: లైసెన్సులు మరియు నోటీసులు
 
 
-84. `about_offline`
+87. `about_offline`
 
    English: IN2FIT runs entirely on this phone. The demo build has no internet permission: nothing you say, scan or log leaves the device.
 
    Telugu: IN2FIT పూర్తిగా ఈ ఫోన్‌లోనే నడుస్తుంది. డెమో బిల్డ్‌కు ఇంటర్నెట్ అనుమతి లేదు: మీరు చెప్పేది, స్కాన్ చేసేది లేదా నమోదు చేసేది ఏదీ ఫోన్ బయటకు వెళ్ళదు.
 
 
-85. `about_notices_pending`
+88. `about_notices_pending`
 
    English: The verbatim copyright notice for the voice models is being prepared and will appear here.
 
    Telugu: వాయిస్ మోడల్స్ కాపీరైట్ నోటీసు యథాతథంగా సిద్ధం చేస్తున్నాము; అది ఇక్కడ కనిపిస్తుంది.
 
 
+89. `about_usda_title`
+
+   English: Nutrition data
+
+   Telugu: పోషక విలువల డేటా
+
+
 ## Lines the app writes for its own language model, not for the screen
 
-86. `context_referral`
-
-   English: That is a question for a doctor, who can look at it with you.
-
-   Telugu: అది డాక్టర్‌ను అడగవలసిన ప్రశ్న; వారు దాన్ని మీతో కలిసి చూడగలరు.
-
-
-87. `context_figure`
+90. `context_figure`
 
    English: %1$s: %2$s %3$s
 
    Telugu: %1$s: %2$s %3$s
 
 
-88. `context_figure_partial`
+91. `context_figure_partial`
 
    English: %1$s: at least %2$s %3$s (no value for %4$s)
 
    Telugu: %1$s: కనీసం %2$s %3$s (%4$sకు విలువ లేదు)
 
 
-89. `context_figure_none`
+92. `context_figure_none`
 
    English: %1$s: not known
 
    Telugu: %1$s: తెలియదు
 
 
-90. `context_meal`
+93. `context_meal`
 
    English: %1$s: %2$s. %3$s
 
    Telugu: %1$s: %2$s. %3$s
 
 
-91. `context_period`
+94. `context_period`
 
    English: %1$s: %2$s
 
    Telugu: %1$s: %2$s
 
 
-92. `context_period_today`
+95. `context_period_today`
 
    English: Today so far
 
    Telugu: ఈరోజు ఇప్పటివరకు
 
 
-93. `context_period_last_seven_days`
+96. `context_period_last_seven_days`
 
    English: The last seven days
 
    Telugu: గత ఏడు రోజులు
 
 
-94. `context_lab`
+97. `context_lab`
 
    English: %1$s: %2$s %3$s (report dated %4$s)
 
    Telugu: %1$s: %2$s %3$s (%4$s తేదీ రిపోర్టు)
 
 
-95. `context_lab_with_range`
+98. `context_lab_with_range`
 
    English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
 
    Telugu: %1$s: %2$s %3$s, రిపోర్టులో ముద్రించిన పరిధి %4$s నుండి %5$s (%6$s తేదీ రిపోర్టు)
 
 
-96. `context_never_suggest_vegetarian`
+99. `context_never_suggest_vegetarian`
 
    English: meat, fish or eggs (vegetarian)
 
    Telugu: మాంసం, చేపలు లేదా గుడ్లు (శాకాహారి)
 
 
-97. `context_never_suggest_vegan`
+100. `context_never_suggest_vegan`
 
    English: meat, fish, eggs, milk or any dairy (vegan)
 
    Telugu: మాంసం, చేపలు, గుడ్లు, పాలు లేదా ఏ పాల ఉత్పత్తులు (వీగన్)
 
 
-98. `context_never_suggest_eggetarian`
+101. `context_never_suggest_eggetarian`
 
    English: meat or fish (eggetarian)
 
    Telugu: మాంసం లేదా చేపలు (గుడ్లు తినే శాకాహారి)
 
 
-99. `context_never_suggest_jain`
+102. `context_never_suggest_jain`
 
    English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
 
    Telugu: మాంసం, చేపలు, గుడ్లు, ఉల్లిపాయ, వెల్లుల్లి లేదా దుంప కూరగాయలు (జైన్)
 
 
+103. `context_referral`
+
+   English: That is a question for a doctor, who can look at it with you.
+
+   Telugu: అది డాక్టర్‌ను అడగవలసిన ప్రశ్న; వారు దాన్ని మీతో కలిసి చూడగలరు.
+
+
 ## Spoken while the app works
 
-100. `tts_lead_in_log`
+104. `tts_lead_in_log`
 
    English: Noting that down.
 
    Telugu: నోట్ చేసుకుంటున్నాను.
 
 
-101. `tts_lead_in_answer`
+105. `tts_lead_in_answer`
 
    English: Let me check your records.
 
    Telugu: మీ రికార్డులు చూస్తాను.
 
 
-102. `tts_lead_in_suggest`
+106. `tts_lead_in_suggest`
 
    English: Let me think about what fits.
 
    Telugu: ఏది సరిపోతుందో ఆలోచిస్తాను.
 
 
-103. `tts_lead_in_recommend`
+107. `tts_lead_in_recommend`
 
    English: Let me see what suits you.
 
@@ -759,56 +787,56 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## Nutrient words
 
-104. `nutrient_energy`
+108. `nutrient_energy`
 
    English: energy
 
    Telugu: శక్తి
 
 
-105. `nutrient_protein`
+109. `nutrient_protein`
 
    English: protein
 
    Telugu: ప్రోటీన్
 
 
-106. `nutrient_carbohydrate`
+110. `nutrient_carbohydrate`
 
    English: carbohydrate
 
    Telugu: కార్బోహైడ్రేట్
 
 
-107. `nutrient_fat`
+111. `nutrient_fat`
 
    English: fat
 
    Telugu: కొవ్వు
 
 
-108. `nutrient_fibre`
+112. `nutrient_fibre`
 
    English: fibre
 
    Telugu: పీచు
 
 
-109. `nutrient_iron`
+113. `nutrient_iron`
 
    English: iron
 
    Telugu: ఇనుము
 
 
-110. `nutrient_vitamin_b12`
+114. `nutrient_vitamin_b12`
 
    English: vitamin B12
 
    Telugu: విటమిన్ B12
 
 
-111. `nutrient_sodium`
+115. `nutrient_sodium`
 
    English: sodium
 
@@ -817,35 +845,35 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## Living-situation phrases
 
-112. `life_context_hostel_student`
+116. `life_context_hostel_student`
 
    English: hostel and canteen food
 
    Telugu: హాస్టల్ మరియు క్యాంటీన్ ఆహారం
 
 
-113. `life_context_pg_own_cooking`
+117. `life_context_pg_own_cooking`
 
    English: cooking for yourself with limited time
 
    Telugu: తక్కువ సమయంలో మీ కోసం మీరు వండుకోవడం
 
 
-114. `life_context_field_or_manual_worker`
+118. `life_context_field_or_manual_worker`
 
    English: long physical shifts and eating out
 
    Telugu: ఎక్కువసేపు శారీరక పని చేయడం మరియు బయట తినడం
 
 
-115. `life_context_desk_professional`
+119. `life_context_desk_professional`
 
    English: a desk day with a full kitchen
 
    Telugu: డెస్క్ వద్ద పని చేసే రోజు మరియు పూర్తి వంటగది
 
 
-116. `life_context_homemaker`
+120. `life_context_homemaker`
 
    English: cooking for the household
 
@@ -854,7 +882,7 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## Language choice
 
-117. `language_picker_title`
+121. `language_picker_title`
 
    English: Language
 
@@ -863,21 +891,21 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The confidence label
 
-118. `confidence_band_good`
+122. `confidence_band_good`
 
    English: Good
 
    Telugu: మంచిది
 
 
-119. `confidence_band_approximate`
+123. `confidence_band_approximate`
 
    English: Approximate
 
    Telugu: సుమారు
 
 
-120. `confidence_band_rough`
+124. `confidence_band_rough`
 
    English: Rough
 
@@ -886,84 +914,84 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## Why the label says what it says
 
-121. `confidence_reason_exact_food_match`
+125. `confidence_reason_exact_food_match`
 
    English: Matched exactly to a food in the database.
 
    Telugu: డేటాబేస్‌లోని ఆహారంతో ఖచ్చితంగా సరిపోలింది.
 
 
-122. `confidence_reason_fuzzy_food_match`
+126. `confidence_reason_fuzzy_food_match`
 
    English: Matched to the closest name in the database; check it is the food you meant.
 
    Telugu: డేటాబేస్‌లోని దగ్గరగా సరిపోలే పేరుతో సరిపోలింది; మీరు ఉద్దేశించిన ఆహారమేనా చూసుకోండి.
 
 
-123. `confidence_reason_category_level_match`
+127. `confidence_reason_category_level_match`
 
    English: Matched only to a food category, not a specific food.
 
    Telugu: నిర్దిష్ట ఆహారంతో కాకుండా, ఆహార వర్గంతో మాత్రమే సరిపోలింది.
 
 
-124. `confidence_reason_quantity_stated`
+128. `confidence_reason_quantity_stated`
 
    English: You gave the quantity in a unit we can convert.
 
    Telugu: మీరు మార్చగలిగే కొలతలో పరిమాణాన్ని చెప్పారు.
 
 
-125. `confidence_reason_household_unit_default`
+129. `confidence_reason_household_unit_default`
 
    English: A household measure was converted with a standard weight. Tap to correct the grams.
 
    Telugu: ఇంట్లో ఉపయోగించే కొలతను ప్రామాణిక బరువుతో మార్చాం. గ్రాములను సరిచేయడానికి నొక్కండి.
 
 
-126. `confidence_reason_quantity_inferred`
+130. `confidence_reason_quantity_inferred`
 
    English: You did not say how much, so this quantity is a guess. Tap to correct it.
 
    Telugu: మీరు ఎంత పరిమాణం చెప్పలేదు, కాబట్టి ఈ పరిమాణం అంచనా మాత్రమే. దాన్ని సరిచేయడానికి నొక్కండి.
 
 
-127. `confidence_reason_authored_reference_recipe`
+131. `confidence_reason_authored_reference_recipe`
 
    English: Based on a reference recipe. Edit it to match how you cook.
 
    Telugu: ఒక ప్రామాణిక వంటకం ఆధారంగా తీసుకున్నది. మీరు ఎలా వండుతారో దానికి అనుగుణంగా మార్చండి.
 
 
-128. `confidence_reason_user_edited_recipe`
+132. `confidence_reason_user_edited_recipe`
 
    English: Based on the recipe as you edited it.
 
    Telugu: మీరు సవరించిన వంటకం ఆధారంగా తీసుకున్నది.
 
 
-129. `confidence_reason_weak_source_record`
+133. `confidence_reason_weak_source_record`
 
    English: The source record for this food rests on few samples or on a label.
 
    Telugu: ఈ ఆహారానికి సంబంధించిన మూల రికార్డు కొన్ని నమూనాలు లేదా ఒక లేబుల్‌పై ఆధారపడి ఉంది.
 
 
-130. `confidence_reason_substitute_food_record`
+134. `confidence_reason_substitute_food_record`
 
    English: The nearest record is a similar food, not this one.
 
    Telugu: దగ్గరగా సరిపోలిన రికార్డు ఇదే ఆహారం కాదు, ఇలాంటి ఆహారానికి సంబంధించినది.
 
 
-131. `confidence_reason_low_asr_confidence`
+135. `confidence_reason_low_asr_confidence`
 
    English: Speech recognition was unsure of what it heard. Check the words.
 
    Telugu: మీరు చెప్పింది ఏమిటో వాయిస్ గుర్తింపు సరిగ్గా నిర్ధారించలేకపోయింది. పదాలను చూసుకోండి.
 
 
-132. `confidence_reason_uncorrected_camera_guess`
+136. `confidence_reason_uncorrected_camera_guess`
 
    English: A camera guess that has not been confirmed by you.
 
@@ -972,133 +1000,133 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The setup screen, behind a long-press, never seen by accident
 
-133. `preflight_title`
+137. `preflight_title`
 
    English: Pre-flight check
 
    Telugu: ప్రీ-ఫ్లైట్ తనిఖీ
 
 
-134. `preflight_intro`
+138. `preflight_intro`
 
    English: What this phone has and what it is missing, read now. Nothing here is estimated.
 
    Telugu: ఈ ఫోన్‌లో ఏముందో, ఏది లేదో, ఇప్పుడు చదివినది. ఇక్కడ ఏదీ అంచనా కాదు.
 
 
-135. `preflight_app`
+139. `preflight_app`
 
    English: App
 
    Telugu: యాప్
 
 
-136. `preflight_device`
+140. `preflight_device`
 
    English: Device
 
    Telugu: పరికరం
 
 
-137. `preflight_locale`
+141. `preflight_locale`
 
    English: Locale
 
    Telugu: భాషా సెట్టింగ్
 
 
-138. `preflight_mic`
+142. `preflight_mic`
 
    English: Microphone permission
 
    Telugu: మైక్రోఫోన్ అనుమతి
 
 
-139. `preflight_camera`
+143. `preflight_camera`
 
    English: Camera permission
 
    Telugu: కెమెరా అనుమతి
 
 
-140. `preflight_models_dir`
+144. `preflight_models_dir`
 
    English: Models folder
 
    Telugu: మోడల్స్ ఫోల్డర్
 
 
-141. `preflight_free_space`
+145. `preflight_free_space`
 
    English: Free space
 
    Telugu: ఖాళీ స్థలం
 
 
-142. `preflight_voices`
+146. `preflight_voices`
 
    English: Voices available
 
    Telugu: అందుబాటులో ఉన్న వాయిస్‌లు
 
 
-143. `preflight_residency`
+147. `preflight_residency`
 
    English: Model memory
 
    Telugu: మోడల్ మెమరీ
 
 
-144. `preflight_models_title`
+148. `preflight_models_title`
 
    English: Models
 
    Telugu: మోడల్స్
 
 
-145. `preflight_present`
+149. `preflight_present`
 
    English: Present, %1$s
 
    Telugu: ఉంది, %1$s
 
 
-146. `preflight_absent`
+150. `preflight_absent`
 
    English: MISSING
 
    Telugu: లేదు
 
 
-147. `preflight_load`
+151. `preflight_load`
 
    English: Load
 
    Telugu: లోడ్ చేయి
 
 
-148. `preflight_loading`
+152. `preflight_loading`
 
    English: Loading…
 
    Telugu: లోడ్ అవుతోంది…
 
 
-149. `preflight_refresh`
+153. `preflight_refresh`
 
    English: Refresh
 
    Telugu: రిఫ్రెష్
 
 
-150. `preflight_yes`
+154. `preflight_yes`
 
    English: granted
 
    Telugu: ఇవ్వబడింది
 
 
-151. `preflight_no`
+155. `preflight_no`
 
    English: NOT granted
 
@@ -1107,21 +1135,21 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## The scripted-feed banner
 
-152. `demo_switch_title`
+156. `demo_switch_title`
 
    English: Scripted demo feed
 
    Telugu: స్క్రిప్ట్ చేసిన డెమో ఫీడ్
 
 
-153. `demo_switch_hint`
+157. `demo_switch_hint`
 
    English: Feeds the screens scripted events instead of the real pipeline. For building and photographing screens only. Every figure it shows is script.
 
    Telugu: నిజమైన పైప్‌లైన్‌కు బదులుగా స్క్రీన్‌లకు స్క్రిప్ట్ చేసిన ఈవెంట్‌లను ఇస్తుంది. స్క్రీన్‌లను నిర్మించడానికి, ఫోటో తీయడానికి మాత్రమే. ఇది చూపించే ప్రతి అంకె స్క్రిప్ట్ మాత్రమే.
 
 
-154. `demo_banner`
+158. `demo_banner`
 
    English: SCRIPTED DEMO FEED. Nothing on this screen is a real result.
 
@@ -1130,80 +1158,89 @@ Machine-generated lines received via Nila; every line below is marked for review
 
 ## TEMPORARY: the build-status screen
 
-155. `status_screen_subtitle`
+159. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
    Telugu: ఫేజ్ 1B ప్రాథమిక నిర్మాణం. అవసరమైన ఒప్పందాలు నిర్వచించబడ్డాయి; ఇంకా ఏ పైప్‌లైన్ నిర్మించబడలేదు.
 
 
-156. `status_line`
+160. `status_line`
 
    English: %1$s: %2$s
 
    Telugu: %1$s: %2$s
 
 
-157. `state_not_implemented`
+161. `state_not_implemented`
 
    English: Not implemented
 
    Telugu: ఇంకా అమలు చేయలేదు
 
 
-158. `pipeline_voice_logging`
+162. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
    Telugu: వాయిస్ లాగింగ్ (ASR, LLM ఎక్స్‌ట్రాక్ట్, TTS)
 
 
-159. `pipeline_nutrition_lookup`
+163. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
    Telugu: పోషక విలువల శోధన
 
 
-160. `pipeline_timeline_query`
+164. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
    Telugu: టైమ్‌లైన్ మరియు వాయిస్ ప్రశ్న
 
 
-161. `pipeline_lab_report_scan`
+165. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
    Telugu: ల్యాబ్ రిపోర్ట్ స్కాన్
 
 
-162. `pipeline_adaptive_suggestions`
+166. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
    Telugu: అనుకూల సూచనలు
 
 
-163. `pipeline_dish_first_guess`
+167. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
    Telugu: కెమెరాతో వంటకం మొదటి అంచనా
 
 
-164. `pipeline_exercise_form`
+168. `pipeline_exercise_form`
 
    English: Exercise form check
 
    Telugu: వ్యాయామం చేసే విధానం తనిఖీ
 
 
+## UNPLACED: ask Vedant where this appears
+
+169. `stop_speaking`
+
+   English: Stop
+
+   Telugu: ఆపు
+
+
 ## Same text under more than one key: confirm this is deliberate
 
 - 2. `trigger_escalate_above_range` and 3. `trigger_escalate_below_range`
 - 10. `tab_talk` and 15. `mic_speak`
-- 12. `tab_about` and 82. `about_title`
-- 37. `meal_item_with_quantity` and 72. `scan_field_line` and 87. `context_figure`
-- 91. `context_period` and 156. `status_line`
+- 12. `tab_about` and 85. `about_title`
+- 37. `meal_item_with_quantity` and 75. `scan_field_line` and 90. `context_figure`
+- 94. `context_period` and 160. `status_line`

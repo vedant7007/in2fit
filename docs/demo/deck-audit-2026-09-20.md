@@ -110,6 +110,16 @@ repository now.
 | 93 / 626 / 52 and 402 / 18 | `logs/food-db-build.log` today; the meal from the shipped tables at two 40 g rotis. Note: the app's default roti is the recipe's 45 g (`chapati`, 270 g / 6), which gives 428 kcal / 19 g; 402 / 18 is right only with the "2 × 40 g" caption, i.e. a person-corrected weight. | RIGHT as captioned |
 | sherpa-onnx and espeak-ng named, copyleft acknowledged | `0005`. The English recogniser is NVIDIA's FastConformer (CC-BY-4.0), which wants naming wherever models are credited; not in the list of corrections. | RIGHT; check NVIDIA is on the line too |
 
+## Two more rows, 18:45, from Meera's end-to-end trace (`0019` addendum 7)
+
+Appended, not merged into the tables above: the rule for this file is that a correction is
+added with its date, never written over what was there.
+
+| deck says | repository says | verdict |
+| --- | --- | --- |
+| Page 5, "Say it: In the language you chose, out loud", and "answer a nutrition question in your own language" | Traced end to end by Meera: the lead-in, the rules engine's sentences and the figures come from `res/values/strings.xml` through the app's UI locale, which the run of show sets to English, and `values-hi` is empty by design; the model is told "Language to reply in: hi" and replies in English anyway, seven of seven on the desktop with the phone's exact GGUF, greedy, including three questions asked in Devanagari (`logs/meera-hindi-reply.log`); the phone has only ever been run with `en-IN`. | **FIX FIRST. UNSUPPORTED**, and it was marked RIGHT in the first pass above, which was wrong: I checked the string tables and the guard, not the language of the reply. Say instead (Meera's wording, supportable today): "You speak in Hindi, Telugu or English; the app answers in English today, on screen and aloud, and the interface follows your language setting." A judge who asks "can it answer in Hindi?" hears "not this build; the recogniser is per-language, the answers are English". |
+| Page 5, "The model may never: state a number it was not handed, name a condition you have not declared ... Those paths are code, and code is testable" | The guards exist and are tested on the JVM (`NumericGuard`, `SafetyLine`, the template digit test). But the desktop model produced BOTH forbidden shapes with the prompts as written (Meera, 18:28: a number not given, and a condition verdict), and whether the guards catch them ON THE PHONE, in the demo's own ANSWER turns, is a measurement that does not exist yet: it is Rao's device run of the ten sentences, read by a person. | **UNVERIFIED on the device** as of 18:45. The sentence is a design claim with JVM tests behind it, not yet a device claim. Keep the wording, but do not present it as measured until that run is read; and the run of show's Beat 2 line ("there is a test for that") stays true only of the JVM test. |
+
 ## What to do, in order
 
 1. Fix the FIX FIRST rows: the "cold" 2.6 s; the 10.6 s wording; "252 tests green on every

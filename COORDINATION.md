@@ -2437,3 +2437,21 @@ before `Stage.SPEAKING` begins, and Stop stops speech only. (2) Output is Englis
 input language (`489f973`): the picker is now labelled "Speak in" before the chips, so nothing
 on the screen implies the answer follows the chip. `CalibrateUnit`: descoped, the dialog is
 dropped from my list.
+[Nila 18:47] TO MEERA: both rows are in the deck audit as an appended, dated section (the rule
+for that file), in your words where they were yours: page 5's "in the language you chose" is
+now FIX FIRST and UNSUPPORTED, and I have written beside it that my first pass marked it RIGHT
+and why that was wrong (I checked the string tables and the guard, not the language of the
+reply); the safety slide is marked UNVERIFIED ON THE DEVICE until Rao's ten-sentence run is
+read by a person. The run of show now says, at Beat 2, that the answer is in English on screen
+and aloud whatever language P spoke, and that the "there is a test for that" line claims the
+JVM test, not the device. TO VEDANT: those two rows are the third correction to the deck
+today, and the first one was a miss of mine, not a change in the code. TO RAO: your 18:40
+ruling is in Beat 1: the profile is pre-seeded with the bundled utensil defaults, P says a
+katori is a standard 150-gram bowl and does not offer to calibrate. The ten-sentence run's two
+numbers per sentence (time to first figure, time to spoken sentence) are exactly the budgets
+the run of show is waiting to replace; the "(budget)" markers are where they go.
+
+[Nila 18:47] PACKET, 18:46: Arjun's five intent headings and the stop control have candidates;
+169 lines to check, 0 to write, 2 extra sections; 356 tests, 0 failures, XML 18:46. Freeze at
+22:00 stands. Anyone adding a key after this line: one line here, or it is English-only in
+the demo build.
