@@ -11,6 +11,13 @@
 # THE RULE: every food in ingredients.csv is in this file exactly once (the importer refuses
 # otherwise), so a record added later is swept or the build fails.
 #
+# THE LIMIT, attached to the gate: the sweep reads the EIGHT nutrients the app ships, named on
+# the line below, which the importer checks against its own list. Vitamin A, D and C
+# fortification (US milk, US juices; Indian packaged oils the other way) is noted per row and
+# is not shipped, so it cannot mislead a figure today. The day a ninth nutrient ships, the build
+# fails here until every row is read again for that nutrient and the line is extended.
+# nutrients_swept: ENERGY|PROTEIN|CARBOHYDRATE|FAT|FIBRE|IRON|VITAMIN_B12|SODIUM
+#
 # action    KEEP      nothing US-specific among the eight, or the unenriched record was chosen
 #           SWAPPED   the fdc_id in ingredients.csv was changed to an honest record
 #           UNSHIP    the named nutrients are NOT shipped for this food (they read Unknown, a
@@ -20,10 +27,10 @@
 # unship    '|'-separated nutrient names, for UNSHIP
 # disclosure  the sentence shown beside the figure, for UNSHIP and DISCLOSE
 key,us_specific,action,unship,disclosure,note
-bread_white,"Enriched flour: iron 3.61 mg per 100 g is US enrichment (unenriched all-purpose flour, 169761, is 1.17; the enriched flour, 168894, is 4.64). No unenriched white bread record exists; Indian bread is not enriched.",UNSHIP,IRON,No iron figure: the US record's iron is enrichment Indian bread does not have.,"Iron reads Unknown for white bread and for the three sandwich recipes made from it; a floor, named, not a wrong number. The alternative, a recipe from unenriched flour, cannot be an ingredient of other recipes."
+bread_white,"Enriched flour: iron 3.61 mg per 100 g is US enrichment (unenriched all-purpose flour, 169761, is 1.17; the enriched flour, 168894, is 4.64). No unenriched white bread record exists; Indian bread is not enriched.",UNSHIP,IRON,Iron not shown: the US record's iron is added by enrichment, which Indian bread does not have.,"Iron reads Unknown for white bread and for the three sandwich recipes made from it; a floor, named, not a wrong number. The alternative, a recipe from unenriched flour, cannot be an ingredient of other recipes."
 curd,"The record was low-fat yogurt with added milk solids (170886): protein 5.25, fat 1.55 per 100 g. Home-set curd is whole-milk yogurt, 171284: protein 3.47, fat 3.25.",SWAPPED,,,Swapped to 171284 on 20 Sep; the demo's katori of curd lost 2.7 g of protein it never had.
 milk_whole,"The record was the vitamin-D fortified twin (171265). The unfortified record, 172217, ships the same eight figures; the description is now honest without a disclosure.",SWAPPED,,,"3.25% fat is toned milk; Indian full-cream is 6%. A product note, not a fortification one."
-cheese_processed,"US pasteurized process American cheese: emulsifying salts, sodium 1671 mg per 100 g. Indian processed cheese (the cube and the slice) is the same kind of product with comparable salt.",DISCLOSE,,US processed cheese; the Indian cube is the same kind of product.,
+cheese_processed,"US pasteurized process American cheese: emulsifying salts, sodium 1671 mg per 100 g. Indian processed cheese (the cube and the slice) is the same kind of product with comparable salt.",DISCLOSE,,From the US record for processed cheese; the Indian cube and slice are the same kind of product.,
 buttermilk,"US cultured buttermilk is undiluted fermented milk, 62 kcal per 100 g. Indian chaas / majjiga is curd thinned with two to three parts water and salt, about a third of that.",RECIPE,,,"Replaced by the chaas recipe: curd 60 g, water 139 g, salt 1 g per 200 ml glass. The USDA record is no longer shipped."
 apple,Unprocessed or single-ingredient; nothing added in the US.,KEEP,,,Checked 20 Sep.
 ash_gourd,"Raw produce; US-grown, covered by the general disclosure; nothing added.",KEEP,,,Checked 20 Sep.

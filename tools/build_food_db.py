@@ -139,6 +139,16 @@ def main():
         for nk in [x.strip() for x in r["unship"].split("|") if x.strip()]:
             if nk not in WANTED:
                 sweep_fail.append(f"{k}: unship names {nk}, not a shipped nutrient")
+    # The limit is a gate too: the header names the nutrients the sweep read, and a ninth
+    # nutrient cannot ship until every row is read again for it.
+    swept_nutrients = None
+    with open(os.path.join(AUTH, "us-record-sweep.csv"), encoding="utf-8") as fh:
+        for line in fh:
+            if line.startswith("# nutrients_swept:"):
+                swept_nutrients = {x.strip() for x in line.split(":", 1)[1].split("|") if x.strip()}
+    if swept_nutrients != set(WANTED):
+        sweep_fail.append(f"the sweep read {sorted(swept_nutrients or [])} and the app ships {sorted(WANTED)}: "
+                          "a nutrient ships only after every record is read for it (reopen us-record-sweep.csv)")
     ingredient_keys = {r["key"] for r in ingredients}
     unswept = ingredient_keys - set(sweep_by_key)
     if unswept:

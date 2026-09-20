@@ -23,6 +23,7 @@ import io.github.vedant7007.katori.domain.RuleEvaluation
 import io.github.vedant7007.katori.domain.RuleInput
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.model.Completeness
+import io.github.vedant7007.katori.domain.model.ConfidenceBand
 import io.github.vedant7007.katori.domain.model.ConfidenceReason
 import io.github.vedant7007.katori.domain.model.ConfidenceRules
 import io.github.vedant7007.katori.domain.model.Outcome
@@ -95,8 +96,10 @@ class DemoSentencesTest {
      * Sentence 4 is the self-correction: the intended result is three rotis, not two and three.
      */
     private val EXTRACTED: Map<Pair<Int, String>, List<ExtractedItem>> = mapOf(
-        (1 to "en") to listOf(ExtractedItem("roti", 2.0, null, null), ExtractedItem("dal", null, null, null)),
-        (1 to "hi") to listOf(ExtractedItem("रोटी", 2.0, null, null), ExtractedItem("दाल", null, null, null)),
+        // "a little dal": the model writes 1.0 for it (Nila, 20 Sep), and the ruling is that an
+        // unstated amount is never QUANTITY_STATED; the row below asserts the band and the shown unit.
+        (1 to "en") to listOf(ExtractedItem("roti", 2.0, null, null), ExtractedItem("dal", 1.0, null, null)),
+        (1 to "hi") to listOf(ExtractedItem("रोटी", 2.0, null, null), ExtractedItem("दाल", 1.0, null, null)),
         (2 to "en") to listOf(ExtractedItem("roti", 2.0, null, null), ExtractedItem("dal", 1.0, "katori", null), ExtractedItem("oil", 2.0, "spoon", null)),
         (2 to "hi") to listOf(ExtractedItem("रोटी", 2.0, null, null), ExtractedItem("दाल", 1.0, "कटोरी", null), ExtractedItem("तेल", 2.0, "चम्मच", null)),
         (3 to "en") to listOf(ExtractedItem("milk", 200.0, "ml", null), ExtractedItem("boiled egg", 1.0, null, "boiled")),
@@ -168,7 +171,7 @@ class DemoSentencesTest {
         out.appendLine("Extraction is authored as the prompt is asked to produce it (labelled in the test); the lab value in beat 4 is a placeholder with the shape of the report.")
         out.appendLine("Profile: 22 years, 62 kg, hostel student, no diet type declared. Both language columns of `demo-utterance-set.csv`.")
         out.appendLine()
-        out.appendLine("| # | beat | lang | reference transcript | intent | decided by | foods resolved (grams, band) | figures the database returns | rules engine |")
+        out.appendLine("| # | beat | lang | reference transcript | intent | decided by | the plate: food, amount said or assumed, taken as, band | figures the database returns | rules engine |")
         out.appendLine("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
 
         var loggedMealForBeat4: ResolvedMeal? = null
@@ -195,13 +198,22 @@ class DemoSentencesTest {
                     is Outcome.Ok -> {
                         val meal = res.value
                         foodsCol = meal.items.zip(meal.parsed.items).joinToString("; ") { (ri, pi) ->
-                            "${pi.spokenName} → ${ri.snapshot.foodCode ?: "no data"} ${ri.snapshot.grams?.let { "%.0f g".format(it) } ?: "weight unknown"} ${ri.confidence.band.name.lowercase()}"
+                            // as the plate shows it: what was said or assumed, then what it was taken as, then the band
+                            val amount = pi.quantity?.let { q -> "%.0f".format(q).removeSuffix(".0") + " " + (pi.unit ?: "") } ?: ""
+                            val assumed = if (ConfidenceReason.QUANTITY_INFERRED in ri.confidence.reasons || ConfidenceReason.HOUSEHOLD_UNIT_DEFAULT in ri.confidence.reasons) "taken as " else ""
+                            "${pi.spokenName} → ${ri.snapshot.foodCode ?: "no data"} $amount ${ri.snapshot.grams?.let { "$assumed%.0f g".format(it) } ?: "weight unknown"} ${ri.confidence.band.name.lowercase()}"
                         }
                         figuresCol = figures(meal)
                         // wrong food?
                         r.expectedFoods.forEachIndexed { i, expected ->
                             val code = meal.items.getOrNull(i)?.snapshot?.foodCode
                             if (code != MEANT[expected]) problems += "#${r.id} ${r.lang}: '$expected' resolved to $code, the demo means ${MEANT[expected]}"
+                        }
+                        // Beat 1's "a little dal": an assumed serving, shown as one, never stated (Vedant, 20 Sep)
+                        if (r.id == 1) {
+                            val (ri, pi) = meal.items.zip(meal.parsed.items).last()
+                            if (ConfidenceReason.QUANTITY_STATED in ri.confidence.reasons || ri.confidence.band != ConfidenceBand.ROUGH || pi.unit != "katori")
+                                problems += "#1 ${r.lang}: 'a little dal' reads as ${pi.quantity} ${pi.unit} ${ri.confidence.band}, not an assumed katori"
                         }
                         // a counted egg is one egg, not a bowl of them: the first run weighed it as a 150 g katori
                         meal.items.zip(meal.parsed.items).filter { (_, pi) -> "egg" in pi.spokenName || "अंडा" in pi.spokenName }.forEach { (ri, pi) ->

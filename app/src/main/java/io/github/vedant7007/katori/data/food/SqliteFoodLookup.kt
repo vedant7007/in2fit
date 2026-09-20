@@ -146,7 +146,7 @@ class SqliteFoodLookup(
             )
         }
         val r = db.query(
-            "SELECT display_name, servings, yield_g FROM recipes WHERE recipe_key = ?",
+            "SELECT display_name, servings, yield_g, moisture_class FROM recipes WHERE recipe_key = ?",
             listOf(code.id),
         ).firstOrNull()
             ?: return Outcome.Unavailable(UnavailableReason.NO_MATCH, "no reference recipe for ${code.id}")
@@ -194,6 +194,7 @@ class SqliteFoodLookup(
                 // The recipe key IS the row id in data-authoring/recipes.csv, where the absorbed
                 // fraction and its reasoning are recorded for a reviewer to challenge.
                 authoringNoteId = code.id,
+                moistureClass = r.str("moisture_class"),
             )
         )
     }

@@ -36,6 +36,7 @@ class UsRecordSweepTest {
         assertEquals("bread_white", m.code.id)
         assertNotNull("the disclosure must travel with the match", m.disclosure)
         assertTrue(m.disclosure!!.contains("enrichment"))
+        assertTrue("a fact about the data, not an apology", m.disclosure!!.startsWith("Iron not shown"))
         // the sandwiches made from it read Unknown for iron, a named floor, never a number
         for (recipe in listOf("bread_butter", "cheese_sandwich", "egg_sandwich")) {
             assertEquals("UNKNOWN", db.query("SELECT state FROM recipe_nutrients WHERE recipe_key = ? AND nutrient = 'IRON'", listOf(recipe)).single().str("state"))

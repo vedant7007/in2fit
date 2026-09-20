@@ -140,6 +140,12 @@ data class ReferenceRecipe(
     val servings: Double,
     /** Stable id of the row in the authoring file that documents how this recipe was derived. */
     val authoringNoteId: String,
+    /**
+     * The importer's moisture class (GRIDDLE_BREAD, GRAVY, SOFT_GRAIN, ...), which is also the
+     * shape of the dish: a bread, a vada or an idli is COUNTED, a gravy or a rice dish is SERVED.
+     * The resolver reads it to know whether "two rotis" states an amount and "one dal" does not.
+     */
+    val moistureClass: String = "",
 )
 
 data class IngredientAmount(
