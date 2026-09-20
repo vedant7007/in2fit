@@ -133,6 +133,18 @@ for "some / a little" as of this log**: the figure was invented upstream and not
 in the app asks. Sent to Rao and Priya at 20:45; the run of show carries both outcomes for Beat 1
 until Tuesday's rehearsal. The row above is not edited.
 
+## Slide 6, hard problem 01, rewritten by Vedant (21:12): unverified until the card exists
+
+Vedant says the deck is already corrected: slide 6's hard problem 01 no longer claims the app
+asks; it now says the plate shows the amount it assumed, in grams, rather than hiding the
+guess. The corrected PDF is not on this laptop yet; the wording is checked when it lands. The
+claim is **UNVERIFIED** on the code as of 21:12: no card shows "taken as … g", `weigh()` still
+marks a unitless quantity on an authored dish as QUANTITY_STATED, and the model still writes a
+1 for "a little". It becomes RIGHT when Ira's card (`plate_unit_taken_as`, §8.4 idea 4) is on
+the phone and the two resolver changes are green. **Vedant's rule, to be held to: if it is not
+on screen by Thursday 24 September, the sentence comes off the slide.** The countdown carries
+the row. The third claim today moved to match the code rather than the other way round.
+
 ## Three numbers from the demo-condition run, verified against the log (20:15)
 
 Asked for at `ea75984`. Checked against the device report itself, not Rao's summary of it:

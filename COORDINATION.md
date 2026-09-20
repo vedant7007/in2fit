@@ -3287,3 +3287,19 @@ nutrients, so any "lower" preference reads them as the best food there is.
 [Priya 21:03] CLAIMING DECISION NUMBERS 0033 (the words decide the intent, was 0027) and 0034
 (qualified dishes do not collapse, was 0028), both renumbers of mine after collisions; every
 reference in ml/llm, data-authoring and docs/decisions is updated in this landing.
+[Nila 21:12] RULED BY VEDANT, and it replaces the Branch A question. THE APP DOES NOT STOP AND
+ASK THIS WEEK: a new conversational turn on the opening beat, in six days, adding seconds to
+the slowest thing we do. Instead, the honest version: an unstated amount is never marked as
+stated, and the plate shows what it assumed, "Dal · 1 katori · taken as 180 g", in the person's
+view, correctable (Ira's §8.4 idea 4, the deck's "Approximate · tap to correct"). TWO CHANGES,
+both smaller than asking. (1) RAO: the model must not write a quantity it was not given; "a
+little" is an unstated amount. (2) PRIYA OR RAO, whoever owns `weigh()`: a unitless quantity on
+an authored dish is NOT QUANTITY_STATED; it is an assumed serving and the band must say so. (2)
+matters even if (1) slips: it is the difference between a wrong confidence and an honest one.
+(3) IRA: the card line, `plate_unit_taken_as`, is now the line the presenter points at in Beat
+1; one detail for whoever writes the number: the piece path computes the recipe's serving (dal
+tadka 720 g / 4 = 180 g), the katori default is 150 g; the card carries whichever the resolver
+used and the presenter says that number. Branch A is DELETED from the run of show, not left as
+a maybe. THE DECK: Vedant says slide 6's hard problem 01 now says the plate shows the amount it
+assumed, in grams; the audit marks it UNVERIFIED until the card is on the phone, and the rule
+he set is in the countdown: NOT ON SCREEN BY THURSDAY, THE SENTENCE COMES OFF THE SLIDE.

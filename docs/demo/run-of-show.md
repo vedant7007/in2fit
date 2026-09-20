@@ -118,40 +118,43 @@ cool yet; Tuesday's rehearsal is where Vedant stands through it himself. The scr
 counter are what P looks at, not the judge. **P says nothing during the wait unless asked**; if
 asked, P reads the stage aloud: "It's matching the foods against the database now."
 
+**"थोड़ी दाल" states no amount. Ruled by Vedant, 20 Sep 21:12: the app does NOT stop and ask this
+week.** A new conversational turn on the opening beat, in six days, adding seconds to the slowest
+thing we do, is not being built. The honest version instead, cheaper and better on stage: an
+unstated amount is never marked as stated, and the plate shows what it assumed, **"Dal · 1
+katori · taken as 180 g"**, in the person's view, correctable (Ira's §8.4 idea 4; the deck's own
+"Approximate · tap to correct"). The weakness becomes the thing the presenter points at.
+
+Two changes, both smaller than asking, neither in the app on 20 September (the demo-condition
+log, row #1, `dal=1.0 none`: the model wrote the 1, `weigh()` marked it QUANTITY_STATED, 467.2
+kcal at full confidence):
+
+- the model must not write a quantity it was not given; "a little" is an unstated amount (Rao);
+- a unitless quantity on an authored dish is an assumed serving, not QUANTITY_STATED, and the
+  band says so (whoever owns `weigh()`, Priya or Rao). This one matters even if the first slips:
+  it is the difference between a wrong confidence and an honest one.
+
+The grams on the card: 180 g is the authored recipe's serving (`recipes.csv`, dal tadka, 720 g
+over 4), which is what the piece path computes today; the katori default for cooked pulses is
+150 g (`household-units.csv`). Whichever the card carries, **P says the number the card shows**,
+and the same number every rehearsal.
+
 **When the plate lands, P says:**
-
-**"थोड़ी दाल" states no amount, and what the app does with that is hard problem 01 on the deck
-("when someone says 'some rice', the app asks what some means instead of inventing a figure").
-One of two things happens on stage; we choose which, and the presenter has a line for each.
-Vedant's preference: show the asking.**
-
-**Branch A: it asks.** *(Preferred. NOT what the app does on 20 September: no path asks for a
-quantity, there is no asking card and no key for one. It needs two changes by Tuesday's
-rehearsal: the extraction leaves "थोड़ी / a little / some" as no quantity instead of the model's
-"1" (Priya, the prompt), and the Talk screen asks "How much dal?" with the household choices
-when a quantity is missing (Rao, the orchestrator event; Arjun, the card). Rao and Arjun say by
-Tuesday whether it exists; if it does, this is the branch.)*
-
-Screen: the rotis resolved with their figure; the dal named, with a question under it, "How
-much dal?", and the choices: a katori, a bowl, a spoon, grams. P taps "a katori".
-
-> "It stopped and asked. I said 'a little dal', and the app does not know what a little is, so it
-> will not invent it: it asks me, once, and remembers the answer. That is the safety rule in
-> three seconds: it never states a number it was not given, not even about my own plate."
-
-**Branch B: it resolves silently at one serving.** *(What the log shows today,
-`e2e-demo-condition-20sep.txt` row #1, `dal=1.0 none`: the model wrote quantity 1 for "a
-little"; the dish path then took 1 with no unit as one piece of an authored dish and marked it
-QUANTITY_STATED, so the plate reads one serving, 467.2 kcal, and the band beside it does not say
-Rough. A number the model invented was treated as a number the person said. If this is the
-branch, the asking exists only on a slide, and the line below must not claim the app says
-"approximate" beside the dal unless the band on the phone actually reads that.)*
 
 > "Two rotis and a little dal. The numbers come from the USDA tables, looked up by code, not
 > written by the model. The word beside each figure is how far to trust it; the dal is a standard
 > serving because I did not say how much, and that figure is the one a person corrects."
 
-*(Tuesday's rehearsal decides which branch is real; the other is struck.)*
+**P points at the dal line and says:**
+
+> "And it tells you what it guessed: one katori, taken as a hundred and eighty grams. I never said
+> how much, so it does not pretend I did. That line is mine to correct, and the app never hides
+> the number it assumed."
+
+*(The second passage is spoken ONLY if the card reads "taken as … g", or the band beside the dal
+reads Approximate; read the card off the phone at Tuesday's rehearsal before rehearsing it. If it
+is not on screen by Thursday, the passage goes, and the deck's slide-6 sentence goes with it,
+Vedant's rule, 21:12.)*
 
 *(Ruled 18:40, Rao: the demo profile is PRE-SEEDED with the bundled utensil defaults from
 `household-units.csv`, katori 150 g for cooked pulses, grains and dairy, 100 g for a sabzi, plate
