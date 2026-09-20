@@ -127,6 +127,8 @@ android {
                 .withPropertyName("logWordsReviewSheet")
             it.inputs.file(rootProject.file("data-authoring/codemix-renderings.csv"))
                 .withPropertyName("codeMixRenderings")
+            it.inputs.file(rootProject.file("data-authoring/qualified-dishes.csv"))
+                .withPropertyName("qualifiedDishes")
             // And the string tables: StringResourcesTest reads res/values*/strings.xml directly,
             // and without this a Telugu import left the test task UP-TO-DATE and its report
             // reading "0 awaiting review" over a file with 48 REVIEW markers in it.

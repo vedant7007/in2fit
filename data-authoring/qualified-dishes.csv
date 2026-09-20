@@ -1,0 +1,89 @@
+# Qualified dish names, swept for the bug class found in 0026: a dish name that CONTAINS a base
+# ingredient's name collapses onto that ingredient through the matcher's containment stage, and
+# the oil, the other ingredients and the dish's own figures are silently dropped. "fried rice"
+# resolved to plain cooked rice. This file is every such name the sweep tried, with what each
+# must do. docs/decisions/0028.
+#
+# AUTHORED, by one hand, from the dishes a demo speaker plausibly names: the utterance set's
+# dishes, Jacob's code-mix list, and the common canteen and home plates. It is the regression
+# guard for the class, not a census of Indian food.
+#
+# expect:
+#   <recipe_key>    a recipe exists and the name must resolve to it, never to an ingredient
+#   <food_key>      the qualifier is a cooking method on ONE food and resolving to that food is
+#                   right (the extraction carries the method separately): boiled egg -> egg
+#   NODATA:<key>    a composed dish with no recipe: refused BY NAME, never fuzzy, never an ingredient
+#   MISS            no recipe and no ingredient name inside it: an honest miss is fine
+#
+# base: the ingredient the name contains, which is what it would collapse onto.
+utterance,base,expect,note
+fried rice,rice,NODATA:fried_rice,the one 0026 found
+egg fried rice,rice,NODATA:fried_rice,
+chicken fried rice,rice,NODATA:fried_rice,
+veg fried rice,rice,NODATA:fried_rice,
+jeera rice,rice,jeera_rice,authored in the sweep; resolved to cumin before
+ghee rice,rice,ghee_rice,authored in the sweep; resolved to ghee before
+coconut rice,rice,coconut_rice,authored in the sweep; resolved to coconut before
+tomato rice,rice,tomato_rice,authored in the sweep; resolved to tomato before
+curd rice,rice,curd_rice,recipe exists
+lemon rice,rice,lemon_rice,recipe exists
+sambar rice,rice,sambar_rice,recipe exists
+rasam rice,rice,NODATA:rasam_rice,rasam and rice exist separately; the mixed plate does not
+veg pulao,rice,NODATA:pulao,
+chicken pulao,rice,NODATA:pulao,
+egg biryani,rice,NODATA:egg_biryani,
+mutton biryani,rice,NODATA:mutton_biryani,
+chicken biryani,rice,chicken_biryani,recipe exists
+veg biryani,rice,veg_biryani,recipe exists
+butter chicken,chicken,NODATA:butter_chicken,cream and butter gravy; none of it is chicken breast
+chilli chicken,chicken,NODATA:chilli_chicken,deep fried and sauced
+chicken 65,chicken,NODATA:chicken_65,deep fried
+chicken tikka,chicken,NODATA:chicken_tikka,
+tandoori chicken,chicken,NODATA:tandoori_chicken,
+chicken curry,chicken,chicken_curry,recipe exists
+chicken fry,chicken,NODATA:chicken_fry,
+fish fry,fish,NODATA:fish_fry,shallow fried in oil and masala
+fish curry,fish,fish_pulusu,recipe exists
+prawn curry,prawn,royyala_iguru,recipe exists
+prawn fry,prawn,royyala_iguru,the prawn recipe already claims this name; the importer's collision assertion caught the sweep labelling it no-data
+egg curry,egg,egg_curry,recipe exists
+egg bhurji,egg,egg_bhurji,authored in the sweep; resolved to raw egg before
+egg omelette,egg,omelette,recipe exists
+masala omelette,egg,omelette,recipe exists; the qualifier is the same dish
+boiled egg,egg,egg,a method on one food; the extraction carries it
+fried egg,egg,fried_egg,authored in the sweep; resolved to raw egg before and dropped the oil
+bread omelette,egg,NODATA:bread_omelette,
+egg sandwich,egg,egg_sandwich,authored in the sweep; resolved to raw egg before
+paneer butter masala,paneer,NODATA:paneer,paneer itself is refused by name
+palak paneer,paneer,NODATA:paneer,the SUGGEST example in the brief; refused by name until paneer exists
+matar paneer,paneer,NODATA:paneer,
+paneer tikka,paneer,NODATA:paneer,
+dal makhani,dal,NODATA:dal_makhani,butter and cream; not dal tadka
+dal fry,dal,toor_dal_tadka,the same dish as dal tadka by another name
+dal tadka,dal,toor_dal_tadka,recipe exists
+chana masala,chana,chana_masala,recipe exists
+chole bhature,chana,NODATA:chole_bhature,
+rajma chawal,rice,NODATA:rajma_chawal,no kidney bean record either
+aloo paratha,aloo,NODATA:aloo_paratha,
+aloo fry,aloo,aloo_fry,recipe exists
+aloo curry,aloo,aloo_curry,recipe exists
+boiled potato,potato,potato,a method on one food
+gobi manchurian,cauliflower,NODATA:gobi_manchurian,deep fried and sauced
+bhindi fry,bhindi,bendakaya_fry,recipe exists
+masala dosa,dosa,masala_dosa,recipe exists
+plain dosa,dosa,plain_dosa,recipe exists
+rava dosa,dosa,NODATA:rava_dosa,a different batter
+onion dosa,dosa,NODATA:onion_dosa,
+idli sambar,idli,NODATA:idli_sambar,two dishes said as one item; resolved to sambar alone before and dropped the idli
+vada sambar,vada,NODATA:vada_sambar,two dishes said as one item; resolved to sambar alone before
+masala chai,tea,chai,the chai recipe
+black tea,tea,tea_brewed,the record for tea without milk
+cold coffee,coffee,cold_coffee,authored in the sweep; resolved to hot milk coffee before
+filter coffee,coffee,coffee_milk,the coffee recipe
+mango lassi,curd,NODATA:mango_lassi,no mango fruit record
+sweet lassi,curd,sweet_lassi,authored in the sweep
+banana shake,banana,banana_shake,authored in the sweep; resolved to a plain banana before
+fruit salad,fruit,NODATA:fruit_salad,
+cheese sandwich,cheese,cheese_sandwich,authored in the sweep; resolved to cheese alone before
+veg sandwich,bread,NODATA:veg_sandwich,
+bread butter,bread,bread_butter,authored in the sweep; resolved to butter alone before
