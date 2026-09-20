@@ -57,6 +57,8 @@ question it cares most about: whether anything has run on a phone. Something has
 > | A session's worktree; landing on master | `powershell -File tools\new-worktree.ps1 -Name <name>`; `powershell -File tools\land.ps1` | never build in the main tree |
 > | The string rules for anyone writing a screen | `docs/localisation/string-conventions.md` | `StringResourcesTest` enforces the ones a test can |
 > | Licence texts and duties | `docs/licences/`, `docs/decisions/0005` | the IITM PDF diff is recorded there before anyone rules from the text |
+> | The models onto a phone, in chunks, hash-checked | `powershell -File tools\stage-models.ps1` (`-Only llm,asr,tts`, `-Serial`) | `logs\stage-models.log`; not yet run on a phone as of 20 Sep, Rao verifies its three tunables; then the pre-flight card |
+> | The week and the day | `docs/demo/countdown.md`: the hour-one list for the loaner iQOO (steps 0 to 8, on the venue network, before airplane mode), the Tuesday and Saturday tables, the no-owner rows | updated nightly by whoever is awake; a correction is appended and dated |
 > | The demo | `docs/demo/run-of-show.md`, `docs/demo/deck-audit-2026-09-20.md` | budgets are replaced by rows from the clean run; the deck is re-read against the repo before every resubmission |
 > | The branch | `master`, and it stays `master` through judging week. The session tooling's own context described this repository's main branch as `main`; it never had one. A rename is one `gh repo edit --default-branch` and is not to be done while anyone may be reading the URL. | |
 > | The remote | `git push origin master` from any worktree, after landing; `https://github.com/vedant7007/in2fit`, private until ruled otherwise | landing does not push; pushing is deliberate |
