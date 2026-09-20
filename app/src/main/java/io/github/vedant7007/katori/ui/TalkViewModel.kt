@@ -57,7 +57,8 @@ class TalkViewModel @Inject constructor(
         /** Rules fired. [trigger] is the engine's own sentence; [phrased] the model's, if it passed. */
         data class Advice(val trigger: String?, val phrased: String?, val referral: String?, val candidates: List<String>) : Entry
 
-        data class Answer(val text: String, val referral: String?) : Entry
+        /** [text] null: every attempt failed a guard; the screen shows answer_refused and [figures], the person's own lines. */
+        data class Answer(val text: String?, val referral: String?, val figures: List<String> = emptyList()) : Entry
 
         /** The classifier was not sure. The person decides; nothing has been written. */
         data class AskIntent(val transcript: String) : Entry
@@ -135,7 +136,7 @@ class TalkViewModel @Inject constructor(
                     candidates = event.evaluation.rankedCandidates.map { it.candidate.displayName },
                 )
             )
-            is OrchestratorEvent.Answered -> add(Entry.Answer(event.text, event.referral))
+            is OrchestratorEvent.Answered -> add(Entry.Answer(event.text, event.referral, event.figures))
             is OrchestratorEvent.Failed -> add(Entry.Failed(event.reason, event.detail))
             is OrchestratorEvent.NotImplemented -> add(Entry.NotBuilt(event.component))
             OrchestratorEvent.Completed -> Unit

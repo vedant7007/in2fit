@@ -28,6 +28,7 @@ import io.github.vedant7007.katori.ml.asr.AsrEvent
 import io.github.vedant7007.katori.ml.asr.AudioClip
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import io.github.vedant7007.katori.ml.asr.Transcript
+import io.github.vedant7007.katori.ml.llm.AnswerLength
 import io.github.vedant7007.katori.ml.llm.AnswerRequest
 import io.github.vedant7007.katori.ml.llm.ExtractionRequest
 import io.github.vedant7007.katori.ml.llm.ExtractionResult
@@ -77,8 +78,8 @@ class ReferralDefectsTest {
         override suspend fun classify(transcript: String, languageTag: String) = intent
         override suspend fun extract(request: ExtractionRequest): Outcome<ExtractionResult> = Outcome.NotImplemented("test")
         override suspend fun phrase(request: PhrasingRequest): Outcome<PhrasedText> = Outcome.NotImplemented("test")
-        override suspend fun answer(request: AnswerRequest) = answered.also { answers += request }
-        override suspend fun recommend(request: RecommendRequest) = recommended.also { recommendations += request }
+        override suspend fun answer(request: AnswerRequest, length: AnswerLength) = answered.also { answers += request }
+        override suspend fun recommend(request: RecommendRequest, length: AnswerLength) = recommended.also { recommendations += request }
         override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> = Outcome.Ok(block(this))
     }
 

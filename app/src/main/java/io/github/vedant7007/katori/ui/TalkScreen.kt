@@ -160,7 +160,9 @@ private fun EntryCard(entry: Entry, onResolve: (String, SpokenIntent) -> Unit) {
                 }
                 is Entry.Answer -> {
                     Text(stringResource(R.string.answer_title), style = MaterialTheme.typography.labelMedium)
-                    Text(entry.text)
+                    // A refused answer is still a turn (0024): the fixed line, then their own figures.
+                    Text(entry.text ?: stringResource(R.string.answer_refused))
+                    if (entry.text == null) entry.figures.forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
                     entry.referral?.let { Text(it, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error) }
                     SafetyLine()
                 }
