@@ -30,7 +30,7 @@
 # looking calm: it is what caught idli reading 227 kcal/100 g, as dense as a dry griddle roti,
 # because its stated yield left a steamed food at 45 % moisture.
 recipe_key,display_name,aliases_roman,aliases_native,servings,serving_g,yield_g,water_change_g,oil_method,absorbed_oil_g,absorbed_basis,absorbed_reason,note,moisture_class
-chapati,Chapati / roti,roti|chapati|phulka|rotte,రొట్టె|रोटी,6,45,270,62,NONE,0,n/a,A dry-griddle phulka uses no fat. The ghee-smeared version is a separate recipe.,Six rotis from 200 g atta.,GRIDDLE_BREAD
+chapati,Chapati / roti,roti|chapati|phulka|rotte,రొట్టె|रोटी|రోటీ|చపాతీ|चपाती,6,45,270,62,NONE,0,n/a,A dry-griddle phulka uses no fat. The ghee-smeared version is a separate recipe.,"Six rotis from 200 g atta. te/hi aliases GENERATED, unreviewed: see log-words-review.md",GRIDDLE_BREAD
 chapati_ghee,Chapati with ghee,ghee roti|ghee chapati|tuppa rotte,,6,48,288,62,SHALLOW_FRY,18,3 g ghee smeared per roti x 6,"Smeared ghee is absorbed into the roti and eaten in full, unlike a frying bath.",,GRIDDLE_BREAD
 poori,Poori,poori|puri,పూరీ|पूरी,6,54,321,90,DEEP_FRY,28,14% of the 203 g pre-fry batter or dough,"deep-fried wheat dough, mid of the usual 10-18% range",Water change set deliberately: dough loses water during frying. Water change: atta is hydrated into dough (+130) then loses water frying (-40).,DEEP_FRIED
 plain_dosa,Plain dosa,dosa|dose|plain dosa|sada dosa,దోస|दोसा,4,90,360,133,SHALLOW_FRY,20,5 g oil per dosa x 4,"A dosa is cooked on a greased griddle, not in a bath. Roughly a teaspoon per dosa is absorbed.",,GRIDDLE_BREAD
@@ -47,7 +47,7 @@ pakoda,Onion pakoda,pakoda|pakora|onion pakoda|ulli pakodi,పకోడీ,4,59,
 samosa,Samosa,samosa|singhara,సమోసా,4,79,317,10,DEEP_FRY,35,13% of the 272 g pre-fry batter or dough,"sealed pastry; the filling inside absorbs nothing, so lower than an open batter",Water change: pastry dough hydrated (+50); the potato filling loses water (-40).,DEEP_FRIED
 sambar,Sambar,sambar|sambhar|saaru with vegetables,సాంబార్,4,200,800,239,TEMPER,15,all 15 g of tempering oil,Tadka is poured in and eaten in full.,,GRAVY
 rasam,Rasam,rasam|chaaru|charu|puli rasam|chintapandu charu,రసం|చారు,4,180,720,465,TEMPER,10,all 10 g of tempering oil,,,THIN_SOUP
-toor_dal_tadka,Dal tadka,dal tadka|pappu|dal|daal|tadka dal|kandi pappu curry,పప్పు|दाल,4,180,720,307,TEMPER,18,all 18 g of tempering oil,,,GRAVY
+toor_dal_tadka,Dal tadka,dal tadka|pappu|dal|daal|tadka dal|kandi pappu curry,పప్పు|दाल|దాల్|దాలు,4,180,720,307,TEMPER,18,all 18 g of tempering oil,,"te/hi aliases GENERATED, unreviewed: see log-words-review.md",GRAVY
 sambar_rice,Sambar rice,sambar rice|sambar annam|bisi bele style,,3,250,750,234,TEMPER,15,all 15 g of tempering oil,,,SOFT_GRAIN
 curd_rice,Curd rice,curd rice|perugu annam|daddojanam|thayir sadam,పెరుగన్నం,3,200,600,91,TEMPER,8,all 8 g of tempering oil,,,SOFT_GRAIN
 lemon_rice,Lemon rice,lemon rice|nimmakaya pulihora|chitranna|elumichai sadam,నిమ్మకాయ పులిహోర,4,180,720,425,TEMPER,25,all 25 g of tempering oil,Pulihora carries more tempering than most rice dishes; peanuts are fried in it and eaten.,,SOFT_GRAIN
@@ -80,3 +80,5 @@ jowar_roti,Jonna rotte,jowar roti|jonna rotte|jolada rotti,జొన్న ర�
 aloo_curry,Aloo curry,aloo curry|potato curry|bangaladumpa kura|aloo kura,బంగాళాదుంప కూర,4,152,606,-60,TEMPER,25,all 25 g of cooking oil,Tempering and sauteing oil stays in the gravy and is eaten in full.,,GRAVY
 chana_masala,Chana masala,chana masala|chhole|senagala kura|chole,చోలే,4,160,640,120,TEMPER,25,all 25 g of cooking oil,Chickpeas absorb water while cooking; the gravy reduces afterwards.,,GRAVY
 rice_kheer,Payasam,payasam|kheer|paramannam|rice payasam,పాయసం,4,159,637,90,TEMPER,15,all 15 g of ghee,Ghee is stirred through and eaten in full.,,SOFT_GRAIN
+chai,Chai (tea with milk and sugar),tea|chai|chaya|milk tea|tea with milk|cutting chai,టీ|తీ|చాయ్|చాయ|चाय|टी,1,200,200,-10,NONE,0,n/a,"Nothing is fried; the tea, milk and sugar are boiled together.","A bare 'tea' is this, not black tea: the Indian default is with milk and sugar. Composition per cup: 100 g brewed tea, 100 g whole milk, 10 g sugar, boiled down to 200 g. te/hi aliases GENERATED, unreviewed: see log-words-review.md",THIN_SOUP
+coffee_milk,Coffee with milk and sugar,coffee|filter coffee|milk coffee|kaapi|kaafi|coffee with milk,కాఫీ|కాపీ|कॉफी|कॉफ़ी,1,200,200,-10,NONE,0,n/a,Nothing is fried.,"A bare 'coffee' is this, not black coffee: the Indian default is with milk and sugar. Composition per cup: 100 g brewed coffee, 100 g whole milk, 10 g sugar, to 200 g. te/hi aliases GENERATED, unreviewed: see log-words-review.md",THIN_SOUP

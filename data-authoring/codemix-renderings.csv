@@ -1,0 +1,41 @@
+# English food words a Telugu speaker mixes in, as the te ASR model rendered them. docs/decisions/0026.
+#
+# THE SOURCE IS A MEASUREMENT, NOT AN AUTHORING SESSION: `logs/asr-codemix-renderings.log`, Jacob,
+# 20 September 2026, one Piper te voice, one rendering per word, the model's output copied exactly.
+# It is synthetic and one voice: a recorded speaker will vary the vowel signs, and the recorded
+# transcripts replace this file when they exist (a small sample of five or six speakers, reported
+# as one). Until then it is the regression guard for code-mixed speech reaching the matcher, which
+# is where code-mixed speech actually broke: 0 of 25 of these resolved against the shipped tables.
+#
+# emitted : the model's rendering, exactly. said : what the speaker meant, in Telugu script with
+# the final consonant written with ్, which the model closes with ు.
+# expect  : <food_key> or <recipe_key> the rendering must resolve to; NODATA:<key> for a known item
+#           the app holds no honest record for and must refuse BY NAME; MISS for a composed dish
+#           that has no recipe and must not collapse onto an ingredient; UNIT:<unit> for a unit
+#           word, scored through resolveUnit on the unit part alone.
+english,emitted,said,expect,note
+milk,మిలిచ,మిల్క్,milk_whole,unstable one-syllable rendering
+egg,ఎది,ఎగ్,egg,unstable
+bread,బ్రెడ్,బ్రెడ్,bread_white,food did not exist
+rice,రైస్,రైస్,rice_cooked,
+chicken,చికెన్,చికెన్,chicken,
+curd,కడ్డ,కర్డ్,curd,unstable
+coffee,కాఫీ,కాఫీ,coffee_milk,food did not exist; the Indian default is with milk and sugar
+tea,తీ,టీ,chai,food did not exist; the Indian default is with milk and sugar
+juice,జ్యూస్,జ్యూస్,juice_generic,food did not exist; a bare juice is a category and resolves to the orange record at ROUGH with a display name that says so
+biscuit,బిస్కెడి,బిస్కెట్,biscuit_marie,food did not exist
+banana,బనానా,బనానా,banana,only raw_banana (plantain) existed
+apple,ఆపిలి,ఆపిల్,apple,food did not exist
+chapati,చపాతీ,చపాతీ,chapati,
+roti,రోటీ,రోటీ,chapati,
+dal,దాల్,దాల్,toor_dal_tadka,bare dal is the tempered dal people eat (utterance set)
+paneer,పనీరు,పనీర్,NODATA:paneer,no honest record: not in USDA and the recipe layer cannot shed the whey
+butter,బటరు,బటర్,butter,
+cheese,చీరి,చీజ్,cheese_processed,food did not exist; the Indian cube or slice is processed cheese
+sugar,షుగరు,షుగర్,sugar,
+oil,ఆయలు,ఆయిల్,groundnut_oil,the default for an unqualified oil (ingredients.csv)
+water,వాటరు,వాటర్,water,food did not exist
+boiled egg,బాయిల్డే ఎగ,బాయిల్డ్ ఎగ్,egg,
+fried rice,ఫైడ్ రైస్,ఫ్రైడ్ రైస్,NODATA:fried_rice,no recipe; before this entry it collapsed onto plain rice through containment, a wrong number this list found
+one glass,వన్ గ్లాస్,వన్ గ్లాస్,UNIT:గ్లాస్,
+two cups,ట కత్స్,టూ కప్స్,UNIT:కత్స్,garbled; the unit word as emitted

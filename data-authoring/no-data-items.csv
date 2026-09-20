@@ -3,7 +3,7 @@
 #
 # This file exists so the absence is a deliberate, reviewed decision rather than a gap nobody
 # noticed. See docs/decisions/0002-usda-import-rules.md.
-key,display_name,aliases_roman,reason
+key,"display_name","aliases_roman","reason"
 curry_leaves,"Curry leaves","curry leaves|kadi patta|karivepaku","Absent from USDA. Contribution to a meal's macros is immaterial, so no-data is honest and harmless."
 asafoetida,"Asafoetida (hing)","hing|asafoetida|inguva","Absent from USDA. Used in fractions of a gram."
 ajwain,"Ajwain","ajwain|carom seeds|vaamu","Absent from USDA."
@@ -17,3 +17,5 @@ cluster_beans,"Cluster beans (goru chikkudu)","cluster beans|goru chikkudu|gawar
 methi_leaves,"Fenugreek leaves (menthi kura)","methi leaves|menthi kura|methi saag|kasuri methi","USDA carries fenugreek SEED only. The leaf and the seed are nutritionally very different, so the seed is not a substitute."
 horse_gram,"Horse gram (ulavalu)","horse gram|ulavalu|kulthi|hurali","No USDA record for Macrotyloma uniflorum. Needed for ulavacharu; stays no-data until a licensed Indian source exists."
 vermicelli,"Vermicelli (semiya)","vermicelli|semiya|seviyan","USDA carries only soy vermicelli and a flavoured mix, neither of which is wheat semiya."
+paneer,"Paneer","paneer|panir|cottage cheese|पनीर|పనీర్|పనీరు","Not in USDA. The recipe layer keeps every ingredient nutrient, and paneer sheds its lactose in the whey, so composing it from milk would overstate carbohydrate about ten-fold; every USDA stand-in (queso fresco, mozzarella) is wrong on sodium, a tracked nutrient. Refused by name until a licensed source or a whey-loss mechanism exists. te/hi aliases GENERATED, unreviewed: see log-words-review.md"
+fried_rice,"Fried rice","fried rice|veg fried rice|egg fried rice|chicken fried rice|ఫ్రైడ్ రైస్|ఫైడ్ రైస్|फ्राइड राइस","No reference recipe authored yet. Without this entry the name collapses onto plain cooked rice through containment (the word rice inside it), which drops the oil and the vegetables: a wrong number, found on the ASR model's own rendering. Refused by name, never fuzzy, until a recipe exists. te/hi aliases GENERATED, unreviewed: see log-words-review.md"

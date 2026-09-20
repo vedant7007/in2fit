@@ -40,7 +40,21 @@ object FoodTextMatching {
             sb.append(if (keep) ch else ' ')
         }
         return sb.toString().trim().replace(Regex("\\s+"), " ")
+            .split(' ').joinToString(" ") { closeFinalTeluguU(it) }
     }
+
+    /**
+     * A word-final ు is treated as ్. Telugu closes a borrowed consonant-final word with a short
+     * u that the speaker did not say: the ASR model rendered పనీర్ as పనీరు, బటర్ as బటరు, వాటర్ as
+     * వాటరు (`logs/asr-codemix-renderings.log`, 0 of 25 English food words said the Telugu way
+     * resolved). This is a property of Telugu phonology, not of that model, so it lives in the
+     * normaliser, on both the alias and the query side: `tools/build_food_db.py` applies the same
+     * rule to `alias_norm`, and a test proves the two agree on the shipped tables. Native words
+     * that really end in ు (పప్పు, పాలు) are normalised the same way on both sides, so nothing
+     * changes for them; the importer's ambiguous-alias assertion would catch a collision.
+     */
+    private fun closeFinalTeluguU(word: String): String =
+        if (word.endsWith('ు')) word.dropLast(1) + '్' else word
 
     /** True when the text contains Devanagari or Telugu characters. */
     fun isNativeScript(text: String): Boolean =

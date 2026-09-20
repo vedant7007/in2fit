@@ -290,7 +290,11 @@ def main():
     def norm(s):
         s = s.strip().lower()
         s = re.sub(r"[^\wऀ-ॿఀ-౿ ]+", " ", s, flags=re.UNICODE)
-        return re.sub(r"\s+", " ", s).strip()
+        s = re.sub(r"\s+", " ", s).strip()
+        # A word-final ు is ్: Telugu closes a borrowed consonant-final word with a short u the
+        # speaker did not say (పనీర్ -> పనీరు). Mirrors FoodTextMatching.normalise; a JVM test
+        # asserts the two agree on every alias in the shipped tables.
+        return re.sub("ు(?= |$)", "్", s)
 
     def is_native(s):
         return any("ऀ" <= ch <= "ॿ" or "ఀ" <= ch <= "౿" for ch in s)
@@ -330,9 +334,18 @@ def main():
             if a:
                 c.execute("INSERT INTO no_data_aliases VALUES (?,?,?)", (a, norm(a), r["key"]))
 
+    # A unit row's `unit` may carry `|`-separated spoken forms (glass|గ్లాస్|गिलास); each becomes
+    # its own row with the same grams, stored normalised, which is what resolveUnit looks up.
     for r in units:
-        c.execute("INSERT INTO unit_conversions VALUES (?,?,?,?)",
-                  (r["unit"], r["food_class"], float(r["grams"]), r["note"] or None))
+        seen_units = set()
+        for u in r["unit"].split("|"):
+            u = norm(u)
+            # Two spellings that normalise to one form (గ్లాస్, గ్లాసు) are one unit, by design.
+            if not u or u in seen_units:
+                continue
+            seen_units.add(u)
+            c.execute("INSERT INTO unit_conversions VALUES (?,?,?,?)",
+                      (u, r["food_class"], float(r["grams"]), r["note"] or None))
 
     # ---- authored reference recipes ------------------------------------------------------
     # A reference recipe is a stated composition, shown to the user and editable. Every figure
