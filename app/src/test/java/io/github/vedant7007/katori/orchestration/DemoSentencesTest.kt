@@ -171,7 +171,7 @@ class DemoSentencesTest {
         out.appendLine("Extraction is authored as the prompt is asked to produce it (labelled in the test); the lab value in beat 4 is a placeholder with the shape of the report.")
         out.appendLine("Profile: 22 years, 62 kg, hostel student, no diet type declared. Both language columns of `demo-utterance-set.csv`.")
         out.appendLine()
-        out.appendLine("| # | beat | lang | reference transcript | intent | decided by | the plate: food, amount said or assumed, taken as, band | figures the database returns | rules engine |")
+        out.appendLine("| # | beat | lang | reference transcript | intent | decided by | the plate: food, amount as said or assumed (taken as: only when inferred; a stated amount's grams in brackets), band | figures the database returns | rules engine |")
         out.appendLine("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
 
         var loggedMealForBeat4: ResolvedMeal? = null
@@ -198,10 +198,14 @@ class DemoSentencesTest {
                     is Outcome.Ok -> {
                         val meal = res.value
                         foodsCol = meal.items.zip(meal.parsed.items).joinToString("; ") { (ri, pi) ->
-                            // as the plate shows it: what was said or assumed, then what it was taken as, then the band
+                            // As the card shows it (0035): the amount as said or assumed; "taken as" ONLY when the
+                            // amount was inferred, since a stated measurable amount is the person's and its
+                            // conversion belongs behind the band's detail, here in brackets; then the band.
                             val amount = pi.quantity?.let { q -> "%.0f".format(q).removeSuffix(".0") + " " + (pi.unit ?: "") } ?: ""
-                            val assumed = if (ConfidenceReason.QUANTITY_INFERRED in ri.confidence.reasons || ConfidenceReason.HOUSEHOLD_UNIT_DEFAULT in ri.confidence.reasons) "taken as " else ""
-                            "${pi.spokenName} → ${ri.snapshot.foodCode ?: "no data"} $amount ${ri.snapshot.grams?.let { "$assumed%.0f g".format(it) } ?: "weight unknown"} ${ri.confidence.band.name.lowercase()}"
+                            val grams = ri.snapshot.grams?.let { g ->
+                                if (ConfidenceReason.QUANTITY_INFERRED in ri.confidence.reasons) "taken as %.0f g".format(g) else "(%.0f g)".format(g)
+                            } ?: "weight unknown"
+                            "${pi.spokenName} → ${ri.snapshot.foodCode ?: "no data"} $amount $grams ${ri.confidence.band.name.lowercase()}"
                         }
                         figuresCol = figures(meal)
                         // wrong food?

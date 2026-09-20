@@ -98,6 +98,17 @@ class UnstatedQuantityTest {
         assertEquals("कटोरी", meal.parsed.items.single().unit)
     }
 
+    /**
+     * "Taken as" is for an inferred amount only (0035): a measurable amount the person stated is
+     * theirs, so it never carries QUANTITY_INFERRED, whatever conversion sits behind the band.
+     */
+    @Test fun `a stated measurable amount is never inferred`() {
+        val meal = resolve(item("milk", 200.0, "ml"), item("oil", 2.0, "spoon"), item("rice", 1.0, "plate"))
+        meal.items.forEach { assertFalse("${it.snapshot.displayName} was stated and reads as inferred", ConfidenceReason.QUANTITY_INFERRED in it.confidence.reasons) }
+        assertEquals(listOf("ml", "spoon", "plate"), meal.parsed.items.map { it.unit })
+        assertEquals(200.0, meal.items[0].snapshot.grams!!, 0.5)
+    }
+
     /** A plain food with a number and no unit: "two rice" is two assumed katoris. */
     @Test fun `a number with no unit on a plain food is an assumed household unit`() {
         val meal = resolve(item("rice", 2.0, null))
