@@ -3521,3 +3521,78 @@ descoped for the battle (Rao, 18:40). TO VEDANT: cut the first half or reword it
 standard katori; the second half stands on the Thursday rule. TO PRIYA: thank you; the run of
 show and the countdown now say the resolver half is done. TO RAO: the model half (no quantity
 it was not given) is the one still open, and `0035` says the plate reads the same either way.
+[Rao 21:50] THE RED ON MASTER, FIRST (Nila 19:40/19:45, Vedant): `DefaultOrchestratorTest > a
+question asking for a clinical judgement gets the fixed referral line with no report on file`.
+Cause found and fixed in `fddedf3`: 9721e14 made a bare digit log evidence in `LogPrefilter`,
+and "my haemoglobin is 7, is that dangerous" has a digit and no marker, so the router decided
+LOG and the turn wrote a MEAL from a health question; no Answered because it was never an
+ANSWER. That is the misroute-to-LOG the router exists to prevent, on the safety path. Fix, first
+thing in `isCertainLog`: a question that asks for a clinical judgement or states a lab reading
+is never a certain log, whatever else its words say; "sugar", "cholesterol" and "iron" beside a
+number are readings. `LogPrefilterTest` pins the sentence. PRIYA: your `RankingDefectsTest`
+went green in the same commit (only a positive score is a suggestion, and each nutrient now
+scores as a fraction of a day's reference so "fibre higher, carbohydrate lower" is not decided
+by grams of carbohydrate outnumbering grams of fibre). MEERA: your two Ollama cases are the
+NUMBER guard (9.5 mg: caught) and the CONDITION check; with "permit what the request contains"
+a row that mentions anaemia would have let "indicates anaemia" through, which is exactly the
+paraphrase class Vedant ruled on below.
+
+[Rao 21:50] RULED BY VEDANT from the ten sentences on the handset, and built (`97abec9`):
+A NUTRITION CLAIM IS QUOTED VERBATIM FROM ITS ROW BY CODE; THE MODEL MAY NOT RESTATE ONE.
+"Chickpeas (bengal gram), cooked. They contain iron and are rich in vitamin C, which enhances
+iron absorption." passed every guard and is false: the model fused a row's claim onto the food
+it was naming. Paraphrasing a sourced claim is deciding, and the model does not decide.
+`ClaimGuard` is the fourth post-condition in `guarded()`: a sentence with a claim verb about a
+nutrition noun (rich in, source of, contains, helps, absorbs, lowers, good for ...) must appear
+verbatim in a row or line the model was given, whole sentence in source or whole source in
+sentence. The model may name the food, introduce it and connect it to the question.
+THE SAME CLASS ABOUT THE DIARY, in Vedant's words: "You ate rice, dal, curd, rotis, milk and
+egg on Tuesday" when nothing was logged on a Tuesday is the model asserting a fact about the
+person's own diary that the diary does not contain, and nothing stopped it. That is the same
+class as the vitamin C error, a missing defence, not only a prompt bug. Built into the same
+guard: a weekday in the output must appear in a diary line the model was given (the lines now
+carry their weekday, `ea75984`), and the question is not a line. PRIYA, two things are yours:
+(1) the prompt half, "if no listed meal is from the day asked, say so"; (2) THIRTEEN of the
+authored good answers in `safety-adversarial-set.csv` restate their rows ("pulses and
+vegetables help keep blood sugar steady"), which was the bar before this ruling and is not now.
+`SafetyLineTest > every good answer passes` is RED BY DESIGN from `97abec9` and its message
+says so; the good answers have to quote their rows verbatim. The defence you asked for is the
+guard; run your set against it.
+
+[Rao 21:50] ALSO RULED: (a) SHORT is too tight for RECOMMEND, and RECOMMEND needs its own
+budget; SHORT is not to be reverted wholesale. PRIYA, the number is yours; the example from the
+phone: 56 tokens produced "Spices, cumin seed" (6 tokens) and, tonight, "Chickpeas (bengal
+gram), cooked." (12). (b) SPOKEN NAMES (`56bd5c7`): the judges hear the first alias ("cooked
+rice", "curd", "palak"), a recipe's own name ("Dal tadka"), the USDA description only as a last
+resort; the description stays on screen next to the citation. `SpokenNames` is the seam;
+everything handed to the model or the voice goes through it; the screen does not. PRIYA: the
+field is the first roman alias in `ingredients.csv`; if a food's first alias is not the one a
+person would say, reorder it, nothing else changes. (c) NILA, THE RUN OF SHOW: LOG at 14.9 s to
+the plate STANDS and gets no more engineering this week; the presenter talks over it, and the
+diary is PRE-SEEDED so beats 2, 3 and 4 never wait on beat 1 completing. The utensils are
+pre-seeded too: the bundled defaults (katori 150 g, plate 200 g, glass 200 ml, spoon of oil 10 g,
+one roti 45 g). (d) ARJUN: `CalibrateUnit` is descoped for the battle; drop the screen.
+(e) KV-cache prefix reuse is dropped until after the battle.
+
+[Rao 21:50] THE DECK NUMBERS, demo condition (USB, airplane on, idle, cool at start; 8 threads;
+`OrchestratorDeviceTest.a`, 19:39): ANSWER figures on screen 0.55 s, spoken 9.2 s; RECOMMEND
+0.50 s / 9.4 s; AdviseOnMeal after a scan 0.47 s; SaveLabReport with its regeneration 9.3 s;
+LOG plate 14.9 s, spoken 24.7 s; SUGGEST plate 8.4 s, spoken 16.9 s. The first AdviseOnMeal
+was 9.2 s, a digest mismatch (the LOG evaluated the resolver's snapshot, the read-back the
+store's); fixed in `ea75984`, the JVM test made Room-shaped so it fails without the fix
+(`41eedd3`), the phone re-measure owed and waiting on a USB link that drops every few minutes
+tonight (four installs failed mid-write; chunked push failed too). The ten sentences: intent
+10/10 by the words; foods and quantities right on 9/10 (#10 dropped sambar, the model's known
+drop); #3's egg has unit "boiled" so it is a hole in every total (egg is DAIRY in the food
+data, so a piece has no gram weight; PRIYA/NILA, a class or a recipe for egg fixes the demo
+sentence). Hindi: "aaj maine kitna protein khaya" with languageTag hi was answered in ENGLISH
+("Today so far: 20.9 g protein."); the model does not switch script by being asked.
+
+[Rao 21:50] TO MEERA: `TtsVoiceProbeTest` cannot run on this realme: `GrantPermissionRule`
+throws `SecurityException: Error granting runtime permission`, and `pm grant` from adb is
+refused too; all three tests die in the rule, including a and b which need no mic. Scope the
+rule to test c and catch it; Vedant grants Microphone to IN2FIT once in Settings. The 14:47
+voices stand. `spokenLanguageOf` is wired in `speak()` and the lead-in. The 0 % CPU hang at
+19:03: every model call stalled with the process asleep, loadavg 15 with `wdtk` kernel threads
+in D, USB in PTP; a reboot cleared it. Stage-day rule: if the model ever stalls at 0 % CPU,
+reboot, do not debug.
