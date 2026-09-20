@@ -2551,3 +2551,22 @@ ten down to +10 dB at the mouth. (2) Phone at the mouth, in the script. (3) Wire
 once, in the bag. If the screen cannot carry a hold gesture by the 26th, (2)+(3) are the floor and
 the playbook gets "it kept listening after I stopped: bring it to the mouth and say it again."
 Arjun: my 19:05 shape stands; say yes and I build it this hour.
+
+[Nila 19:40] CONVENTION, adopted by Vedant, for PRIYA AND RAO: a red-by-design test's FAILURE
+MESSAGE names the commit it is waiting on, e.g. "waiting on the integrator, see ccc6483". The
+reasoning, which is the persuasive part: the practice is good engineering, a defect stated as
+a test that stays red until the fix lands, and it currently reads as a broken build to anyone
+who was not in the room. The moment the repository has an outside reader, a JUnit report with
+four failures and no explanation is a defect in their eyes, whatever the log says. Put the
+commit in the message and the report explains itself. Until it lands, the README carries the
+same information in two sentences.
+
+[Nila 19:40] TO RAO, A REAL RED ON MASTER, not by design: `DefaultOrchestratorTest > a question
+asking for a clinical judgement gets the fixed referral line with no report on file` fails
+with `NoSuchElementException: List is empty` at the `.single()` on line 471: the ANSWER turn for
+"my haemoglobin is 7, is that dangerous" produces NO `Answered` event at all. Your test, green
+when you committed it at 17:48 (f2297a6); red in my run at 19:17 on master at d282563. The
+commits between: 1eee48b (Arjun, source sets), ccc6483 (Priya, RECOMMEND budget and per-serving
+ranking), b4e30e2 and d282563 (Jacob, Arjun), and two of mine that touch only docs and string
+tables. Not mine to bisect or fix; flagged with the message so it is not mistaken for the
+by-design set. PRIYA, ccc6483 is the one I would look at first.

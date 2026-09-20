@@ -58,3 +58,11 @@ start until step 4 has fetched the speech runtime it needs, with its checksum ve
 - A wrong food is the metric, not the match rate.
 
 The reasons behind each are in `HANDOVER.md` §6.
+
+## Tests that are red on purpose
+
+Some tests on `master` are red by design: they state a defect the integrator has not yet fixed,
+and their failure message names the commit that opened them. On 20 September those are the
+three in `domain/RankingDefectsTest` (opened in `ccc6483`: a zero-scored candidate must not be
+presented as a suggestion). Any other red test is a defect, not a convention, and is tracked in
+`COORDINATION.md`.
