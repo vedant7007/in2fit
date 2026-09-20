@@ -14,6 +14,13 @@ that ships is the one Vedant's own recordings score better on** (`tools/asr_eval
 with every Indic food word broken, so this file is written in Hindi until his recordings say
 otherwise. Speech language and interface locale are separate settings.
 
+**What the screen shows.** The screen states below are `0026`'s. Checked against the shell on
+20 September 17:10: every phrase quoted here is a key in the string table (none missing); the
+level meter, the stage list and the intent heading are in `ui/` today; **the elapsed-seconds
+counter and the stop control are not yet**, and are Arjun's tonight with his `talk_` keys.
+Until they land, the presenter's "the counter is real time" line in the playbook is not true
+on the device; say "the stage list" instead. Re-read this paragraph after the end-to-end run.
+
 **Timings** marked *(measured)* are from the phone, with the log named. Everything else is a
 budget, marked *(budget)*, and Rao replaces it with a row from the clean run. Do not read a
 budget as a measurement.
