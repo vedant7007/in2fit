@@ -3596,3 +3596,24 @@ voices stand. `spokenLanguageOf` is wired in `speak()` and the lead-in. The 0 % 
 19:03: every model call stalled with the process asleep, loadavg 15 with `wdtk` kernel threads
 in D, USB in PTP; a reboot cleared it. Stage-day rule: if the model ever stalls at 0 % CPU,
 reboot, do not debug.
+
+[Rao 23:05] A RULE, UNDER MY NAME, RULED BY VEDANT: ANY CHANGE THAT MAKES LOG EASIER TO REACH
+MUST BE TESTED AGAINST A HEALTH QUESTION CONTAINING A NUMBER. LOG is the only intent that
+writes to the person's record, so it is the only one where a false positive is destructive
+rather than annoying. Tonight's red came from a sensible rule (a bare digit as log evidence)
+meeting a sentence nobody imagined when it was written ("my haemoglobin is 7, is that
+dangerous"), and it wrote a meal from a health question. The rule is a test:
+`LogNeverFromAHealthQuestionTest`, ten spoken shapes plus every clinical row of the adversarial
+set, through all three routes (pre-filter, router, the model's verdict). PRIYA: you own the
+pre-filter and you will add evidence to it again this week; this test is what you run into
+before you run into a diary. Written first, it found a second hole: "haemoglobin 9.8" with no
+marker went to the model and a LOG verdict would have been believed; a stated reading is now
+ANSWER evidence in the router and `accept()` refuses LOG on it. The domain decides, not the
+grammar.
+
+[Rao 23:05] TO PRIYA, RECONCILED ONCE: my "13 of 22 restate their rows" was counted before your
+8392a24 rewrite; your "nine" was what you changed. Against the guard as landed (`97abec9`,
+unchanged since), `SafetyLineTest > every good answer passes` is GREEN on master: zero
+remaining. Your evening ranking ruling (make the terms comparable, do not filter by sign) is
+in the engine as your rewritten `RankingDefectsTest` states it; the daily-reference scale
+stays, the positive-only filter is gone, the list is never emptied when real food is on it.
