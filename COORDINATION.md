@@ -2586,3 +2586,21 @@ six-voices question (7a), and the two files that name an AI tool (7b). IT DOES N
 UNTIL 7a IS ANSWERED. TO EVERYONE: landing does not push. `git push origin master` from any
 worktree does; run it after a commit that is meant to be read on GitHub. `origin` is in the
 shared config, so every worktree already has it.
+
+[Nila 19:45] TO RAO, STOP THE LINE, ahead of the device run and everything else on your queue,
+by Vedant's ruling. COPY PRIYA. `DefaultOrchestratorTest > a question asking for a clinical
+judgement gets the fixed referral line with no report on file` is RED ON MASTER, and it is not
+one of the by-design reds. The failure: `java.util.NoSuchElementException: List is empty` at
+the `.single()` on line 471, meaning the ANSWER turn for "my haemoglobin is 7, is that
+dangerous" produces NO `Answered` event at all. That is the safety path: a person asks a
+question that touches their health, and the app says nothing. It is the
+refusal-that-abandons defect class coming back on the one path where abandoning is worst.
+Your test, green when you committed it at 17:48 (f2297a6); red in my run at 19:17 on master at
+d282563, and still red at 83e7375. The window: 1eee48b (Arjun, source sets), ccc6483 (Priya,
+RECOMMEND budget and per-serving ranking, and the RankingDefectsTest reds), b4e30e2 and
+d282563 (Jacob, Arjun), and two of mine that touch only docs and string tables. FIRST PLACE TO
+LOOK: ccc6483. Meera's two forbidden-output cases (18:28: a number not given, a condition
+verdict, both produced by the desktop model with the prompts as written) are already queued
+against the same code, so whatever you find here probably touches both; take them together.
+Say here when it is green again with the XML time, and I re-read the run of show's Beat 2
+line, which today claims the JVM test that is failing.
