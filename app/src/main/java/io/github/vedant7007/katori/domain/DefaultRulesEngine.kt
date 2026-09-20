@@ -198,11 +198,13 @@ class DefaultRulesEngine : RulesEngine {
             val applied = mutableListOf<Constraint>()
             for (p in prefs) {
                 val per100 = c.nutrientsPer100g[p.nutrient] ?: continue
-                // Per serving, not per 100 g (the CandidateFood contract says why), then an
-                // integer score in thousandths so ordering cannot drift with floating point
-                // across devices.
+                // Per serving, not per 100 g (the CandidateFood contract says why); then as a
+                // FRACTION OF A DAY'S REFERENCE AMOUNT for that nutrient, so that "fibre higher,
+                // carbohydrate lower" is not decided by grams of carbohydrate always outnumbering
+                // grams of fibre (every real food lost that contest); then an integer score in
+                // thousandths so ordering cannot drift with floating point across devices.
                 val perServing = per100 * c.servingGrams / 100.0
-                val contribution = (perServing * p.weight * 1000).toInt()
+                val contribution = (perServing / DAILY_REFERENCE.getValue(p.nutrient) * p.weight * 1000).toInt()
                 score += if (p.direction == Constraint.PreferNutrient.Direction.HIGHER) contribution else -contribution
                 applied += p
             }
@@ -214,12 +216,27 @@ class DefaultRulesEngine : RulesEngine {
             )
         }
 
-        // Total order: score descending, then food code. The final tiebreak is what stops two
-        // equally scored candidates swapping places between runs.
-        return scored.sortedWith(
+        // ONLY A POSITIVE SCORE IS A SUGGESTION (Priya's RankingDefectsTest, 20 Sep). A candidate
+        // the preferences argue against scores below zero; one they give no reason to prefer
+        // scores zero; neither is advice, and an alphabetical tail of them under the real
+        // suggestions read as advice on the screen. Nothing to say is an empty list.
+        //
+        // Total order among the rest: score descending, then food code. The final tiebreak is
+        // what stops two equally scored candidates swapping places between runs.
+        return scored.filter { it.score > 0 }.sortedWith(
             compareByDescending<RankedCandidate> { it.score }.thenBy { it.candidate.foodCode }
         )
     }
+
+    /**
+     * A day's reference amount per nutrient, USED ONLY AS A RANKING SCALE so that nutrients
+     * measured in grams and in milligrams weigh alike. Never shown, never compared against a
+     * person's intake, never a target: a ranking device, like the score it feeds.
+     */
+    private val DAILY_REFERENCE: Map<Nutrient, Double> = mapOf(
+        Nutrient.ENERGY to 2000.0, Nutrient.PROTEIN to 50.0, Nutrient.CARBOHYDRATE to 250.0, Nutrient.FAT to 65.0,
+        Nutrient.FIBRE to 25.0, Nutrient.IRON to 18.0, Nutrient.VITAMIN_B12 to 2.4, Nutrient.SODIUM to 2000.0,
+    )
 
     // --- trigger ------------------------------------------------------------------------------
 

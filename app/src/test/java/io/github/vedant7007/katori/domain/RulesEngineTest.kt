@@ -212,12 +212,13 @@ class RulesEngineTest {
         assertTrue("before the report there is nothing to explain", before.trigger == null)
 
         // The ordering must be driven by the constraint, not by the tiebreak. Sprouts carry more
-        // fibre and less carbohydrate than white rice, so they must rank above it.
+        // fibre and less carbohydrate than white rice, so they are suggested; and white rice,
+        // which the constraint argues against, is not a suggestion at all (RankingDefectsTest):
+        // a food the preferences score below zero does not appear under the sentence that
+        // explains why the list changed.
         val order = after.rankedCandidates.map { it.candidate.foodCode }
-        assertTrue(
-            "ranking must reflect the fired constraint, got \$order",
-            order.indexOf("sprouts") < order.indexOf("white_rice"),
-        )
+        assertTrue("ranking must reflect the fired constraint, got $order", order.first() == "sprouts")
+        assertTrue("a food the constraint argues against is not offered, got $order", "white_rice" !in order)
         assertEquals(TriggerTemplate.LAB_ABOVE_RANGE, after.trigger!!.template)
         val t = after.triggerText()!!
         assertTrue("the trigger must cite the report date", t.contains("2026-09-12"))

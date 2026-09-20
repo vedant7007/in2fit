@@ -102,6 +102,9 @@ object SafetyLine {
     internal val LAB_TERMS: List<String> = listOf(
         "haemoglobin", "hemoglobin", "hb", "glucose", "fasting", "hba1c", "a1c", "bp", "blood pressure", "ldl", "hdl",
         "triglycerides", "creatinine", "tsh", "b12", "vitamin d", "ferritin", "reading", "report", "level", "levels",
+        // "my sugar is 140": the word people actually use for a glucose reading (added 20 Sep
+        // with the pre-filter fix; a number beside it is a reading, not a spoonful).
+        "sugar", "cholesterol", "iron",
     )
 
     /**

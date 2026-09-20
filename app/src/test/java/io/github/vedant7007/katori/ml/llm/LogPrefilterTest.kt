@@ -57,6 +57,15 @@ class LogPrefilterTest {
 
     // --- the shape of the rule, on cases chosen to be awkward -----------------------------------
 
+    /** Red on master 20 Sep: the digit rule made a stated lab reading a certain log. Never. */
+    @Test fun `a stated reading or a clinical question is never a certain log, digit or not`() {
+        assertFalse(LogPrefilter.isCertainLog("my haemoglobin is 7, is that dangerous"))
+        assertFalse(LogPrefilter.isCertainLog("my sugar was 140 this morning"))
+        assertFalse(LogPrefilter.isCertainLog("haemoglobin 9.8"))
+        // and a plain quantity beside a food still is one
+        assertTrue(LogPrefilter.isCertainLog("two rotis and a katori of dal"))
+    }
+
     @Test fun `a past-tense eating word with no marker is certain`() {
         assertTrue(LogPrefilter.isCertainLog("I ate dal and rice"))
         assertTrue(LogPrefilter.isCertainLog("nenu annam pappu tinnanu"))

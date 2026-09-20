@@ -40,6 +40,12 @@ object LogPrefilter {
     /** True only when [transcript] is certainly a meal log. False means "let the model decide". */
     fun isCertainLog(transcript: String): Boolean {
         if (hasMarker(transcript)) return false
+        // A stated reading is not a meal. FOUND RED ON MASTER (20 Sep, 19:17): "my haemoglobin is
+        // 7, is that dangerous" has a digit and no marker, so the quantity rule made it a certain
+        // log and the diary would have been written from a health question. A question that
+        // asks for a clinical judgement, or states a lab reading, is never a log, whatever else
+        // its words say; this is the refusal-that-abandons class, and it goes first.
+        if (SafetyLine.invitesClinicalJudgement(transcript)) return false
         val text = FoodTextMatching.normalise(transcript)
         if (text.isEmpty()) return false
         val words = text.split(' ')
