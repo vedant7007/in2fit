@@ -60,6 +60,22 @@ class StringResourcesTest {
         }
     }
 
+    /**
+     * A merge conflict marker landed in values/strings.xml on 20 September (a bare `=======`
+     * line, from a rebase resolved by hand) and would have failed the next resource merge for
+     * everyone. The XML parser does not object to it, since it is text between elements, so
+     * this reads the raw lines.
+     */
+    @Test
+    fun `no string table carries a merge conflict marker`() {
+        val marker = Regex("""^(<<<<<<<|=======|>>>>>>>)""")
+        val hits = (listOf("values") + locales.map { "values-$it" })
+            .map { File(res, "$it/strings.xml") }
+            .filter { it.isFile }
+            .flatMap { f -> f.readLines().mapIndexedNotNull { i, l -> if (marker.containsMatchIn(l)) "${f.parentFile.name}/strings.xml:${i + 1}: $l" else null } }
+        assertTrue("merge conflict markers in a string table:\n${hits.joinToString("\n")}", hits.isEmpty())
+    }
+
     @Test
     fun `every key in a locale file exists in the default table`() {
         val default = keysOf(File(res, "values/strings.xml")).keys

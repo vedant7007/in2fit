@@ -291,9 +291,65 @@
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="about_title">గురించి</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
-    <string name="about_offline">IN2FIT పూర్తిగా ఈ ఫోన్‌లోనే నడుస్తుంది. డెమో బిల్డ్‌కు ఇంటర్నెట్ అనుమతి లేదు: మీరు చెప్పేది, స్కాన్ చేసేది లేదా నమోదు చేసేది ఏదీ ఫోన్ బయటకు వెళ్ళదు.</string>
-    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="about_licences_title">లైసెన్సులు మరియు నోటీసులు</string>
     <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="about_offline">IN2FIT పూర్తిగా ఈ ఫోన్‌లోనే నడుస్తుంది. డెమో బిల్డ్‌కు ఇంటర్నెట్ అనుమతి లేదు: మీరు చెప్పేది, స్కాన్ చేసేది లేదా నమోదు చేసేది ఏదీ ఫోన్ బయటకు వెళ్ళదు.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
     <string name="about_notices_pending">వాయిస్ మోడల్స్ కాపీరైట్ నోటీసు యథాతథంగా సిద్ధం చేస్తున్నాము; అది ఇక్కడ కనిపిస్తుంది.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="answer_refused">దానిపై నేను ఒక సంఖ్య గానీ తీర్పు గానీ చెప్పలేను. మీ డైరీ చూపిస్తున్నది ఇదిగో.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="context_referral">అది డాక్టర్‌ను అడగవలసిన ప్రశ్న; వారు దాన్ని మీతో కలిసి చూడగలరు.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="talk_elapsed_seconds">%1$d సె</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="scan_saved">ఈ రిపోర్టు నుండి %1$d విలువలు సేవ్ చేశాను.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="about_usda_title">పోషక విలువల డేటా</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="answer_from_diary">మీ డైరీ నుండి</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_title">ప్రీ-ఫ్లైట్ తనిఖీ</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_intro">ఈ ఫోన్‌లో ఏముందో, ఏది లేదో, ఇప్పుడు చదివినది. ఇక్కడ ఏదీ అంచనా కాదు.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_app">యాప్</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_device">పరికరం</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_locale">భాషా సెట్టింగ్</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_mic">మైక్రోఫోన్ అనుమతి</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_camera">కెమెరా అనుమతి</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_models_dir">మోడల్స్ ఫోల్డర్</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_free_space">ఖాళీ స్థలం</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_voices">అందుబాటులో ఉన్న వాయిస్‌లు</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_residency">మోడల్ మెమరీ</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_models_title">మోడల్స్</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_present">ఉంది, %1$s</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_absent">లేదు</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_load">లోడ్ చేయి</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_loading">లోడ్ అవుతోంది…</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_refresh">రిఫ్రెష్</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_yes">ఇవ్వబడింది</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="preflight_no">ఇవ్వలేదు</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="demo_switch_title">స్క్రిప్ట్ చేసిన డెమో ఫీడ్</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="demo_switch_hint">నిజమైన పైప్‌లైన్‌కు బదులుగా స్క్రీన్‌లకు స్క్రిప్ట్ చేసిన ఈవెంట్‌లను ఇస్తుంది. స్క్రీన్‌లను నిర్మించడానికి, ఫోటో తీయడానికి మాత్రమే. ఇది చూపించే ప్రతి అంకె స్క్రిప్ట్ మాత్రమే.</string>
+    <!-- REVIEW: machine-generated, received via Nila, 20 Sep 2026, unreviewed -->
+    <string name="demo_banner">స్క్రిప్ట్ చేసిన డెమో ఫీడ్. ఈ స్క్రీన్‌లో ఏదీ నిజమైన ఫలితం కాదు.</string>
 </resources>

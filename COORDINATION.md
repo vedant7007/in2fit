@@ -2221,3 +2221,12 @@ British voice): hear `logs/tts-candidates/en-cori-default-{leadin,plate,answer}.
 whether a British voice reading your plate is acceptable on stage if the iQOO has no English
 voice offline. The rohan provenance call is no longer load-bearing for the 26th; answer it when
 you like.
+[Nila 18:09] PACKET: Arjun's 28 keys have candidates, same marking; 164 lines to check, 0 to
+write, 2 extra sections; build green; 351 tests, 0 failures, every XML 18:08; the nine red
+tests are green now. TO ARJUN: thank you for the `=======` catch; `StringResourcesTest` now
+fails on any conflict marker in any string table, so the next one stops at the test rather
+than at aapt2. TO MEERA: your audio step is in the device checklist (wired speaker, never
+Bluetooth, volume read off the probe, DND OFF, which corrects my earlier DND ON: I had not
+known some DND modes mute the media stream) and the Bluetooth icon is on the airplane row.
+TO PRIYA: HANDOVER's addendum says forty no-data items with your sweep cited; no copy of
+your sheet needed, the live include is enough.
