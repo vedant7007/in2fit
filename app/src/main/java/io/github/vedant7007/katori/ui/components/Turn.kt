@@ -59,10 +59,11 @@ fun IntentHeading(title: String, leadIn: String?, modifier: Modifier = Modifier)
  * current one marked with an accent dot, and the seconds beside it in 28 sp tabular accent, the
  * one moving thing on the screen while the model works. [elapsed] is read here and nowhere
  * else, so the 1 Hz tick recomposes this composable only. The counter does not move
- * horizontally as digits change because Plex's digits are tabular by default.
+ * horizontally as digits change because Plex's digits are tabular by default. [elapsed] null
+ * shows the stage with no counter, for a wait the caller cannot time honestly.
  */
 @Composable
-fun StageIndicator(done: List<String>, current: String, elapsed: () -> Int, modifier: Modifier = Modifier) {
+fun StageIndicator(done: List<String>, current: String, elapsed: (() -> Int)?, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth().padding(vertical = Space.s), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
         done.forEach { name ->
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -75,11 +76,13 @@ fun StageIndicator(done: List<String>, current: String, elapsed: () -> Int, modi
                 Box(Modifier.size(10.dp).background(In2fitColors.accent, CircleShape))
             }
             Text(current, style = In2fitText.body, modifier = Modifier.padding(start = Space.s).weight(1f))
-            Text(
-                stringResource(R.string.talk_elapsed_seconds, elapsed()),
-                style = In2fitText.title, color = In2fitColors.accent, softWrap = false,
-                modifier = Modifier.width(88.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
-            )
+            if (elapsed != null) {
+                Text(
+                    stringResource(R.string.talk_elapsed_seconds, elapsed()),
+                    style = In2fitText.title, color = In2fitColors.accent, softWrap = false,
+                    modifier = Modifier.width(88.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                )
+            }
         }
     }
 }

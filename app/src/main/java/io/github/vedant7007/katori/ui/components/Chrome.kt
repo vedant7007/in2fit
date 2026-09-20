@@ -89,7 +89,7 @@ fun BottomTabs(titles: List<String>, selected: Int, onSelect: (Int) -> Unit, mod
             titles.forEachIndexed { i, title ->
                 val chosen = i == selected
                 Column(
-                    Modifier.weight(1f).height(56.dp).clickable { onSelect(i) },
+                    Modifier.weight(1f).heightIn(min = 56.dp).clickable { onSelect(i) }.padding(vertical = Space.s),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
@@ -97,6 +97,7 @@ fun BottomTabs(titles: List<String>, selected: Int, onSelect: (Int) -> Unit, mod
                         title,
                         style = if (chosen) In2fitText.bodySmall.copy(fontWeight = FontWeight.Medium) else In2fitText.bodySmall,
                         color = if (chosen) In2fitColors.ink else In2fitColors.inkSecondary,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                     Box(Modifier.padding(top = Space.xs).width(24.dp).height(2.dp).background(if (chosen) In2fitColors.accent else Color.Transparent))
                 }

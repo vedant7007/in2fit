@@ -68,7 +68,7 @@ fun ScanScreen(vm: ScanViewModel = hiltViewModel()) {
         when {
             !granted -> Text(stringResource(R.string.camera_permission_needed), style = In2fitText.body)
             // 0026's rule holds here too: the wait is named, with a counter, never a bare bar.
-            state.reading -> StageIndicator(done = emptyList(), current = stringResource(R.string.scan_reading), elapsed = { 0 })
+            state.reading -> StageIndicator(done = emptyList(), current = stringResource(R.string.scan_reading), elapsed = null)
             state.report == null && state.failure == null && state.notBuilt == null ->
                 CameraCapture(onCaptured = vm::captured, onFailed = vm::captureFailed)
             else -> Results(state, onToggle = vm::toggle, onRetake = vm::retake, onSave = vm::save)

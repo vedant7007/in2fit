@@ -236,6 +236,31 @@ One consequence worth carrying to the device pass: the plate card is nine `Figur
 to three `Text` nodes each. If the device's worst frame is the plate's arrival, the row collapses
 to one `Text` with an inline span; not before a number says so.
 
+## Checked in hostile conditions (21 September, emulator)
+
+The two claims the deck makes about every screen, the safety line and the offline mark, were
+pushed with: the system font scale at 2.0 (the largest Android offers), a 360×640 dp screen
+(`wm size 720x1280`, `wm density 320`), night mode on, and a long Devanagari sentence in place of
+each English line (a local, uncommitted string override, built and discarded). Screenshots
+`docs/screenshots/2026-09-21-ira/hostile-*.png`.
+
+Both survive every combination, wrapped and never truncated, on Talk and Scan. What the check
+changed: the pinned block under the conversation is now the safety line, the mic and "Type
+instead" only; the language picker (set once, before a demo) heads the conversation instead;
+chips never break mid-word; the tab bar's rows grow with their text. Before those changes, 2×
+made the pinned block fill the screen and clipped "Scan report". Night mode changes nothing:
+the app is light-only by ruling and the status icons stay dark. The honest limit: at 2× on 360
+dp with Devanagari the conversation keeps a window of about 60 dp; it scrolls, and the claims
+stand.
+
+## Icon (`res/mipmap-*`, `res/drawable/ic_launcher_*`)
+
+The katori, in the brand cream on `#252F26`: an adaptive icon with a monochrome layer for themed
+launchers, and legacy PNG pairs at mdpi–xxxhdpi for launchers that read them. One set of
+numbers generates the vector, the monochrome silhouette and the PNGs (the Python is in the
+21 September commit's message; rerun it, do not hand-edit a density). Checked on the emulator's
+launcher grid and in the recents pill (`icon-48px.png`).
+
 ## Not yet in the system
 
 The katori's gram assumption (ruled e; `plate_unit_taken_as` exists, the grams do not reach the

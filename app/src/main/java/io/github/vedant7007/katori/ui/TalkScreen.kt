@@ -5,9 +5,11 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -63,6 +65,7 @@ import io.github.vedant7007.katori.ui.components.PlateItem
 import io.github.vedant7007.katori.ui.components.Prose
 import io.github.vedant7007.katori.ui.components.SafetyLine
 import io.github.vedant7007.katori.ui.components.SaidBlock
+import io.github.vedant7007.katori.ui.components.SecondaryButton
 import io.github.vedant7007.katori.ui.components.StageIndicator
 import io.github.vedant7007.katori.ui.theme.In2fitColors
 import io.github.vedant7007.katori.ui.theme.In2fitText
@@ -98,8 +101,8 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
     val listState = rememberLazyListState()
     // The newest thing is always at the bottom: the stage indicator while a turn runs (with the
     // transcript just above it, 0026 step 3), the answer when it lands.
-    val itemCount = state.entries.size + if (state.stages.isNotEmpty()) 1 else 0
-    LaunchedEffect(itemCount) { if (itemCount > 0) listState.animateScrollToItem(itemCount - 1) }
+    val itemCount = 1 + state.entries.size + if (state.stages.isNotEmpty() || state.lastMealId != null) 1 else 0
+    LaunchedEffect(itemCount) { if (itemCount > 1) listState.animateScrollToItem(itemCount - 1) }
 
     Column(Modifier.fillMaxSize().imePadding().padding(horizontal = Space.l)) {
         OfflineMark(Modifier.padding(top = Space.m, bottom = Space.xs))
@@ -110,8 +113,21 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
             verticalArrangement = Arrangement.spacedBy(Space.s),
             contentPadding = PaddingValues(vertical = Space.s),
         ) {
+            // The language is set once, before a demo, never during a turn: it heads the
+            // conversation rather than the pinned block, which stays small enough at a 2x font
+            // scale on a 360 dp screen to leave the conversation its room (hostile check, 21 Sep).
+            item(key = "picker") {
+                FlowRow(Modifier.fillMaxWidth().padding(bottom = Space.s), verticalArrangement = Arrangement.spacedBy(Space.xs), itemVerticalAlignment = Alignment.CenterVertically) {
+                    // The chips choose the language the person will SPEAK in. Answers are English, on
+                    // screen and aloud, whatever is chosen (0019 addendum 7); the label says so.
+                    Text(stringResource(R.string.speak_in_label), style = In2fitText.label, modifier = Modifier.padding(end = Space.s))
+                    LanguageChip(state.language, "te", R.string.language_telugu, vm::setLanguage)
+                    LanguageChip(state.language, "hi", R.string.language_hindi, vm::setLanguage)
+                    LanguageChip(state.language, "en-IN", R.string.language_english, vm::setLanguage)
+                }
+            }
             if (state.entries.isEmpty()) {
-                item { Text(stringResource(R.string.talk_hint), style = In2fitText.transcript, modifier = Modifier.padding(top = Space.xl)) }
+                item { Text(stringResource(R.string.talk_hint), style = In2fitText.transcript, modifier = Modifier.padding(top = Space.l)) }
             }
             itemsIndexed(state.entries, key = { i, e -> "$i:${e::class.simpleName}" }) { _, entry -> EntryView(entry, onResolve = vm::resolve) }
             if (state.stages.isNotEmpty()) {
@@ -119,16 +135,17 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
                     val names = state.stages.map { stringResource(Sentences.stage(it)) }
                     StageIndicator(done = names.dropLast(1), current = names.last(), elapsed = { elapsed.value })
                 }
+            } else if (state.lastMealId != null) {
+                // Beat 4's control sits with the meal it acts on, not in the pinned block (which must
+                // stay small enough at a 2x font scale to leave the conversation its room).
+                item(key = "advise-again") {
+                    SecondaryButton(stringResource(R.string.advise_again), onClick = vm::adviseAgain, enabled = !state.busy, modifier = Modifier.fillMaxWidth().padding(vertical = Space.s))
+                }
             }
         }
 
         // The controls, in the thumb's third of the screen. The safety line once, pinned (spec 15.3).
         SafetyLine(Modifier.padding(vertical = Space.s))
-        if (state.lastMealId != null) {
-            TextButton(enabled = !state.busy, onClick = vm::adviseAgain, contentPadding = PaddingValues(0.dp)) {
-                Text(stringResource(R.string.advise_again), style = In2fitText.button)
-            }
-        }
         if (state.stage == Stage.SPEAKING) {
             // 0026 step 8: stops speech only; the answer stays on screen.
             MicButton(label = stringResource(R.string.stop_speaking), enabled = true, active = false, level = { 0f }, onPress = {}, onRelease = {}, stop = vm::stopSpeaking)
@@ -148,18 +165,8 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
                 onRelease = {},
             )
         }
-        Row(Modifier.fillMaxWidth().padding(top = Space.s), verticalAlignment = Alignment.CenterVertically) {
-            // The chips choose the language the person will SPEAK in. Answers are English, on
-            // screen and aloud, whatever is chosen (0019 addendum 7); the label says so.
-            Text(stringResource(R.string.speak_in_label), style = In2fitText.label)
-            Spacer(Modifier.width(Space.s))
-            LanguageChip(state.language, "te", R.string.language_telugu, vm::setLanguage)
-            LanguageChip(state.language, "hi", R.string.language_hindi, vm::setLanguage)
-            LanguageChip(state.language, "en-IN", R.string.language_english, vm::setLanguage)
-            Spacer(Modifier.weight(1f))
-            TextButton(onClick = { typing = !typing }, contentPadding = PaddingValues(0.dp)) {
-                Text(stringResource(R.string.talk_type_instead), style = In2fitText.label)
-            }
+        TextButton(onClick = { typing = !typing }, contentPadding = PaddingValues(0.dp), modifier = Modifier.padding(top = Space.xs)) {
+            Text(stringResource(R.string.talk_type_instead), style = In2fitText.bodySmall.copy(fontWeight = FontWeight.Medium), color = In2fitColors.ink)
         }
         if (micDenied) Text(stringResource(R.string.mic_permission_needed), style = In2fitText.bodySmall, color = In2fitColors.inkSecondary)
         if (typing) {
@@ -191,11 +198,13 @@ private fun LanguageChip(current: String, tag: String, nameRes: Int, onPick: (St
     val chosen = current == tag
     Text(
         stringResource(nameRes),
+        maxLines = 1, softWrap = false,
         style = if (chosen) In2fitText.bodySmall.copy(fontWeight = FontWeight.Medium) else In2fitText.bodySmall,
         color = if (chosen) In2fitColors.ink else In2fitColors.inkSecondary,
         modifier = Modifier
             .padding(end = Space.xs)
             .background(if (chosen) In2fitColors.selected else In2fitColors.ground, MaterialTheme.shapes.small)
+            .border(1.dp, if (chosen) In2fitColors.selected else In2fitColors.hairline, MaterialTheme.shapes.small)
             .clickable { onPick(tag) }
             .padding(horizontal = Space.m, vertical = Space.s),
     )
