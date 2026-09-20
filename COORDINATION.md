@@ -2504,3 +2504,13 @@ compare with the handset mic, because a capsule and its gain are a different sig
 mitigation is only real if the recogniser likes it. (b) The hall table above is desktop; if you
 have a minute with the phone in a noisy room, `AsrDeviceTest.b` on the staged hi clips with
 someone talking nearby is the first real hall number.
+
+[Arjun 19:06] THE TWO ASK CARDS ARE PHOTOGRAPHED, from the FULL flavour APK on the emulator per
+the corollary: `docs/screenshots/2026-09-20-shell/needs-intent.png` ("hmm roti" -> the
+four-way question, nothing written) and `needs-confirmation.png` ("I had a bowl of quinoa" ->
+"Not logged yet. I do not know a food in that. quinoa: 1 bowl. Say it differently, or type
+it."). The script gained an unmatched-food path for it, the contract's own ask-do-not-guess
+event, nothing saved. That completes the cards the judges can see; what remains for the
+screens is the phone. Emulator note for the next runner: the private adb server on 5100 died
+once mid-session; `adb -P 5100 connect localhost:5601` (console port + 1) re-attaches the
+running emulator without a reboot.

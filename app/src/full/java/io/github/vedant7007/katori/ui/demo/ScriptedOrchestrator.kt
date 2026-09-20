@@ -110,6 +110,17 @@ class ScriptedOrchestrator(
         emit(Progress(Stage.EXTRACTING)); delay(1400)
         val items = if (text.contains("rice", true)) RICE_AND_DAL else ROTI_AND_DAL
         emit(Progress(Stage.MATCHING_FOODS)); delay(500)
+        // A food the database does not hold: the contract's own ask-do-not-guess path, so the
+        // Confirm card can be built. Nothing is saved.
+        UNKNOWN_FOODS.firstOrNull { text.contains(it, true) }?.let { unknown ->
+            val parsed = ParsedMeal(
+                items = listOf(ParsedItem(unknown, 1.0, "bowl", null, ConfidenceRules.of(ConfidenceReason.QUANTITY_STATED))),
+                confidence = ConfidenceRules.of(ConfidenceReason.QUANTITY_STATED), rawTranscript = text,
+            )
+            emit(OrchestratorEvent.NeedsConfirmation(UnavailableReason.NO_MATCH, parsed))
+            emit(OrchestratorEvent.Completed)
+            return
+        }
         emit(Progress(Stage.COMPUTING)); delay(300)
         val parsed = ParsedMeal(
             items = items.map { ParsedItem(it.spoken, it.quantity, it.unit, it.foodCode, ConfidenceRules.of(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.QUANTITY_STATED)) },
@@ -236,6 +247,8 @@ class ScriptedOrchestrator(
             Item("rice", 1.0, "plate", "rice_cooked", "Cooked rice", 200.0, g(130.0, 2.7, 28.0, 0.3, 0.4, 0.2, 0.0, 1.0)),
         )
         private val ROTI_AND_DAL = ITEMS.take(3)
+        /** Foods the shipped database does not hold, for the Confirm card. */
+        private val UNKNOWN_FOODS = listOf("quinoa", "kale", "tofu")
         private val RICE_AND_DAL = listOf(ITEMS[3], ITEMS[1])
 
         private val PROFILE = ProfileSnapshot(
