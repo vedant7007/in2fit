@@ -358,72 +358,102 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
    Telugu: వ్యాయామం చేసే విధానం తనిఖీ
 
 
-## UNPLACED: ask Vedant where this appears
+## The About screen
 
-49. `context_figure`
+49. `about_licences_title`
+
+   English: Data sources and open-source licences
+
+   Telugu: (nothing yet)
+
+
+## Lines the app writes for its own language model, not for the screen
+
+50. `context_figure`
 
    English: %1$s: %2$s %3$s
 
    Telugu: (nothing yet)
 
 
-50. `context_figure_partial`
+51. `context_figure_partial`
 
    English: %1$s: at least %2$s %3$s (no value for %4$s)
 
    Telugu: (nothing yet)
 
 
-51. `context_figure_none`
+52. `context_figure_none`
 
    English: %1$s: not known
 
    Telugu: (nothing yet)
 
 
-52. `context_meal`
+53. `context_meal`
 
    English: %1$s: %2$s. %3$s
 
    Telugu: (nothing yet)
 
 
-53. `context_lab`
+54. `context_period`
+
+   English: %1$s: %2$s
+
+   Telugu: (nothing yet)
+
+
+55. `context_period_today`
+
+   English: Today so far
+
+   Telugu: (nothing yet)
+
+
+56. `context_period_last_seven_days`
+
+   English: The last seven days
+
+   Telugu: (nothing yet)
+
+
+57. `context_lab`
 
    English: %1$s: %2$s %3$s (report dated %4$s)
 
    Telugu: (nothing yet)
 
 
-54. `context_lab_with_range`
+58. `context_lab_with_range`
 
    English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
 
    Telugu: (nothing yet)
 
 
-55. `context_never_suggest_vegetarian`
+59. `context_never_suggest_vegetarian`
 
    English: meat, fish or eggs (vegetarian)
 
    Telugu: (nothing yet)
 
 
-56. `context_never_suggest_vegan`
+60. `context_never_suggest_vegan`
 
    English: meat, fish, eggs, milk or any dairy (vegan)
 
    Telugu: (nothing yet)
 
 
-57. `context_never_suggest_eggetarian`
+61. `context_never_suggest_eggetarian`
 
    English: meat or fish (eggetarian)
 
    Telugu: (nothing yet)
 
 
-58. `context_never_suggest_jain`
+62. `context_never_suggest_jain`
 
    English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
 

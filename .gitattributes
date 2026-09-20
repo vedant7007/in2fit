@@ -10,3 +10,7 @@ app/src/main/assets/** -text
 # raises no conflict, which is exactly right for a log and wrong for anything else: do not
 # widen this pattern.
 COORDINATION.md merge=union
+
+# Licence texts are filed verbatim and compared byte-for-byte against their sources; never
+# normalise their line endings on checkout.
+docs/licences/** -text

@@ -143,6 +143,65 @@ or its text pasted into this record verbatim, then the three voices re-ruled her
 day. Until then: `maya` and `rohan` stay excluded, pocket-tts stays out of the register and off
 the phone.
 
+### The text is in the repository. Filed 20 Sep 2026 (Nila). NOT yet diffed against the PDF.
+
+`docs/licences/iitm-tts-eula.txt`, 4,921 bytes, sha256
+`3dcfe36df6afa2e73849491333f25b0017682bd76cc7169652ea25fda6510f0c`, byte-identical to the file
+Vedant handed over, fetched from the URL above on 20 Sep 2026 from a machine that can reach it.
+**Its provenance header says what it is: machine-converted from the PDF by a fetch service,
+not read from the PDF by a person.** The PDF itself is being downloaded separately; when it
+lands it is diffed against this text and any difference is recorded here BEFORE anyone rules
+from this text. Nothing below is a ruling. It is what the converted text says, quoted where
+the words matter, so the ruling can be made against words rather than a summary.
+
+**What the text settles, and what it does not.** It settles the TERMS a licensee of the IITM
+distribution takes. It says nothing about PROVENANCE: whether `maya`, `rohan` or pocket-tts
+actually descend from IITM data, and whether weights are a derivative of audio, are the chain
+questions above and this document does not touch them. Those remain Meera's to close.
+
+**2.1, the grant.** "a perpetual, non-exclusive, worldwide, transferable, sub-licensable,
+royalty-free license to a) make copies of the Licensed Software in source and object code and
+data; b) modify copies of the Licensed Software and data to create derivative works thereof."
+Then: "The Licensee will exclusively own all software, files, documentation, discoveries,
+ideas, inventions, improvements, processes, materials and data ("Derivative Work")
+acquired/prepared/generated/developed in any medium by Licensee using the Licensed Software",
+with an irrevocable assignment to vest that ownership, and: "Notwithstanding anything to the
+contrary, Licensee shall be allowed to freely distribute the Derivative Work."
+
+**2.2, the clause the summary above called "teeth".** In its own words: "The Licensee agrees
+not to remove any copyright, trademark or patent notices that appear in the Licensed
+Software. The Licensee shall ensure that the third party to whom the Derivative Work is sold
+is made aware that the Derivative Work has few open source component along with Licensee's
+IP. Such third party shall not be allowed to further sell, lease, license, sub-license,
+decompile, disassemble or reverse engineer any portion of the Licensed Software or the
+Derivative Work." Read as written: the second and third sentences bind a third party "to whom
+the Derivative Work is sold". That is a flow-down obligation on RESALE, not a bar on the
+licensee shipping. It is not the downstream restriction on this app that the summary above
+feared; it is a term this project would have to pass on if it ever SOLD a derivative.
+
+**What lands on this project if an IITM-derived voice ships**, per the text: keep every
+copyright, trademark and patent notice intact (2.2, first sentence), and, under the
+capitalised line before section 6, "REDISTRIBUTORS MUST RETAIN THE FOLLOWING COPYRIGHT
+NOTICE", reproduce this verbatim on redistribution:
+
+    "COPYRIGHT 2016 TTS Consortium, TDIL, Meity represented by Hema A Murthy & S
+    Umesh, DEPARTMENT OF Computer Science and Engineering and Electrical
+    Engineering, IIT Madras. ALL RIGHTS RESERVED"
+
+That notice needs a home in the app. The string key `licence_notice_iitm_tts` now holds it
+verbatim, `translatable="false"`, bound to nothing until a voice under this licence ships; the
+screen it goes on is raised with Arjun. Also in the text: 2.3 and 2.4 disclaim warranty and
+consequential damages; 3 makes the agreement effective on download and terminable by the
+licensee with destruction of copies; 4 is Indian law; 5 encourages, "though not a license
+condition", bug reports and a reference to IITM in publications; 6 says contributions do not
+fall under this agreement.
+
+**Corrections to the lines above, once the PDF diff confirms the text:** `maya` and `rohan`
+were excluded "because this document could not be read", and `rohan` was listed in the
+rejected table as "the IITM PDF that returns empty". The text is readable now; whether the
+voices are IITM-derived, and whether weights are a derivative, are the questions that remain.
+Re-ruling those three is Meera's, on the same day the diff is recorded.
+
 ## NON-COMMERCIAL DEPENDENCY REGISTER
 
 **One entry, added 20 September 2026, the day the voice was added.** Everything else shipped

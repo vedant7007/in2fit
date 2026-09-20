@@ -1,6 +1,6 @@
 # IN2FIT: Telugu strings for review
 
-Generated 20 September 2026 from the app's English string table. 10 strings to write, 48 to check.
+Generated 20 September 2026 from the app's English string table. 14 strings to write, 48 to check.
 
 Reviewer's name: ______________________
 
@@ -513,72 +513,106 @@ A developer screen listing what is built. It will be replaced before the demo. L
 
 ## Telugu not yet written
 
-### UNPLACED: ask Vedant where this appears
+### The About screen
 
-49. `context_figure`
+Where the app says where its numbers come from and which open-source parts it contains.
+
+49. `about_licences_title`
+
+   English: Data sources and open-source licences
+
+   Telugu:
+
+
+### Lines the app writes for its own language model, not for the screen
+
+Not shown on a screen. When the person asks a question, the app writes their own meals, lab values and diet into a few lines like these and gives them to its language model, in the person's language, before it answers; the answer may repeat them back. Plain and literal, no advice in them: every slot is a name, a number or a date the app fills in.
+
+50. `context_figure`
 
    English: %1$s: %2$s %3$s
 
    Telugu:
 
 
-50. `context_figure_partial`
+51. `context_figure_partial`
 
    English: %1$s: at least %2$s %3$s (no value for %4$s)
 
    Telugu:
 
 
-51. `context_figure_none`
+52. `context_figure_none`
 
    English: %1$s: not known
 
    Telugu:
 
 
-52. `context_meal`
+53. `context_meal`
 
    English: %1$s: %2$s. %3$s
 
    Telugu:
 
 
-53. `context_lab`
+54. `context_period`
+
+   English: %1$s: %2$s
+
+   Telugu:
+
+
+55. `context_period_today`
+
+   English: Today so far
+
+   Telugu:
+
+
+56. `context_period_last_seven_days`
+
+   English: The last seven days
+
+   Telugu:
+
+
+57. `context_lab`
 
    English: %1$s: %2$s %3$s (report dated %4$s)
 
    Telugu:
 
 
-54. `context_lab_with_range`
+58. `context_lab_with_range`
 
    English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
 
    Telugu:
 
 
-55. `context_never_suggest_vegetarian`
+59. `context_never_suggest_vegetarian`
 
    English: meat, fish or eggs (vegetarian)
 
    Telugu:
 
 
-56. `context_never_suggest_vegan`
+60. `context_never_suggest_vegan`
 
    English: meat, fish, eggs, milk or any dairy (vegan)
 
    Telugu:
 
 
-57. `context_never_suggest_eggetarian`
+61. `context_never_suggest_eggetarian`
 
    English: meat or fish (eggetarian)
 
    Telugu:
 
 
-58. `context_never_suggest_jain`
+62. `context_never_suggest_jain`
 
    English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
 

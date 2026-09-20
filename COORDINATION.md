@@ -1201,3 +1201,48 @@ status phrases with no health content so the safety line is untouched:
     tts_lead_in_recommend  "Let me see what suits you."
 Short on purpose: each is one to two seconds spoken, and the wrapper waits for it to finish
 before the answer plays. The Telugu ones are the ones that matter and I will not write them.
+[Nila 14:30] PROVENANCE OF THE 48 TELUGU LINES, from Vedant, recorded in 0017 in these words:
+MACHINE-GENERATED, AUTHOR UNVERIFIABLE, UNREVIEWED. A model wrote them; nobody on this team can
+read them. That is why the REVIEW marker on every entry and the demo-build rule (Telugu out of
+the build unless a fluent speaker confirms the nine health sentences) are mandatory, not
+cautious. Vedant's own instruction: nobody softens that line later, including him.
+
+[Nila 14:30] TO MEERA: the IITM Indic TTS EULA text is in the repo,
+`docs/licences/iitm-tts-eula.txt` (4,921 B, sha256 3dcfe36d…), fetched by Vedant from a
+machine that reaches the URL. READ ITS HEADER FIRST: machine-converted from the PDF, not read
+from the PDF by a person; the PDF is being downloaded and will be diffed, and any difference
+goes into 0005 before anyone rules from this text. The words of 2.1 and 2.2 are quoted under
+your section in 0005. They are not what the summary assumed: 2.1 is a perpetual, worldwide,
+sub-licensable, royalty-free grant to modify and make derivatives, vests the derivative in the
+licensee, and says the licensee "shall be allowed to freely distribute the Derivative Work";
+the clause with teeth is 2.2 and binds "the third party to whom the Derivative Work is sold",
+a flow-down on resale, not a bar on shipping. What lands on us: keep every notice intact and
+reproduce the "COPYRIGHT 2016 TTS Consortium..." notice verbatim on redistribution. The text
+settles TERMS, not PROVENANCE: whether maya, rohan and pocket-tts actually descend from IITM
+data is still your chain question and this document says nothing about it. Yours to re-rule,
+after the PDF diff.
+
+[Nila 14:30] TO ARJUN, while you are building screens: the app needs an About screen entry for
+data sources and licences, and it needs it as a place, not a paragraph you write later. Keys
+exist now: `about_licences_title` ("Data sources and open-source licences") and
+`licence_notice_iitm_tts` (the verbatim IITM notice, translatable=false, bound to nothing
+until an IITM-derived voice ships). What the screen has to hold, from 0002 and 0005: the USDA
+attribution, licence and disclosure (already rows in the food database's `meta` table, keys
+`attribution`, `licence`, `disclosure`, read them rather than duplicate them); the app's own
+Apache-2.0; if Piper stays, the espeak-ng GPL-3 notice with a source pointer; the CC-BY-4.0
+attribution for the Telugu Piper voice; and the IITM notice if that voice family ships. Legal
+notices are reproduced, never translated, so those keys are translatable=false; the labels
+around them are ordinary keys. When you know where it lives, tell me in one line and I write
+the remaining keys; no literals in composables, StringResourcesTest will refuse them.
+
+[Nila 14:30] TO PRIYA: your `context_*` keys have a place on the review sheet now, items 50-62,
+section "Lines the app writes for its own language model, not for the screen", described to
+the reviewer as: not shown on a screen; when the person asks a question the app writes their
+meals, lab values and diet into lines like these for its model, in the person's language,
+before it answers, and the answer may repeat them; plain and literal, no advice in them, every
+slot a name, number or date. If that misdescribes them, one line and I change it. Your three
+`context_period_*` keys landed there too.
+
+[Nila 14:30] TO VEDANT: IITM text filed, hash matches your file, header kept. When the PDF
+lands, drop it next to the .txt (`docs/licences/`), or anywhere, and say so; I diff and record
+before anyone rules. The notice has a key in the app and a home request with Arjun.

@@ -144,8 +144,12 @@ A name is required; without it the script refuses. Two stamps, and the differenc
 whole point: `written by <name>` means a fluent speaker wrote or checked the line;
 `REVIEW: received via <name>, author not confirmed` (`--unreviewed`) means the lines arrived
 through someone who cannot verify them. **The first Telugu reply, 20 September, is the second
-case**: 48 lines came back under Vedant's name, and Vedant does not read Telugu well enough to
-have written or checked them. They were imported unreviewed, every entry carries the marker,
+case, and its provenance is now known and recorded in these words: MACHINE-GENERATED, AUTHOR
+UNVERIFIABLE, UNREVIEWED.** A model wrote the 48 lines. Nobody on this team can read them. That
+is not a reason for caution; it is the reason the `REVIEW` markers on every entry and the
+demo-build rule below (Telugu comes out of the build unless a fluent speaker confirms the
+health sentences) are MANDATORY. Vedant's instruction, verbatim in intent: do not let anyone
+soften that line later, including him. They were imported unreviewed, every entry carries the marker,
 the test reports "48 awaiting review", the queue keeps them, and the check file went back with
 the question at the top. Nothing is stamped as reviewed until a fluent speaker confirms it
 through a check sheet, one entry at a time; a blank answer under a `REVIEW`-marked entry is

@@ -1,0 +1,95 @@
+PROVENANCE
+Source URL : https://www.iitm.ac.in/donlab/indictts/downloads/license.pdf
+Retrieved  : 2026-09-20
+Method     : fetched and converted from PDF by an automated fetch service, NOT
+             read from the PDF by a member of this team. The original PDF is to
+             be downloaded separately and diffed against this file; record any
+             difference in docs/decisions/0005 before relying on this text for a
+             licence ruling.
+Covers     : IITM / TTS Consortium Indic TTS distribution (source, scripts,
+             voice files, lab files, pronunciation dictionaries).
+
+--------------------------------------------------------------------------------
+
+END USER LICENSE AGREEMENT
+
+1. Definitions
+
+Licensed Data and Software: All source code (segmentation software, scripts for
+building voices), object or executable code, associated technical documentation
+and all data files (voice files, lab files, pronunciation dictionaries) in this
+IITM distribution.
+
+Licensor: The Indian Institute of Technology Madras (IITM)
+
+Licensee: The company/individual/industry who downloads the Text to Speech
+Synthesis distribution or any part of it.
+
+2. License Rights and Obligations
+
+2.1 The Licensor hereby grants the Licensee a perpetual, non-exclusive,
+worldwide, transferable, sub-licensable, royalty-free license to a) make copies
+of the Licensed Software in source and object code and data; b) modify copies of
+the Licensed Software and data to create derivative works thereof. The Licensee
+will exclusively own all software, files, documentation, discoveries, ideas,
+inventions, improvements, processes, materials and data ("Derivative Work")
+acquired/prepared/generated/developed in any medium by Licensee using the
+Licensed Software. To the extent necessary to vest such sole and exclusive
+ownership in the Licensee, Licensor and/or its personnel hereby irrevocably
+assign to License(and, as applicable, its successors and assigns) any and all
+rights in and to such Derivative Work. Notwithstanding anything to the contrary,
+Licensee shall be allowed to freely distribute the Derivative Work.
+
+2.2 The Licensee agrees not to remove any copyright, trademark or patent notices
+that appear in the Licensed Software. The Licensee shall ensure that the third
+party to whom the Derivative Work is sold is made aware that the Derivative Work
+has few open source component along with Licensee's IP. Such third party shall
+not be allowed to further sell, lease, license, sub-license, decompile,
+disassemble or reverse engineer any portion of the Licensed Software or the
+Derivative Work.
+
+2.3 THE LICENSED SOFTWARE ARE PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY KIND.
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, ANY AND ALL EXPRESS AND IMPLIED
+WARRANTIES OF ANY KIND WHATSOEVER, INCLUDING BUT NOT LIMITED TO THOSE OF, OF
+FITNESS FOR A PARTICULAR PURPOSE, OF ACCURACY OR COMPLETENESS OF RESPONSES, OF
+RESULTS, OF REASONABLE CARE OR WORKMANLIKE EFFORT, OF LACK OF NEGLIGENCE, AND/OR
+OF A LACK OF VIRUSES, ALL WITH REGARD TO THE LICENSED SOFTWARE ARE EXPRESSLY
+EXCLUDED. LICENSOR DOES NOT MAKE ANY WARRANTY THAT THE LICENSED SOFTWARE WILL
+OPERATE PROPERLY AS INTEGRATED IN YOUR PRODUCT(S) OR ON ANY CUSTOMER SYSTEM(S).
+
+2.4 THE LICENSEE AGREES THAT NEITHER PARTY, SHALL BE LIABLE FOR ANY
+CONSEQUENTIAL, INCIDENTAL, INDIRECT, ECONOMIC OR PUNITIVE DAMAGES WHATSOEVER
+(INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF BUSINESS OR PERSONAL PROFIT,
+BUSINESS INTERRUPTION, LOSS OF BUSINESS OR ANY OTHER PECUNIARY LOSS, DAMAGES FOR
+LOSS OF PRIVACY, OR FOR FAILURE TO MEET ANY DUTY, INCLUDING ANY DUTY OF GOOD
+FAITH, OR TO EXERCISE COMMERCIALLY REASONABLE CARE OR FOR NEGLIGENCE) ARISING
+OUT OF OR IN ANY WAY RELATED TO THE USE OF OR INABILITY TO USE THE LICENSED
+SOFTWARE AND DATA.
+
+3. Term of Agreement
+
+This agreement is effective upon the download of the Licensed Data and Software
+and shall remain in effect until terminated by the Licensee. Termination by the
+Licensee should be accompanied by the complete destruction of the Licensed Data
+and Software and any complete or partial copies thereof.
+
+4. Governing Law
+
+This agreement shall be construed and interpreted in accordance with the laws of
+India.
+
+5. Though not a license condition, Licensees are strongly encouraged to
+a) report all bugs, where possible with bug fixes, that are found.
+b) reference the use of IITM in any publications that use the Licensed Software.
+
+REDISTRIBUTORS MUST RETAIN THE FOLLOWING COPYRIGHT NOTICE:
+
+"COPYRIGHT 2016 TTS Consortium, TDIL, Meity represented by Hema A Murthy & S
+Umesh, DEPARTMENT OF Computer Science and Engineering and Electrical
+Engineering, IIT Madras. ALL RIGHTS RESERVED"
+
+6. Contributions to Indic Sources
+
+We strongly encourage contributions to the TTS data and source code base and
+data. These will in general be additional tools or library modules which will
+not fall under this IITM License Agreement.

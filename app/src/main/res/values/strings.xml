@@ -52,6 +52,15 @@
     <string name="pipeline_dish_first_guess">Camera dish first guess</string>
     <string name="pipeline_exercise_form">Exercise form check</string>
 
+    <!-- The About screen: where the numbers come from and which open-source parts the app
+         contains (0002's disclosure screen, 0005's licence duties). Legal notices are
+         translatable="false": they are reproduced, not translated. -->
+    <string name="about_licences_title">Data sources and open-source licences</string>
+    <!-- Required verbatim by the IIT Madras Indic TTS EULA ("REDISTRIBUTORS MUST RETAIN THE
+         FOLLOWING COPYRIGHT NOTICE"), docs/licences/iitm-tts-eula.txt. Bound to nothing until
+         a voice under that licence ships; if one does, it is shown on the About screen. -->
+    <string name="licence_notice_iitm_tts" translatable="false">COPYRIGHT 2016 TTS Consortium, TDIL, Meity represented by Hema A Murthy &amp; S Umesh, DEPARTMENT OF Computer Science and Engineering and Electrical Engineering, IIT Madras. ALL RIGHTS RESERVED</string>
+
     <!-- Confidence bands, spec 15.1.1. Shown inline with every figure, never as a percentage. -->
     <string name="confidence_band_good">Good</string>
     <string name="confidence_band_approximate">Approximate</string>

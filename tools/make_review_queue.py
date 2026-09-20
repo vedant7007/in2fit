@@ -47,6 +47,13 @@ PLACES = [
      "assumed, such as a standard bowl size; Rough means the figure could be far off."),
     ("confidence_reason_", "Why the label says what it says",
      "Shown when the person taps the confidence label. One sentence explaining it."),
+    ("about_", "The About screen",
+     "Where the app says where its numbers come from and which open-source parts it contains."),
+    ("context_", "Lines the app writes for its own language model, not for the screen",
+     "Not shown on a screen. When the person asks a question, the app writes their own meals, "
+     "lab values and diet into a few lines like these and gives them to its language model, in "
+     "the person's language, before it answers; the answer may repeat them back. Plain and "
+     "literal, no advice in them: every slot is a name, a number or a date the app fills in."),
     ("status_", "TEMPORARY: the build-status screen",
      "A developer screen listing what is built. It will be replaced before the demo. Lowest "
      "priority: do these last, or skip them."),
