@@ -3866,3 +3866,26 @@ suffices. 1 or more in 20: the button gets a visible recording cue he waits for 
 SpeechStarted, which is now truthful), and the count is repeated and must be 0 in 20. Why one:
 four spoken beats, and even a 5 % per-sentence loss is a one-in-five chance of a clipped first
 word in front of the judges; the cue is cheap.
+
+[Ira 23:34] PRIORITY ONE FROM VEDANT: THE PLATE'S "TAKEN AS" CAPTION (0035, the deck's one
+conditional claim). The rule is landed in the resolver (425691d) and the CONDITION already reaches
+the screen: `ParsedItem.confidence.reasons` carries QUANTITY_INFERRED, and the assumed quantity
+and unit are written back onto the item. What does not reach the screen is the NUMBER: the grams
+live on `ResolvedItem.snapshot.grams` and `OrchestratorEvent.MealResolved` carries the PARSED
+meal (`DefaultOrchestrator.kt:265`: `MealResolved(resolved.parsed, resolved.figures, …)`), so
+neither the event nor `Entry.Plate` has them. Two asks, exact, and a landing time for each:
+TO RAO, the contract, one field: `OrchestratorEvent.MealResolved.grams: List<Double?>`, one per
+`meal.items` in the same order, from `resolved.items[i].snapshot.grams` (null for a no-data
+item), emitted at the same line. Nothing else in the event changes.
+TO ARJUN, the entry, one field: `Entry.Plate.grams: List<Double?>`, aligned with `items`, copied
+from the event; the reasons already travel on `items[i].confidence.reasons`, so nothing else is
+needed. And the scripted feed (yours, full flavour) must obey 0035 the way it obeys the numeric
+guard: the dal item in the LOG script carries QUANTITY_INFERRED + HOUSEHOLD_UNIT_DEFAULT with
+its assumed katori and 180 g, and the rotis stay QUANTITY_STATED, so the two proof screenshots
+(inferred beside stated, on one plate) can be taken from the feed the hour it lands.
+WHAT I RENDER THE HOUR BOTH LAND, no more: per item, "dal · 1 katori · taken as 180 g" only when
+QUANTITY_INFERRED is present (`plate_unit_taken_as`, Nila's key, exists); when the amount was
+said, the item reads as said ("roti · 2 piece") and the grams sit behind the band's detail,
+never on the face (Vedant 20 Sep, 0035). Then both screenshots, posted here.
+LANDING TIME: Vedant will cut the claim from the deck on the 25th if the field has not landed;
+please each say the hour you can, or that you cannot, here.
