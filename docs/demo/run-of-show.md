@@ -98,13 +98,14 @@ sentence, the slowest of the ten; thirty-nine seconds is not a pause, it is the 
 The sentence changed, not the system.
 
 **P brings the phone to the mouth (Jacob, 19:05: speak first, THEN show the screen; never both at
-arm's length), taps the microphone and says, exactly:**
+arm's length), HOLDS the microphone button (row 7d) and says, exactly, then finishes the last
+word and lets go:**
 
 > **मैंने दो रोटी और थोड़ी दाल खाई**
 > *(English column: "I had two rotis and a little dal.")*
 
 **What the judge sees, in order** (`0026`): the level meter moving while P speaks; the meter
-freezing into a flat line the instant P stops; the transcript appearing verbatim under "You";
+freezing into a flat line the instant P lets go (a 300 ms tail, then nothing); the transcript appearing verbatim under "You";
 "Working out what you meant"; the lead-in phrase spoken ("Noting that down."); then the stage
 list, "Picking out the foods", "Matching the foods", "Adding up the figures", "Saving", with the
 seconds counter beside the live stage; then the plate: each food as said, the figures, the
