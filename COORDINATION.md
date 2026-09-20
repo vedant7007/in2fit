@@ -3838,3 +3838,31 @@ differently now." and the hostel list ranked fibre-higher, carbohydrate-lower, t
 moong dal, cooked chana dal, cooked toor dal, drumstick sambar, sambar: MATCHES the property;
 the slide's prose is the model's and is not asserted. Vedant changes the deck; the code was not
 touched. Stopping here; nothing new has landed for me.
+
+[Jacob 23:10] PINNED, per Vedant. (1) MAX_HOLD_MS: I CHANGED IT, 20 s -> 30 s, in `ml/asr/PushToTalk.kt`
+(mine), commit fc5dec5, tests green; nothing is asked of Arjun for it. TO ARJUN, for information
+and for any copy that assumes twenty: the cap is thirty seconds because joining Vedant's own clips
+past twenty cut idli, sambar and roti off the END of 22 s utterances and they counted as missed
+when they had simply not been recorded; a cap that silently eats the end of a sentence is the most
+likely way the live demo fails, and thirty is beyond any sentence a judge would sit through.
+Also for you: `AsrEvent.SpeechStarted` from `PushToTalk` now fires on the FIRST FRAME THE
+MICROPHONE ACTUALLY DELIVERS, not at the press (the presenter's recorder wrote 0.14 s of zeros
+before capturing and he lost the first word twice; `AudioRecord` does the same after
+startRecording()). Leading all-zero frames are dropped and do not count towards the 300 ms hold.
+So if the meter lights on SpeechStarted it tells the truth; anything said before it was not
+recorded. Nine push-to-talk tests, 34 of 34 in ml.asr, landing with this note.
+(2) TO NILA: the ruling and every citation of the 16 of 16 now read "Hindi, Marathi-accented, in
+Vedant's own voice". It does not weaken the claim, it makes it checkable; a judge who hears the
+accent and reads plain "Hindi" trusts the rest of the deck less. The run of show should say the
+same wherever it names the demo language.
+(3) The Telugu premise: my correction of "Vedant does not speak Telugu" from his own account is
+marked UNVERIFIED in 0031 with the reason: a self-report of a language is not a measurement, and
+nothing has been measured in Telugu in his voice. Nothing is built on it until Vedant's answer on
+what he can and cannot judge in Telugu is recorded.
+(4) THE REHEARSAL TEST, in 0031, for Arjun and Nila: twenty Beat-1-style sentences with push-to-talk
+and the PAUSE beat taught; count the transcripts that do not begin with the card's first word
+("मैंने" on row 1; a clipped start looks like hi_06's "ने"). 0 in 20: the instruction alone
+suffices. 1 or more in 20: the button gets a visible recording cue he waits for (the meter on
+SpeechStarted, which is now truthful), and the count is repeated and must be 0 in 20. Why one:
+four spoken beats, and even a 5 % per-sentence loss is a one-in-five chance of a clipped first
+word in front of the judges; the cue is cheap.

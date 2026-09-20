@@ -21,9 +21,17 @@ import java.util.concurrent.atomic.AtomicBoolean
  * to a voice only 10 dB above the room. Nobody controls when the next table laughs.
  *
  * SAME EVENTS AS [AsrEngine.listen], so a screen that handles that flow handles this one and only
- * the gesture changes: [AsrEvent.SpeechStarted] on press, [AsrEvent.Level] per frame while held,
- * [AsrEvent.SpeechEnded] on release, [AsrEvent.Transcribing], then exactly one [AsrEvent.Result]
- * or [AsrEvent.Unavailable]. A hold shorter than [MIN_HOLD_MS] is a tap, not a sentence, and is
+ * the gesture changes: [AsrEvent.SpeechStarted] when the microphone is actually delivering (see
+ * below), [AsrEvent.Level] per frame while held, [AsrEvent.SpeechEnded] on release,
+ * [AsrEvent.Transcribing], then exactly one [AsrEvent.Result] or [AsrEvent.Unavailable].
+ *
+ * SPEECH-STARTED MEANS THE MICROPHONE IS LIVE, NOT THAT THE BUTTON WENT DOWN. The presenter's own
+ * recorder wrote 0.14 s of exact digital zeros before it captured anything, and he lost the first
+ * word twice in twenty recordings by speaking as he pressed (`0031`, hi_06 and hi_10).
+ * `AudioRecord` behaves the same way after `startRecording()`. So leading all-zero frames are
+ * dropped, do not count towards the hold, and [AsrEvent.SpeechStarted] is emitted on the first
+ * frame that carries any signal at all. A screen that lights its cue on that event tells the truth:
+ * anything said before it was not recorded. A hold shorter than [MIN_HOLD_MS] is a tap, not a sentence, and is
  * INPUT_NOT_USABLE exactly as a cough is on the open-listening path. A hold longer than
  * [MAX_HOLD_MS] is cut there and transcribed anyway; a meal log is not dictation.
  *
@@ -79,15 +87,22 @@ class PushToTalk(
             return@flow
         }
         try {
-            emit(AsrEvent.SpeechStarted)
             val frames = ArrayList<ShortArray>()
             var heldMs = 0
+            var live = false
             try {
                 audio.frames(DefaultAsrEngine.SAMPLE_RATE_HZ, FRAME_MS)
                     // While held, up to the cap; after release, the tail. heldMs counts only the hold,
                     // so a tap plus its tail is still a tap.
                     .takeWhile { (held.value && heldMs < MAX_HOLD_MS) || tailLeftMs > 0 }
                     .collect { frame ->
+                        if (!live) {
+                            // The microphone is not delivering yet: nothing said now is being recorded,
+                            // so nothing is claimed. The first frame with signal is the true start.
+                            if (frame.all { it == 0.toShort() }) return@collect
+                            live = true
+                            emit(AsrEvent.SpeechStarted)
+                        }
                         frames += frame
                         if (held.value && heldMs < MAX_HOLD_MS) heldMs += FRAME_MS else tailLeftMs -= FRAME_MS
                         emit(AsrEvent.Level(EnergyEndpointer.rms(frame)))
@@ -98,7 +113,7 @@ class PushToTalk(
                 emit(unavailable(UnavailableReason.INTERNAL_ERROR, "capture failed: ${e.message}"))
                 return@flow
             }
-            emit(AsrEvent.SpeechEnded)
+            if (live) emit(AsrEvent.SpeechEnded)
             if (heldMs < MIN_HOLD_MS) {
                 emit(unavailable(UnavailableReason.INPUT_NOT_USABLE, "held for $heldMs ms, under $MIN_HOLD_MS: a tap, not a sentence"))
                 return@flow

@@ -48,6 +48,59 @@ class PushToTalkTest {
     }
 
     @Test
+    fun `speech started means the microphone is live, and silent lead-in frames are neither counted nor kept`() = runBlocking {
+        // AudioRecord delivers all-zero buffers before it is really capturing; the presenter's recorder
+        // wrote 0.14 s of them and he lost his first word twice. 15 zero frames (300 ms), then signal.
+        val decoder = ScriptedDecoder(heard)
+        lateinit var ptt: PushToTalk
+        var emitted = 0
+        val audio = object : AudioSource {
+            override fun canRecord() = true
+            override fun frames(sampleRateHz: Int, frameMs: Int) = kotlinx.coroutines.flow.flow {
+                while (true) {
+                    emitted++
+                    emit(if (emitted <= 15) ShortArray(320) else frame(6_000))
+                    if (emitted == 15 + 40) ptt.release()
+                    yield()
+                }
+            }
+        }
+        ptt = PushToTalk(engine(decoder, audio), audio)
+        val events = ptt.hold(SpeechLanguage.HINDI).toList()
+        // No SpeechStarted and no Level until the first frame with signal.
+        assertTrue(events.first() is AsrEvent.SpeechStarted)
+        assertEquals(40 + PushToTalk.RELEASE_TAIL_MS / PushToTalk.FRAME_MS, events.count { it is AsrEvent.Level })
+        assertTrue(events.last() is AsrEvent.Result)
+        // The clip holds only live frames: 40 held plus the tail, none of the 15 silent ones.
+        val (samples, _) = decoder.clips.single()
+        assertEquals((40 + PushToTalk.RELEASE_TAIL_MS / PushToTalk.FRAME_MS) * 320, samples.size)
+    }
+
+    @Test
+    fun `a slow microphone cannot turn a real hold into a tap by itself, but a tap stays a tap`() = runBlocking {
+        // 15 silent frames, then 5 live frames (100 ms of real audio) before release: only the live
+        // part counts as held, so this is a tap however long the thumb was physically down.
+        val decoder = ScriptedDecoder(heard)
+        lateinit var ptt: PushToTalk
+        var emitted = 0
+        val audio = object : AudioSource {
+            override fun canRecord() = true
+            override fun frames(sampleRateHz: Int, frameMs: Int) = kotlinx.coroutines.flow.flow {
+                while (true) {
+                    emitted++
+                    emit(if (emitted <= 15) ShortArray(320) else frame(6_000))
+                    if (emitted == 15 + 5) ptt.release()
+                    yield()
+                }
+            }
+        }
+        ptt = PushToTalk(engine(decoder, audio), audio)
+        val events = ptt.hold(SpeechLanguage.HINDI).toList()
+        assertEquals(UnavailableReason.INPUT_NOT_USABLE, (events.last() as AsrEvent.Unavailable).outcome.reason)
+        assertTrue(decoder.clips.isEmpty())
+    }
+
+    @Test
     fun `a tap is not a sentence`() = runBlocking {
         val decoder = ScriptedDecoder(heard)
         lateinit var ptt: PushToTalk

@@ -86,30 +86,35 @@ the 26th.
 
 **RULED by Vedant, 20 September: demo speech language `hi`, utterances Hinglish. CONFIRMED on
 Vedant's own recording of the twenty sentences the same night** (`logs/asr-eval-vedant-demo.log`,
-RECORDED-DEMO, one speaker): the hi checkpoint got every food word in all ten Hindi sentences and
+RECORDED-DEMO, one speaker): the hi checkpoint got every food word in all ten Hindi sentences (Marathi-accented, his own voice) and
 rows 1, 2 and 7 exact; the en checkpoint broke the food words in 8 of 10 on his voice (roties, doll,
 "cutgory of Dal", darl, thrl, "at least" for idlis, samber), 0 of ten exact. The strict hi count is
 3 of ten because he did not read verbatim: he added words in six rows, as the instruction invited,
 and the recogniser transcribed the additions as fluent Hindi that the reference does not contain.
 Two rows lost a content word (hi_06 "पिछले", hi_10 "नाश्ते में") and are with him to check by ear.
 Re-scored with the error split: hi 5 substitutions / 3 deletions / 35 insertions, "reference words
-all present" 5 of ten, **expected food words heard 16 of 16**; en 21 / 4 / 54, 2 of ten, food words
+all present" 5 of ten, **expected food words heard 16 of 16, Hindi, Marathi-accented, his own voice**; en 21 / 4 / 54, 2 of ten, food words
 heard 7 of 16 (`logs/asr-eval-vedant-demo.log`). The harness prints those columns in every table
 now, so "3 of ten exact" cannot leave the tool without the insertions and the foods beside it.
 The paragraph below is kept as it was written before his voice was heard.**
 
-## RULING, 20 September: the demo is Hindi, in Vedant's own voice. English is not a demo language.
+## RULING, 20 September: the demo is Hindi, Marathi-accented, in Vedant's own voice. English is not a demo language.
 
 Decided by Vedant on the re-scored twenty (`logs/asr-eval-vedant-demo.log`), on four numbers:
-**foods heard 16 of 16 in hi against 7 of 16 in en; exact 3 of ten in hi against 0 of ten in en.**
-Not a close call. The run of show carries no English path; if anyone proposes an English beat
+**foods heard 16 of 16 in Hindi, Marathi-accented, in Vedant's own voice, against 7 of 16 in
+English; exact 3 of ten against 0 of ten.** Not a close call. "Marathi-accented" is part of the
+claim wherever the 16 of 16 is cited: it does not weaken it, it makes it checkable, and a judge who
+hears the accent and reads plain "Hindi" trusts the rest less. The run of show carries no English path; if anyone proposes an English beat
 later, this paragraph is the answer.
 
-Two premises corrected by the presenter himself, neither of which the ruling rests on: he is a
-**native Marathi speaker** (19; speaks Telugu, English, Hindi, Marathi, Kannada), so the Hindi on
-stage is Marathi-accented Hindi, and that is the voice the 16 of 16 was measured on; and "Vedant
-does not speak Telugu", stated above, is wrong by his own account. His Telugu was never recorded
-or measured; the ruling stands on the Hindi measurement, not on that premise.
+Two premises from the presenter himself, neither of which the ruling rests on. He is a **native
+Marathi speaker** (19), so the Hindi on stage is Marathi-accented Hindi, and that is the voice the
+16 of 16 was measured on. And he reports speaking Telugu, English, Hindi, Marathi and Kannada, which
+contradicts "Vedant does not speak Telugu" above. **That correction is UNVERIFIED**: a speaker's
+self-report of a language is not the same evidence as a measurement, and nothing has been measured
+in Telugu in his voice. Vedant is being asked what he can and cannot judge in Telugu; until that
+answer is recorded here, nothing is built on the corrected premise, and the sentence above stands
+as written with this note beside it.
 
 His two ear-checks, resolved against the audio: hi_06, he did say "पिछले"; the file begins with
 0.14 s of exact digital zeros (the recorder's padding) and the first piece lands at 0.28 s with
@@ -155,7 +160,7 @@ foods heard against insertions, all rows above pooled (insertion bands):
    5-9  insertions:  3 rows, foods heard 14/14
   10-19 insertions:  8 rows, foods heard 47/50  <- 3 missed
 
-**It holds flat.** On the natural clips, foods heard is 16 of 16 from 0 to 14 insertions; hi_08,
+**It holds flat.** On the natural clips (Hindi, Marathi-accented, his own voice), foods heard is 16 of 16 from 0 to 14 insertions; hi_08,
 10.2 s of him talking freely with 14 insertions, heard both foods. On the joined utterances that
 fit under the 20 s push-to-talk cap, 43 of 43 across 5 to 19 insertions. The only three misses in
 the table are foods **physically cut off by the 20 s cap**: the two four-clip joins ran to 22 s,
@@ -173,6 +178,21 @@ the longest joins (3 to 8) and some of those are the cap cutting a word in half.
 **FROZEN, 20 September, by rule: Beat 1's sentence.** Row 1, "मैंने दो रोटी और थोड़ी दाल खाई", exact
 on the presenter's voice through the hi checkpoint, is the one measured thing in the demo. Nobody
 improves it, rephrases it, or makes it more impressive.
+
+**The rehearsal test that decides whether the button needs a visible recording cue.** He lost the
+first word twice in twenty recordings on his own recorder, with no button involved, by speaking as
+he pressed. With push-to-talk and the PAUSE beat taught, rehearsal counts how often he loses the
+first word: twenty Beat-1-style sentences, each scored by whether the transcript begins with the
+card's first word (row 1 begins "मैंने"; a clipped start shows as "ने" or a missing word, which is
+what hi_06 and hi_10 look like). **Threshold: 0 losses in 20 and the instruction alone suffices;
+1 or more in 20 and the button gets a visible recording cue that he waits for before speaking.**
+Why one: the demo has about four spoken beats, and a per-sentence loss rate of even 5 % is a
+one-in-five chance of a clipped first word in front of the judges, while the cue is cheap: the
+meter Arjun already shows lights on `AsrEvent.SpeechStarted`. That event is now emitted on the
+first frame the microphone actually delivers, not at the press, because his recorder wrote 0.14 s
+of zeros before capturing and `AudioRecord` does the same, so a cue lit on the press would lie;
+leading all-zero frames are dropped and do not count towards the hold. With the cue in place the
+count is repeated and must be 0 in 20 as well.
 
 **The presenter's instruction, three beats, all measured: PRESS · PAUSE · SPEAK · FINISH THE WORD ·
 LET GO.** The pause after the press because push-to-talk has no pre-roll (the microphone is not open
