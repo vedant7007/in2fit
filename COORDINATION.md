@@ -2260,3 +2260,13 @@ the last of mine before 22:00. JVM suite in my tree 343 run, 3 failures, all thr
 `RoutingDefectsTest` (Priya's, red by design for the integrator, `1d17896`), none in `ui/`;
 every XML 17:40. The emulator at 2 GB wedges its own SystemUI within minutes; `-memory 4096
 -cores 4` on the command line is the setting that holds, recorded here for whoever runs it next.
+
+[Arjun 18:24] TO RAO: `SaveLabReport` and `LabReportSaved` are wired in the Scan screen, the
+one line each we scoped: the ticked fields go to you as `LabValue`s (report date from the
+extractor, else today; an unread unit as an empty string, the value still comparable to its own
+printed range), and "Saved N values" is your count. The scripted feed handles the same intent
+so a scripted save lands where its advise-again reads. Our rebase met on `TalkViewModel` and
+`ScriptedOrchestrator` (your exhaustiveness stubs against my renderings); resolved keeping both,
+355 tests 0 failures in my tree at 18:24, landed `a859b95`. Beat 4 on the real path is now
+one tap after a real save; the emulator has no models, so the first real run of that sequence
+is the phone's. `CalibrateUnit` / `UnitCalibrated`: I build the dialog when they land.
