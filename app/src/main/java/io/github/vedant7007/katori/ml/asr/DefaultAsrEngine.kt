@@ -68,8 +68,28 @@ class DefaultAsrEngine(
 
     private val capturing = AtomicBoolean(false)
 
-    override suspend fun prepare(language: SpeechLanguage): Outcome<Unit> =
-        arbiter.preload(AsrModels.handleFor(language))
+    /**
+     * Load AND warm: admit the model and run one throwaway decode of [WARM_UP_MS] of silence inside
+     * the lease, so the first real utterance is not also the runtime's first pass. `0028`: the cold
+     * cost is the load (seconds for a 197 MB model on the desktop) and the first decode after it
+     * pays ONNX Runtime's lazy set-up as well; both belong at app start, not on the presenter's
+     * first sentence. The lease ends on return, leaving the model resident and unpinned, which is
+     * what `preload` would have left, plus warm. The silence decodes to a phantom piece or two and
+     * is discarded; nothing about it is a transcript.
+     */
+    override suspend fun prepare(language: SpeechLanguage): Outcome<Unit> {
+        val handle = AsrModels.handleFor(language)
+        val warmed = arbiter.withModel(handle) { loaded ->
+            val decoder = loaded.native as? AsrDecoder
+                ?: error("${handle.id} was loaded as ${loaded.native::class.java.name}, not an AsrDecoder")
+            withContext(dispatcher) { decoder.decode(ShortArray(SAMPLE_RATE_HZ * WARM_UP_MS / 1000), SAMPLE_RATE_HZ) }
+        }
+        return when (warmed) {
+            is Outcome.Ok -> Outcome.Ok(Unit)
+            is Outcome.Unavailable -> warmed
+            is Outcome.NotImplemented -> warmed
+        }
+    }
 
     override fun listen(language: SpeechLanguage): Flow<AsrEvent> = flow {
         if (!audio.canRecord()) {
@@ -197,6 +217,9 @@ class DefaultAsrEngine(
 
         /** A clip too short to carry a feature frame is refused before the model is asked. */
         const val MIN_CLIP_MS = 200
+
+        /** Silence decoded once by [prepare] so the runtime's first pass is not the user's. */
+        const val WARM_UP_MS = 1_000
 
         /**
          * Below this many pieces per second of clip, the model heard nothing. Desktop, `0021`:

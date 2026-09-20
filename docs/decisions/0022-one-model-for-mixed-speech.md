@@ -82,17 +82,53 @@ English.** The synthetic voices are not Vedant; his own recording of the ten sen
 `vedant_hi_01`..`vedant_hi_10` (or `_en_`), through
 `tools/asr_eval.py manifest <folder> data-authoring/demo-utterance-set.csv` and `wer`, is the
 number that decides the column, and it is the one number in this project that must be good on
-the 26th. Gaps the hi path exposes for the matcher, handed to Priya: no Devanagari alias for इडली,
-सांबर, पनीर; the unit table is English-only (`katori`, `spoon`, `glass`, `plate`), so कटोरी, चम्मच,
-गिलास, प्लेट need to reach `resolveUnit`, either as aliases or normalised by the extractor.
+the 26th.
+
+**RULED by Vedant, 20 September: demo speech language `hi`, utterances Hinglish. PROVISIONAL on
+Vedant's own recording of the ten sentences.** The Windows voice is not the presenter. If his
+recording disagrees with it, the ruling flips to `en-IN` the same evening and Priya's Devanagari
+work changes shape, which is why that recording is his highest-priority task tonight and why this
+paragraph says provisional rather than settled. Consequence recorded for Rao: staging
+`asr/en/model.int8.onnx` on the phone is off the critical path; keep it as the fallback the flip
+would need, not as an urgent item.
+
+The demo set was re-measured after one edit: "boiled egg" said inside a Hindi sentence came out as
+**एक**, the number one, twice (`logs/asr-hi-emitted-forms.log`), so row 3 now says उबला अंडा. With
+that, the hi column reads 2.5 % WER / 1.1 % CER over the ten synthetic rows (this regeneration;
+Piper is not bit-stable between runs) and the en column is unchanged at 19.1 %.
+
+### What the hi checkpoint emits, exactly, for Priya's matcher and classifier
+
+Measured through the same Piper voice (`logs/asr-hi-emitted-forms.log`), checked against the
+database at `5144f8f` (870 aliases; Priya's Telugu renderings and the Devanagari units landed
+that afternoon). An earlier line in this record said the unit table was English-only; that was
+true of the database I first read and is not true now, and the claim is withdrawn.
+
+- **Question markers arrive as Devanagari, every one exact**: क्या, कितना, कितनी, कैसा, कब, कौन
+  सी, क्यों, कहाँ, चाहिए, बताओ, and the code-mixed verb ऐड करूँ. The roman forms (kya, kitna,
+  kaisa) never reach the classifier from speech; they are the typed-input path only. A marker set
+  for the spoken demo has to hold the Devanagari half, and that half is the one the demo depends on.
+- **Units**: कटोरी, चम्मच, बड़ा चम्मच, छोटा चम्मच, गिलास, प्लेट, कप, कटोरा arrive exactly and are in the
+  unit table. Not in it: the English loans said in Hindi, पीस (piece) and बाउल (bowl). Minor.
+- **Alias gaps, food exists** (demo-blocking on the hi path): इडली→idli; सांभर AND सांबर→sambar (the
+  model emitted the भ form for a speaker saying the ब form); डोसा→plain_dosa (only दोसा exists);
+  उपमा→upma; पोहा→poha_upma; ऑमलेट→omelette; छोले→chana_masala; बिरयानी→veg_biryani;
+  दाल फ्राई→toor_dal_tadka.
+- **Food gaps, nothing to alias to**: पनीर, पालक पनीर, पराठा, सब्ज़ी, राजमा, खिचड़ी. Data authoring,
+  not matching.
+- **Unstable renderings to know about**: ब्रेड→ब्रिड, पराठा→पराठक, बॉयल्ड एग→बॉयल एक, and the "egg"→एक
+  case above. One voice, one rendering each; a recorded speaker will vary them.
 
 ## "I didn't catch that": the path where a wrong-language sentence is not logged
 
-Today a transliterated sentence is already NOT saved: `LookupMealResolver` refuses on the first
-item the lookup cannot match, and `DefaultOrchestrator.plate()` turns that into
-`NeedsConfirmation(NO_MATCH, parsed)` and completes without writing. What is wrong is the message:
-NO_MATCH renders as "I do not know that food", which tells the judge the database is missing an
-item when the truth is that nothing on the plate was speech the app understood.
+**The finding first, plainly: garbage was already not being saved.** `LookupMealResolver` refuses
+on the first item the lookup cannot match, and `DefaultOrchestrator.plate()` turns that into
+`NeedsConfirmation(NO_MATCH, parsed)` and completes without writing. The system was correct. What
+is wrong is the MESSAGE: NO_MATCH renders as "I do not know that food", which tells a judge the
+database is missing an item when the truth is that nothing on the plate was speech the app
+understood. A correct system with a wrong message is a different defect class from a broken one,
+and the change below must not be written up as fixing a bug that logged wrong meals, because no
+such bug existed.
 
 Agreed threshold (Jacob, for Priya's matcher and Rao's orchestrator; the code is theirs):
 

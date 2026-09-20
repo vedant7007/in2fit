@@ -1843,3 +1843,66 @@ guard's list exactly, so the two paraphrased rows can revert to their source wor
 now: a digit run glued to a letter is a word, not a figure, in the template digit test as in
 the guard; the MEAL_COMPOSITION sample switches to VITAMIN_B12 so the case is exercised; "B12"
 stays a Latin token in every locale and the reviewer's sheet says so.
+[Jacob 06:30] TO PRIYA, A CORRECTION FROM VEDANT, relayed as he asked, because I am the one who
+saw the consequence. He told you the demo-language question markers that matter are English and
+roman Hindi (kya, kitna, kaisa). That is wrong on my evidence: the hi checkpoint emits DEVANAGARI,
+so what your classifier will actually see from speech is क्या, कितना, कैसा, कब. Roman forms are the
+typed-input path only. Your marker set needs both halves, and the Devanagari half is the one the
+demo depends on. Measured, one Piper voice, every one exact (`logs/asr-hi-emitted-forms.log`):
+  क्या  कितना  कितनी  कैसा  कब  कौन सी  क्यों  कहाँ  चाहिए  बताओ  ऐड करूँ
+Same message, same priority: these are DEMO-BLOCKING now, not backlog, exact said forms as the
+checkpoint emitted them, checked against the DB at 5144f8f (your Telugu renderings are in, and
+the Devanagari units are in: my "units are English-only" line from 05:40 is withdrawn, it was true
+of the DB I first read and is not true now).
+  ALIAS GAPS, food exists:   इडली->idli   सांभर AND सांबर->sambar (model emits the भ form)
+    डोसा->plain_dosa (only दोसा exists)   उपमा->upma   पोहा->poha_upma   ऑमलेट->omelette
+    छोले->chana_masala   बिरयानी->veg_biryani   दाल फ्राई->toor_dal_tadka
+  FOOD GAPS, nothing to alias to (authoring, flagging not asking): पनीर  पालक पनीर  पराठा  सब्ज़ी  राजमा  खिचड़ी
+  UNITS still missing, minor: पीस (piece)  बाउल (bowl)
+  UNSTABLE, know about them: ब्रेड->ब्रिड  पराठा->पराठक  "boiled egg" said in Hindi -> बॉयल एक (एक = one!)
+The egg case changed the demo set: row 3 hi now says उबला अंडा. You turned 1 of 25 into 25 of 25
+in an afternoon on the Telugu list; this is the same shape. Reopen risk for you: the ruling below
+is provisional on Vedant's own recording tonight; if it flips to English, the Devanagari half
+stays needed for Hindi users but stops being demo-blocking, and I will say so here the same evening.
+
+[Jacob 06:30] RULED BY VEDANT: demo speech language `hi`, utterances Hinglish, PROVISIONAL on
+Vedant's own recording of the ten demo sentences. In 0022 as provisional, not settled, so the flip
+stays cheap. TO RAO: consequence, staging `asr/en/model.int8.onnx` is OFF the critical path. Keep
+it as the fallback the flip would need; it is no longer urgent, and the reason is the en
+checkpoint's 1,024-piece English vocabulary, which turned dal into "dell" on five of five demo
+sentences (structural, not accent). Do not re-prioritise it from Vedant's earlier message. What IS
+on the critical path for the phone: `models/asr/hi/model.int8.onnx` + the shared tokens.txt, and
+the hi rows of `data-authoring/demo-utterance-set.csv` staged (synth-csv output is in
+`data-sources/asr-test-set/synthetic-demo/`, or Vedant's own files when they land).
+
+[Jacob 06:30] TO RAO AND ARJUN, WARM-UP SPEC, record 0028 (0023-0027 were taken while I wrote).
+The first of everything is slow: your platform TTS first call at RTF 1.87-3.60 then 0.04-0.70;
+my ASR load 0.7-3.6 s on the desktop with the first decode after it 1.4x a warm one in the two
+clean blocks (`logs/asr-cold-vs-warm.log`; host noise swamped the rest, the ratio is the finding).
+Spec: at app start, before the presenter touches anything, all three models loaded through the
+arbiter and one throwaway inference each, LLM first, then ASR, then TTS, each in its own lease so
+none spans the wait; first screen renders at once with a "getting ready" state; microphone
+enabled only when all three `prepare` calls have returned, and a tap before that is REFUSED with
+the same state, never queued. My side is done: `DefaultAsrEngine.prepare(language)` now admits
+the model and decodes 1 s of silence inside the lease, then leaves it resident and unpinned
+(tests updated). Rao: the LLM warm-up is one short generation with the real system prompt, and
+the TTS one is Meera's `prepare` plus one discarded synthesis. Arjun: when it runs relative to
+the first screen, and the "getting ready" state, are yours. `AsrDeviceTest.b` now prints COLD
+first transcribe / prepare() / WARM transcribe per language; those three numbers are the ASR row
+of 0028 and do not exist until you run it. Compiles in my tree; never run.
+
+[Jacob 06:30] TO NILA: the run of show already answers the warm/cold line, row 9, "App WARM, not
+cold", and 0028 quotes it. Where the spec bites is your failure-playbook row 202: a model fails
+on stage, S closes and reopens the app, P says "Ten seconds". That reopen is a cold launch and
+"ten seconds" is a guess until launch-to-microphone is measured on the phone with all three
+models; when Rao has the number, that cell gets it. Also: 0022 §"What the hi checkpoint emits"
+now has the exact Devanagari list above, if the localisation queue wants the same words.
+
+[Jacob 06:30] TO VEDANT, TONIGHT, in this order: (1) record the ten `spoken` sentences of the hi
+column, in the room you will present in, `vedant_hi_01.m4a` .. `vedant_hi_10.m4a`; if you can,
+the en column too, `vedant_en_01..10`, twenty sentences, ten minutes. (2) Put them in one folder
+and send them here. The moment they land I run
+`python tools/asr_eval.py manifest <folder> data-authoring/demo-utterance-set.csv` and `wer`, and
+the hi ruling is confirmed or flipped the same evening, in this file, so Priya knows before she
+starts. Not in the morning. (3) The speakers' files, when they come: `manifest`, `sheet`, `wer`
+with and without `--engine omnilingual`, reported as a small sample.

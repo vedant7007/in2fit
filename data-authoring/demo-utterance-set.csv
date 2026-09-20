@@ -10,6 +10,10 @@
 # checkpoint writes everything in Devanagari, the en checkpoint everything in Latin, so WER is scored
 # against `reference`, never against `spoken`. `expected_foods` is for the on-device extraction count.
 #
+# Row 3 (hi) says उबला अंडा, not "boiled egg": through the hi checkpoint the English word "egg" inside a
+# Hindi sentence came out as एक, the number one, on both synthetic runs (logs/asr-hi-emitted-forms.log),
+# and a plate that hears "one" where a food was is the wrong kind of error to bring on stage.
+#
 # HONESTY NOTE: any WER on synthesised versions of these rows is a smoke test. The number that
 # matters is Vedant's own voice saying them, recorded with the same naming as the speaker script
 # (vedant_hi_01 ...), through tools/asr_eval.py. Until that exists, nothing here is a demo guarantee.
@@ -18,7 +22,7 @@ id,beat,intent,language,spoken,reference,expected_foods
 1,1,LOG,en,I had two rotis and a little dal.,I had two rotis and a little dal.,roti;dal
 2,1,LOG,hi,"दो रोटी, एक कटोरी दाल, और दो चम्मच तेल","दो रोटी, एक कटोरी दाल, और दो चम्मच तेल",roti;dal;oil
 2,1,LOG,en,"Two rotis, a katori of dal, and I used two spoons of oil.","Two rotis, a katori of dal, and I used two spoons of oil.",roti;dal;oil
-3,1,LOG,hi,मैंने दो सौ ml दूध पिया और एक boiled egg खाया,मैंने दो सौ एमएल दूध पिया और एक बॉयल्ड एग खाया,milk;egg
+3,1,LOG,hi,मैंने दो सौ ml दूध पिया और एक उबला अंडा खाया,मैंने दो सौ एमएल दूध पिया और एक उबला अंडा खाया,milk;egg
 3,1,LOG,en,I drank 200 ml of milk and ate one boiled egg.,I drank 200 ml of milk and ate one boiled egg.,milk;egg
 4,1,LOG,hi,"दो रोटी... नहीं, तीन रोटी और दाल","दो रोटी नहीं, तीन रोटी और दाल",roti;dal
 4,1,LOG,en,"Two rotis... no, three rotis and dal.","Two rotis no, three rotis and dal.",roti;dal

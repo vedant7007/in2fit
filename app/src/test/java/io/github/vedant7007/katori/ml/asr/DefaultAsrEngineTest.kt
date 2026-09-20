@@ -244,16 +244,32 @@ class DefaultAsrEngineTest {
     // --- models -------------------------------------------------------------------------------
 
     @Test
-    fun `prepare preloads the handle for the language and nothing else`() = runBlocking {
-        val decoder = ScriptedDecoder(speechDecoded)
+    fun `prepare loads the handle for the language and runs one throwaway decode of silence`() = runBlocking {
+        val decoder = ScriptedDecoder(AsrDecoder.Decoded("ఈారు", listOf("ఈ", "ారు")))   // what silence really decodes to
         val loader = ScriptedLoader(decoder)
         val engine = engine(FakeAudio(frames = emptyList()), decoder, loader)
         assertTrue(engine.prepare(SpeechLanguage.HINDI) is Outcome.Ok)
         assertEquals(listOf("asr.indicconformer-hi"), loader.loaded.map { it.id })
         assertEquals("asr/hi/model.int8.onnx", loader.loaded.single().relativePath)
-        // Preloaded means resident and evictable, not pinned.
+
+        // The warm-up is one decode of WARM_UP_MS of digital silence, at the model's rate.
+        val (samples, rate) = decoder.clips.single()
+        assertEquals(DefaultAsrEngine.SAMPLE_RATE_HZ, rate)
+        assertEquals(DefaultAsrEngine.SAMPLE_RATE_HZ * DefaultAsrEngine.WARM_UP_MS / 1000, samples.size)
+        assertTrue(samples.all { it == 0.toShort() })
+
+        // Warm means resident and evictable, not pinned: a second prepare decodes again without reloading.
         assertTrue(engine.prepare(SpeechLanguage.HINDI) is Outcome.Ok)
         assertEquals(1, loader.loaded.size)
+        assertEquals(2, decoder.clips.size)
+    }
+
+    @Test
+    fun `prepare reports a model that will not load, and warms nothing`() = runBlocking {
+        val decoder = ScriptedDecoder(speechDecoded)
+        val r = engine(FakeAudio(frames = emptyList()), decoder, ScriptedLoader(decoder, failWith = "model missing")).prepare(SpeechLanguage.TELUGU)
+        assertEquals(UnavailableReason.MODEL_LOAD_FAILED, (r as Outcome.Unavailable).reason)
+        assertTrue(decoder.clips.isEmpty())
     }
 
     @Test

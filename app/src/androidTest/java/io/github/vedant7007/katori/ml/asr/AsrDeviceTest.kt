@@ -124,18 +124,28 @@ class AsrDeviceTest {
         val arbiter = arbiter()
         val engine = DefaultAsrEngine(arbiter, NoMicrophone)
 
-        var loadNoted = false
+        val warmed = mutableSetOf<SpeechLanguage>()
         val perLang = mutableMapOf<String, Totals>()
         var anyOk = false
         for (row in rows) {
             val language = SpeechLanguage.entries.first { it.tag.substringBefore('-') == row.language }
-            if (!loadNoted) {
-                val t0 = System.nanoTime()
-                val prepared = runBlocking { engine.prepare(language) }
-                say("prepare(${language.name}) ${(System.nanoTime() - t0) / 1_000_000} ms -> ${prepared::class.java.simpleName}")
-                loadNoted = true
-            }
             val clip = readWav(File(testSetDir, row.path))
+            if (language !in warmed) {
+                // COLD AGAINST WARM, the number 0028's warm-up spec rests on. The first clip of each
+                // language is decoded three times: once truly cold (model not resident), once after
+                // prepare(), and once more warm. Only the last counts in the WER table's timing.
+                val t0 = System.nanoTime()
+                val cold = runBlocking { engine.transcribe(clip, language) }
+                val coldMs = (System.nanoTime() - t0) / 1_000_000
+                val t1 = System.nanoTime()
+                val prepared = runBlocking { engine.prepare(language) }
+                val prepareMs = (System.nanoTime() - t1) / 1_000_000
+                val t2 = System.nanoTime()
+                runBlocking { engine.transcribe(clip, language) }
+                val warmMs = (System.nanoTime() - t2) / 1_000_000
+                say("[${row.language}] COLD first transcribe (load + first decode) ${coldMs} ms -> ${cold::class.java.simpleName}; prepare() ${prepareMs} ms -> ${prepared::class.java.simpleName}; WARM transcribe ${warmMs} ms; ${THREADS} threads")
+                warmed += language
+            }
             val t0 = System.nanoTime()
             val outcome = runBlocking { engine.transcribe(clip, language) }
             val ms = (System.nanoTime() - t0) / 1_000_000
