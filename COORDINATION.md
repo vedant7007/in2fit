@@ -2705,3 +2705,61 @@ names the phone question.
 [Arjun 20:16] TO NILA: keys added, `mic_hold_to_speak` and `mic_hold_hint`, the last two before
 22:00. `mic_speak` is unchanged: a "Hold to speak" label on tonight's tap button would lie, so
 the label switches to the new key the hour the gesture lands.
+
+[Meera 20:17] TO NILA, FOR THE COUNTDOWN AND THE PRE-DEMO CHECKLIST, THE STAGING NOBODY HAS
+SAID OUT LOUD. Every model reaches a phone by `adb push` (0019 addendum 8's correction); on the
+26th that is somebody at a table with a laptop, a cable and a handset nobody has connected
+before, moving 1.6 GB under time pressure. Written as steps, with the figures the repo has and
+the one it does not:
+
+    WHAT GOES ON THE PHONE (Hindi in, English out; Telugu speech is post-battle and stays off)
+      app-demo-debug.apk                                  66,889,734 B (clean package, 0019; espeak data is inside it)
+      models/qwen2.5-1.5b-instruct-q4_k_m.gguf         1,117,320,736 B
+      models/asr/hi/model.int8.onnx + tokens.txt         197,663,198 B (tokens = the repo-root one, 67,605 B)
+      models/asr/en/model.int8.onnx + tokens.txt         174,621,490 B (its own 11,433 B tokens)
+      models/tts/en_GB-cori-medium/model.onnx+tokens.txt  63,532,476 B
+      models/tts/hi_IN-pratham-medium/ (or rohan)        63,518,005 B
+      TOTAL models                                     1,616,656,765 B = 1,542 MiB, plus the APK
+      Free space needed on the handset before you start: 2 GB, checked with `adb shell df /sdcard`.
+      (The realme sat at 98-100 % full and there was not room for a second copy of the GGUF.)
+
+    THE ONLY MEASURED RATE: 6.3 MB/s over USB on the realme (`logs/hardware.log`, the 198 MB ASR
+    push in 30.0 s). At that rate the set is about 4.3 minutes of pure transfer and the LLM alone
+    is 177 s, IF NOTHING DROPS. On the realme the LLM push died twice, at 18.3 s and 43.4 s,
+    "no response: Broken pipe", because that USB link re-enumerates every few minutes (0012).
+    A GUESS UNTIL RAO TIMES IT: the number in the checklist must be his stopwatch, not this.
+
+    STEPS
+      1. Enable Developer options on the handset (Settings > About > tap Build number 7 times),
+         then USB debugging. On vivo/iQOO ROMs also look for "Install via USB" and "USB debugging
+         (Security settings)"; on some of those ROMs "Install via USB" wants a vivo account and a
+         network to switch on. VERIFY THE HOUR THE HANDSET ARRIVES, NOT ON THE MORNING; this is
+         the one step that can need network and a login, and it is the step the demo build cannot
+         do for itself.
+      2. USB mode "File transfer / MTP" (charging-only hides adb on many ROMs); accept the RSA
+         prompt on the phone; `adb devices` shows `device`, not `unauthorized`.
+      3. `adb install -r app-demo-debug.apk`; open it once so `externalMediaDirs` exists.
+      4. Push the models in chunks with per-chunk retry and an on-device `sha256sum` at the end
+         (0012's procedure; the plain `adb push` of the GGUF is what died). Rao has the working
+         commands; they belong in `tools/` as a script before the 26th, not in his history.
+      5. `adb shell sha256sum` every file against `logs/model-fetch.log` and the stamped-voice
+         hashes in 0019. A file that does not match is pushed again, never trusted.
+      6. Voice data for the platform engine (the earlier checklist step), volume, wired speaker,
+         `TtsVoiceProbeTest` in airplane mode, one spoken turn from the back of the room.
+      IF THE CABLE MISBEHAVES: a different cable and a different port first (the re-enumeration
+      followed the link, not the phone); then `adb tcpip 5555` + `adb connect <phone ip>:5555`
+      over the venue's Wi-Fi for control and the pushes, which on the realme "has not dropped";
+      then, last, copy the files by MTP in the file manager and let the app find them, which the
+      loader accepts because it only reads the directory.
+
+[Meera 20:17] TO VEDANT, A LOGISTICS ITEM: a laptop with the repo's `data-sources/models` on it,
+adb, and a KNOWN-GOOD USB cable that has moved a gigabyte to a phone without dropping are demo
+equipment now, not optional. 1.6 GB has to cross a cable onto the iQOO before it can say a word,
+and the one link this project has used dropped a gigabyte twice.
+
+[Meera 20:17] TO RAO: inside your next cable session, at no extra cost, the rehearsal that turns
+the checklist's "4.3 minutes, a guess" into a number: wipe the models directory on the realme,
+stage the full set above from scratch with your chunked procedure, stopwatch running from
+`adb devices` to the last `sha256sum` match, and paste the time and the drop count. And please
+commit the chunked push as `tools/stage-models.ps1` (Nila's directory; say so in the message as
+the others have): on the 26th it is run by whoever holds the cable, and that may not be you.
