@@ -1680,3 +1680,42 @@ accident) and `demo_` (the scripted-feed banner and its switch), and `talk_` add
 The About screen will read the USDA `attribution`, `licence` and `disclosure` rows from the
 food database's `meta` table as your conventions file asks, through the `FoodDbSource` seam
 AppModule already provides; that is a read of bundled data, not the orchestrator's path.
+[Nila 16:44] RULED, RECORDED IN 0017 AND STATUS: the demo runs in Hindi or Indian English
+speech with an English interface (Vedant presents, Vedant does not speak Telugu; 0022's
+"Demo language"), and Telugu is the toggle, the localisation demonstration. So `values-te` is
+no longer a ship blocker: the 0017 rule now costs a toggle, not the demo. THE PACKET STILL
+GOES OUT AT 22:00 AND THE REVIEW STILL HAPPENS. Nobody reads the descope as the work having
+been wasted: the table, the importer, the packet and the rule are what make a reviewed Telugu
+a file rather than a rebuild on the day a reviewer exists, and the health sentences will be
+read by the Telugu-speaking half of the room whichever language the presenter speaks.
+
+[Nila 16:44] TWO NEW FILES, FOR EVERYONE. `docs/demo/run-of-show.md`: the exact sentences
+per beat (the Hindi column of Jacob's `demo-utterance-set.csv`, English as the alternative,
+the recordings decide), what is on screen at each moment from 0026, who holds the phone,
+timings marked measured or budget, the device-state checklist (airplane, nothing else running,
+screen awake against OplusHansManager, cool, warm app), the pre-demo checklist, and a failure
+playbook of one sentence and one action per branch. TO RAO: every "(budget)" in it is yours to
+replace with a row from the clean airplane-mode run; the "What this file waits on" table at the
+end is the list. TO JACOB: the WER strings are exactly the `spoken` column, unchanged. TO
+ARJUN AND RAO, two findings from writing it: (1) `TalkViewModel.kt:75` sends `language = "te"`
+as a constant; a Hindi demo needs it to follow the profile's speech language. (2) There is no
+in-app language picker yet; the system's per-app language setting works today because
+`localeConfig` is declared, but on stage that is a trip through Settings. Beat 5 (the toggle)
+is conditional on Telugu Part 1 anyway; if a picker is coming, say where.
+
+[Nila 16:44] TO VEDANT, THE DECK: `docs/demo/deck-audit-2026-09-20.md`, every claim on the
+nine pages against a named file. Seven FIX FIRST: "2.6 s cold" (no log has a 2.6 s row; cold
+loads on record are 5.4-8.5 s, the sub-second ones are page-cached); "10.6 s for a whole
+spoken meal ... and a citation" (10.6 s is the model on a transcript, ASR and lookup excluded,
+no citation in it); "252 tests green on every commit" (315 today, NINE RED BY DESIGN from
+ebd88cf until Rao's fixes land, so not green on master right now); "48 strings translated"
+(136, none translated by a person, all machine-drafted and marked); the three-languages-in-
+one-sentence claims on pages 6 and 7 (0022 measured the opposite: one checkpoint per selected
+language); the page-4 sentence "so fewer fast carbs at one sitting helps" (asserts a food
+changes a clinical value, which our own templates forbid, on the slide about the safety
+line); and three [Name] placeholders still on page 9. Stale counts: 93 ingredients, 626
+aliases, 52 dishes. The page-3 mock meal (412 kcal, 14 g protein) is not what the database
+produces (402 kcal, 18 g protein for two 40 g rotis and a katori of dal tadka). The stack line
+omits sherpa-onnx, the NVIDIA English recogniser and espeak-ng (GPL) while claiming every
+dependency disclosed. The SENSORS tile describes code that does not exist. Details and the
+exact replacement wording per row are in the file.

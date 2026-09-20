@@ -89,9 +89,20 @@ line in `app/build.gradle.kts`: `localeFilters += listOf("en", "te", "hi")` beco
 `listOf("en", "hi")`, which drops the Telugu table from the APK; every screen falls back to
 the default table. The rule, the line and the reason are here so the cut is a lookup.
 
-That is the contingency, not the plan. The health sentences are what beat 4 displays, and
-losing Telugu guts the demo's strongest moment. The plan is a ten-minute read by a fluent
-speaker, which Vedant is chasing.
+That is the contingency, not the plan. The plan is a ten-minute read by a fluent speaker, which
+Vedant is chasing.
+
+**What the rule costs changed on the same day.** The demo language was ruled: Vedant presents,
+Vedant does not speak Telugu, so the demo runs in Hindi or Indian English speech with an
+English interface (`0022-one-model-for-mixed-speech`, "Demo language"). Speech language and
+interface locale are separate settings. Telugu is shown as the localisation demonstration: the
+toggle, Beat 5 of `docs/demo/run-of-show.md`, shown only if Part 1 is confirmed. So
+`values-te` is no longer a ship blocker: if the nine are not confirmed, the contingency above
+costs the toggle, not the demo. The packet still goes out on the freeze, the review still
+happens, and the descope is not to be read as the work having been wasted: the string table,
+the importer, the packet and the rule are what make a reviewed Telugu a file rather than a
+rebuild, on the day a reviewer exists, and the health sentences are the ones that will be read
+by the Telugu-speaking half of the room in Hyderabad whichever language the presenter speaks.
 
 **A middle option, recorded and NOT built:** the health templates and the UI strings are
 separate keys. If the review comes back partial, a build could keep the confirmed strings and

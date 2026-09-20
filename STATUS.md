@@ -249,7 +249,10 @@ the XML comment on every entry says so. 48 arrived via Vedant; 89 were generated
 Vedant's ruling that the packet should carry candidates rather than holes. Nobody on the team
 can read them. **Rule (`0017`): if the nine lines of Part 1 are not confirmed by a fluent
 speaker before the demo build is cut, `values-te` leaves that build** (one `localeFilters`
-line). A partial-review middle shape is recorded there and not built.
+line). **The demo language was ruled the same day: Hindi or Indian English speech, English
+interface, Telugu as the toggle.** So that rule now costs a toggle, not the demo, and the
+review is not wasted work: it is what makes Telugu a file rather than a rebuild on the day a
+reviewer exists. `docs/demo/run-of-show.md` has the beats; Beat 5 is the toggle, conditional.
 
 The reviewer packet ships once, frozen 22:00 IST 20 Sep, owned by Nila: Part 1 the nine
 sentences, Part 2 the screens the demo shows, Part 3 the rest, Part 4 Priya's word lists and
@@ -358,3 +361,7 @@ Open on the build and documentation side, 15:30:
 - The About screen's USDA citation and disclosure lines (Arjun, from the database's `meta`).
 - The hardware section of this file is Rao's to refresh; it predates today's ASR, TTS and
   screen work.
+- `docs/demo/run-of-show.md`: the exact sentences per beat, screen states, budgets waiting on
+  Rao's clean airplane-mode run, the device-state and pre-demo checklists, the failure
+  playbook. `docs/demo/deck-audit-2026-09-20.md`: every claim in the submission deck against
+  the repository, seven marked FIX FIRST.
