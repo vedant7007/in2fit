@@ -198,14 +198,21 @@ object FoodTextMatching {
 
         if (!allowFuzzy) return null
 
+        // The fuzzy stage runs on the query AND on its singular. FOUND ON THE PHONE (21 Sep, a
+        // typed turn): "chapatiis", a plural with a typo, is two edits from "chapati" at nine
+        // letters, which the tolerance refuses; its singular "chapatii" is one edit at eight,
+        // which it allows, and the singular never reached this stage. A real typo and a real
+        // mishearing, and the LOG said "I do not know a food in that".
         val fuzzy = mutableListOf<Candidate>()
-        for ((alias, key) in aliases) {
-            // Never fuzzy-match across scripts: a roman query must not fuzzy onto a Telugu alias.
-            if (isNativeScript(alias) != isNativeScript(q)) continue
-            val tol = toleranceFor(minOf(alias.length, q.length))
-            if (tol == 0) continue
-            val d = editDistance(q, alias)
-            if (d <= tol) fuzzy += Candidate(key, alias, MatchStrength.FUZZY, d)
+        for (form in listOfNotNull(q, singular(q))) {
+            for ((alias, key) in aliases) {
+                // Never fuzzy-match across scripts: a roman query must not fuzzy onto a Telugu alias.
+                if (isNativeScript(alias) != isNativeScript(form)) continue
+                val tol = toleranceFor(minOf(alias.length, form.length))
+                if (tol == 0) continue
+                val d = editDistance(form, alias)
+                if (d <= tol) fuzzy += Candidate(key, alias, MatchStrength.FUZZY, d)
+            }
         }
         return best(fuzzy)
     }

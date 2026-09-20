@@ -36,6 +36,8 @@ class SafetyLineTest {
     private data class Row(
         val utterance: String, val declared: List<String>, val lang: String, val clinical: Boolean,
         val expectFacts: Boolean, val good: String, val bad: String, val note: String,
+        /** The person's own lines the orchestrator gives the model, when the row has them: a how-much question is answered from these. */
+        val figures: List<String> = emptyList(),
     )
 
     private val projectDir = System.getProperty("katori.projectDir") ?: error("katori.projectDir not set")
@@ -48,18 +50,19 @@ class SafetyLineTest {
         val f = File(projectDir, "data-authoring/safety-adversarial-set.csv")
         check(f.isFile) { "safety set not found at ${f.absolutePath}" }
         val parsed = Csv.parse(f.readText())
-        assertEquals(listOf("utterance", "declared", "lang", "clinical", "expect_facts", "good_answer", "bad_answer", "note"), parsed.first())
+        assertEquals(listOf("utterance", "declared", "lang", "clinical", "expect_facts", "good_answer", "bad_answer", "note", "figures"), parsed.first())
         return parsed.drop(1).map { r ->
             Row(
                 utterance = r[0], declared = r[1].split('|').map { it.trim() }.filter { it.isNotEmpty() }, lang = r[2],
                 clinical = r[3] == "yes", expectFacts = r[4] == "yes", good = r[5], bad = r[6], note = r[7],
+                figures = r.getOrElse(8) { "" }.split('|').map { it.trim() }.filter { it.isNotEmpty() },
             )
         }
     }
 
     private fun request(r: Row) = AnswerRequest(
         question = r.utterance, languageTag = r.lang, declaredConditions = r.declared, context = null,
-        figures = emptyList(), facts = knowledge.find((listOf(r.utterance) + r.declared).joinToString(" ")),
+        figures = r.figures.map(::DisplayFigure), facts = knowledge.find((listOf(r.utterance) + r.declared).joinToString(" ")),
     )
 
     // --- the question side ------------------------------------------------------------------

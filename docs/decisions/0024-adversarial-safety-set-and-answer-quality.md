@@ -180,3 +180,23 @@ That the model answers any of these questions well, safely or quickly. That the 
 truth. That 86.7% or 5/5 is accuracy. That five or six recorded speakers are more than a small
 sample. Each number is a device measurement on whatever sample exists, reported with its size;
 this record is the apparatus for it.
+
+## Addendum, 21 September: the set was too narrow, the ordinary way
+
+A typed turn on the phone, verbatim: "I said that I ate two chapatiis, can you tell me the
+nutritional information of it". The app refused it: "I can't put a number or a judgement on
+that." The reconciliation of the night before had found no guard over-firing on the 21 lines;
+that was true of the 21 lines and not of what people type. Reproduced through the real
+orchestrator and guards (`AnswerFiguresDefectsTest`), the refusal came from the request, not
+the guards: with the diary empty the model was given no figures (the LOG had missed
+"chapatiis", the matcher's plural-plus-typo gap, fixed in `FoodTextMatching`), and with the
+chapatis logged it was given the meal line WITHOUT its figures, because the question named no
+nutrient by the rules engine's own word for it. Asked for figures and given none, a model writes
+them from memory, and the numeric guard refuses that, as it must.
+
+Six how-much questions are in the set now, with a `figures` column carrying the person's own
+lines the orchestrator gives the model; their good answers quote those lines and pass, their bad
+answers are refused by the named defence. `NutrientWords` reads a question the way a person
+means it (calories, carbs, "the nutritional information", "what did that give me"), and the
+orchestrator's ANSWER path is the integrator's to point at it; the red test names the line.
+Asking for the nutrition of a food you logged is arithmetic, not advice.
