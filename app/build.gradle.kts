@@ -116,6 +116,17 @@ android {
                 .withPropertyName("knowledgeFacts")
             it.inputs.file(rootProject.file("data-authoring/intent-test-set.csv"))
                 .withPropertyName("intentTestSet")
+            // The safety set, the answer-quality set, the reviewer's word sheet (0024) and the
+            // ASR renderings the matcher is measured against (0026): all read through
+            // katori.projectDir, so all declared, per the rule recorded on 20 September.
+            it.inputs.file(rootProject.file("data-authoring/safety-adversarial-set.csv"))
+                .withPropertyName("safetyAdversarialSet")
+            it.inputs.file(rootProject.file("data-authoring/answer-quality-set.csv"))
+                .withPropertyName("answerQualitySet")
+            it.inputs.file(rootProject.file("data-authoring/log-words-review.md"))
+                .withPropertyName("logWordsReviewSheet")
+            it.inputs.file(rootProject.file("data-authoring/codemix-renderings.csv"))
+                .withPropertyName("codeMixRenderings")
             // And the string tables: StringResourcesTest reads res/values*/strings.xml directly,
             // and without this a Telugu import left the test task UP-TO-DATE and its report
             // reading "0 awaiting review" over a file with 48 REVIEW markers in it.
