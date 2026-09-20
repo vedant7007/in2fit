@@ -23,6 +23,9 @@ question it cares most about: whether anything has run on a phone. Something has
 >   this date; see the commit that added this addendum.
 > - The product is now IN2FIT (`0015`). Display strings only; the package stays `katori`.
 > - `onnxruntime-android` is now `androidTestImplementation` (`0016`).
+> - "There is no README at the repo root" below: there is one as of 20 September 17:43,
+>   written for the judge who follows the submission's prototype link. The spec is in the
+>   repository (`docs/spec.md`, `df82e35`); the "no copy of the spec" line below is history.
 > - §3 and §6 rule 2 count thirteen no-data items and 81 ingredients; on 20 September the
 >   corpus is 93 ingredients, 626 aliases, 52 recipes and FIFTEEN no-data items, paneer and
 >   fried rice added (`0026-code-mixed-food-words`, `logs/food-db-build.log`). The rule is
