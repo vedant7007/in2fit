@@ -292,13 +292,16 @@ class RulesEngineTest {
             TriggerTemplate.LAB_ABOVE_RANGE to lab,
             TriggerTemplate.LAB_BELOW_RANGE to low,
             TriggerTemplate.DECLARED_CONDITION to Evidence.UserDeclaredCondition(DeclaredCondition("Diabetes", ConditionSource.USER_DECLARED)),
-            TriggerTemplate.MEAL_COMPOSITION to Evidence.MealComposition(nutrient = Nutrient.CARBOHYDRATE, shareOfMeal = 0.62, dominantItem = "white rice"),
+            // VITAMIN_B12 on purpose (0028): "vitamin B12" must render, and its 12 must not read as a figure.
+            TriggerTemplate.MEAL_COMPOSITION to Evidence.MealComposition(nutrient = Nutrient.VITAMIN_B12, shareOfMeal = 0.62, dominantItem = "curd"),
             TriggerTemplate.LIFE_CONTEXT to Evidence.ProfileContext(LifeContext.HOSTEL_STUDENT),
             TriggerTemplate.TIMELINE to Evidence.TimelinePattern(description = "iron has been low on most days", daysObserved = 7),
         )
         assertEquals("every template needs a sample here", TriggerTemplate.values().toSet(), samples.keys)
 
-        val digits = Regex("""\d+(?:\.\d+)?""")
+        // 0028: a digit run glued to a letter on either side is a word ("B12"), not a figure. The
+        // same boundary DefaultNumericGuard applies; stated once, used here as there.
+        val digits = Regex("""(?<![\p{L}\d])\d+(?:\.\d+)?(?![\p{L}\d])""")
         samples.forEach { (template, evidence) ->
             val text = words.render(TriggerStatement(RuleIds.LAB_ABOVE_RANGE, template, evidence))
             assertTrue("$template rendered empty", text.isNotBlank())

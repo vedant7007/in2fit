@@ -73,6 +73,67 @@ decisions, not another prompt edit.
 
 Anyone retrying it measures across BOTH thread counts, and treats a pass on one as meaningless.
 
+## The conversational turn, measured 20 September, and the ruling that followed
+
+Every number above is extraction's: 221 prompt tokens, 55 generated. The first ANSWER and
+RECOMMEND turns were timed on 20 September with the request built exactly as the orchestrator
+builds it (the person's period totals, two meals, a lab line, the engine's sentence, six
+knowledge rows): **688 prompt tokens for ANSWER, 779 for RECOMMEND**. Same device, `+dotprod+fp16`
+build, from `HardwareProbeTest.b3_conversationalTurns`; "cold" is the first inference after a
+fresh load in a fresh process, page cache uncontrolled.
+
+    idle phone, screen awake, 04:15          4 thr   ANSWER cold 32.5 s (prompt 24.1 s @28.5 tok/s, gen 43 tok 8.1 s)   warm 22.8 s (17.8 + 4.8)
+                                             8 thr   ANSWER cold 31.4 s (24.8 + 6.4)                                    warm 30.7 s (17.3 + 13.3, 103 tok)
+                                                     RECOMMEND warm 28.8 s (17.0 + 11.6, 86 tok)
+    hot, in use, thermal SEVERE, 14:48       4 thr   ANSWER cold 51.3 s   warm 133 s (screen off; prompt at 5.6 tok/s)
+                                             8 thr   ANSWER cold 40.1 s   warm 32.5 s (23.4 + 9.0);  RECOMMEND cold 52.0 s, warm 45.5 s
+
+**A spoken ANSWER never came back under 20 s.** The prompt is 17-33 s of it on its own; generation
+is 5-14 s. The floor with every tuning applied (short answer, prefix cache, 8 threads) is about
+15 s warm on an idle phone, and the demo phone will be neither warm-idle nor ours alone.
+
+### An error, on the record, in Vedant's words
+
+"I reverted prompt trimming after Priya measured generation at roughly 5x prompt cost per token.
+Your numbers show why that was wrong: the prompt is 16x longer, so it dominates regardless. The
+specific revert, putting 'No markdown' back after its removal made the model fence its output,
+was correct. The conclusion I drew from it, that the prompt was the weak lever, was not."
+
+The 5x per-token ratio in this record is still true. It is the wrong quantity to reason from
+when the prompt is 16x the length of the answer: per-token cost times token count is what the
+person waits for, and on the conversational shape that product is 24 s of prompt against 6 s
+of answer. Nobody should re-derive "trim the answer, not the prompt" from the ratio above.
+
+### The ruling: architecture, not tuning
+
+1. **Precompute RECOMMEND.** Advice is generated when the meal is logged and regenerated when a
+   lab report is saved; the save is the trigger, and the scan's own pause hides the
+   regeneration. Beat 4 becomes instant. Invalidation is by `RuleEvaluation.inputDigest`.
+2. **Stop sending the model a choice.** Six rows, two meals, a lab line and totals is the model
+   deciding which applies, and the design claim is that it does not decide. Code selects the
+   one or two rows the fired rules point at, and only the figures those rules used go in.
+   Target under 250 prompt tokens: about 7 s of prompt instead of 24, and free accuracy.
+3. Then the tail: the short answer as default (`0025`), KV-cache prefix reuse for the constant
+   system block, **8 threads pinned for the demo build**.
+
+**And the turn shape that makes it a product regardless:** for "how much protein today" the
+number is in the database. The person's own figures go on screen first, straight from the store
+(`OrchestratorEvent.OwnFigures`), with the lead-in speaking; the model's sentence arrives later
+and is spoken. The answer is on screen in under a second; a 12-second model is phrasing.
+
+### Flagged, not chased
+
+**Thread count changed the model's output.** At 4 threads the same ANSWER request produced a
+computed "14.6" on every pass and the guard refused it; at 8 threads it quoted the period total
+correctly, and it was faster. `0011` already records that a compiler flag moved an argmax; this
+is the same class of finding one level down. It is why 8 threads is pinned, and it is not being
+investigated this week.
+
+**Every number above was taken with airplane mode off** (adb over TCP), and the afternoon's on a
+phone with Instagram in the foreground and thermal at SEVERE. The demo condition (USB, airplane
+on, nothing else running, screen held, ambient) has never been measured; that run's number is
+the one that goes in the deck, after 1 and 2 land.
+
 ## What the UI has to do about it
 
 Ten seconds of silence reads as a hang. Ten seconds with continuous visible feedback reads as
