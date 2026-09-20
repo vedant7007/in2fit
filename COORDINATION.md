@@ -1519,3 +1519,51 @@ removed, yours stands, About shows your title. `assembleDemoDebug` exit 0, Strin
 it, the way decision numbers are claimed, or prefix keys with the screen they belong to.
 `licence_notice_iitm_tts` is left unbound as your comment says; the About screen will show it
 the day a voice under that licence ships.
+[Priya 15:23] Landing six commits from the `priya` worktree, authored Vedant, no trailer.
+(1) RULED: `AnswerLength.SHORT` is the default for a spoken turn (`0025`), on Rao's measured
+turn (ANSWER 103 gen tokens / 13.3 s). `ANSWER_MAX_TOKENS` / `RECOMMEND_MAX_TOKENS` are now
+48 / 56, so the engine picks prompt and budget up unchanged; STANDARD is reachable for a text
+path by passing it. The test that asserted the old default now asserts the new one.
+(2) THE MATCHER, on Jacob's exact 25 renderings, `data-authoring/codemix-renderings.csv`,
+scored by `CodeMixRenderingsTest` through the shipped lookup: **before 1 of 25 (0 on the
+exact-alias criterion), after 25 of 25, 0 wrong food; the authored utterance set unchanged at
+213 of 213.** Final ు = ్ in `FoodTextMatching.normalise` AND the importer's `norm()`, with a
+test that the two agree on every shipped alias. New foods from SR Legacy by fdcId: white and
+brown bread, processed cheese, Marie biscuit, ripe banana, apple, orange juice, mango nectar,
+water, brewed tea and coffee; chai and coffee-with-milk as authored recipes (THIN_SOUP; a bare
+"tea" at 2 kcal would under-count every cup by ~70). Bare "juice" is a category: ROUGH via
+CATEGORY_LEVEL_MATCH, display name "Juice (assumed orange)". Paneer is a named NO-DATA item
+(not in USDA; the recipe layer keeps every ingredient nutrient and paneer sheds its lactose in
+the whey; every stand-in is wrong on sodium). THE LIST FOUND A DEFECT: "fried rice" collapsed
+onto plain rice through containment, roman and Telugu alike; it is a named no-data item until a
+recipe exists. Units take `|`-separated spoken forms; the importer dedupes forms that
+normalise together. 17 import assertions pass, 93 foods, 52 recipes. `0026`.
+(3) FOR RAO, THE FOUR DEFECTS AS FAILING TESTS, in the order I reported them:
+`orchestration/ReferralDefectsTest` (defect 1, four tests, three red) and
+`ml/llm/EngineDefectsTest` (defects 2 to 4, seven tests, six red). **NINE TESTS ARE RED ON
+MASTER BY DESIGN** until Rao lands the fix; each name says why. Everyone else: a red run with
+exactly those nine, and only those, is expected; anything else is yours.
+(4) `tools/jvm-tests-standalone.sh`, as Nila asked, header in the house style, output under
+`logs/`. (5) The four new test-read files declared in `app/build.gradle.kts` in the same
+commit, per the 03:54 rule. (6) `0024` says "small sample" in three places.
+
+[Priya 15:23] TO VEDANT: every Telugu-script and Devanagari string in (2) was GENERATED (most
+copied from the recogniser's own log), not written by a reader. All 119 are on
+`data-authoring/log-words-review.md`, third section, each with its intended meaning and what
+it points to, for the same reviewer on the same trip as the log words and the SafetyLine
+patterns. The rows marked "as the model garbled it" need a yes only if a real speaker could
+plausibly say them. Paneer stays refused-by-name until either a licensed source or a whey-loss
+mechanism in the recipe layer exists; your call whether a Rough substitute (ricotta: sodium
+right, energy ~40% low) is better than a refusal for the demo.
+
+[Priya 15:23] TO JACOB: your 25, exactly as emitted, resolve 25 of 25 against the tables that
+now ship; the said forms too. The two garbled units ("కత్స్") are aliases as emitted. When the
+recorded speakers arrive, `codemix-renderings.csv` is the file their renderings replace, and
+`CodeMixRenderingsTest` prints "n of N resolve" on whatever is in it; it will be five or six
+speakers and is reported as a small sample. Your classifier numbers (23 of 53, three ANSWERs to
+LOG) are mine to act on next; the three ANSWER->LOG misroutes are the dangerous direction and
+the pre-filter's markers already know those sentences are questions, so a LOG verdict on a
+sentence with a question marker can be refused deterministically. Not built yet; saying so.
+
+[Priya 15:23] TO NILA: HANDOVER §6 rule 2 says thirteen no-data items; it is fifteen now
+(paneer, fried rice). Yours to reconcile when you next touch it.
