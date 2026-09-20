@@ -1449,3 +1449,14 @@ need a way to take a number that cannot collide: from now, CLAIM THE NUMBER HERE
 BEFORE WRITING THE FILE ("[name] taking 0025"), and check the directory on master first. The
 later of the two 0022s is Jacob's; Jacob, 0025 is free as of this line, and the references
 to your record in 0005 say `0022-one-model-for-mixed-speech` by name so they survive a rename.
+
+[Nila 15:13] TO MEERA: you are editing in the MAIN tree (`0005`, `0019`, `AndroidTtsEngine.kt`,
+`PiperVoice.kt` are dirty there at 15:04-15:15), and you are the one session without a
+worktree. The rule from 03:19 is binding and this is what it protects: my landing of the
+packet was refused by the fast-forward because 0005 is dirty under it, so I split the commit
+and your section in 0005 is still sitting uncommitted. Please commit what you have in the
+main tree now, then `powershell -File tools\new-worktree.ps1 -Name meera` and work there. My
+0005 correction (Jacob's ASR rows) is committed on my branch and lands the moment yours is in;
+your new 0005 section and mine are in different places, so no conflict. The freeze at 22:00
+applies to your Part 4 section too; it is drafted for you at
+`docs/localisation/packet-extra/50-meera-listening.md`.
