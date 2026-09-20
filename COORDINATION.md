@@ -3109,3 +3109,63 @@ same build in the bag, which the realme is. The countdown now says exactly that 
 stand-in question to Vedant. Meera's "or the realme from the bag" is therefore not struck,
 only unruled. (Ira: `ui-research.md` row "the realme is the backup" quotes my 16:xx line; the
 role moved at 20:45, the file is yours.)
+
+[Jacob 21:10] TO VEDANT, RECORD FROM THIS. Read top to bottom while holding the phone.
+
+  Quiet room, door shut.
+  The phone's own voice recorder app; keep whatever file type it saves.
+  Hold it a hand's width from your mouth, like a call on speaker.
+  One file per sentence. Do NOT re-record a hesitation: a natural stumble is data, a polished take is not.
+
+  Name each file exactly as shown (the extension is whatever your recorder writes).
+
+HINDI, the ruled column. Say the Latin words the way you normally say them inside Hindi.
+
+  vedant_hi_01   मैंने दो रोटी और थोड़ी दाल खाई   <- BEAT 1, the one that matters most; if you stop after one, stop after this one
+                 Maine do roti aur thodi dal khayi
+
+  vedant_hi_02   दो रोटी, एक कटोरी दाल, और दो चम्मच तेल
+                 Do roti, ek katori dal, aur do chammach tel
+
+  vedant_hi_03   मैंने दो सौ ml दूध पिया और एक उबला अंडा खाया
+                 Maine do sau ML doodh piya aur ek ubla anda khaya
+
+  vedant_hi_04   दो रोटी... नहीं, तीन रोटी और दाल
+                 Do roti... nahin, teen roti aur dal
+
+  vedant_hi_05   एक plate चावल, दाल और एक कटोरी दही
+                 Ek plate chawal, dal aur ek katori dahi
+
+  vedant_hi_06   मैंने पिछले मंगलवार को क्या खाया?
+                 Maine pichhle mangalvaar ko kya khaya?
+
+  vedant_hi_07   मेरे lunch में कितना protein था?
+                 Mere lunch mein kitna protein tha?
+
+  vedant_hi_08   मैं चावल और दाल खा रहा हूँ, इसमें क्या add करूँ?
+                 Main chawal aur dal kha raha hoon, isme kya add karoon?
+
+  vedant_hi_09   मेरा iron कम है, मुझे क्या खाना चाहिए?
+                 Mera iron kam hai, mujhe kya khana chahiye?
+
+  vedant_hi_10   नाश्ते में तीन इडली और सांबर खाया
+                 Nashte mein teen idli aur sambar khaya
+
+ENGLISH, the other column, if you have ten more minutes.
+
+  vedant_en_01   I had two rotis and a little dal.   <- BEAT 1
+  vedant_en_02   Two rotis, a katori of dal, and I used two spoons of oil.
+  vedant_en_03   I drank 200 ml of milk and ate one boiled egg.
+  vedant_en_04   Two rotis... no, three rotis and dal.
+  vedant_en_05   One plate of rice, dal and a bowl of curd.
+  vedant_en_06   What did I eat last Tuesday?
+  vedant_en_07   How much protein was in my lunch?
+  vedant_en_08   I'm having rice and dal, what should I add?
+  vedant_en_09   I have anaemia, what should I eat for iron?
+  vedant_en_10   For breakfast I had three idlis and sambar.
+
+Then send back, in the same chat as the files:
+  1. If you renamed or skipped anything: which file is which sentence number.
+  2. One line: your first language, your age (roughly), and the town you grew up in.
+
+I score them the moment they land; the demo language is confirmed or flipped tonight.
