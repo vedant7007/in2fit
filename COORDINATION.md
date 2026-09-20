@@ -3232,3 +3232,58 @@ the transcript block takes an optional doubt mark that nothing sets today.
   4. The splash, last, per the 20:09 rules.
 Every landing: both flavours assemble, the JVM suite green from my own XML, the four beats
 through the scripted feed on the emulator, screenshots in `docs/screenshots/<date>-ira/`.
+[Priya 21:03] TO RAO, THE RANKING, RULED BY VEDANT: **make the terms comparable; do not filter by
+sign.** Your `fddedf3` did both: the daily-reference scaling IS the terms made comparable (with it
+a katori of dal scores positive, coconut beats the egg, rice is last: exactly the ruling), and
+the `filter { it.score > 0 }` is the sign filter, which the ruling forbids and which my first
+`RankingDefectsTest` wrongly asked for. That version is withdrawn. Why the filter is wrong even
+with your scaling: a candidate the preference argues against is still ranked below the ones it
+favours, and dropping it turns "ordered by the preference" into "deleted by the preference",
+which on a short list (four candidates, a hostel context) reads as the engine refusing to
+suggest. The rewritten `RankingDefectsTest`, three tests, is the guard: (1) an empty cup does not
+lead a list with real food on it; (2) THE RULING IN ONE ASSERTION: coconut, best on fibre and
+middling on carbohydrate, ranks ABOVE the egg, worst on fibre and nearly best on carbohydrate,
+and rice is last; (3) the list is never emptied by the scoring, every candidate ranked, the
+preference orders and does not delete. On your tip (2) and (3) are RED because the egg and the
+rice are filtered out; remove the filter and all three are green under your scaling (I
+simulated a per-nutrient rank and the daily-reference scaling; both pass, the additive scoring
+fails 1 and 2). A test that goes red if the fix is the plausible wrong one is worth more than
+the ruling, because the ruling can be forgotten and the test cannot.
+[Priya 21:03] TO RAO, YOUR CLAIM RULE: the nine authored good answers in
+`safety-adversarial-set.csv` that restated their rows now frame in claim-free words ("from the
+notes:") and quote the row whole; `SafetyLineTest`'s "every good answer passes" is green on my
+run with your `ClaimGuard` in the slice. The claim rule is in the set's header. (You counted
+thirteen; nine failed against my reproduction of `find` + `ClaimGuard`, and the test is the
+arbiter.) Also two references of yours to `0027` for the router are `0033` now: my
+`0027-the-words-decide-the-intent` collided with Arjun's claim and is renumbered, with
+`0028-qualified-dishes` to `0034` (Jacob's note at 21:00; the later claimant moves). The
+comments in `DefaultOrchestrator.kt` lines 147 and 157 and `DefaultOrchestratorTest.kt` line
+280 are yours to touch.
+[Priya 21:03] THE US-RECORD SWEEP, ruled after the bread: every shipped USDA record read for a
+value that depends on US fortification, enrichment or processing that Indian production does not
+have, in the eight nutrients we ship. `data-authoring/us-record-sweep.csv`: **93 records read,
+5 acted on, 88 kept**, one row per record with the finding and the action; the importer refuses
+a shipped record that is not in it, so a record added later is swept or the build fails; 0002
+addendum has the dated corrections to rule 4's table. The five: (1) CURD was 170886, LOW-FAT
+yogurt with added milk solids: protein 5.25, fat 1.55 per 100 g where home-set curd is 3.47 and
+3.25. Now 171284, whole milk. NILA: #5's katori of curd loses 2.7 g of protein it never had; the
+table is re-issued. (2) MILK is now 172217, the record without added vitamin A and D, same
+eight figures, so the description is honest without a disclosure. (3) WHITE BREAD ships no iron
+figure: the record's 3.61 mg is enrichment (unenriched flour is 1.17), no unenriched white bread
+record exists, so iron reads Unknown for it and for the three sandwich recipes, a named floor,
+never a number, and the sentence "no iron figure: the US record's iron is enrichment Indian
+bread does not have" travels on `FoodMatch.disclosure` (RAO: one field, default null, for the
+snapshot; ARJUN/IRA: shown beside the figures when present; two records carry one today).
+(4) BUTTERMILK was US cultured buttermilk, undiluted fermented milk at 62 kcal per 100 g; it is
+the `chaas` recipe now, curd 60 g, water 139 g, salt 1 g per glass, a third of that; the USDA
+record is no longer shipped. (5) PROCESSED CHEESE ships with a disclosure: US process American
+cheese, the Indian cube is the same kind of product. Confirmed as deliberate unenriched or
+unsweetened choices: rice raw and cooked, poha, rice flour, sooji, atta, dried coconut, unsalted
+roasted peanuts, plain chicken breast, raw orange juice. The shipped `meta.disclosure` says what
+the sweep did in one sentence. If a judge asks why the app thinks Indian bread has American
+iron in it: it does not; the file is the list of records we checked and what we did about each.
+Also off the suggestion list: water, black tea, black coffee. They have nothing of the eight
+nutrients, so any "lower" preference reads them as the best food there is.
+[Priya 21:03] CLAIMING DECISION NUMBERS 0033 (the words decide the intent, was 0027) and 0034
+(qualified dishes do not collapse, was 0028), both renumbers of mine after collisions; every
+reference in ml/llm, data-authoring and docs/decisions is updated in this landing.
