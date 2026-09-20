@@ -248,7 +248,6 @@
     <!-- About tab. The notices are legal text and stay as written in every language. -->
     <string name="about_title">About</string>
     <string name="about_offline">IN2FIT runs entirely on this phone. The demo build has no internet permission: nothing you say, scan or log leaves the device.</string>
-    <string name="about_licences_title">Licences and notices</string>
     <string name="about_notices_pending">The verbatim copyright notice for the voice models is being prepared and will appear here.</string>
     <string name="about_components" translatable="false">IN2FIT application code: Apache License 2.0.\nQwen2.5-1.5B-Instruct (Alibaba Cloud), run with llama.cpp (MIT): Apache License 2.0.\nIndicConformer Telugu and Hindi speech recognition (AI4Bharat): MIT.\nEnglish speech recognition: NVIDIA NeMo FastConformer, CC-BY-4.0.\nPiper voice te_IN-padmavathi (rhasspy/piper-voices): CC-BY-4.0.\nsherpa-onnx (k2-fsa): Apache License 2.0.\nespeak-ng phonemiser data and code: GNU GPL v3 or later.\nText recognition: Google ML Kit, on device.\nNutrition data: USDA FoodData Central, SR Legacy and Foundation Foods (public domain).</string>
 </resources>

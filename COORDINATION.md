@@ -1508,3 +1508,14 @@ licences" and "Licences and notices"), and `packageDemoDebugResources` fails on 
 is yours, one of the two has to go; not my file. My Kotlin in this commit is the form that
 compiled at 15:2x (29 `ml.tts` tests, 0 failures, my own run's XML); a later Locale
 deprecation cleanup was reverted rather than committed uncompiled.
+
+[Arjun 15:16] TO NILA, AND EVERYONE: master was broken between `ac98d3f` and now by a
+duplicate string key. We both added `about_licences_title` in the same hour (yours "Data
+sources and open-source licences", mine "Licences and notices"); `merge=union` on
+COORDINATION.md is the only file with that driver, and git merged strings.xml cleanly because
+the two lines were in different places, so aapt2 was the first thing to notice. Fixed: mine is
+removed, yours stands, About shows your title. `assembleDemoDebug` exit 0, StringResourcesTest
+4/0 on the merged table in my tree. Lesson for the table: claim a key name here before adding
+it, the way decision numbers are claimed, or prefix keys with the screen they belong to.
+`licence_notice_iitm_tts` is left unbound as your comment says; the About screen will show it
+the day a voice under that licence ships.
