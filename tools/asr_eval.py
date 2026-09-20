@@ -18,6 +18,12 @@ Word and character error rate of the shipped ASR models, on the desktop, through
                                                   writes the true words under each and runs `sheet-import`
     python asr_eval.py sheet-import <recordings-dir>
                                                   read the filled sheet back into manifest.csv
+    python asr_eval.py robustness <manifest.csv> [--engine ...]
+                                                  the crowded-hall test: every clip of the manifest under many-voice
+                                                  babble at several SNRs, under arm's-length and across-the-room
+                                                  distance (attenuation + synthetic reverb), and both together;
+                                                  prints exact n/N per condition, and runs the energy endpointer on
+                                                  the same audio to show where it stops seeing the end of a sentence
     python asr_eval.py manifest <recordings-dir> [set.csv]
                                                   (two presenters? name the files <name>_hi_01 .. for each, same folder;
                                                   `wer` then prints a by-speaker table against the same references)
@@ -476,6 +482,177 @@ def cmd_sheet_import(folder: Path) -> None:
     print(f"imported {n} transcription(s) into {manifest}; {still} row(s) still without a reference")
 
 
+
+# ---------------------------------------------------------------------------------------------
+# The crowded hall. Everything measured before this was clean audio at the microphone.
+# ---------------------------------------------------------------------------------------------
+
+def _babble_pool(exclude_substrings):
+    """Talkers for the babble: every synthetic clip on disk whose voice is NOT the target's. Piper te
+    and the Windows English voices, never the Piper hi voice the hi demo rows are spoken by."""
+    import numpy as np
+    pool = []
+    for d in ("synthetic", "synthetic-mixed", "synthetic-demo"):
+        for f in sorted((REPO / "data-sources/asr-test-set" / d).glob("*.wav")):
+            if any(x in f.name for x in exclude_substrings):
+                continue
+            x, sr = load_audio(f)
+            if sr != 16000:
+                x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
+            pool.append(x)
+    if len(pool) < 6:
+        sys.exit("not enough babble talkers on disk; run synth and synth-mixed first")
+    return pool
+
+
+def _babble(pool, n_samples, talkers, rng):
+    """`talkers` voices at once, each a random clip at a random offset, looped to cover the length.
+    Conversational level is set by the caller through the SNR; this returns unit-RMS babble."""
+    import numpy as np
+    out = np.zeros(n_samples, np.float32)
+    for _ in range(talkers):
+        track = np.zeros(n_samples, np.float32)
+        pos = -int(rng.integers(0, 16000))
+        while pos < n_samples:
+            clip = pool[int(rng.integers(len(pool)))]
+            clip = clip / (np.sqrt(np.mean(clip ** 2)) + 1e-9)
+            a, b = max(pos, 0), min(pos + len(clip), n_samples)
+            if b > a:
+                track[a:b] += clip[a - pos:b - pos]
+            pos += len(clip) + int(rng.integers(0, 8000))
+        out += track
+    return out / (np.sqrt(np.mean(out ** 2)) + 1e-9)
+
+
+def _reverb(x, rt60_s, drr_db, rng):
+    """Direct path plus an exponentially decaying noise tail: the textbook synthetic room. `drr_db` is the
+    direct-to-reverberant ratio; +10 dB is a phone at the mouth, 0 dB arm's length, -5 dB across a hall."""
+    import numpy as np
+    n = int(rt60_s * 16000)
+    t = np.arange(n) / 16000.0
+    tail = rng.standard_normal(n).astype(np.float32) * np.exp(-6.9 * t / rt60_s)
+    tail[:int(0.005 * 16000)] = 0                       # nothing arrives before the direct sound
+    tail /= np.sqrt(np.sum(tail ** 2)) + 1e-9
+    tail *= 10 ** (-drr_db / 20)
+    h = np.zeros(n, np.float32); h[0] = 1.0; h += tail
+    y = np.convolve(x, h)[: len(x)].astype(np.float32)
+    return y
+
+
+def _endpoint(x, frame_ms=20, calibration_ms=300, onset_ms=60, hangover_ms=700, max_wait_ms=8000,
+              max_utt_ms=15000, threshold_over_floor=3.0, floor_min=0.004, floor_adapt=0.05):
+    """A faithful port of EnergyEndpointer.feed(), so the VAD's behaviour in babble is measured with the
+    same arithmetic the phone runs, not a lookalike. Returns (onset_ms or None, end_ms or None, reason)."""
+    import numpy as np
+    n = int(16000 * frame_ms / 1000)
+    floor = -1.0; above = 0; below = 0; elapsed = 0; onset = None
+    for i in range(len(x) // n):
+        rms = float(np.sqrt(np.mean(x[i * n:(i + 1) * n] ** 2)))
+        elapsed += frame_ms
+        if floor < 0:
+            floor = rms
+        thr = max(floor_min, floor) * threshold_over_floor
+        if onset is None:
+            if rms > thr and elapsed > calibration_ms:
+                above += frame_ms
+                if above >= onset_ms:
+                    onset = elapsed - above
+            else:
+                above = 0
+                floor += (rms - floor) * floor_adapt
+            if elapsed >= max_wait_ms:
+                return None, None, "GAVE_UP: no onset within max_wait"
+        else:
+            below = 0 if rms > thr else below + frame_ms
+            spoken = elapsed - onset
+            if below >= hangover_ms:
+                return onset, elapsed - hangover_ms, "hangover"
+            if spoken >= max_utt_ms:
+                return onset, elapsed, "MAX_UTTERANCE: never heard the end"
+    return onset, None, "clip ended before the endpointer decided"
+
+
+def cmd_robustness(manifest: Path, engine: str = "indicconformer") -> None:
+    import numpy as np
+    rng = np.random.default_rng(20260920)
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8", newline="")))
+    if not rows:
+        sys.exit("no rows")
+    langs = {r["language"] for r in rows}
+    exclude = ["_hi.wav", "hi_pratham", "mix_"] if "hi" in langs else ["_te.wav", "te_padma", "mix_"]
+    pool = _babble_pool(exclude)
+    clips = []
+    for r in rows:
+        x, sr = load_audio(manifest.parent / r["path"])
+        if sr != 16000:
+            x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
+        clips.append((r, x))
+    recs = {lang: recognizer(lang, engine=engine) for lang in langs} if engine == "indicconformer" else {lang: recognizer(lang, engine=engine) for lang in langs}
+
+    # (name, babble SNR dB or None, distance preset or None, burst). Distance presets: gain dB, DRR dB, RT60 s.
+    # `burst` adds one louder talker (a laugh, a PA line) for 2 s starting 300 ms after the sentence ends,
+    # 10 dB above the babble: the thing that keeps an open-listening endpointer from ever hearing the pause.
+    DIST = {"close (at the mouth)": (0, 10, 0.3), "arm's length": (-12, 0, 0.6), "across the room": (-20, -5, 0.8)}
+    conditions = [("clean, at the mouth", None, None, False)]
+    conditions += [(f"babble SNR {snr:+d} dB, at the mouth", snr, None, False) for snr in (20, 15, 10, 5, 0)]
+    conditions += [(f"babble SNR {snr:+d} dB + burst after the sentence", snr, None, True) for snr in (20, 15)]
+    conditions += [(f"{d}, quiet room", None, d, False) for d in ("arm's length", "across the room")]
+    conditions += [(f"arm's length + babble SNR {snr:+d} dB", snr, "arm's length", False) for snr in (15, 10, 5)]
+    conditions += [("across the room + babble SNR +10 dB", 10, "across the room", False)]
+
+    print(f"machine: {platform.processor() or platform.machine()}, {platform.system()}; engine: {engine}; {len(clips)} clips, {len(pool)} babble talker clips")
+    print("SYNTHETIC HALL: babble is 12 other synthetic voices at once; reverb is a textbook exponential tail; the")
+    print("presenter's voice is a Windows/Piper voice, not a person. Report as 'n of the ten' per condition, never as")
+    print("a WER standing alone, and never as a claim about the hall itself: it says where THIS recogniser breaks (0022).\n")
+    print(f"{'condition':46s} exact   WER    endpointer on the same audio, open listening: no onset / clean end / ran on (mean end delay)")
+    lead = int(2.0 * 16000)   # babble-only lead-in and 3 s tail, so the VAD has to find the sentence and its end
+    tail = int(3.0 * 16000)
+    for name, snr, dist, burst in conditions:
+        exact = 0; w_err = 0; w_ref = 0; no_onset = 0; ends = 0; ran_on = 0; delays = []
+        for r, x in clips:
+            speech = x.copy()
+            if dist is not None:
+                gain_db, drr, rt60 = DIST[dist]
+                speech = _reverb(speech, rt60, drr, rng) * 10 ** (gain_db / 20)
+            padded = np.concatenate([np.zeros(lead, np.float32), speech, np.zeros(tail, np.float32)])
+            if snr is not None:
+                # SNR is set against the speech as it reaches the microphone, so distance lowers it further only
+                # through the gain applied above; the babble itself is at a fixed conversational level.
+                b = _babble(pool, len(padded), talkers=12, rng=rng)
+                s_rms = np.sqrt(np.mean(speech ** 2)) + 1e-9
+                b_level = s_rms / 10 ** (snr / 20)
+                padded = padded + b * b_level
+                if burst:
+                    start = lead + len(speech) + int(0.3 * 16000)
+                    one = _babble(pool, 2 * 16000, talkers=1, rng=rng) * b_level * 10 ** (10 / 20)
+                    padded[start:start + len(one)] += one[: max(0, min(len(one), len(padded) - start))]
+            padded = np.clip(padded, -1, 1).astype(np.float32)
+            # recogniser: on the sentence region only, the way a working endpointer would cut it
+            region = padded[lead:lead + len(speech)]
+            stream = recs[r["language"]].create_stream(); stream.accept_waveform(16000, region); recs[r["language"]].decode_stream(stream)
+            hyp = stream.result.text
+            ref_w, hyp_w = normalise(r["reference"]), normalise(hyp)
+            e = edit_distance(ref_w, hyp_w); w_err += e; w_ref += len(ref_w); exact += int(e == 0)
+            # endpointer: on the whole padded clip, babble lead-in included
+            onset, end, why = _endpoint(padded)
+            true_end_ms = (lead + len(speech)) * 1000 // 16000
+            if onset is None:
+                no_onset += 1
+            elif why == "hangover":
+                ends += 1; delays.append(end - true_end_ms)
+            else:
+                ran_on += 1
+        n = len(clips)
+        delay = f"{np.mean(delays):+.0f} ms" if delays else "-"
+        print(f"{name:46s} {exact:2d}/{n:<3d} {100.0 * w_err / max(1, w_ref):5.1f}%   no onset {no_onset}/{n}, clean end {ends}/{n}, ran on {ran_on}/{n} ({delay})")
+    print("\nendpointer columns, open listening with 2 s of hall before the sentence and 3 s after: 'no onset' = the VAD")
+    print("never started, the app says it heard nothing; 'clean end' = it closed on the 700 ms hangover, with the mean")
+    print("delay of that close against the true end of speech (a positive delay is that much hall audio handed to the")
+    print("recogniser along with the sentence); 'ran on' = it had not closed 3 s after the sentence ended (on the phone")
+    print("it runs to the 15 s cap and hands all of it over). Recogniser columns are on the correctly cut sentence, so")
+    print("they show the model's floor; the endpointer columns show whether open listening would hand it that sentence.")
+    print("Push-to-talk removes the endpointer from the question entirely.")
+
 def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
     import re
 
@@ -539,6 +716,8 @@ if __name__ == "__main__":
         cmd_synth_mixed(Path(args[1]))
     elif len(args) >= 2 and args[0] == "wer":
         cmd_wer([Path(p) for p in args[1:]], engine=engine)
+    elif len(args) >= 2 and args[0] == "robustness":
+        cmd_robustness(Path(args[1]), engine=engine)
     elif len(args) >= 2 and args[0] == "manifest":
         cmd_manifest(Path(args[1]), Path(args[2]) if len(args) >= 3 else None)
     elif len(args) >= 3 and args[0] == "synth-csv":

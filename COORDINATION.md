@@ -2455,3 +2455,52 @@ the run of show is waiting to replace; the "(budget)" markers are where they go.
 169 lines to check, 0 to write, 2 extra sections; 356 tests, 0 failures, XML 18:46. Freeze at
 22:00 stands. Anyone adding a key after this line: one line here, or it is English-only in
 the demo build.
+
+[Jacob 19:05] THE CROWDED HALL, MEASURED, and it could decide the demo. Every clip until now was
+clean at the microphone. `tools/asr_eval.py robustness` on the ten hi demo rows: twelve other
+synthetic voices as babble at a fixed conversational level, attenuation + synthetic reverb for
+distance (`logs/asr-robustness-hall-hi-run1.log`; SYNTHETIC hall, SYNTHETIC presenter, it says
+where THIS recogniser breaks, not what the hall is). Exact of the ten, hi checkpoint:
+  at the mouth:      clean 8 | babble +20 dB 8 | +15 dB 8 | +10 dB 7 | +5 dB 5 | 0 dB 4
+  quiet room:        arm's length 6 | across the room 5
+  arm's length:      + babble +15 dB 6 | +10 dB 3 | +5 dB 2      across the room + babble +10 dB: 1
+The endpointer has its own cliff, separate from the recogniser: in steady babble the energy VAD
+STOPS STARTING below about +8 dB (starts on 4/10 at +5, 0/10 at 0 dB), because speech must be 3x
+the adaptive floor and the floor has become the babble; the app then says it heard nothing. The
+burst case (a laugh or a PA line right after the sentence, running the utterance on) is measured
+in a rerun waiting for the laptop to have memory; the row goes into 0022 when it lands.
+THE THRESHOLD TO PREPARE AGAINST: phone at the mouth, voice at least 10 dB above the room. Distance
+costs more than moderate babble: arm's length in a QUIET room already loses two sentences, and a
+voice at 60 cm is ~20 dB quieter at the mic than at 5 cm, so the same hall is "+20 dB, 8 of ten"
+at the mouth and "0 dB, 4 of ten with the VAD never starting" at arm's length. Microphone distance
+is the variable and the one we control. Full table and reasoning in 0022 §"The crowded hall".
+
+[Jacob 19:05] TO NILA, RUN OF SHOW AND PLAYBOOK, three cheap mitigations, all to decide before
+the day: (1) the phone is held AT THE MOUTH when speaking, and the script says so: speak, then
+show the screen, never both at once at arm's length; if the screen must be seen while speaking,
+the second person mirrors it. (2) A wired headset or lapel mic in the bag: microphone at the
+mouth whatever the hand does, and a cable costs nothing on the airplane-mode claim, unlike
+anything Bluetooth; it needs one rehearsal pass through it (below, Rao). (3) Push-to-talk, not
+open listening, for the voice beats: press, speak, release, and the endpointer never has to find
+the end of a sentence in a room full of sentences. Playbook rows to add: "it heard nothing" in a
+loud room -> bring the phone to the mouth, or plug the headset in; "it kept listening after I
+stopped" -> same, and it is the open-listening failure push-to-talk removes. Recommended: (1)
+always, (3) unless the screen cannot carry a hold gesture by the day, (2) tested and in the bag.
+
+[Jacob 19:05] TO ARJUN: push-to-talk changes the Talk screen. Shape I can build in ml/asr without
+touching the frozen `AsrEngine` interface: a `PushToTalk` capture that, while the button is held,
+records from `AudioSource` and emits `AsrEvent.Level` for the meter, and on release cuts the clip
+and calls `AsrEngine.transcribe(clip, language)`, emitting `Transcribing` then `Result` or
+`Unavailable`, the same events the open-listening flow emits, so the screen's event handling does
+not change; only the gesture does (hold instead of tap-and-wait-for-silence). Minimum hold 300 ms
+is INPUT_NOT_USABLE exactly as a cough is today. Say whether the Talk screen can carry a hold
+gesture by the 26th and I build it the same hour; if not, open listening stays and rule (1) does
+the work. Either way nothing else on the screen changes.
+
+[Jacob 19:05] TO RAO, two device asks with the batch, both small: (a) `AndroidAudioSource` records
+from `VOICE_RECOGNITION`, which should follow a wired headset microphone automatically; run the
+ten hi demo clips... no, run the ten sentences SPOKEN through a plugged-in wired headset once, and
+compare with the handset mic, because a capsule and its gain are a different signal and the
+mitigation is only real if the recogniser likes it. (b) The hall table above is desktop; if you
+have a minute with the phone in a noisy room, `AsrDeviceTest.b` on the staged hi clips with
+someone talking nearby is the first real hall number.
