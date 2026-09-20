@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import io.github.vedant7007.katori.data.food.AndroidFoodDbSource
 import io.github.vedant7007.katori.data.food.LookupMealResolver
 import io.github.vedant7007.katori.data.food.SqliteFoodLookup
+import io.github.vedant7007.katori.data.food.SqliteSpokenNames
 import io.github.vedant7007.katori.data.knowledge.KnowledgeFacts
 import io.github.vedant7007.katori.data.local.AndroidContextStrings
 import io.github.vedant7007.katori.data.local.AndroidTriggerStrings
@@ -122,6 +123,7 @@ class OrchestratorDeviceTest {
                 contextSource = RoomUserContextSource(db, foods),
                 knowledge = KnowledgeFacts.load { ctx.assets.open(KnowledgeFacts.ASSET_PATH) },
                 triggerText = trigger, contextText = ContextText(AndroidContextStrings(ctx), AndroidTriggerStrings(ctx)),
+                spokenNames = SqliteSpokenNames(foods),
             )
             // The person: a hostel student who declared their condition and has one report on file.
             runBlocking {

@@ -96,6 +96,17 @@ class LookupMealResolverTest {
         assertEquals("egg", r.items[2].snapshot.foodCode)
     }
 
+    /** Ruled 20 Sep: the judges hear the first alias, not the USDA description. */
+    @Test fun `the spoken name is the first alias, a recipe's own name, and the description only as a last resort`() {
+        val names = SqliteSpokenNames(db)
+        assertEquals("cooked rice", names.of("rice_cooked", "Rice, white, cooked (unenriched)"))
+        assertEquals("curd", names.of("curd", "Yogurt, plain"))
+        assertEquals("palak", names.of("palakura", "Spinach, raw"))
+        assertEquals("Dal tadka", names.of("toor_dal_tadka", "Dal tadka"))
+        assertEquals("Something, raw", names.of("no_such_key", "Something, raw"))
+        assertEquals("curry leaves", names.of(null, "curry leaves"))
+    }
+
     @Test fun `nothing matching is a refusal, never the nearest food`() {
         val r = runBlocking { resolver.resolve(meal(item("xyzzy plugh", 1.0, "katori")), "en-IN") }
         assertEquals(UnavailableReason.NO_MATCH, (r as Outcome.Unavailable).reason)

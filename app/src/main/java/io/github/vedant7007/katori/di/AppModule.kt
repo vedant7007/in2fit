@@ -23,6 +23,7 @@ import io.github.vedant7007.katori.domain.ModelArbiter
 import io.github.vedant7007.katori.ml.llm.LlamaCppModelLoader
 import io.github.vedant7007.katori.domain.RulesEngine
 import io.github.vedant7007.katori.data.food.LookupMealResolver
+import io.github.vedant7007.katori.data.food.SqliteSpokenNames
 import io.github.vedant7007.katori.data.knowledge.KnowledgeFacts
 import io.github.vedant7007.katori.data.local.AndroidContextStrings
 import io.github.vedant7007.katori.data.local.AndroidTriggerStrings
@@ -38,6 +39,7 @@ import io.github.vedant7007.katori.domain.MealResolver
 import io.github.vedant7007.katori.domain.MealStore
 import io.github.vedant7007.katori.domain.ModelFamily
 import io.github.vedant7007.katori.domain.Orchestrator
+import io.github.vedant7007.katori.domain.SpokenNames
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.UserContextSource
 import io.github.vedant7007.katori.domain.model.Outcome
@@ -214,6 +216,10 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSpokenNames(foods: FoodDbSource): SpokenNames = SqliteSpokenNames(foods)
+
+    @Provides
+    @Singleton
     fun provideAdviceStore(db: KatoriDatabase): AdviceStore = RoomAdviceStore(db)
 
     @Provides
@@ -235,6 +241,6 @@ object AppModule {
     fun provideOrchestrator(
         asr: AsrEngine, llm: LlmLease, tts: TtsEngine, rules: RulesEngine, resolver: MealResolver, store: MealStore,
         advice: AdviceStore, labs: LabStore,
-        contextSource: UserContextSource, knowledge: KnowledgeFacts, triggerText: TriggerText, contextText: ContextText,
-    ): Orchestrator = DefaultOrchestrator(asr, llm, tts, rules, resolver, store, advice, labs, contextSource, knowledge, triggerText, contextText)
+        contextSource: UserContextSource, knowledge: KnowledgeFacts, triggerText: TriggerText, contextText: ContextText, spokenNames: SpokenNames,
+    ): Orchestrator = DefaultOrchestrator(asr, llm, tts, rules, resolver, store, advice, labs, contextSource, knowledge, triggerText, contextText, spokenNames)
 }

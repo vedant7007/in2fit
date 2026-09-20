@@ -20,6 +20,7 @@ import io.github.vedant7007.katori.domain.ResolvedMeal
 import io.github.vedant7007.katori.domain.RuleInput
 import io.github.vedant7007.katori.domain.RulesEngine
 import io.github.vedant7007.katori.domain.SpeechLanguageRef
+import io.github.vedant7007.katori.domain.SpokenNames
 import io.github.vedant7007.katori.domain.SpokenIntent
 import io.github.vedant7007.katori.domain.Stage
 import io.github.vedant7007.katori.domain.TriggerText
@@ -97,6 +98,8 @@ class DefaultOrchestrator(
     private val knowledge: KnowledgeFacts,
     private val triggerText: TriggerText,
     private val contextText: ContextText,
+    /** What a food is called when spoken or given to the model; the screen keeps the database's name. */
+    private val spokenNames: SpokenNames = SpokenNames { _, displayName -> displayName },
     private val clock: Clock = Clock.systemUTC(),
     /** The product decision on answer length (`0024`, measured in `0014`). One flip, here. */
     private val answerLength: AnswerLength = AnswerLength.SHORT,
@@ -299,12 +302,12 @@ class DefaultOrchestrator(
             it.phrase(
                 PhrasingRequest(
                     evaluation = evaluation, triggerText = trigger,
-                    mealItems = resolved.items.map { it.snapshot.displayName },
+                    mealItems = resolved.items.map { spokenNames.of(it.snapshot.foodCode, it.snapshot.displayName) },
                     // Energy and protein, and the nutrient a fired rule is about: two or three
                     // figures, not eight. The screen shows them all; the sentence names two.
                     figures = resolved.figures.filter { f -> f.total.nutrient in spokenNutrients(evaluation) }.map { f -> DisplayFigure(contextText.figure(f)) },
                     languageTag = language.tag,
-                    allowedFoodNames = evaluation.rankedCandidates.take(1).map { c -> c.candidate.displayName },
+                    allowedFoodNames = evaluation.rankedCandidates.take(1).map { c -> spokenNames.of(c.candidate.foodCode, c.candidate.displayName) },
                 )
             )
         }.textOrNull()
@@ -381,9 +384,9 @@ class DefaultOrchestrator(
             it.phrase(
                 PhrasingRequest(
                     evaluation = evaluation, triggerText = trigger, figures = figures.map(::DisplayFigure),
-                    mealItems = meal.items.map { it.displayName },
+                    mealItems = meal.items.map { spokenNames.of(it.foodCode, it.displayName) },
                     languageTag = language.tag,
-                    allowedFoodNames = evaluation.rankedCandidates.take(1).map { c -> c.candidate.displayName },
+                    allowedFoodNames = evaluation.rankedCandidates.take(1).map { c -> spokenNames.of(c.candidate.foodCode, c.candidate.displayName) },
                 )
             )
         }.textOrNull()
@@ -476,7 +479,7 @@ class DefaultOrchestrator(
         // Code selects (0014): the top few ranked foods, and at most two rows keyed by the
         // question, the declared conditions and what the fired rules are about; never the whole
         // allowed list as retrieval text, which is what buried the row a question most needed.
-        val allowed = evaluation.rankedCandidates.take(ALLOWED_FOODS).map { it.candidate.displayName }
+        val allowed = evaluation.rankedCandidates.take(ALLOWED_FOODS).map { spokenNames.of(it.candidate.foodCode, it.candidate.displayName) }
         val facts = knowledge.find((listOf(text) + declared + ruleWords(evaluation)).joinToString(" "), limit = FACT_ROWS)
         val request = RecommendRequest(
             request = text, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),

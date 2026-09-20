@@ -143,6 +143,20 @@ data class StoredAdvice(
     val createdAt: Instant,
 )
 
+/**
+ * THE SPOKEN NAME of a food: what a person would say, not what the database calls it.
+ *
+ * Ruled 20 Sep from the handset: "Rice, white, cooked (unenriched)" and "Chickpeas (bengal
+ * gram), cooked" are what the judges would hear, and they sound like a database because they
+ * are one. The spoken name is the first alias in the authored file ("cooked rice", "curd",
+ * "palak"); the USDA description stays on screen next to the citation, where it does us
+ * credit. Everything handed to the model or the voice goes through this; the screen does not.
+ */
+fun interface SpokenNames {
+    /** The name to say for [foodCode], or [displayName] when the food has no alias. */
+    fun of(foodCode: String?, displayName: String): String
+}
+
 /** Writes the confirmed values of a scanned report. The one write beat 3 makes. */
 interface LabStore {
     suspend fun save(values: List<LabValue>): Outcome<Int>
