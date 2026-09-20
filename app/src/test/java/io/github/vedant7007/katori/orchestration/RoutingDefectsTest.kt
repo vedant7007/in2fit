@@ -45,6 +45,17 @@ class RoutingDefectsTest {
         assertTrue("the words say ANSWER: $asked", asked.any { it is OrchestratorEvent.Answered })
     }
 
+    /**
+     * `0025`: SHORT is the default for a spoken turn. The engine now takes the length explicitly
+     * and the orchestrator's default is what the phone runs; until it is SHORT the ruling is not
+     * in effect. One word in the constructor default, or `AppModule` passing it.
+     */
+    @Test fun `a spoken turn asks the model for the short answer by default`() {
+        val llm = FakeLlm().apply { intent = Outcome.Ok(Intent.ANSWER) }
+        run(llm, "how much protein did I eat today")
+        assertEquals(listOf(io.github.vedant7007.katori.ml.llm.AnswerLength.SHORT), llm.lengths)
+    }
+
     /** Where the words are silent, the model still decides, as before. */
     @Test fun `a sentence with no evidence still goes to the model`() {
         val llm = FakeLlm().apply { intent = Outcome.Ok(Intent.SUGGEST) }

@@ -2064,3 +2064,12 @@ screen should say we do not have it yet rather than go quiet. The reason text is
 person ("Say them separately: two idli and sambar"). Whoever renders `NeedsConfirmation` for
 `KNOWN_ITEM_NO_DATA`: show the display name and the reason; it is the honest state and it is
 already in the row.
+
+[Priya 17:41] CORRECTION to my 17:16, after rebasing onto Rao's `3a32642`: the referral and
+engine targets are GREEN on master, his fix took them; thank you. Red by design now: exactly
+THREE, all in `orchestration/RoutingDefectsTest`: the router wiring (two) and a new one:
+**`0025` is not in effect.** `LlmEngine.answer/recommend` now take `length` explicitly and
+`DefaultOrchestrator.answerLength` defaults to `STANDARD`, so the phone runs the long answer.
+TO RAO: your constructor default is the right switch (a text path passes STANDARD); flip it to
+`AnswerLength.SHORT`, or have `AppModule` pass it, and the test goes green. The engine's
+budgets follow the length already, which is right.

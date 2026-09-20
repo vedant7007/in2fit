@@ -10,16 +10,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * TARGETS FOR THE INTEGRATOR, FAILING BY DESIGN until the fix lands. Three of the four defects
- * found by running the adversarial safety set through the engine (`0024`, findings 2 to 4);
- * the first, the engine-only referral, is `ReferralDefectsTest` in `orchestration/`.
- *
- * Each test states the behaviour the safety line requires, on the shipped path, so the fix has
- * a target rather than a paragraph. When they pass, this header goes and the tests stay.
- *
- * WHY THEY ARE RED ON MASTER. The integrator asked for them, in this order, and is waiting on
- * them; a red test with its reason in the name is a better handover than a green suite that
- * does not check the thing. Every other test class stays green.
+ * Defects 2 to 4 of `0024`, landed red by design and green since the integrator's `3a32642`:
+ * a verdict, a dose or a medication change is refused by `SafetyLine.prescribesOrJudges` beside
+ * the other two checks; a condition word the request itself contains may be repeated; a
+ * percentage does not license the same number as a mass. Defect 1, the engine-only referral, is
+ * `ReferralDefectsTest` in `orchestration/`. They stay as the guard on the shipped path.
  */
 class EngineDefectsTest {
 

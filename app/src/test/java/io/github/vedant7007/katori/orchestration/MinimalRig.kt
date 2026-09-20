@@ -73,14 +73,16 @@ internal object MinimalRig {
     ) : LlmEngine, LlmLease {
         val answers = mutableListOf<AnswerRequest>()
         val recommendations = mutableListOf<RecommendRequest>()
+        /** The length the orchestrator asked for, per call. */
+        val lengths = mutableListOf<AnswerLength>()
         var intent: Outcome<Intent> = Outcome.Ok(Intent.ANSWER)
         override suspend fun classify(transcript: String, languageTag: String) = intent
         /** A real extraction, so a LOG that should never have been one visibly reaches the store. */
         override suspend fun extract(request: ExtractionRequest): Outcome<ExtractionResult> =
             Outcome.Ok(ExtractionResult(listOf(ExtractedItem("roti", 2.0, "piece", null)), "{}"))
         override suspend fun phrase(request: PhrasingRequest): Outcome<PhrasedText> = Outcome.NotImplemented("test")
-        override suspend fun answer(request: AnswerRequest, length: AnswerLength) = answered.also { answers += request }
-        override suspend fun recommend(request: RecommendRequest, length: AnswerLength) = recommended.also { recommendations += request }
+        override suspend fun answer(request: AnswerRequest, length: AnswerLength) = answered.also { answers += request; lengths += length }
+        override suspend fun recommend(request: RecommendRequest, length: AnswerLength) = recommended.also { recommendations += request; lengths += length }
         override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> = Outcome.Ok(block(this))
     }
 
