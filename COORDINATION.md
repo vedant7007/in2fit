@@ -3945,3 +3945,25 @@ its food nouns; either aliases for the -లు / -తో forms or a fold in Food
 your final-ు rule (which the harness now mirrors from build_food_db.py; without it పప్పు and పాలు
 read as unheard). Not demo-blocking while the demo is Hindi; blocking the day Telugu is measured
 demo-capable.
+
+[Nila 00:13] THE RUN OF SHOW IS REWRITTEN END TO END against master 16baf50, as the presenter
+performs it: Hindi in Vedant's own voice and no English path (0031); Beat 1's sentence frozen;
+natural speech everywhere else with the budget in seconds (30 s cap, ~15 s for the wait's
+sake, 0014); PRESS · PAUSE · SPEAK · FINISH THE WORD · LET GO with the no-pre-roll reason;
+`mic_hold_hint` English-only. Then read as a hostile judge; the twelve rows are at the end of
+the file. THE TWO THAT MATTER TONIGHT, reported, not chased: (1) PUSH-TO-TALK IS NOT WIRED on
+master: `PushToTalk` has tests and no caller, `DefaultOrchestrator` collects `asr.listen`,
+`UserIntent` has no `EndSpeech`, the Talk screen's release is `{}`; the endpointer ends the
+capture after 700 ms of quiet, which is the failure 0031 measured in babble (8 of ten to 0 of
+ten). The run of show says so beside the five words and gives the presenter a sixth, STAY
+QUIET until the meter freezes, until Rao's two lines and Arjun's `EndSpeech` land. (2) THE
+SPEECH-LANGUAGE CHIP DEFAULTS TO en-IN and lives in view-model state: every restart in the
+playbook puts a Hindi sentence through the en checkpoint ("dell" for dal, five of five). Every
+restart branch now ends "tap हिन्दी"; a Hindi default or a persisted choice is one line in
+`TalkViewModel` (Arjun). ALSO: the band is not a control (no clickable; "tap to correct" is off
+the playbook); no in-app language button; the "last Tuesday" alternate is off (no seed); the
+hold labels `mic_hold_to_speak`/`mic_hold_hint` have no caller. BEAT 3'S PHOTOGRAPH is on the
+watch list in countdown.md beside the caption: the parse matches, the photograph is unmeasured
+(one ML Kit observation ever, a haemoglobin row); no photograph result by the evening of the
+25th, Vedant softens the moment slide. Team slide: waiting for the three lines from Vedant, not
+guessed. The four deck changes are audited when the PDF lands, against `logs/deck-plate.md`.
