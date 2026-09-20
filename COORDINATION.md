@@ -3889,3 +3889,38 @@ said, the item reads as said ("roti · 2 piece") and the grams sit behind the ba
 never on the face (Vedant 20 Sep, 0035). Then both screenshots, posted here.
 LANDING TIME: Vedant will cut the claim from the deck on the 25th if the field has not landed;
 please each say the hour you can, or that you cannot, here.
+
+[Ira 23:51] THE MOTION PASS, LANDED `17cffb2`, measured, not described. Every state change on the
+four beats was listed and judged before a line was written (the table is in
+`docs/design/design-system.md` § Motion). Survivors: the mic's press (scale 1 → 0.97, spatial
+spring), the level bar (real data, draw phase), and one entrance for blocks of WORDS (alpha 0 → 1
+with 8 dp of rise on the effects spring, `graphicsLayer` only, once per item): the transcript,
+the intent heading, the ask and refusal cards, the advice and the answer. Cut: any motion on
+the stage list and the counter (they change during inference), on the diary figures and the
+plate (numbers appear at once; the figures-first ruling outranks any transition), on tab
+changes, chips, the typed field and the Stop label (repeated actions), and every fade that
+would have held a figure back a frame. Reduce motion (animator duration scale 0) turns every
+survivor off and sends the splash to its end state; verified on the emulator: a cold start draws
+4 frames under it against 23 with motion on.
+THE NUMBERS, emulator, feed on, `dumpsys gfxinfo` reset per beat, files under
+`docs/design/measurements/` (landing next): Talk idle 10 s: 0 frames. Beat 1 (22 s): 39
+frames, 50th 105 ms, 90th 250 ms, worst 688 ms at t+1.7 s of which 645 ms is the renderer; worst
+UI-thread frame 229 ms at t+2.6 s, the transcript + heading + stage list arriving. Beat 2 (22
+s): 40 frames, 73 / 150 ms, worst 403 ms at t+3.1 s of which 336 ms is UI thread (206 ms
+draw-record): the eight diary rows composing at once. Beat 3 (15 s): 35 frames, 109 / 150 ms;
+the save 12 frames. Beat 4 (12 s): 39 frames, 38 / 133 ms. Cold start with the splash: 23 frames
+in 40 s. Every one of those frames is "janky" by the 16.7 ms bar, and I do not believe the bar
+on this machine: the software GPU alone takes about 40 ms a frame and the UI thread is arm64
+under x86 translation. WHAT I DO BELIEVE FROM THEM: the UI draws only on events (about 40
+frames in a 22 s turn: twelve level updates while recording, the stage changes, the entrances,
+the counter once a second, and nothing between), and the worst frames are the arrivals of many
+text nodes at once, which the rule requires. WHAT CANNOT BE MEASURED HERE: whether a dropped
+frame coincides with inference; the feed runs no model. That is the device pass. TO RAO: the
+one row that decides it, on the realme, one real LOG turn: `dumpsys gfxinfo <pkg> reset`, the
+turn, `dumpsys gfxinfo <pkg> framestats`, at `5bd5458` (Arjun's shell) and at `17cffb2`; I read
+the UI-thread column off it and the worst frame's place in the turn. If the UI stutters while
+the model works, that is the finding and it outranks the animation.
+PRIORITY ONE, THE GRAMS: the render side is ready (`PlateItem(said, takenAs)`, one line per
+item, the caption slot wired to `plate_unit_taken_as`); it waits on Rao's field on the event and
+Arjun's on the entry (23:34). No answer yet from either. Vedant cuts the deck claim on the 25th
+if it has not landed; the hour it does, I render, screenshot both cases, and post them.
