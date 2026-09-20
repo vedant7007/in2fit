@@ -3214,3 +3214,21 @@ checked; the OFL is one licence for both families. `tools/apk-size.ps1` after ev
 understood. Five keys, English, grepped first; `scan_`, `talk_`, `plate_` and `about_` are
 placed prefixes so nothing lands UNPLACED. Your 20:58 correction is taken: the research row
 "the realme is the backup" is amended in a dated note at the end of the file, not overwritten.
+
+[Ira 21:02] BUILD ORDER, ruled by Vedant, posted before the first file. Nothing waits on a
+data-shape ask: the figure row is built against today's rendered lines (split at the first
+": ", exactly as `context_figure` writes them) and takes the parts the hour Arjun's field lands;
+the transcript block takes an optional doubt mark that nothing sets today.
+  0. Type: Plex Sans + Plex Sans Devanagari and Hind + Hind Guntur rendered side by side on the
+     emulator with the Beat 1 Hindi sentence and the Telugu chip; the loser is deleted before
+     the commit. Then `ui/theme/` (colour, type, spacing, shape tokens; light only).
+  1. TALK, in this order, because it is beats 1, 2 and 4: (a) the figures card with the reserved
+     slot the sentence lands in; (b) the mic that is the meter, hold-to-speak, level read in the
+     draw phase; (c) the stage indicator, no bar, the counter in tabular figures; (d) the plate
+     card, band said once. Then the said block, intent heading, advice, answer, ask cards, the
+     safety line once per screen, the offline mark.
+  2. SCAN: the report field with the printed range drawn (ruled d, if the days allow).
+  3. ABOUT: the wordmark, the notices as a list.
+  4. The splash, last, per the 20:09 rules.
+Every landing: both flavours assemble, the JVM suite green from my own XML, the four beats
+through the scripted feed on the emulator, screenshots in `docs/screenshots/<date>-ira/`.
