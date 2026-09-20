@@ -7,6 +7,7 @@ import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.Orchestrator
 import io.github.vedant7007.katori.domain.OrchestratorEvent
 import io.github.vedant7007.katori.domain.ParsedItem
+import io.github.vedant7007.katori.domain.RulesEngine
 import io.github.vedant7007.katori.domain.SpeechLanguageRef
 import io.github.vedant7007.katori.domain.SpokenIntent
 import io.github.vedant7007.katori.domain.Stage
@@ -14,7 +15,10 @@ import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.UserIntent
 import io.github.vedant7007.katori.domain.model.ConfidenceBand
 import io.github.vedant7007.katori.domain.model.UnavailableReason
+import io.github.vedant7007.katori.ui.demo.DemoFeed
+import io.github.vedant7007.katori.ui.demo.ScriptedOrchestrator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,21 +30,29 @@ import javax.inject.Inject
 /**
  * The Talk tab's state: one conversation, rendered from [OrchestratorEvent]s and nothing else.
  *
- * THE BOUNDARY (COORDINATION.md, 20 Sep 14:30). This class calls `Orchestrator.handle` and
- * renders the events the contract defines. It renders the trigger sentence with [TriggerText]
- * and the figures with [ContextText.figure], the same renderers the orchestrator uses for
- * speech and for the model's context, so the screen never says a number a second way. It calls
- * no engine, writes to no store, and holds no number it was not handed.
+ * THE BOUNDARY (COORDINATION.md, 20 Sep 14:30, agreed 14:55). This class calls
+ * `Orchestrator.handle` and renders the events the contract defines. It renders the trigger
+ * sentence with [TriggerText] and the figures with [ContextText.figure], the same renderers the
+ * orchestrator uses for speech and for the model's context, so the screen never says a number
+ * a second way. It calls no engine, writes to no store, and holds no number it was not handed.
  *
- * WHAT IS NEVER SHOWN. A figure without its band; a candidate score; a sample of anything. A
- * path that is not built shows [Entry.NotBuilt] with the component's name.
+ * THE TURN ON SCREEN follows `docs/decisions/0026`: the transcript is pinned for the whole turn,
+ * every stage is named and ticked as it completes, and an elapsed-seconds counter runs beside
+ * the current stage so a long wait reads as work. Text lands before speech.
+ *
+ * THE SCRIPTED FEED (`0027`) is used only while [DemoFeed.enabled] is on, which only the
+ * pre-flight screen can do, and the banner on every tab says so. [RulesEngine] is injected for
+ * that feed alone: the script runs the real engine over scripted input.
  */
 @HiltViewModel
 class TalkViewModel @Inject constructor(
     private val orchestrator: Orchestrator,
     private val triggerText: TriggerText,
     private val contextText: ContextText,
+    rules: RulesEngine,
 ) : ViewModel() {
+
+    private val scripted = ScriptedOrchestrator(rules, contextText, triggerText)
 
     sealed interface Entry {
         /** What was heard or typed, shown the moment it is known. */
@@ -72,16 +84,21 @@ class TalkViewModel @Inject constructor(
     }
 
     data class State(
-        /** The language the person chose (spec 10.2: chosen, never detected). */
-        val language: String = "te",
+        /** The language the person chose (spec 10.2: chosen, never detected). The presenter's, by default (0022). */
+        val language: String = "en-IN",
         val busy: Boolean = false,
-        val stage: Stage? = null,
+        /** Stages of the current turn in order; the last one is current until Completed. */
+        val stages: List<Stage> = emptyList(),
+        /** Seconds since the current stage began (0026: the counter is the honesty device). */
+        val elapsedSeconds: Int = 0,
         /** Microphone level while recording, 0..1, the meter that replaces streaming transcripts. */
         val level: Float = 0f,
         val entries: List<Entry> = emptyList(),
         /** The meal logged most recently in this session, for beat 4's "advise again". */
         val lastMealId: Long? = null,
-    )
+    ) {
+        val stage: Stage? get() = stages.lastOrNull()
+    }
 
     private val _state = MutableStateFlow(State())
     val state: StateFlow<State> = _state.asStateFlow()
@@ -97,20 +114,25 @@ class TalkViewModel @Inject constructor(
 
     private fun run(intent: UserIntent) {
         if (state.value.busy) return
-        _state.update { it.copy(busy = true, stage = null, level = 0f) }
+        _state.update { it.copy(busy = true, stages = emptyList(), elapsedSeconds = 0, level = 0f) }
+        val source = if (DemoFeed.enabled.value) scripted else orchestrator
         viewModelScope.launch(Dispatchers.Default) {
-            orchestrator.handle(intent)
+            val ticker = launch {
+                while (true) { delay(1000); _state.update { it.copy(elapsedSeconds = it.elapsedSeconds + 1) } }
+            }
+            source.handle(intent)
                 // A flow that throws instead of ending in Failed is a bug in the pipeline; it is
                 // shown as one, with the exception's name, rather than swallowed.
                 .catch { e -> add(Entry.Failed(UnavailableReason.INTERNAL_ERROR, e.toString())) }
                 .collect(::on)
-            _state.update { it.copy(busy = false, stage = null, level = 0f) }
+            ticker.cancel()
+            _state.update { it.copy(busy = false, stages = emptyList(), elapsedSeconds = 0, level = 0f) }
         }
     }
 
     private fun on(event: OrchestratorEvent) {
         when (event) {
-            is OrchestratorEvent.Progress -> _state.update { it.copy(stage = event.stage) }
+            is OrchestratorEvent.Progress -> _state.update { it.copy(stages = it.stages + event.stage, elapsedSeconds = 0) }
             is OrchestratorEvent.AudioLevel -> _state.update { it.copy(level = event.rms.coerceIn(0f, 1f)) }
             is OrchestratorEvent.Transcribed -> add(Entry.Said(event.text))
             // The two events the 0026 screen asked for; rendering them is Arjun's next step.

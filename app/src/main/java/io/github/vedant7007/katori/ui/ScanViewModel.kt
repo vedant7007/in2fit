@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.vedant7007.katori.domain.LabValue
 import io.github.vedant7007.katori.domain.Orchestrator
 import io.github.vedant7007.katori.domain.OrchestratorEvent
 import io.github.vedant7007.katori.domain.UserIntent
@@ -14,6 +15,10 @@ import io.github.vedant7007.katori.ml.vision.LabField
 import io.github.vedant7007.katori.ml.vision.LabReport
 import io.github.vedant7007.katori.ml.vision.LabReportExtractor
 import io.github.vedant7007.katori.ml.vision.OcrEngine
+import io.github.vedant7007.katori.ml.vision.RecognisedText
+import io.github.vedant7007.katori.ml.vision.TextBlock
+import io.github.vedant7007.katori.ui.demo.DemoFeed
+import io.github.vedant7007.katori.ui.demo.ScriptedOrchestrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,7 +62,10 @@ class ScanViewModel @Inject constructor(
         _state.update { State(reading = true) }
         viewModelScope.launch(Dispatchers.Default) {
             val ref = frames.hold(bitmap, rotationDegrees)
-            when (val o = ocr.readText(ref)) {
+            // The scripted feed (0027) replaces the recogniser's output with the scripted report's
+            // lines; the extractor that reads them is the real one, and the banner is on.
+            val outcome = if (DemoFeed.enabled.value) Outcome.Ok(scriptedReport()) else ocr.readText(ref)
+            when (val o = outcome) {
                 is Outcome.Ok -> {
                     val report = LabReportExtractor.extract(o.value)
                     _state.update { State(report = report, fields = report.fields.map { Field(it, ticked = true) }) }
@@ -79,9 +87,17 @@ class ScanViewModel @Inject constructor(
     fun save() {
         if (state.value.saving) return
         _state.update { it.copy(saving = true, notBuilt = null, failure = null) }
+        val confirmed = state.value.fields.filter { it.ticked }.map { it.field }
+        val date = state.value.report?.reportDate
         viewModelScope.launch(Dispatchers.Default) {
-            // The confirmed values are state.value.fields.filter { it.ticked }; the intent that
-            // carries them is Rao's to add. Until then this is the contract's own not-built path.
+            if (DemoFeed.enabled.value) {
+                // The script keeps the confirmed values so beat 4 evaluates against them.
+                DemoFeed.labValues += confirmed.map { LabValue(it.testName, it.value, it.unit.orEmpty(), it.referenceLow, it.referenceHigh, date ?: ScriptedOrchestrator.REPORT_DATE) }
+                _state.update { it.copy(saving = false, savedCount = confirmed.size) }
+                return@launch
+            }
+            // The intent that carries the confirmed values is Rao's to add (agreed 14:55). Until
+            // then this is the contract's own not-built path.
             orchestrator.handle(UserIntent.ScanLabReport).collect { ev ->
                 when (ev) {
                     is OrchestratorEvent.NotImplemented -> _state.update { it.copy(notBuilt = ev.component) }
@@ -91,5 +107,19 @@ class ScanViewModel @Inject constructor(
             }
             _state.update { it.copy(saving = false) }
         }
+    }
+
+    /** The scripted report as recognised lines, one box per cell, for the real extractor. */
+    private fun scriptedReport(): RecognisedText {
+        val lines = mutableListOf(
+            TextBlock("Reported on ${ScriptedOrchestrator.REPORT_DATE.dayOfMonth}/${ScriptedOrchestrator.REPORT_DATE.monthValue}/${ScriptedOrchestrator.REPORT_DATE.year}", 40, 40, 500, 76),
+        )
+        ScriptedOrchestrator.REPORT_ROWS.forEachIndexed { i, (name, value, range) ->
+            val y = 140 + i * 60
+            lines += TextBlock(name, 40, y, 40 + 14 * name.length, y + 36)
+            lines += TextBlock(value, 520, y, 520 + 14 * value.length, y + 36)
+            lines += TextBlock(range, 760, y, 760 + 14 * range.length, y + 36)
+        }
+        return RecognisedText(lines)
     }
 }

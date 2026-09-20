@@ -78,13 +78,26 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
             items(state.entries) { entry -> EntryCard(entry, onResolve = vm::resolve) }
         }
 
-        // Progress is named, never a bare spinner; while recording the bar is the microphone level.
-        state.stage?.let { stage ->
-            Text(stringResource(Sentences.stage(stage)), style = MaterialTheme.typography.labelLarge)
-            if (stage == Stage.RECORDING) {
-                LinearProgressIndicator(progress = { state.level }, modifier = Modifier.fillMaxWidth())
-            } else {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        // 0026 step 6: every stage named, completed ones ticked, a seconds counter beside the
+        // current one. While recording the bar is the microphone level; at the endpoint it freezes.
+        if (state.stages.isNotEmpty()) {
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                state.stages.dropLast(1).forEach { done ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(stringResource(R.string.talk_stage_done), style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(Sentences.stage(done)), style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                val current = state.stages.last()
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(stringResource(Sentences.stage(current)), style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.talk_elapsed_seconds, state.elapsedSeconds), style = MaterialTheme.typography.labelLarge)
+                }
+                if (current == Stage.RECORDING || current == Stage.TRANSCRIBING) {
+                    LinearProgressIndicator(progress = { state.level }, modifier = Modifier.fillMaxWidth())
+                } else {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
             }
         }
         if (micDenied) Text(stringResource(R.string.mic_permission_needed), style = MaterialTheme.typography.bodySmall)
@@ -160,9 +173,14 @@ private fun EntryCard(entry: Entry, onResolve: (String, SpokenIntent) -> Unit) {
                 }
                 is Entry.Answer -> {
                     Text(stringResource(R.string.answer_title), style = MaterialTheme.typography.labelMedium)
-                    // A refused answer is still a turn (0024): the fixed line, then their own figures.
-                    Text(entry.text ?: stringResource(R.string.answer_refused))
-                    if (entry.text == null) entry.figures.forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    // Their own lines first, from the database: the answer is in them, and the
+                    // model's sentence is the part that arrives late (Vedant, 20 Sep). A refused
+                    // answer (0024) is the fixed line over the same lines.
+                    if (entry.figures.isNotEmpty()) {
+                        Text(stringResource(R.string.answer_from_diary), style = MaterialTheme.typography.labelSmall)
+                        entry.figures.forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    }
+                    Text(entry.text ?: stringResource(R.string.answer_refused), style = MaterialTheme.typography.bodyLarge)
                     entry.referral?.let { Text(it, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error) }
                     SafetyLine()
                 }

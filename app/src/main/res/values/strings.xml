@@ -250,10 +250,51 @@
     <string name="about_offline">IN2FIT runs entirely on this phone. The demo build has no internet permission: nothing you say, scan or log leaves the device.</string>
     <string name="about_notices_pending">The verbatim copyright notice for the voice models is being prepared and will appear here.</string>
     <string name="about_components" translatable="false">IN2FIT application code: Apache License 2.0.\nQwen2.5-1.5B-Instruct (Alibaba Cloud), run with llama.cpp (MIT): Apache License 2.0.\nIndicConformer Telugu and Hindi speech recognition (AI4Bharat): MIT.\nEnglish speech recognition: NVIDIA NeMo FastConformer, CC-BY-4.0.\nPiper voice te_IN-padmavathi (rhasspy/piper-voices): CC-BY-4.0.\nsherpa-onnx (k2-fsa): Apache License 2.0.\nespeak-ng phonemiser data and code: GNU GPL v3 or later.\nText recognition: Google ML Kit, on device.\nNutrition data: USDA FoodData Central, SR Legacy and Foundation Foods (public domain).</string>
-=======
     <!-- Shown in place of the model's answer when every attempt failed a guard (0024, "the refusal that abandons").
          The person's own figures (Answered.figures) are shown under it, so a refused answer still hands them their data. -->
     <string name="answer_refused">I can\'t put a number or a judgement on that. Here is what your diary shows.</string>
     <!-- The fixed doctor-referral line for a question that asks for a clinical judgement (0024). Never generated. -->
     <string name="context_referral">That is a question for a doctor, who can look at it with you.</string>
+    <!-- 0026, the turn on screen: the elapsed-seconds counter beside the current stage. 1 the count. -->
+    <string name="talk_elapsed_seconds">%1$d s</string>
+    <!-- The tick before a completed stage. A glyph, not a word. -->
+    <string name="talk_stage_done" translatable="false">✓</string>
+    <!-- Scan: shown after a save. 1 the number of values saved. -->
+    <string name="scan_saved">Saved %1$d values from this report.</string>
+    <!-- About: the heading above the USDA lines read from the food database's meta table. -->
+    <string name="about_usda_title">Nutrition data</string>
+    <!-- Talk, an answer: the label over the person's own lines (Answered.figures), shown above the model's sentence. -->
+    <string name="answer_from_diary">From your diary</string>
+
+    <!-- THE PRE-FLIGHT CHECK (Arjun, 20 Sep). Reached only by a long-press on the About title; for
+         whoever sets the phone up on the morning of the demo. Every line is a fact read off the
+         device now: a file is there or not, at that size, at that path; a model loads or the
+         arbiter says why not. Judges never see it. -->
+    <string name="preflight_title">Pre-flight check</string>
+    <string name="preflight_intro">What this phone has and what it is missing, read now. Nothing here is estimated.</string>
+    <string name="preflight_app">App</string>
+    <string name="preflight_device">Device</string>
+    <string name="preflight_locale">Locale</string>
+    <string name="preflight_mic">Microphone permission</string>
+    <string name="preflight_camera">Camera permission</string>
+    <string name="preflight_models_dir">Models folder</string>
+    <string name="preflight_free_space">Free space</string>
+    <string name="preflight_voices">Voices available</string>
+    <string name="preflight_residency">Model memory</string>
+    <string name="preflight_models_title">Models</string>
+    <!-- 1 the file size, formatted by the app. -->
+    <string name="preflight_present">Present, %1$s</string>
+    <string name="preflight_absent">MISSING</string>
+    <string name="preflight_load">Load</string>
+    <string name="preflight_loading">Loading…</string>
+    <string name="preflight_refresh">Refresh</string>
+    <string name="preflight_yes">granted</string>
+    <string name="preflight_no">NOT granted</string>
+
+    <!-- THE SCRIPTED DEMO FEED (docs/decisions/0027). The switch lives on the pre-flight check;
+         the banner sits at the top of every tab while it is on, so no screenshot or glance can
+         mistake scripted figures for real ones. -->
+    <string name="demo_switch_title">Scripted demo feed</string>
+    <string name="demo_switch_hint">Feeds the screens scripted events instead of the real pipeline. For building and photographing screens only. Every figure it shows is script.</string>
+    <string name="demo_banner">SCRIPTED DEMO FEED. Nothing on this screen is a real result.</string>
 </resources>

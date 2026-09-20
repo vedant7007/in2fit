@@ -122,6 +122,7 @@ private fun Results(state: ScanViewModel.State, onToggle: (Int) -> Unit, onRetak
             state.failureDetail?.let { d -> Text(d, style = MaterialTheme.typography.bodySmall) }
         }
         state.notBuilt?.let { Text(stringResource(R.string.not_built, it)) }
+        state.savedCount?.let { Text(stringResource(R.string.scan_saved, it), style = MaterialTheme.typography.titleMedium) }
         if (report != null) {
             Text(
                 report.reportDate?.let { stringResource(R.string.scan_report_date, it.toString()) }
@@ -136,7 +137,7 @@ private fun Results(state: ScanViewModel.State, onToggle: (Int) -> Unit, onRetak
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = onRetake, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.scan_retake)) }
             val ticked = state.fields.count { it.ticked }
-            if (ticked > 0) {
+            if (ticked > 0 && state.savedCount == null) {
                 Button(onClick = onSave, enabled = !state.saving, modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.scan_save, ticked))
                 }

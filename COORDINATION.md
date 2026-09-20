@@ -2073,3 +2073,49 @@ THREE, all in `orchestration/RoutingDefectsTest`: the router wiring (two) and a 
 TO RAO: your constructor default is the right switch (a text path passes STANDARD); flip it to
 `AnswerLength.SHORT`, or have `AppModule` pass it, and the test goes green. The engine's
 budgets follow the length already, which is right.
+
+[Arjun 17:34] ALL FOUR BEATS RENDER, from the scripted feed (`0027`), screenshots in
+`docs/screenshots/2026-09-20-shell/`: `beat1-turn-in-progress.png` (0026's stage list, ticks,
+seconds counter, transcript pinned, banner), `beat1-logged.png`, `beat2-answer.png` (the
+person's own diary line ABOVE the model's sentence, the shape of Vedant's figures-first
+ruling), `beat3-fields.png` (the REAL `LabReportExtractor` over scripted lines: five fields,
+ranges as printed, source rows, ticks), `beat4-advice-after-report.png` (the REAL rules engine's
+own sentence: "Your report from 2026-09-12 shows Ferritin at 8.2 ng/mL, below the 15 printed on
+it, so suggestions are ranked differently now", and the candidates re-ranked by iron),
+`recommend.png`, `preflight.png`. What is real and what is script is in 0027, with the five
+guards that keep the feed from becoming a fake (never injected, off by default, long-press only,
+banner on every tab, the 16:41 rule). `ScriptedOrchestratorTest` asserts beat 4's proof on the
+real engine: the digest and the trigger change once the report is in. JVM suite in my tree:
+323 tests, 0 failures, 0 errors, every XML 17:28. Demo APK 67,416,520 B, permissions exactly
+the three.
+[Arjun 17:34] PRE-FLIGHT SCREEN is in: long-press the IN2FIT title on About. Every model with
+its id, exact path, present or MISSING with size, and a Load button that is a real
+`ModelArbiter.preload` with the verdict verbatim; mic and camera permissions; locale; models
+folder; free space; voices the TTS claims; the arbiter's residency line; the scripted-feed
+switch. `preflight.png` is the emulator's honest answer: every model MISSING at its path.
+TO NILA, keys added, all before 22:00: prefixes `preflight_` (22 keys, "a setup screen reached
+by a long-press on the About title, for whoever prepares the phone; judges never see it"),
+`demo_` (3 keys, "the scripted-feed banner at the top of every tab while the feed is on, and
+its switch on the pre-flight screen"), plus `talk_elapsed_seconds`, `talk_stage_done` (a glyph,
+not translatable), `scan_saved`, `about_usda_title`, `answer_from_diary`. The About screen now
+reads the USDA `attribution`, `licence`, `disclosure` and release rows from the food database's
+`meta` table through `FoodDbSource`, as your conventions file asks. ALSO: `values/strings.xml`
+on master carried a bare `=======` conflict marker at line 253 from `0463557`; removed in this
+landing. aapt2 would have refused the next resource merge.
+[Arjun 17:34] TO MEERA, WHERE 0026 MEETS A REAL SCREEN, three places: (1) step 5's intent
+heading and the lead-in line on screen need an event that says which intent the turn became;
+the contract has none, so I asked Rao for `IntentKnown(intent, leadIn)` at 16:41. Until it
+lands the screen goes from "Working out what you meant" straight to the route's first stage.
+(2) Step 8's stop control needs `TtsEngine.stop()` and the boundary forbids me the engine; asked
+Rao for `UserIntent.StopSpeaking`. (3) The counter resets per stage rather than running for the
+whole turn; I read your "an elapsed-time counter beside the current stage" that way, and it
+reads well: "Writing the reply 7 s" is more honest than a turn total. Say if you meant the total.
+Everything else in the table renders as written: meter live while recording and frozen at the
+endpoint, transcript pinned, ticks on completed stages, text before speech, a failed turn is one
+sentence, not-built is named.
+[Arjun 17:34] TO RAO: the three events at 16:41 are what stands between the screen and 0026;
+`OwnFigures` first. Also, since 15:06 the demo runs in the presenter's language: the picker now
+defaults to en-IN. And two facts from the emulator worth having before the phone: the platform
+TTS on an API 37 image claims te, hi and en-IN, so `RoutingTtsEngine` reports all three
+"available" there; and the arbiter's residency line reads "ceiling 0.0 MB, tier MID" before any
+calibration, which the pre-flight will show on a fresh handset on the 26th until the first load.
