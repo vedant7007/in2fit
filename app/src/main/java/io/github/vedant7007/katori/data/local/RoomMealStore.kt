@@ -4,12 +4,15 @@ import androidx.room.withTransaction
 import io.github.vedant7007.katori.data.local.entity.MealEntity
 import io.github.vedant7007.katori.data.local.entity.MealItemEntity
 import io.github.vedant7007.katori.data.local.entity.MealItemNutrientEntity
+import io.github.vedant7007.katori.domain.MealItemSnapshot
+import io.github.vedant7007.katori.domain.MealSnapshot
 import io.github.vedant7007.katori.domain.MealStore
 import io.github.vedant7007.katori.domain.ResolvedMeal
 import io.github.vedant7007.katori.domain.model.Nutrient
 import io.github.vedant7007.katori.domain.model.NutrientValue
 import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.domain.model.UnavailableReason
+import kotlinx.coroutines.flow.first
 import java.time.Instant
 
 /**
@@ -71,4 +74,24 @@ class RoomMealStore(private val db: KatoriDatabase, private val languageTag: () 
         }
         return Outcome.Ok(id)
     }
+
+    /** The meal as the rules engine sees it: measured amounts only; an Unknown is simply absent from the map. */
+    override suspend fun meal(mealId: Long): MealSnapshot? {
+        val dao = db.mealDao()
+        val meal = dao.meal(mealId) ?: return null
+        val items = dao.itemsFor(mealId)
+        val nutrients = dao.measuredNutrientsFor(mealId).groupBy({ it.meal_item_id }) { it.nutrient to it.amount }
+        return MealSnapshot(
+            mealId = meal.id,
+            items = items.map { i ->
+                MealItemSnapshot(
+                    displayName = i.spoken_name, foodCode = i.food_id, grams = i.grams,
+                    nutrients = nutrients[i.id].orEmpty().mapNotNull { (n, a) -> Nutrient.entries.firstOrNull { it.name == n }?.let { it to a } }.toMap(),
+                )
+            },
+            loggedAt = Instant.ofEpochMilli(meal.logged_at_epoch_ms),
+        )
+    }
+
+    override suspend fun latestMealId(): Long? = db.mealDao().recentMeals(1).first().firstOrNull()?.id
 }

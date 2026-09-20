@@ -96,6 +96,24 @@ object FoodTextMatching {
         else -> 2
     }
 
+    /**
+     * The query with an English plural ending removed, or null when it has none. Roman script
+     * only, and only the two regular endings: "rotis" -> "roti", "idlis" -> "idli", "chapatis" ->
+     * "chapati", "tomatoes" -> "tomato". A word that is not a plural but ends in s ("sprouts" as
+     * an alias, "dosas") is tried in its full form first, so nothing is lost by the second try.
+     */
+    fun singular(q: String): String? {
+        if (isNativeScript(q) || q.length < 4) return null
+        return when {
+            q.endsWith("ies") -> q.dropLast(3) + "y"
+            q.endsWith("oes") -> q.dropLast(2)
+            q.endsWith("ses") || q.endsWith("xes") || q.endsWith("ches") || q.endsWith("shes") -> q.dropLast(2)
+            q.endsWith("ss") -> null
+            q.endsWith("s") -> q.dropLast(1)
+            else -> null
+        }
+    }
+
     /** How a candidate was reached. Ordered best to worst; used to pick a winner. */
     enum class MatchStrength { EXACT, CONTAINED, FUZZY }
 
@@ -165,6 +183,18 @@ object FoodTextMatching {
             }
         }
         if (contained.isNotEmpty()) return best(contained)
+
+        // An English plural. "rotis" against "roti" is one edit at four letters, which the
+        // tolerance rule rightly refuses (that slack also reaches "dahi" from "dal"), so the
+        // plural is taken off explicitly and the exact and contained stages run once more.
+        // MEASURED on the first end-to-end run (20 Sep): "I had two rotis and a katori of dal"
+        // was NO_MATCH on "rotis", and the demo language is English.
+        singular(q)?.let { sq ->
+            aliases[sq]?.let { return Candidate(it, sq, MatchStrength.EXACT, 0) }
+            val c = aliases.filter { (alias, _) -> alias.length >= 3 && containsAsWords(sq, alias) }
+                .map { (alias, key) -> Candidate(key, alias, MatchStrength.CONTAINED, sq.length - alias.length) }
+            if (c.isNotEmpty()) return best(c)
+        }
 
         if (!allowFuzzy) return null
 

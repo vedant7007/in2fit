@@ -138,6 +138,7 @@ class TalkViewModel @Inject constructor(
             // The two events the 0026 screen asked for; rendering them is Arjun's next step.
             is OrchestratorEvent.IntentKnown -> Unit
             is OrchestratorEvent.OwnFigures -> Unit
+            is OrchestratorEvent.LabReportSaved -> Unit
             is OrchestratorEvent.NeedsIntent -> add(Entry.AskIntent(event.transcript))
             is OrchestratorEvent.NeedsConfirmation -> add(Entry.Confirm(event.why, event.parsed.items))
             is OrchestratorEvent.MealResolved -> add(

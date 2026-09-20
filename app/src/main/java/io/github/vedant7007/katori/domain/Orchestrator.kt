@@ -102,10 +102,22 @@ sealed interface UserIntent {
      */
     data class Resolve(val text: String, val language: SpeechLanguageRef, val intent: SpokenIntent) : UserIntent
 
-    /** Beat 3. Scan a printed lab report. */
+    /** Beat 3, the capture half: the Scan screen's own. Sent only while [SaveLabReport] is unwired. */
     data object ScanLabReport : UserIntent
 
-    /** Beat 4. Re-evaluate advice for a meal already logged. */
+    /**
+     * Beat 3, the write: the values the person CONFIRMED on the Scan screen, report date on
+     * each. The orchestrator writes them, emits [OrchestratorEvent.LabReportSaved], and then
+     * regenerates the last meal's advice against the new context inside the same turn, so the
+     * next [AdviseOnMeal] is instant (`AdviceStore`).
+     */
+    data class SaveLabReport(val values: List<LabValue>) : UserIntent
+
+    /**
+     * Beat 4. Advice for a meal already logged, against the CURRENT context. Instant when the
+     * stored advice's digest matches; the model runs only when something in the context changed
+     * since it was phrased and nothing has regenerated it yet.
+     */
     data class AdviseOnMeal(val mealId: Long) : UserIntent
 
     /** Correct something the system inferred. Spec 15.3 requires this to always be available. */
@@ -176,6 +188,9 @@ sealed interface OrchestratorEvent {
 
     /** The meal is on the timeline. Emitted on LOG and on nothing else. */
     data class MealLogged(val mealId: Long) : OrchestratorEvent
+
+    /** The confirmed report values are on file. [regeneratedMealId] is the meal whose advice was refreshed, if any. */
+    data class LabReportSaved(val count: Int, val regeneratedMealId: Long?) : OrchestratorEvent
 
     /**
      * Rules fired: LOG, SUGGEST and RECOMMEND all end here, and the UI renders the suggestions

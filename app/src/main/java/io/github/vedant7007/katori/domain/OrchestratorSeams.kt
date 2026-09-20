@@ -105,6 +105,48 @@ data class ResolvedItem(
 interface MealStore {
     /** @return the new meal id. */
     suspend fun save(meal: ResolvedMeal, loggedAt: Instant): Outcome<Long>
+
+    /** A logged meal as the rules engine sees it, or null when there is no such meal. */
+    suspend fun meal(mealId: Long): MealSnapshot?
+
+    /** The most recently logged meal's id, or null when nothing has been logged. */
+    suspend fun latestMealId(): Long?
+}
+
+/**
+ * THE ADVICE, PRECOMPUTED. Ruled 20 Sep from the measured conversational turn (`0014`): the
+ * person must never wait for RECOMMEND. The model's sentence for a meal is generated when the
+ * meal is logged and regenerated when a lab report is saved, and stored here against the
+ * `RuleEvaluation.inputDigest` it was generated under.
+ *
+ * THE INVALIDATION RULE, agreed with Priya: a stored advice is valid while evaluating the meal
+ * against the CURRENT context yields the same digest; the digest covers profile, declared
+ * conditions, lab values, the meal and the candidates, so any of those changing dirties it.
+ * Reading the advice back never involves a model: the rules engine is re-run (pure, instant),
+ * the digests are compared, and only a mismatch generates.
+ *
+ * The rows are the `suggestions` table of spec 8.3: two rows with different digests and a named
+ * rule between them are beat 4's proof that the input changed.
+ */
+interface AdviceStore {
+    suspend fun latest(mealId: Long): StoredAdvice?
+    suspend fun save(mealId: Long, advice: StoredAdvice)
+}
+
+data class StoredAdvice(
+    /** The model's guarded sentence, or null when every attempt failed a guard. */
+    val phrased: String?,
+    /** The rendered trigger sentence, null when nothing fired. */
+    val triggerText: String?,
+    val triggerRuleId: RuleId?,
+    /** [RuleEvaluation.inputDigest] of the evaluation this advice was phrased for. */
+    val inputDigest: String,
+    val createdAt: Instant,
+)
+
+/** Writes the confirmed values of a scanned report. The one write beat 3 makes. */
+interface LabStore {
+    suspend fun save(values: List<LabValue>): Outcome<Int>
 }
 
 /**
@@ -181,6 +223,9 @@ class ContextText(
     }
 
     fun lifeContext(c: LifeContext): String = trigger.lifeContext(c)
+
+    /** The locale's word for a nutrient, as the trigger table renders it. */
+    fun nutrientWord(n: io.github.vedant7007.katori.domain.model.Nutrient): String = trigger.nutrient(n)
 
     fun neverSuggest(diet: DietType): String? = strings.neverSuggest(diet)
 

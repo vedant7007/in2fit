@@ -87,6 +87,15 @@ class LookupMealResolverTest {
         }
     }
 
+    /** The first end-to-end run (20 Sep) was NO_MATCH on "rotis": one edit at four letters is refused, so the plural is taken off. */
+    @Test fun `an English plural resolves to the food, as the person said it`() {
+        val r = resolve(item("rotis", 2.0, null), item("idlis", 3.0, null), item("eggs", 1.0, null))
+        assertEquals("chapati", r.items[0].snapshot.foodCode)
+        assertEquals(90.0, r.items[0].snapshot.grams!!, 0.01)
+        assertEquals("idli", r.items[1].snapshot.foodCode?.substringBefore('_'))
+        assertEquals("egg", r.items[2].snapshot.foodCode)
+    }
+
     @Test fun `nothing matching is a refusal, never the nearest food`() {
         val r = runBlocking { resolver.resolve(meal(item("xyzzy plugh", 1.0, "katori")), "en-IN") }
         assertEquals(UnavailableReason.NO_MATCH, (r as Outcome.Unavailable).reason)

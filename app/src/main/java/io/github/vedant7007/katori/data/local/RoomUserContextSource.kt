@@ -157,6 +157,11 @@ class RoomUserContextSource(
         val forbidden = FORBIDDEN_WORDS[diet].orEmpty()
         fun allowed(key: String, description: String, foodClass: String?): Boolean {
             if (key in avoided) return false
+            // MEASURED on the first end-to-end run (20 Sep): ranked by iron per 100 g, the top four
+            // candidates for a person with low haemoglobin were cumin, turmeric, bay leaf and
+            // fenugreek. Nobody eats 100 g of cumin. A spice or a cooking fat is a seasoning, not
+            // a food anyone is told to add a portion of; they are not candidates.
+            if (foodClass == "SPICE" || foodClass == "FAT_OIL") return false
             if (diet == DietType.VEGAN && foodClass == "DAIRY") return false
             val words = description.lowercase().split(Regex("[^a-z]+")).filter { it.isNotEmpty() }
             return forbidden.none { it in words }

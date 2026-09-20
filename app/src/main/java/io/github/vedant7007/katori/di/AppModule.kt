@@ -26,9 +26,13 @@ import io.github.vedant7007.katori.data.food.LookupMealResolver
 import io.github.vedant7007.katori.data.knowledge.KnowledgeFacts
 import io.github.vedant7007.katori.data.local.AndroidContextStrings
 import io.github.vedant7007.katori.data.local.AndroidTriggerStrings
+import io.github.vedant7007.katori.data.local.RoomAdviceStore
+import io.github.vedant7007.katori.data.local.RoomLabStore
 import io.github.vedant7007.katori.data.local.RoomMealStore
 import io.github.vedant7007.katori.data.local.RoomUserContextSource
+import io.github.vedant7007.katori.domain.AdviceStore
 import io.github.vedant7007.katori.domain.ContextText
+import io.github.vedant7007.katori.domain.LabStore
 import io.github.vedant7007.katori.domain.FamilyModelLoader
 import io.github.vedant7007.katori.domain.MealResolver
 import io.github.vedant7007.katori.domain.MealStore
@@ -208,6 +212,14 @@ object AppModule {
     @Singleton
     fun provideMealStore(db: KatoriDatabase): MealStore = RoomMealStore(db)
 
+    @Provides
+    @Singleton
+    fun provideAdviceStore(db: KatoriDatabase): AdviceStore = RoomAdviceStore(db)
+
+    @Provides
+    @Singleton
+    fun provideLabStore(db: KatoriDatabase): LabStore = RoomLabStore(db)
+
     /** The LLM is leased from the arbiter per call; the engine is built over the admitted runtime. */
     @Provides
     @Singleton
@@ -222,6 +234,7 @@ object AppModule {
     @Singleton
     fun provideOrchestrator(
         asr: AsrEngine, llm: LlmLease, tts: TtsEngine, rules: RulesEngine, resolver: MealResolver, store: MealStore,
+        advice: AdviceStore, labs: LabStore,
         contextSource: UserContextSource, knowledge: KnowledgeFacts, triggerText: TriggerText, contextText: ContextText,
-    ): Orchestrator = DefaultOrchestrator(asr, llm, tts, rules, resolver, store, contextSource, knowledge, triggerText, contextText)
+    ): Orchestrator = DefaultOrchestrator(asr, llm, tts, rules, resolver, store, advice, labs, contextSource, knowledge, triggerText, contextText)
 }

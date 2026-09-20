@@ -119,6 +119,17 @@ interface MealDao {
     )
     suspend fun unknownContributors(mealId: Long): List<UnknownContributorRow>
 
+    /** The measured amounts of a meal's items, for the snapshot the rules engine re-evaluates. */
+    @Query(
+        """
+        SELECT n.meal_item_id AS meal_item_id, n.nutrient AS nutrient, n.amount AS amount
+        FROM meal_item_nutrients n
+        JOIN meal_items i ON i.id = n.meal_item_id
+        WHERE i.meal_id = :mealId AND n.state = 'MEASURED' AND n.amount IS NOT NULL
+        """
+    )
+    suspend fun measuredNutrientsFor(mealId: Long): List<MeasuredNutrientRow>
+
     /** The same holes, over a time range, for the period totals. */
     @Query(
         """
@@ -143,6 +154,13 @@ data class NutrientTotalRow(
     val total: Double,
     val unknown_count: Int,
     val measured_count: Int,
+)
+
+/** One measured amount of one item. */
+data class MeasuredNutrientRow(
+    val meal_item_id: Long,
+    val nutrient: String,
+    val amount: Double,
 )
 
 /** One hole in a derived total: this item had no value for this nutrient. */

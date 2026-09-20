@@ -22,6 +22,11 @@ import io.github.vedant7007.katori.domain.model.NutrientValue
 import io.github.vedant7007.katori.domain.model.NutritionFigure
 import io.github.vedant7007.katori.ml.llm.ExtractedItem
 import io.github.vedant7007.katori.domain.MealStore
+import io.github.vedant7007.katori.domain.MealSnapshot
+import io.github.vedant7007.katori.domain.AdviceStore
+import io.github.vedant7007.katori.domain.LabStore
+import io.github.vedant7007.katori.domain.LabValue
+import io.github.vedant7007.katori.domain.StoredAdvice
 import io.github.vedant7007.katori.domain.OrchestratorEvent
 import io.github.vedant7007.katori.domain.ParsedMeal
 import io.github.vedant7007.katori.domain.ProfileSnapshot
@@ -90,6 +95,8 @@ internal object MinimalRig {
     class RecordingStore : MealStore {
         val saved = mutableListOf<ResolvedMeal>()
         override suspend fun save(meal: ResolvedMeal, loggedAt: Instant): Outcome<Long> { saved += meal; return Outcome.Ok(42L) }
+        override suspend fun meal(mealId: Long): MealSnapshot? = null
+        override suspend fun latestMealId(): Long? = null
     }
 
     /** Resolves every item to a plausible food, so a misrouted LOG goes all the way to the store. */
@@ -149,6 +156,8 @@ internal object MinimalRig {
         lastStore = RecordingStore()
         val orchestrator = DefaultOrchestrator(
             asr = NoAsr(), llm = llm, tts = SilentTts(), rules = DefaultRulesEngine(), resolver = PlainResolver(), store = lastStore,
+            advice = object : AdviceStore { override suspend fun latest(mealId: Long) = null; override suspend fun save(mealId: Long, advice: StoredAdvice) = Unit },
+            labs = object : LabStore { override suspend fun save(values: List<LabValue>) = Outcome.Ok(values.size) },
             contextSource = object : UserContextSource { override suspend fun current() = nobodyOnFile },
             knowledge = facts, triggerText = TriggerText(TriggerText.ENGLISH),
             contextText = ContextText(ContextText.ENGLISH, TriggerText.ENGLISH, ZoneId.of("Asia/Kolkata")),

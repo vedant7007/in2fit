@@ -2,7 +2,10 @@ package io.github.vedant7007.katori.orchestration
 
 import io.github.vedant7007.katori.data.knowledge.KnowledgeFact
 import io.github.vedant7007.katori.data.knowledge.KnowledgeFacts
+import io.github.vedant7007.katori.domain.AdviceStore
 import io.github.vedant7007.katori.domain.CandidateFood
+import io.github.vedant7007.katori.domain.LabStore
+import io.github.vedant7007.katori.domain.StoredAdvice
 import io.github.vedant7007.katori.domain.ConditionSource
 import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.DeclaredCondition
@@ -109,6 +112,21 @@ class DefaultOrchestratorTest {
             saved += meal
             return Outcome.Ok(42L)
         }
+        override suspend fun meal(mealId: Long): MealSnapshot? = saved.lastOrNull()?.let { r ->
+            MealSnapshot(mealId, r.items.map { it.snapshot }, Instant.parse("2026-09-20T07:00:00Z"))
+        }
+        override suspend fun latestMealId(): Long? = if (saved.isEmpty()) null else 42L
+    }
+
+    private class MemoryAdvice : AdviceStore {
+        val rows = mutableListOf<Pair<Long, StoredAdvice>>()
+        override suspend fun latest(mealId: Long) = rows.lastOrNull { it.first == mealId }?.second
+        override suspend fun save(mealId: Long, advice: StoredAdvice) { rows += mealId to advice }
+    }
+
+    /** Writes land in the context the next read sees, as Room's would. */
+    private class MemoryLabs(private val onSave: (List<LabValue>) -> Unit) : LabStore {
+        override suspend fun save(values: List<LabValue>): Outcome<Int> { onSave(values); return Outcome.Ok(values.size) }
     }
 
     private class FakeResolver(var outcome: Outcome<ResolvedMeal>? = null) : MealResolver {
@@ -183,11 +201,13 @@ class DefaultOrchestratorTest {
         val resolver: FakeResolver = FakeResolver(),
         val tts: SilentTts = SilentTts(),
         val asr: AsrEngine = ScriptedAsr(emptyList()),
-        val ctx: UserContext,
+        var ctx: UserContext,
         val facts: KnowledgeFacts,
     ) {
+        val advice = MemoryAdvice()
         val orchestrator = DefaultOrchestrator(
             asr = asr, llm = llm, tts = tts, rules = DefaultRulesEngine(), resolver = resolver, store = store,
+            advice = advice, labs = MemoryLabs { ctx = ctx.copy(labValues = ctx.labValues + it) },
             contextSource = object : UserContextSource { override suspend fun current() = ctx },
             knowledge = facts, triggerText = TriggerText(TriggerText.ENGLISH),
             contextText = ContextText(ContextText.ENGLISH, TriggerText.ENGLISH, ZoneId.of("Asia/Kolkata")),
@@ -278,15 +298,20 @@ class DefaultOrchestratorTest {
         val request = r.llm.answers.single()
         assertEquals(listOf("low iron"), request.declaredConditions)
         assertEquals(TriggerText.ENGLISH.lifeContext(LifeContext.HOSTEL_STUDENT), request.context)
+        // The person's full lines go on screen (OwnFigures) and back on Answered.figures; the
+        // model is given only what the question is about (0014: no choice). Both are checked.
+        val own = events.filterIsInstance<OrchestratorEvent.OwnFigures>().single().lines
+        assertTrue("the logged meal is in the person's own lines: $own", own.any { it.contains("roti, dal") && it.contains("iron: 2.5 mg") })
+        assertTrue("a partial total is worded as a floor: $own", own.any { it.contains("protein: at least 11 g (no value for dal)") })
+        assertTrue("the lab value is in the person's own lines: $own", own.any { it.contains("Haemoglobin: 9.8 g/dL, printed range 12 to 15") })
         val figures = request.figures.map { it.text }
-        assertTrue("the logged meal must be in the request: $figures", figures.any { it.contains("roti, dal") && it.contains("iron: 2.5 mg") })
-        assertTrue("a partial total is worded as a floor: $figures", figures.any { it.contains("protein: at least 11 g (no value for dal)") })
-        assertTrue("the lab value must be in the request: $figures", figures.any { it.contains("Haemoglobin: 9.8 g/dL, printed range 12 to 15") })
         assertTrue("the period total, computed by the store, must be in the request: $figures", figures.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
         assertTrue("the engine's own sentence about the value must be in the request: $figures", figures.any { it.contains("below") && it.contains("9.8") })
         assertEquals("retrieval ran on the question", listOf("iron.vitc"), request.facts.map { it.id })
 
         val answered = events.filterIsInstance<OrchestratorEvent.Answered>().single()
+        assertTrue("the person's lines ride on the answer too, with the engine's sentence", answered.figures.containsAll(own))
+        assertTrue("every line the model gets is one the person sees", answered.figures.containsAll(figures))
         assertEquals("answered", answered.text)
         assertEquals(listOf("iron.vitc"), answered.factIds)
         assertNull("no referral: haemoglobin at 9.8 is below range, not far below", answered.referral)
@@ -299,13 +324,17 @@ class DefaultOrchestratorTest {
         val events = r.run(UserIntent.Type("did I get enough iron this week", en))
         val known = events.indexOfFirst { it is OrchestratorEvent.IntentKnown }
         val own = events.indexOfFirst { it is OrchestratorEvent.OwnFigures }
+        val classifying = events.indexOfFirst { it == OrchestratorEvent.Progress(Stage.CLASSIFYING) }
         val retrieving = events.indexOfFirst { it == OrchestratorEvent.Progress(Stage.RETRIEVING_FACTS) }
         val answered = events.indexOfFirst { it is OrchestratorEvent.Answered }
-        assertTrue("$events", known in 0 until own && own < retrieving && retrieving < answered)
+        // MEASURED 20 Sep: the classifier alone is 6-8 s, so the figures go out before it.
+        assertTrue("$events", own in 0 until classifying && classifying < known && known < retrieving && retrieving < answered)
         assertEquals(OrchestratorEvent.IntentKnown(SpokenIntent.ANSWER, "Let me check your records."), events[known])
         val lines = (events[own] as OrchestratorEvent.OwnFigures).lines
         assertTrue("the number they asked for is in the first lines: $lines", lines.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
-        assertEquals("the same lines the model is then given", lines, r.llm.answers.single().figures.map { it.text })
+        val given = r.llm.answers.single().figures.map { it.text }
+        val answerEvent = events[answered] as OrchestratorEvent.Answered
+        assertTrue("the model is given a selection of the person's lines plus the engine's sentence, never others: $given", answerEvent.figures.containsAll(given) && answerEvent.figures.containsAll(lines))
         // The lead-in was spoken before the answer, and the answer after it.
         assertEquals(listOf("Let me check your records.", "answered"), r.tts.spoken)
     }
@@ -316,6 +345,79 @@ class DefaultOrchestratorTest {
         assertEquals(listOf<OrchestratorEvent>(OrchestratorEvent.Completed), events)
         assertEquals(1, r.tts.stops)
         assertEquals(0, r.store.saved.size)
+    }
+
+    // --- beat 4 is precomputed: the save is the trigger, the read is instant -------------------
+
+    @Test fun `LOG stores the phrased advice under its digest, and AdviseOnMeal reads it back without the model`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.LOG)))
+        r.run(UserIntent.Type("I had rice and palak paneer", en))
+        assertEquals(1, r.advice.rows.size)
+        val stored = r.advice.rows.single().second
+        assertEquals("phrased", stored.phrased)
+        assertEquals(1, r.llm.phrasings.size)
+
+        val events = r.run(UserIntent.AdviseOnMeal(42L))
+        val advice = events.filterIsInstance<OrchestratorEvent.Advice>().single()
+        assertEquals("the stored prose, not a fresh generation", "phrased", advice.phrased)
+        assertEquals("the digest matched, so the model was not consulted again", 1, r.llm.phrasings.size)
+        assertEquals(stored.inputDigest, advice.evaluation.inputDigest)
+        assertEquals(OrchestratorEvent.Completed, events.last())
+    }
+
+    @Test fun `saving a lab report regenerates the last meal's advice, so the next AdviseOnMeal is instant and different`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.LOG)), ctx = context(labs = emptyList()))
+        r.run(UserIntent.Type("I had rice and palak paneer", en))
+        val before = r.advice.rows.single().second
+        assertNull("nothing on file, so no trigger", before.triggerText)
+
+        r.llm.phrased = Outcome.Ok(PhrasedText("phrased again, now that the report is in", numericGuardPassed = true))
+        val saved = r.run(UserIntent.SaveLabReport(listOf(glucoseFarAbove)))
+        assertEquals(OrchestratorEvent.LabReportSaved(1, 42L), saved.first { it is OrchestratorEvent.LabReportSaved })
+        assertEquals("the save regenerated", 2, r.llm.phrasings.size)
+        val after = r.advice.rows.last().second
+        assertTrue("a different digest is beat 4's proof", after.inputDigest != before.inputDigest)
+        assertTrue("the trigger now cites the report: ${after.triggerText}", after.triggerText!!.contains("260"))
+
+        val events = r.run(UserIntent.AdviseOnMeal(42L))
+        val advice = events.filterIsInstance<OrchestratorEvent.Advice>().single()
+        assertEquals("phrased again, now that the report is in", advice.phrased)
+        assertEquals("instant: no third generation", 2, r.llm.phrasings.size)
+        assertNotNull("and the referral is mandatory now", advice.referral)
+    }
+
+    @Test fun `AdviseOnMeal regenerates only when the context changed under it`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.LOG)), ctx = context(labs = emptyList()))
+        r.run(UserIntent.Type("I had rice and palak paneer", en))
+        r.ctx = r.ctx.copy(declaredConditions = r.ctx.declaredConditions + DeclaredCondition("type 2 diabetes", ConditionSource.USER_DECLARED))
+        r.run(UserIntent.AdviseOnMeal(42L))
+        assertEquals("the context changed, so it phrased once more and stored it", 2, r.llm.phrasings.size)
+        assertEquals(2, r.advice.rows.size)
+        r.run(UserIntent.AdviseOnMeal(42L))
+        assertEquals("and then not again", 2, r.llm.phrasings.size)
+    }
+
+    // --- the model is not given a choice ---------------------------------------------------------
+
+    @Test fun `the model gets the lines the question is about and at most two rows, never the whole diary`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.ANSWER)))
+        r.run(UserIntent.Type("did I get enough iron this week", en))
+        val request = r.llm.answers.single()
+        val given = request.figures.map { it.text }
+        assertTrue("the iron total: $given", given.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
+        assertTrue("not the protein total: $given", given.none { it.contains("protein") })
+        assertTrue("not the meal lines: $given", given.none { it.contains("roti, dal") })
+        assertTrue("the engine's sentence about their report: $given", given.any { it.contains("9.8") && it.contains("below") })
+        assertTrue("at most two rows", request.facts.size <= 2)
+    }
+
+    @Test fun `RECOMMEND names the top of the ranked list, not all of it`() {
+        val many = context().copy(candidates = (1..9).map { CandidateFood("f$it", "food $it", setOf(LifeContext.HOSTEL_STUDENT), mapOf(Nutrient.IRON to it.toDouble())) })
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.RECOMMEND)), ctx = many)
+        r.run(UserIntent.Type("what should I eat for more iron", en))
+        val request = r.llm.recommendations.single()
+        assertEquals(4, request.allowedFoodNames.size)
+        assertTrue(request.facts.size <= 2)
     }
 
     @Test fun `RECOMMEND carries their conditions, situation, diet, report line and the allowed list`() {
