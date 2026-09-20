@@ -55,7 +55,7 @@ class PiperTtsEngine(
             if (stops.get() != epoch) {
                 Outcome.Unavailable(UnavailableReason.CANCELLED, "stopped during synthesis")
             } else {
-                sink.play(pcm, voice.sampleRateHz)
+                sink.play(normalisePeak(pcm), voice.sampleRateHz)
             }
         }
         return when (leased) {
@@ -74,4 +74,28 @@ class PiperTtsEngine(
         UnavailableReason.MODEL_NOT_LOADED,
         "no Piper voice for $language; this engine has ${voices.keys}",
     )
+}
+
+/**
+ * Scale [pcm] so its loudest sample sits at [target] of full scale.
+ *
+ * A handset speaker in a crowded hall is close to inaudible, and the Piper voices measured on
+ * the desktop peak anywhere from 0.41 to 0.81 of full scale depending on the voice and the
+ * text (`0019` addendum 6). Whatever ships must sit at the top of the phone's range without
+ * clipping, and VITS output is bounded, so a peak normalisation is exact: no sample exceeds
+ * [target] afterwards. Gain is capped at [maxGain] so an utterance that is mostly silence is
+ * not turned into amplified noise. Already-loud audio is turned DOWN to the same ceiling, which
+ * is what keeps two voices at one level.
+ *
+ * ponytail: peak, not loudness. Two utterances at the same peak can differ in perceived
+ * loudness; if listeners report the level wandering between voices, the upgrade is an RMS or
+ * LUFS target with a limiter. Not before a phone has been heard.
+ */
+internal fun normalisePeak(pcm: FloatArray, target: Float = 0.89f, maxGain: Float = 8f): FloatArray {
+    var peak = 0f
+    for (s in pcm) { val a = if (s < 0f) -s else s; if (a > peak) peak = a }
+    if (peak == 0f) return pcm
+    val gain = minOf(target / peak, maxGain)
+    if (gain == 1f) return pcm
+    return FloatArray(pcm.size) { pcm[it] * gain }
 }

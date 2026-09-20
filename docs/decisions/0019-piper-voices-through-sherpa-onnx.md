@@ -522,3 +522,68 @@ With the radios off, does the platform engine's Hindi voice still resolve and sy
 probe run in airplane mode answers it; a second run online, same day, shows whether anything
 changes. That is the assumption "local means local" that rung 1 rests on, tested rather than
 believed.
+
+---
+
+## Addendum 6, 20 September 2026, 17:30: whether the judges can hear the phone
+
+A handset speaker in a crowded hackathon hall is close to inaudible, and this product's output
+is spoken. Nobody had asked the question. Four answers, in the order they fail.
+
+### Level
+
+The voices are not at one loudness. Measured on the desktop, peak of full scale per utterance:
+Piper `padmavathi` 0.41, `venkatesh` 0.41, `pratham` 0.66-0.73, `rohan` 0.79-0.81, MMS 0.87-0.91;
+the platform voice is whatever its engine decides. So `PiperTtsEngine` now peak-normalises
+every utterance to 0.89 of full scale before it reaches the sink: exact for a bounded VITS
+output, never clipping, gain capped at 8x so near-silence is not amplified into hiss, and
+already-loud audio brought DOWN to the same ceiling so two voices sit at one level
+(`normalisePeak`, tested). It is peak, not loudness; if listeners report the level wandering
+between voices, the upgrade is an RMS or LUFS target with a limiter, and not before a phone has
+been heard. The platform engine's volume parameter stays at its default of 1.0.
+
+The level that matters most is not in code: the phone's media stream at maximum. Our track
+plays under `USAGE_ASSISTANT`, whose volume control stream the probe now prints, alongside the
+music stream's current and maximum. That is a checklist item on the day, not something the app
+forces; an app that sets the volume on its own is the app that startles a judge.
+
+### Routing after a microphone capture
+
+Every spoken turn starts with a capture, and the capture-to-playback transition is where
+Android routing goes wrong: an audio mode left in communication, and the answer comes out of
+the earpiece at earpiece level. `ml/asr/AudioSource` records with `VOICE_RECOGNITION` and sets
+no mode, which should leave routing alone; "should" is not a measurement, so
+`TtsVoiceProbeTest.c_outputRouteAndLevelAfterMicrophoneCapture` records for half a second the
+way the turn does, releases, plays a 0.4 s tone through the exact attributes `AudioTrackSink`
+uses, and prints `AudioTrack.routedDevice`: it must read `BUILTIN_SPEAKER` (or the wired
+device), never `BUILTIN_EARPIECE`. The audio mode and speakerphone flag before and after the
+capture are printed with it. Rao runs it once with nothing plugged in and once with the wired
+speaker.
+
+### A wired speaker is insurance, and Bluetooth is not
+
+A USB-C or 3.5 mm speaker is a cable, not a radio: it costs nothing against the airplane-mode
+claim and Android routes media to it on its own. **A Bluetooth speaker is a radio.** Android
+lets Bluetooth be re-enabled inside airplane mode, and a judge who sees the Bluetooth icon next
+to the airplane icon has a reasonable question we do not want to answer on stage. So: wired
+only, and this is written down so nobody reaches for a Bluetooth speaker on the morning. The
+probe's route line is the proof that the wired path is live: it reads `USB_HEADSET`,
+`USB_DEVICE`, `LINE_ANALOG` or `WIRED_HEADPHONES`, and the tone is heard from the speaker.
+
+### The rule that makes it survivable
+
+The screen carries the full answer as text, always, so audio is a bonus and never a dependency.
+That was already rule one of `0026` ("text before speech"); it is now stated there in those
+words, and it is Arjun's build to honour. If the hall eats the sound, the demo is a screen a
+judge can read over a shoulder, with a voice they may or may not catch.
+
+### For the run of show
+
+1. Days before: media volume to maximum (volume keys during playback, or
+   `adb shell cmd media_session volume --stream 3 --set 15`; the probe prints the maximum for
+   this phone). Do-not-disturb off.
+2. Plug the wired speaker (USB-C or 3.5 mm; never Bluetooth) into the demo phone and run
+   `TtsVoiceProbeTest`; the route line must name the wired device and the tone must be heard
+   from it. Repeat with it unplugged: the route must be `BUILTIN_SPEAKER`.
+3. On the morning: airplane mode on, Bluetooth icon absent, speaker plugged, one spoken turn
+   end to end from the back of the room before the judges arrive.

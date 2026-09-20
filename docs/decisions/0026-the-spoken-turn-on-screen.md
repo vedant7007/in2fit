@@ -53,8 +53,11 @@ still and never shows a spinner that means nothing; every state names what is ha
 
 ## Rules the spec keeps
 
-- **Text before speech, every time.** Step 7 precedes step 8 without exception, so a person who
-  cannot hear the phone, or a judge reading over a shoulder, is never behind the voice.
+- **Text before speech, every time, and audio is a bonus, never a dependency.** Step 7 precedes
+  step 8 without exception, and the full answer stays readable on screen whether or not a word
+  of it is heard: a handset speaker in a crowded hall is close to inaudible (`0019` addendum 6),
+  so a person who cannot hear the phone, or a judge reading over a shoulder, has the whole
+  answer without the voice. Nothing on the screen depends on playback having happened.
 - **Nothing spoken is not on screen.** The lead-in phrase is shown as it is spoken (a small
   line under the intent heading), because a voice saying something the screen does not show is
   the kind of thing a demo audience notices.

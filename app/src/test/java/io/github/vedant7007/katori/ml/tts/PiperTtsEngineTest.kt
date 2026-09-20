@@ -64,9 +64,11 @@ class PiperTtsEngineTest {
 
     private class FakeSink(val outcome: Outcome<Unit> = Outcome.Ok(Unit)) : AudioSink {
         val played = mutableListOf<Pair<Int, Int>>() // samples, rate
+        val peaks = mutableListOf<Float>()
         var stops = 0
         override suspend fun play(pcm: FloatArray, sampleRateHz: Int): Outcome<Unit> {
             played += pcm.size to sampleRateHz
+            peaks += pcm.maxOfOrNull { kotlin.math.abs(it) } ?: 0f
             return outcome
         }
         override fun stop() { stops++ }
@@ -185,6 +187,33 @@ class PiperTtsEngineTest {
         assertTrue(speaking.isCancelled)
         assertTrue(voice.abandoned)
         assertTrue(sink.played.isEmpty())
+    }
+
+    @Test
+    fun `audio is peak-normalised before it reaches the sink, and never clips`() {
+        val quiet = FloatArray(4) { floatArrayOf(0.1f, -0.2f, 0.05f, 0.0f)[it] }
+        val loud = FloatArray(3) { floatArrayOf(0.95f, -1.0f, 0.5f)[it] }
+        val nearSilence = FloatArray(3) { 0.001f }
+
+        val q = normalisePeak(quiet)
+        assertEquals(0.89f, q.maxOf { kotlin.math.abs(it) }, 1e-6f)
+        assertEquals("the waveform's shape is kept", quiet[0] / quiet[1], q[0] / q[1], 1e-6f)
+
+        val l = normalisePeak(loud)
+        assertEquals("already-loud audio comes DOWN to the same ceiling", 0.89f, l.maxOf { kotlin.math.abs(it) }, 1e-6f)
+
+        val n = normalisePeak(nearSilence)
+        assertEquals("gain is capped, so silence is not amplified into noise", 0.008f, n[0], 1e-6f)
+
+        assertTrue("silence stays silence", normalisePeak(FloatArray(5)).all { it == 0f })
+    }
+
+    @Test
+    fun `what the sink plays is the normalised audio`() = runBlocking {
+        val voice = FakeVoice()  // synthesises 0.1f per sample: quiet, so it is lifted, by at most 8x
+        val sink = FakeSink()
+        engine(FakeLoader(voice), sink).speak("abc", SpeechLanguage.TELUGU)
+        assertEquals("0.1 lifted by the capped gain of 8, not all the way to 0.89", 0.8f, sink.peaks.single(), 1e-6f)
     }
 
     @Test

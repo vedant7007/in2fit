@@ -1,5 +1,12 @@
 package io.github.vedant7007.katori.ml.tts
 
+import android.Manifest
+import android.media.AudioDeviceInfo
+import android.media.AudioFormat
+import android.media.AudioManager
+import android.media.AudioRecord
+import android.media.AudioTrack
+import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -8,6 +15,7 @@ import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
@@ -15,11 +23,14 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertEquals
 import org.junit.FixMethodOrder
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import java.io.File
 import java.time.LocalDateTime
+import kotlin.math.PI
+import kotlin.math.sin
 
 /**
  * Which spoken voices THIS phone has, and what they sound like.
@@ -43,6 +54,11 @@ import java.time.LocalDateTime
  *
  * WHAT IS ASSERTED: only that the platform engine binds. No voice for a language is a finding
  * the report states, not a test failure; the app falls through to Piper for that language.
+ *
+ * Test c is about whether the judges can HEAR the phone (`0019` addendum 6): after a microphone
+ * capture like the one every spoken turn starts with, where does our audio come out (speaker,
+ * earpiece, a wired device), and how far below maximum is the volume it plays at. Run it once
+ * with nothing plugged in and once with the wired speaker the run of show names.
  */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -51,6 +67,10 @@ class TtsVoiceProbeTest {
     private val ctx = InstrumentationRegistry.getInstrumentation().targetContext
     private val outDir = File(ctx.externalMediaDirs.first(), "tts-probe").apply { mkdirs() }
     private val report = File(outDir, "katori-tts-report.txt")
+
+    /** Test c opens the microphone the way a spoken turn does; the app already declares this. */
+    @get:Rule
+    val microphone: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     private fun say(line: String) {
         Log.i(TAG, line)
@@ -131,6 +151,65 @@ class TtsVoiceProbeTest {
         tts.shutdown()
         say("pull with: adb pull ${outDir.absolutePath} logs/tts-probe")
     }
+
+    @Test
+    fun c_outputRouteAndLevelAfterMicrophoneCapture() {
+        val audio = ctx.getSystemService(AudioManager::class.java)
+        say("-- output route and level")
+        say("   before capture: mode=${audio.mode} speakerphone=${audio.isSpeakerphoneOn}" +
+            "  outputs=${audio.getDevices(AudioManager.GET_DEVICES_OUTPUTS).map { deviceName(it) }}")
+
+        // A capture like the one every spoken turn starts with: same source as ml/asr/AudioSource,
+        // half a second, then released. Routing after THIS is what the demo hears.
+        val rate = 16_000
+        val min = AudioRecord.getMinBufferSize(rate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        val recorder = AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, rate, AudioFormat.CHANNEL_IN_MONO,
+            AudioFormat.ENCODING_PCM_16BIT, maxOf(min, rate))
+        val captured = if (recorder.state == AudioRecord.STATE_INITIALIZED) {
+            recorder.startRecording()
+            val buf = ShortArray(rate / 2)
+            val n = recorder.read(buf, 0, buf.size)
+            recorder.stop(); recorder.release()
+            "read $n samples"
+        } else "AudioRecord did not initialise (state ${recorder.state})"
+        say("   capture: $captured; after capture: mode=${audio.mode} speakerphone=${audio.isSpeakerphoneOn}")
+
+        // Then our own output path: the same attributes AudioTrackSink uses, a 0.4 s tone at the
+        // level the engine normalises to, and the device the track actually routed to.
+        val outRate = 22_050
+        val tone = FloatArray(outRate * 2 / 5) { (0.89 * sin(2 * PI * 440 * it / outRate)).toFloat() }
+        val track = AudioTrack.Builder()
+            .setAudioAttributes(speechAttributes)
+            .setAudioFormat(AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                .setSampleRate(outRate).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).build())
+            .setTransferMode(AudioTrack.MODE_STATIC).setBufferSizeInBytes(tone.size * 4).build()
+        track.write(tone, 0, tone.size, AudioTrack.WRITE_BLOCKING)
+        track.play()
+        SystemClock.sleep(150)
+        val routed = track.routedDevice
+        say("   our track routed to: ${routed?.let { deviceName(it) } ?: "UNKNOWN (null)"}")
+        SystemClock.sleep(400)
+        track.stop(); track.release()
+
+        val stream = speechAttributes.volumeControlStream
+        say("   volume: stream $stream (3 = music) at ${audio.getStreamVolume(stream)} of ${audio.getStreamMaxVolume(stream)};" +
+            " music ${audio.getStreamVolume(AudioManager.STREAM_MUSIC)} of ${audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)}")
+        say("   read this as: the route must be BUILTIN_SPEAKER or the wired device, never BUILTIN_EARPIECE," +
+            " and the stream volume must be at its maximum on the day; both are checklist items, not code.")
+    }
+
+    private fun deviceName(d: AudioDeviceInfo): String = when (d.type) {
+        AudioDeviceInfo.TYPE_BUILTIN_SPEAKER -> "BUILTIN_SPEAKER"
+        AudioDeviceInfo.TYPE_BUILTIN_EARPIECE -> "BUILTIN_EARPIECE"
+        AudioDeviceInfo.TYPE_WIRED_HEADSET -> "WIRED_HEADSET"
+        AudioDeviceInfo.TYPE_WIRED_HEADPHONES -> "WIRED_HEADPHONES"
+        AudioDeviceInfo.TYPE_USB_HEADSET -> "USB_HEADSET"
+        AudioDeviceInfo.TYPE_USB_DEVICE -> "USB_DEVICE"
+        AudioDeviceInfo.TYPE_LINE_ANALOG -> "LINE_ANALOG"
+        AudioDeviceInfo.TYPE_BLUETOOTH_A2DP -> "BLUETOOTH_A2DP"
+        AudioDeviceInfo.TYPE_BLUETOOTH_SCO -> "BLUETOOTH_SCO"
+        else -> "type ${d.type}"
+    } + "(${d.productName})"
 
     /** Seconds of audio in a canonical 44-byte-header PCM WAV, or 0 if it is not one. */
     private fun wavSeconds(f: File): Double {

@@ -1968,3 +1968,49 @@ to do after it. If I am paused past 22:00: `python tools/make_review_queue.py te
 packet, `tools\land.ps1`. The corrected deck PDF has not landed on this laptop yet (Downloads
 still has the 14:07 file); the hour it does, all nine pages get read against the repo again,
 your corrections included.
+[Meera 17:24] TO PRIYA, THE RUNNER FIX AS A DIFF, NOT A BUG REPORT: `C:\tmp\jvm-slice-derive.patch`
+(160 lines, `git apply` from the repo root; the new file is also at `C:\tmp\jvm_slice.py`).
+It removes the hard-coded CORE list from `tools/jvm-tests-standalone.sh` and derives the main
+sources from the test files: every `import io.github.vedant7007.katori.<pkg>.<Symbol>` resolves
+to the file in that package declaring `Symbol` at top level; each pulled file (and each test
+file, against its own package under main) also pulls the same-package siblings whose top-level
+names it uses, which is the hole a list-by-imports alone leaves because Kotlin needs no import
+inside a package; anything importing android/androidx/dagger/javax.inject/com.k2fsa/com.google
+is left out and named on stderr. Stdlib Python, `newline="\n"` so bash gets clean names on
+Windows. Measured, not reviewed: your example slice derives 19 files and runs 24 tests OK; mine
+derives 15 and runs 31 OK; both with no MAIN_EXTRA. The stale-list problem is live today: the
+committed CORE fails on master because `LlamaCppLlmEngine` now needs `SafetyLine`, which
+needs `data/food`. `tools/` is Nila's, the script is yours; apply and land it from your tree
+or tell me to.
+
+[Meera 17:24] CAN THE JUDGES HEAR THE PHONE. Nobody had asked. 0019 addendum 6, in code and in
+the checklist: (1) `PiperTtsEngine` peak-normalises every utterance to 0.89 of full scale
+before the sink (the Piper voices measured 0.41 to 0.81 peak on the desktop, so they were not at
+one level); exact, no clipping, gain capped at 8x; tested. (2) `TtsVoiceProbeTest` test c records
+half a second the way a turn does, then plays a tone through `AudioTrackSink`'s attributes and
+prints the ROUTED DEVICE (must be BUILTIN_SPEAKER or the wired device, never BUILTIN_EARPIECE),
+the audio mode before and after capture, and the stream volumes. (3) A wired speaker (USB-C or
+3.5 mm) is a cable and costs nothing against airplane mode; a Bluetooth speaker is a radio and
+hands a judge a question; written down so nobody reaches for one on the morning. (4) 0026 now
+says in words: audio is a bonus, never a dependency; the full answer is always on screen.
+31 tests in `ml.tts`, 0 failures, standalone; main and androidTest compiled against android.jar
+standalone, zero warnings. No laptop Gradle.
+
+[Meera 17:24] TO NILA, FOR THE RUN OF SHOW, same form as the voice-data step:
+    1. Days before: media volume to maximum (volume keys during playback, or
+       `adb shell cmd media_session volume --stream 3 --set 15`); do-not-disturb OFF. The probe
+       prints "stream 3 at N of MAX" so the checker reads the number rather than trusting the key.
+    2. Plug the wired speaker (USB-C or 3.5 mm; NEVER Bluetooth, it is a radio and shows an icon
+       next to the airplane one) and run `TtsVoiceProbeTest`; the "routed to" line must name the
+       wired device and the tone must be heard from it. Unplug, run again: "BUILTIN_SPEAKER".
+    3. Morning: airplane mode ON, Bluetooth icon ABSENT, speaker plugged, one spoken turn heard
+       from the back of the room before the judges arrive.
+
+[Meera 17:24] TO ARJUN: one line added to 0026's first rule, yours to build: the full answer is on
+screen whether or not playback happens; nothing on the screen waits for or depends on audio.
+The hall may eat the sound; the screen is what a judge reads over a shoulder.
+
+[Meera 17:24] TO RAO: `TtsVoiceProbeTest` grew test c; it needs RECORD_AUDIO and grants itself via
+`GrantPermissionRule`. Run it unplugged and with the wired speaker, and paste the "routed to",
+"mode", and "volume" lines. If the route after capture reads BUILTIN_EARPIECE on your realme,
+that is the finding that changes `AudioTrackSink`, and I want it before the iQOO arrives.
