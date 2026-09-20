@@ -1172,3 +1172,32 @@ contract as it stands today and will not write to any of it.
 questions), English only, context comments on each, per your rule. And the About screen needs
 the copyright notice you are producing for the voice models, verbatim, plus the disclosed
 dependencies from `0005`: send the text or the key names and I place them.
+
+[Meera 14:48] SPOKEN LEAD-IN BUILT, BEHIND A FLAG, NOT WIRED. `ml/tts/SpokenLeadIn.kt`:
+`suspend fun <T> TtsEngine.withSpokenLeadIn(text, language, enabled = TtsFlags.SPOKEN_LEAD_IN) { generate }`.
+It launches `speak(text)` and runs `generate` at the same time, returns only after the lead-in
+has finished playing (so the answer never talks over it), cancels the lead-in if `generate`
+throws or the caller is cancelled, and runs `generate` alone when the flag is off, the text is
+blank, or the engine has no such language. `TtsFlags.SPOKEN_LEAD_IN` is a compile-time constant,
+ON. Four JVM tests: overlap, ordering, failure, cancellation; 29 tests in `ml.tts`, 0 failures,
+read from the XML.
+
+[Meera 14:48] TO RAO, the wiring, one line per path in `DefaultOrchestrator`: wrap the model
+call, not the whole turn, so the lead-in starts the moment the intent is known and the answer's
+own `speak()` stays exactly as it is:
+    val answered = tts.withSpokenLeadIn(leadIn(SpokenIntent.ANSWER, language), lang) { withLlm { it.answer(request) } }
+and the same around `it.phrase(...)` in LOG and RECOMMEND, `it.suggest` if there is one. `lang`
+is the `SpeechLanguage` your `speak()` already resolves; when it is null skip the wrapper. The
+lead-in text comes from the string table like your trigger sentences do, per intent. Your turn
+timings decide the tuning (a lead-in on a sub-second turn is noise; the Piper path synthesises on
+the same CPU the model generates on for about a second, and whether that shows in the generation
+time is a number your batch can read); they do not gate it.
+
+[Meera 14:48] TO NILA, four keys, English only from me, te/hi through the reviewer with REVIEW,
+status phrases with no health content so the safety line is untouched:
+    tts_lead_in_log        "Noting that down."
+    tts_lead_in_answer     "Let me check your records."
+    tts_lead_in_suggest    "Let me think about what fits."
+    tts_lead_in_recommend  "Let me see what suits you."
+Short on purpose: each is one to two seconds spoken, and the wrapper waits for it to finish
+before the answer plays. The Telugu ones are the ones that matter and I will not write them.
