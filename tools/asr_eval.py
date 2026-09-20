@@ -7,12 +7,25 @@ Word and character error rate of the shipped ASR models, on the desktop, through
     python asr_eval.py wer --engine omnilingual <manifest.csv> ...
                                                   same, through Meta Omnilingual ASR CTC-300M (0022): one
                                                   model for every row, and the language column is then a label
-    python asr_eval.py manifest <recordings-dir>  write manifest.csv for a folder of REAL recordings named
-                                                  <speaker>_<te|hi|en>_<01..13>.<any audio ext>, per
-                                                  data-authoring/asr-recording-script.md; references for
-                                                  sentences 1-11 are filled from the script, 12-13 left blank
-                                                  for a person to transcribe (they still run for extraction);
-                                                  non-WAV recordings get a 16 kHz WAV twin for the phone probe
+    python asr_eval.py synth-csv <set.csv> <out-dir>
+                                                  synthesise an authored set (data-authoring/demo-utterance-set.csv:
+                                                  columns id,language,spoken,reference,expected_foods; te and hi
+                                                  through the Piper voices, en through a Windows voice) into clips
+                                                  named <id>_<lang>.wav plus a manifest marked synthetic-demo
+    python asr_eval.py sheet <recordings-dir>     write transcription-sheet.md for the rows of manifest.csv that
+                                                  have no reference (the own-words items), with what the
+                                                  recogniser heard pre-filled as a starting point; a person
+                                                  writes the true words under each and runs `sheet-import`
+    python asr_eval.py sheet-import <recordings-dir>
+                                                  read the filled sheet back into manifest.csv
+    python asr_eval.py manifest <recordings-dir> [set.csv]
+                                                  write manifest.csv for a folder of REAL recordings named
+                                                  <speaker>_<te|hi|en>_<nn>.<any audio ext>. Without set.csv the
+                                                  numbers are the 13 sentences of data-authoring/asr-recording-script.md
+                                                  (1-11 filled, 12-13 left blank for a person to transcribe); with
+                                                  set.csv (e.g. data-authoring/demo-utterance-set.csv) the numbers
+                                                  are that set's ids and the reference is its row for the file's
+                                                  language. Non-WAV recordings get a 16 kHz WAV twin for the phone probe
 
 Needs: pip install sherpa-onnx soundfile numpy   (plus piper-tts for `synth`; Windows for its English voices;
 ffmpeg on PATH for phone recordings: libsndfile reads wav/flac/mp3/ogg, ffmpeg decodes m4a/aac/3gp)
@@ -53,6 +66,7 @@ from __future__ import annotations
 import csv
 import platform
 import sys
+import tempfile
 import time
 import unicodedata
 from collections import defaultdict
@@ -315,8 +329,143 @@ SCRIPT_SENTENCES = {
 }
 
 
-def cmd_manifest(folder: Path) -> None:
+def _voices():
+    """te and hi Piper voices plus a Windows English voice, each as text -> (float32 16 kHz mono)."""
+    import io
+    import subprocess
+    import wave
+
+    import numpy as np
+    from piper import PiperVoice
+
+    voices = REPO / "data-sources/models/tts/piper"
+    piper_te = PiperVoice.load(str(voices / "te_IN-padmavathi-medium.onnx"))
+    piper_hi = PiperVoice.load(str(voices / "hi_IN-pratham-medium.onnx"))  # CC-BY-NC-SA-4.0, test audio only
+
+    def resample(x, a, b):
+        return x if a == b else np.interp(np.linspace(0, len(x) - 1, int(len(x) * b / a)), np.arange(len(x)), x).astype(np.float32)
+
+    def piper(voice):
+        def say(text):
+            buf = io.BytesIO()
+            with wave.open(buf, "wb") as w:
+                voice.synthesize_wav(text, w)
+            buf.seek(0)
+            with wave.open(buf, "rb") as w:
+                sr = w.getframerate()
+                x = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
+            return resample(x, sr, 16000)
+        return say
+
+    def sapi(text, voice="Microsoft Zira Desktop"):
+        p = Path(tempfile.gettempdir()) / "asr_eval_sapi.wav"
+        safe = text.replace("'", "''")
+        ps = ("Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+              "$fmt=New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(16000,[System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen,[System.Speech.AudioFormat.AudioChannel]::Mono); "
+              f"$s.SelectVoice('{voice}'); $s.SetOutputToWaveFile('{p}',$fmt); $s.Speak('{safe}'); $s.SetOutputToNull()")
+        subprocess.run(["powershell", "-NoProfile", "-Command", ps], check=True)
+        with wave.open(str(p), "rb") as w:
+            x = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
+        p.unlink()
+        return x
+
+    return {"te": piper(piper_te), "hi": piper(piper_hi), "en": sapi}
+
+
+def write_wav(path: Path, x) -> None:
+    import wave
+
+    import numpy as np
+
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(16000)
+        w.writeframes((np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes())
+
+
+def cmd_synth_csv(csv_path: Path, out: Path) -> None:
+    """One clip per row of an authored set. The Piper Hindi voice reads Latin letters as letters, so a
+    Hinglish `spoken` text is voiced from `reference` (the Devanagari spelling of the same words); the
+    English voice reads `spoken`. Synthetic, one voice per language, labelled synthetic-demo."""
+    out.mkdir(parents=True, exist_ok=True)
+    say = _voices()
+    rows = []
+    with open(csv_path, encoding="utf-8", newline="") as f:
+        for r in csv.DictReader(l for l in f if not l.startswith("#")):
+            lang = r["language"]
+            text = r["spoken"] if lang == "en" else r["reference"]
+            name = f"{int(r['id']):02d}_{lang}.wav"
+            write_wav(out / name, say[lang](text))
+            rows.append((name, lang, "synthetic-demo", r["reference"], r.get("expected_foods", "")))
+    with open(out / "manifest.csv", "w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["path", "language", "source", "reference", "expected_foods"])
+        w.writerows(rows)
+    print(f"wrote {len(rows)} clips and manifest.csv to {out} (SYNTHETIC-DEMO: one voice per language, not the presenter)")
+
+
+def cmd_sheet(folder: Path) -> None:
+    """The own-words rows, with the recogniser's hypothesis under each so the transcriber corrects rather
+    than types from nothing. Meant to be sent to the speaker the same evening: 'is this what you said?'"""
+    manifest = folder / "manifest.csv"
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8", newline="")))
+    todo = [r for r in rows if not r["reference"].strip()]
+    if not todo:
+        sys.exit("every row has a reference; nothing to transcribe")
+    recs = {}
+    lines = ["# Transcription sheet", "",
+             "For each clip: play it, read what the recogniser heard, and write what was ACTUALLY said on the",
+             "`said:` line, in the script of that language (Telugu in Telugu script, Hindi in Devanagari, English",
+             "words as the speaker would write them). If the recogniser was right, copy its line. Then list the",
+             "foods named, in English, separated by `;`, on the `foods:` line (leave empty for a question).",
+             "Ask the speaker if unsure: they were there. Then run `python tools/asr_eval.py sheet-import <folder>`.", ""]
+    for r in todo:
+        lang = r["language"]
+        if lang not in recs:
+            recs[lang] = recognizer(lang)
+        hyp, _, _, secs = transcribe(recs[lang], folder / r["path"])
+        lines += [f"## {r['path']}  ({lang}, {secs:.1f}s)", f"heard: {hyp}", "said: ", "foods: ", ""]
+    (folder / "transcription-sheet.md").write_text("\n".join(lines), encoding="utf-8")
+    print(f"wrote {folder / 'transcription-sheet.md'} with {len(todo)} clip(s) to transcribe")
+
+
+def cmd_sheet_import(folder: Path) -> None:
     import re
+
+    text = (folder / "transcription-sheet.md").read_text(encoding="utf-8")
+    filled = {}
+    for block in re.split(r"^## ", text, flags=re.M)[1:]:
+        name = block.split()[0]
+        said = re.search(r"^said:\s*(.*)$", block, flags=re.M)
+        foods = re.search(r"^foods:\s*(.*)$", block, flags=re.M)
+        if said and said.group(1).strip():
+            filled[name] = (said.group(1).strip(), (foods.group(1).strip() if foods else ""))
+    manifest = folder / "manifest.csv"
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8", newline="")))
+    n = 0
+    for r in rows:
+        if r["path"] in filled and not r["reference"].strip():
+            r["reference"], r["expected_foods"] = filled[r["path"]]
+            n += 1
+    with open(manifest, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["path", "language", "source", "reference", "expected_foods"])
+        w.writeheader()
+        w.writerows(rows)
+    still = sum(1 for r in rows if not r["reference"].strip())
+    print(f"imported {n} transcription(s) into {manifest}; {still} row(s) still without a reference")
+
+
+def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
+    import re
+
+    sentences = SCRIPT_SENTENCES
+    if set_csv is not None:
+        # (id, language) -> (language, reference, foods), from an authored set such as the demo one.
+        sentences = {}
+        with open(set_csv, encoding="utf-8", newline="") as f:
+            for r in csv.DictReader(l for l in f if not l.startswith("#")):
+                sentences[(int(r["id"]), r["language"])] = (r["language"], r["reference"], r.get("expected_foods", ""))
 
     pattern = re.compile(r"^(?P<speaker>[^_]+)_(?P<lang>te|hi|en)_(?P<n>\d{1,2})\.(?P<ext>[A-Za-z0-9]+)$")
     rows, skipped = [], []
@@ -326,11 +475,12 @@ def cmd_manifest(folder: Path) -> None:
             skipped.append(f.name)
             continue
         n = int(m["n"])
-        if n not in SCRIPT_SENTENCES:
+        lang = m["lang"]
+        key = (n, lang) if set_csv is not None else n
+        if key not in sentences:
             skipped.append(f.name)
             continue
-        script_lang, reference, foods = SCRIPT_SENTENCES[n]
-        lang = m["lang"]
+        script_lang, reference, foods = sentences[key]
         if script_lang and script_lang != lang:
             print(f"note: {f.name} is sentence {n}, which the script prints as {script_lang}; keeping the file's {lang}")
         # The phone probe (AsrDeviceTest) reads 16-bit WAV only, so a phone recording gets a 16 kHz
@@ -370,6 +520,12 @@ if __name__ == "__main__":
     elif len(args) >= 2 and args[0] == "wer":
         cmd_wer([Path(p) for p in args[1:]], engine=engine)
     elif len(args) >= 2 and args[0] == "manifest":
-        cmd_manifest(Path(args[1]))
+        cmd_manifest(Path(args[1]), Path(args[2]) if len(args) >= 3 else None)
+    elif len(args) >= 3 and args[0] == "synth-csv":
+        cmd_synth_csv(Path(args[1]), Path(args[2]))
+    elif len(args) >= 2 and args[0] == "sheet":
+        cmd_sheet(Path(args[1]))
+    elif len(args) >= 2 and args[0] == "sheet-import":
+        cmd_sheet_import(Path(args[1]))
     else:
         sys.exit(__doc__)

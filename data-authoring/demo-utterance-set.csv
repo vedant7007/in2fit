@@ -1,0 +1,36 @@
+# The sentences the presenter will actually say on stage, per beat (spec 7.1) and per intent (0015).
+# docs/decisions/0022 §"Demo language": the demo runs in the language the PRESENTER speaks. Vedant does
+# not speak Telugu, so every sentence is here in Hindi (Hinglish, the way it is really said) and in
+# Indian English; he picks one column of `language` and those rows become the best-measured sentences
+# in the repo. Telugu stays in the demo as the language picker and the reviewed strings, not as the
+# live recognition language.
+#
+# `spoken` is what the presenter reads, in the spelling a Hindi speaker would actually write (Latin
+# for English words inside Hindi). `reference` is what the recogniser is expected to emit: the hi
+# checkpoint writes everything in Devanagari, the en checkpoint everything in Latin, so WER is scored
+# against `reference`, never against `spoken`. `expected_foods` is for the on-device extraction count.
+#
+# HONESTY NOTE: any WER on synthesised versions of these rows is a smoke test. The number that
+# matters is Vedant's own voice saying them, recorded with the same naming as the speaker script
+# (vedant_hi_01 ...), through tools/asr_eval.py. Until that exists, nothing here is a demo guarantee.
+id,beat,intent,language,spoken,reference,expected_foods
+1,1,LOG,hi,मैंने दो रोटी और थोड़ी दाल खाई,मैंने दो रोटी और थोड़ी दाल खाई,roti;dal
+1,1,LOG,en,I had two rotis and a little dal.,I had two rotis and a little dal.,roti;dal
+2,1,LOG,hi,"दो रोटी, एक कटोरी दाल, और दो चम्मच तेल","दो रोटी, एक कटोरी दाल, और दो चम्मच तेल",roti;dal;oil
+2,1,LOG,en,"Two rotis, a katori of dal, and I used two spoons of oil.","Two rotis, a katori of dal, and I used two spoons of oil.",roti;dal;oil
+3,1,LOG,hi,मैंने दो सौ ml दूध पिया और एक boiled egg खाया,मैंने दो सौ एमएल दूध पिया और एक बॉयल्ड एग खाया,milk;egg
+3,1,LOG,en,I drank 200 ml of milk and ate one boiled egg.,I drank 200 ml of milk and ate one boiled egg.,milk;egg
+4,1,LOG,hi,"दो रोटी... नहीं, तीन रोटी और दाल","दो रोटी नहीं, तीन रोटी और दाल",roti;dal
+4,1,LOG,en,"Two rotis... no, three rotis and dal.","Two rotis no, three rotis and dal.",roti;dal
+5,1,LOG,hi,"एक plate चावल, दाल और एक कटोरी दही","एक प्लेट चावल, दाल और एक कटोरी दही",rice;dal;curd
+5,1,LOG,en,"One plate of rice, dal and a bowl of curd.","One plate of rice, dal and a bowl of curd.",rice;dal;curd
+6,2,ANSWER,hi,मैंने पिछले मंगलवार को क्या खाया?,मैंने पिछले मंगलवार को क्या खाया,
+6,2,ANSWER,en,What did I eat last Tuesday?,What did I eat last Tuesday?,
+7,2,ANSWER,hi,मेरे lunch में कितना protein था?,मेरे लंच में कितना प्रोटीन था,
+7,2,ANSWER,en,How much protein was in my lunch?,How much protein was in my lunch?,
+8,4,SUGGEST,hi,"मैं चावल और दाल खा रहा हूँ, इसमें क्या add करूँ?","मैं चावल और दाल खा रहा हूँ इसमें क्या ऐड करूँ",rice;dal
+8,4,SUGGEST,en,"I'm having rice and dal, what should I add?","I'm having rice and dal, what should I add?",rice;dal
+9,3,RECOMMEND,hi,"मेरा iron कम है, मुझे क्या खाना चाहिए?","मेरा आयरन कम है मुझे क्या खाना चाहिए",
+9,3,RECOMMEND,en,"I have anaemia, what should I eat for iron?","I have anaemia, what should I eat for iron?",
+10,1,LOG,hi,नाश्ते में तीन इडली और सांबर खाया,नाश्ते में तीन इडली और सांबर खाया,idli;sambar
+10,1,LOG,en,For breakfast I had three idlis and sambar.,For breakfast I had three idlis and sambar.,idli;sambar

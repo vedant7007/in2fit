@@ -39,6 +39,78 @@ selected output language. Its evidence is in §3 below and the harness already r
 code-mixed speech. Not synthetic clips, not spliced voices, not this record's tables: recorded
 people. That is the test and it is the only test.
 
+**The profile field** (decided by Vedant, 20 Sep): `ProfileEntity.speech_language_tag: String?`,
+nullable, no default, values exactly `te`, `hi` or `en-IN`; the user picks at onboarding; never
+detected. Rao's `DefaultOrchestrator.speechLanguage()` resolves it to `SpeechLanguage` and the
+checkpoint follows.
+
+## Demo language: the mitigation for the gap, decided 20 September
+
+The gap above bites hardest in exactly one place: on stage. **The demo is performed by Vedant, and
+Vedant does not speak Telugu.** With the profile set to `te`, his own spoken sentence would go
+through the Telugu checkpoint and come back as a Telugu-script transliteration of Hindi or English,
+which is the failure this record just described. Telugu had quietly become the assumed demo
+language because it is the language the TTS voice, the reviewed strings and the first smoke test
+were in. Nobody on stage speaks it.
+
+Decided:
+
+1. **The demo runs in the language the presenter actually speaks.** Hindi or Indian English until
+   Vedant says otherwise. Code-mixing stays the headline claim and still holds: "do roti aur thoda
+   dal" is code-mixed, it is what he says naturally, and it goes through the right checkpoint.
+2. **Telugu stays in the demo as the language picker and the reviewed interface strings.** That
+   shows the localisation without betting the live recognition on a language nobody present speaks.
+3. **The demo utterance set is the best-measured thing in the repo**:
+   `data-authoring/demo-utterance-set.csv`, ten sentences across the four beats and the four
+   intents, each in Hinglish and in Indian English, with `spoken` (what the presenter reads) and
+   `reference` (what the checkpoint emits) kept apart. Not a corpus: the sentences we will say.
+
+**First measurement**, synthetic (Piper `hi_IN-pratham` for Hindi, a Windows English voice for
+English; `tools/asr_eval.py synth-csv` then `wer`; `logs/asr-eval-demo-synthetic.log`):
+
+| checkpoint | exact | WER | CER | what broke |
+| --- | ---: | ---: | ---: | --- |
+| hi on the Hinglish rows | 7 of 10 | 6.2 % | 1.8 % | एग→एक once, करूँ→करू, इडली और सांबर→इरली और सांबा |
+| en on the Indian-English rows | 2 of 10 | 19.1 % | 13.0 % | **every Indic food word**: rotis→rotees (x3), dal→dell (x5), katori→catery, idlis→idies, sambar→sombre |
+
+Every रोटी, दाल, चावल, दही, दूध from the hi checkpoint arrived in the Devanagari the alias table
+already holds (`रोटी->chapati`, `दाल->toor_dal_tadka`, `चावल->rice_cooked`, `दही->curd`,
+`दूध->milk_whole`). The en checkpoint has a 1,024-piece English vocabulary and no Indic food word
+in it; "dell" for dal on five of five sentences is not an accent artefact. **On this evidence the
+safer stage path is a Hindi profile and Hinglish speech, not an English profile and Indian
+English.** The synthetic voices are not Vedant; his own recording of the ten sentences, named
+`vedant_hi_01`..`vedant_hi_10` (or `_en_`), through
+`tools/asr_eval.py manifest <folder> data-authoring/demo-utterance-set.csv` and `wer`, is the
+number that decides the column, and it is the one number in this project that must be good on
+the 26th. Gaps the hi path exposes for the matcher, handed to Priya: no Devanagari alias for इडली,
+सांबर, पनीर; the unit table is English-only (`katori`, `spoon`, `glass`, `plate`), so कटोरी, चम्मच,
+गिलास, प्लेट need to reach `resolveUnit`, either as aliases or normalised by the extractor.
+
+## "I didn't catch that": the path where a wrong-language sentence is not logged
+
+Today a transliterated sentence is already NOT saved: `LookupMealResolver` refuses on the first
+item the lookup cannot match, and `DefaultOrchestrator.plate()` turns that into
+`NeedsConfirmation(NO_MATCH, parsed)` and completes without writing. What is wrong is the message:
+NO_MATCH renders as "I do not know that food", which tells the judge the database is missing an
+item when the truth is that nothing on the plate was speech the app understood.
+
+Agreed threshold (Jacob, for Priya's matcher and Rao's orchestrator; the code is theirs):
+
+- **0 of N extracted items resolve, N >= 1: end the turn with "I didn't catch that, say it
+  again."** The resolver evaluates every item rather than stopping at the first miss, and when
+  none resolves returns `INPUT_NOT_USABLE` (already in the vocabulary: "the input itself was not
+  usable", the same reason the ASR uses for non-speech). `plate()` treats it like the other ask
+  reasons: `NeedsConfirmation(INPUT_NOT_USABLE, parsed)`, `Completed`, nothing saved. The UI's
+  sentence for INPUT_NOT_USABLE is the retry line.
+- **1 or more of N resolve but not all: today's behaviour**, `NeedsConfirmation(NO_MATCH, ...)`
+  naming the item, nothing saved. A single fuzzy hit does not rescue a plate.
+- **No ASR-side signal is added**, because none exists: a wrong-language sentence decodes at full
+  piece density with no `<unk>`, and a language-identification check is forbidden by the
+  contract. The zero-match result is the cheapest honest signal and it is downstream of the ASR.
+- The remaining risk is a WRONG match, a fuzzy hit on the wrong food from a transliterated
+  syllable, which no retry path catches. That is the matcher's WRONG FOOD metric and its
+  tolerances, and it is why "dell" for dal is worth Priya's look before the demo.
+
 ## The requirement
 
 Vedant, 20 Sep, overriding the per-language default in `AsrEngine`: a code-mixed utterance is NOT

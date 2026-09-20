@@ -1308,3 +1308,58 @@ survives as plain text; if they get a PDF, ask Nila, it is her directory.
 authored CSVs it will feed; move or rename as you like. TO PRIYA: the matcher list in my 04:05
 note is now the fix Vedant named for the code-mixing gap; the harness will show whether the
 renderings resolve once your aliases land, through `AsrDeviceTest.c` on the phone.
+
+[Jacob 05:40] TO RAO, DECIDED BY VEDANT, NOT A PROPOSAL: `ProfileEntity.speech_language_tag:
+String?`, nullable, no default, values exactly `te` / `hi` / `en-IN`, set by the user at onboarding,
+never detected. Your `speechLanguage()` resolves it; the checkpoint follows. In 0022. Get on.
+
+[Jacob 05:40] TO RAO AND PRIYA, THE "I DIDN'T CATCH THAT" PATH, threshold agreed on my side and in
+0022 §"I didn't catch that"; the two files are yours. Today a transliterated wrong-language
+sentence is already NOT saved: `LookupMealResolver` refuses on the first unmatched item and
+`plate()` emits `NeedsConfirmation(NO_MATCH, parsed)` and completes. What is wrong is the SENTENCE:
+NO_MATCH renders as "I do not know that food", which tells a judge the database has a hole when
+the truth is that nothing on the plate was speech we understood. Rule: (1) 0 of N extracted items
+resolve, N>=1 -> the resolver evaluates all items instead of stopping at the first miss and returns
+`Unavailable(INPUT_NOT_USABLE, "0 of N items resolved")`; `plate()` adds INPUT_NOT_USABLE to the
+three ask reasons it already handles -> `NeedsConfirmation(INPUT_NOT_USABLE, parsed)`, `Completed`,
+nothing saved; the UI's INPUT_NOT_USABLE sentence is "I didn't catch that, say it again". No new
+reason, no frozen file touched. (2) 1..N-1 resolve -> today's NO_MATCH behaviour naming the item,
+nothing saved; one fuzzy hit never rescues a plate. (3) Nothing on the ASR side, because there is
+no signal: a wrong-language sentence decodes at full density with no <unk>, and language ID is
+forbidden. Priya, two matcher items from the demo measurement below: "dal" through the ENGLISH
+checkpoint came out "dell" on five of five sentences; whether "dell" fuzzes to dal or to nothing
+is your tolerance table, and a WRONG match there is the one thing this path cannot catch. And
+the unit table is English-only (`katori`, `spoon`, `glass`, `plate`): through the HINDI
+checkpoint the units arrive as कटोरी, चम्मच, गिलास, प्लेट and `resolveUnit` will not know them;
+aliases or an extractor normalisation, your call. Also no Devanagari alias for इडली, सांबर, पनीर.
+
+[Jacob 05:40] TO VEDANT, THE DEMO LANGUAGE, and it changes what you record tonight. Decided (yours,
+via the brief) and in 0022: the demo runs in the language you speak, Hindi or Indian English;
+Telugu stays as the picker and the reviewed strings. The reason is the gap 0022 recorded: with the
+profile on `te`, YOUR sentence goes through the Telugu checkpoint and comes back as Telugu-script
+transliteration. `data-authoring/demo-utterance-set.csv` has the ten sentences we will actually
+say, four beats, four intents, each in Hinglish and in Indian English. First measurement, synthetic
+voices, `logs/asr-eval-demo-synthetic.log`: **hi checkpoint on Hinglish 7/10 exact, WER 6.2 %**,
+every रोटी/दाल/चावल/दही/दूध in the Devanagari the matcher knows; **en checkpoint on Indian English
+2/10 exact, WER 19.1 %, every Indic food word broken** (rotis->rotees, dal->dell x5,
+katori->catery, idlis->idies, sambar->sombre). On this evidence the safer stage path is a HINDI
+profile and Hinglish speech. The synthetic voice is not you: record the ten `spoken` sentences of
+whichever column you choose, in the room you will present in, named `vedant_hi_01.m4a` ..
+`vedant_hi_10.m4a` (or `_en_`), then
+`python tools/asr_eval.py manifest <folder> data-authoring/demo-utterance-set.csv` and
+`python tools/asr_eval.py wer <folder>/manifest.csv`. That is the one number that has to be good
+on the 26th. If you want both columns measured, record both; twenty sentences is ten minutes.
+
+[Jacob 05:40] TO VEDANT, THE TRANSCRIPTION SHEET for the own-words items, ready as a fill-in job:
+after `manifest <folder>`, run `python tools/asr_eval.py sheet <folder>`. It writes
+`transcription-sheet.md` with one block per own-words clip: `heard:` (what the recogniser got,
+pre-filled) / `said:` (you or the speaker write the true words) / `foods:` (English names, `;`).
+Send each speaker their blocks the same evening, paste their corrections in, then
+`python tools/asr_eval.py sheet-import <folder>`. Round-tripped end to end today on a fake folder.
+You do not need to read Telugu: the speaker corrects the `heard:` line, you paste.
+
+[Jacob 05:40] TO NILA: two new files in `data-authoring/` (`demo-utterance-set.csv`,
+`asr-recording-script.md`, the latter from 04:50) and one string ask: the UI sentence for
+`UnavailableReason.INPUT_NOT_USABLE` on the meal path should read as "I didn't catch that, say it
+again", in the three languages, once Rao's resolver change lands; if that reason already has a
+sentence, check it reads as a retry and not as an error.
