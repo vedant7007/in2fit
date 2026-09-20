@@ -105,7 +105,7 @@ shipped espeak-ng-data is trimmed to 1.07 MB with byte-identical output). For EN
 built-in engine is the only path, deliberately, with the offline check above applied to the
 voice it picks. Hindi TTS is now sourced; see the register below.
 
-## The IIT Madras Indic TTS licence: one document, three voices, NOT YET READ VERBATIM
+## The IIT Madras Indic TTS licence: one document, three voices (read from the committed text on 20 Sep; ruling at the end of this section)
 
 *Added 20 Sep 2026, 04:05, Meera.*
 
@@ -201,6 +201,72 @@ were excluded "because this document could not be read", and `rohan` was listed 
 rejected table as "the IITM PDF that returns empty". The text is readable now; whether the
 voices are IITM-derived, and whether weights are a derivative, are the questions that remain.
 Re-ruling those three is Meera's, on the same day the diff is recorded.
+
+### Ruling from the committed text, 20 Sep 2026, 15:05 (Meera). Provisional on the PDF diff.
+
+Read in full from `docs/licences/iitm-tts-eula.txt` at sha256 `3dcfe36d…10c`, not from any
+summary. The file is machine-converted and not yet diffed against the PDF; nothing below rests
+on a phrase that looks like a conversion artefact ("has few open source component"), and if the
+diff changes a word that matters, this ruling is re-made the same day.
+
+**1. The terms, as I read them.**
+
+- *The grant covers the audio, not only the code.* §1 defines one term, "Licensed Data and
+  Software", to include "all data files (voice files, lab files, pronunciation dictionaries)",
+  and 2.1(b) licenses the licensee to "modify copies of the Licensed Software and data to
+  create derivative works thereof". The document then uses "Licensed Software" loosely where §1
+  says "Licensed Data and Software"; I read the single defined term as governing throughout.
+- *"Derivative Work" is defined by the licence itself, and the definition reaches a trained
+  model on its face.* 2.1: "all software, files, documentation, discoveries, ideas, inventions,
+  improvements, processes, materials and data ("Derivative Work")
+  acquired/prepared/generated/developed in any medium by Licensee using the Licensed Software."
+  Model weights are data generated using the licensed data. So the question this record left
+  open earlier, whether weights are a derivative of training audio, does not need copyright
+  law's answer HERE: for material under this licence the licensor has defined the term and
+  granted the right, and the licensee "will exclusively own" the result, with an irrevocable
+  assignment to vest that ownership, and "Notwithstanding anything to the contrary, Licensee
+  shall be allowed to freely distribute the Derivative Work." The general legal question stays
+  unsettled; it is simply not load-bearing for this licence.
+- *Nothing in the text is non-commercial.* Perpetual, non-exclusive, worldwide, transferable,
+  sub-licensable, royalty-free; no field-of-use term anywhere. This licence does NOT go in the
+  non-commercial register.
+- *2.2 is a flow-down on sale, not a bar on shipping.* First sentence binds us: no removal of
+  copyright, trademark or patent notices. Second and third sentences bind "the third party to
+  whom the Derivative Work is sold": that party must be told the work has open-source
+  components and "shall not be allowed to further sell, lease, license, sub-license,
+  decompile, disassemble or reverse engineer" it. On its words it triggers on a SALE. IN2FIT is
+  not sold; if it ever is, the buyer is told and bound, and that sits under the commercial
+  re-audit this record already requires. One consequence worth naming: a sold derivative cannot
+  be passed on by its buyer under an open-source licence, because the buyer may not
+  sub-license. Not our case today.
+- *What lands on us the day anything under this licence ships:* the notice quoted above,
+  verbatim, on redistribution (`licence_notice_iitm_tts`, home pending with Nila and Arjun),
+  and every existing notice left intact. 2.3 and 2.4 disclaim warranty and consequential
+  damages; 3 makes it effective on download and terminable by us with destruction of copies;
+  4 is Indian law; 5's bug reports and publication reference are "not a license condition".
+
+**2. Provenance is a separate gate, and it stays closed. Say it plainly so the two are never
+conflated:** the licence tells us what a licensee of IITM's distribution may do. It says
+nothing about whether `maya`, `rohan` or pocket-tts were in fact built from that
+distribution. That is a chain-of-custody question, and the evidence for it is:
+
+| voice | provenance evidence today | what the licence text clears | what still gates it |
+| --- | --- | --- | --- |
+| `hi_IN-rohan-medium` | the trainer's MODEL_CARD: "URL: https://www.iitm.ac.in/donlab/indictts · Database Name: Hindi Mono Male · License: [this PDF]" | the terms, if the claim is true | a second source that the "Hindi Mono Male" database exists in the IITM distribution under this licence, the way padmavathi's card was checked against its dataset's own record; the IITM database page is reachable from India and not from here |
+| `te_IN-maya-medium` | the trainer's MODEL_CARD: "URL: https://www.iitm.ac.in/donlab/indictts · License: [this PDF]"; fine-tuned from the English `lessac` voice | the same | the same second source, plus the `lessac` base voice's own licence, unread |
+| pocket-tts Telugu (`prasadvittaldev/…-syspin`) | the card names TWO corpora: `SPRINGLab/IndicTTS_Telugu` (IITM) and `arpit-tiwari/syspin-telugu-tts` (SYSPIN, IISc); the student was distilled on the SYSPIN speaker | the IITM half only | **the SYSPIN half is still unlicensed**: the re-upload carries no licence and SYSPIN's own terms are unread. IITM being permissive does not clear this voice. Independently, `0019` addendum 2: no working Android path, and desktop RTF 0.8-0.9 |
+
+Padmavathi was accepted on its card PLUS its dataset's own licence record. The same standard
+applies here: card plus a second source. Until the second source is read, `maya` and `rohan`
+move from "excluded: licence unreadable" to "licence read and permissive; provenance
+unconfirmed", and neither ships. pocket-tts stays out on the SYSPIN gate alone, whatever the
+IITM text says.
+
+**3. What changes today.** Nothing that ships. Piper `padmavathi`/`venkatesh` (CC-BY-4.0) and
+the platform voices remain the candidates; the register still holds one entry, `pratham`. The
+"EXCLUDED: its licence is a PDF … that returns an empty reply" line on `maya` above and the
+`rohan` row in the rejected table are superseded by this section and left in place as the
+record of why the exclusion was made when it was made.
 
 ## NON-COMMERCIAL DEPENDENCY REGISTER
 

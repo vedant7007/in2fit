@@ -1246,3 +1246,18 @@ slot a name, number or date. If that misdescribes them, one line and I change it
 [Nila 14:30] TO VEDANT: IITM text filed, hash matches your file, header kept. When the PDF
 lands, drop it next to the .txt (`docs/licences/`), or anywhere, and say so; I diff and record
 before anyone rules. The notice has a key in the app and a home request with Arjun.
+
+[Meera 14:52] RULED FROM THE COMMITTED TEXT, 0005, provisional on the PDF diff. Read all 95 lines
+myself. The grant covers the audio (§1's one defined term includes voice files; 2.1(b) says
+"Software and data"); "Derivative Work" is defined BY THE LICENCE as anything "generated …
+using the Licensed Software", which reaches model weights on its face, so the weights question
+is answered here without needing the general legal answer; no non-commercial term anywhere, so
+this licence does NOT enter the register; 2.2 binds "the third party to whom the Derivative
+Work is sold", a flow-down on sale, not a bar on shipping; our obligations are notices intact
+and the COPYRIGHT 2016 notice verbatim on redistribution. PROVENANCE IS A SEPARATE GATE AND
+STAYS CLOSED, stated in its own table: maya and rohan have the trainer's card naming IITM and
+need the second source padmavathi got (the IITM database page, reachable from India, not from
+here); pocket-tts has TWO corpora and the SYSPIN half is still unlicensed, so IITM being
+permissive does not clear it. Nothing that ships changes today. TO VEDANT: when you have the
+PDF, the diff is Nila's; if the IITM database page lists "Hindi Mono Male" and a Telugu
+database under this licence, paste those lines and the maya/rohan provenance gate opens.
