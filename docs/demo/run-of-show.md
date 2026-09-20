@@ -87,7 +87,7 @@ paper handling: 2–3 minutes. Measure per beat; a single total is not a target.
 
 **P closes the shade. The Talk tab is showing, empty, "Say what you ate, or ask a question."**
 
-### Beat 1. Speak a meal. *(measured extraction 10.6–10.7 s; whole turn budget 15 s)*
+### Beat 1. Speak a meal. *(measured 20 Sep 19:41–19:44, thermal 3, USB-powered: this exact sentence, three foods, 28.7 s to the first figure, 39.3 s to the spoken sentence; the two-food sentence "two rotis and a katori of dal" 9.2 s / 19.0 s; the ten LOG rows ran 8.3–28.7 s / 15.2–39.3 s)*
 
 **P brings the phone to the mouth (Jacob, 19:05: speak first, THEN show the screen; never both at
 arm's length), taps the microphone and says, exactly:**
@@ -102,9 +102,12 @@ list, "Picking out the foods", "Matching the foods", "Adding up the figures", "S
 seconds counter beside the live stage; then the plate: each food as said, the figures, the
 confidence band beside each, "Logged".
 
-**The wait:** extraction is 10.6 s on this phone, warm, 8 threads *(measured,
-`logs/hw-report-run3.txt`, `0014`)*; speech recognition before it and the lookup after it are
-not in that figure and are Rao's rows to add. The screen carries it: the stage list and the
+**The wait:** measured end to end on 20 September (`e2e-demo-condition-20sep.txt`, Rao's
+worktree): this sentence took 28.7 s to its first figure and 39.3 s to the spoken sentence, on a
+phone at thermal status 3; "two rotis and a katori of dal" took 9.2 s and 19.0 s. **Decision for
+Vedant:** the three-food sentence is the spec's and it is the slowest of the ten; the two-food
+sentence halves the wait and still shows a katori. If the phone is cool the gap narrows; nobody
+has measured it cool yet. Speech recognition is not in these figures. The screen carries it: the stage list and the
 counter are what P looks at, not the judge. **P says nothing during the wait unless asked**; if
 asked, P reads the stage aloud: "It's matching the foods against the database now."
 
@@ -121,7 +124,7 @@ asked, P reads the stage aloud: "It's matching the foods against the database no
 your size" is on screen as a figure carrying `HOUSEHOLD_UNIT_DEFAULT`. Calibrating a utensil is
 descoped for the battle; P does not offer to.)*
 
-### Beat 2. Ask about your own history. *(budget 25 s; measured turn 30.7 s at STANDARD length, SHORT not yet measured)*
+### Beat 2. Ask about your own history. *(measured 20 Sep 19:41: own figures on screen at 0.55 s, the spoken one-sentence answer at 9.2 s; 10.3–10.7 s in the ten-sentence sequence, warmer)*
 
 **P taps the microphone and says, exactly:**
 
@@ -135,11 +138,10 @@ is in English, on screen and aloud, whatever language P spoke in** (Meera, 18:07
 end; `values-hi` is empty by design and the model replies in English regardless). P does not
 claim otherwise; if asked, "it answers in English in this build."
 
-**The wait:** the first measured conversational turn was 30.7 s at the old answer length
-(`0025`, `logs/hw-report-conversational.txt`); one-sentence answers are now the default, which by
-the generation rate alone takes 5–6 s off that; the prompt side, about 17 s, is unchanged. **Rao's
-clean run gives this beat its number.** If it stays above 20 s, the alternative is the meal that
-was just logged answering from the plate on screen, and P says so.
+**The wait:** the person's own figures are on screen at 0.55 s, before the model starts; the
+one-sentence answer arrives and is spoken at 9.2 s (380-token prompt, 11 generated tokens;
+`e2e-demo-condition-20sep.txt`). The old 30.7 s (`0025`) is history. What the judge looks at
+for those nine seconds is their own diary, which is the point.
 
 **When the answer lands, P says:**
 
@@ -165,7 +167,10 @@ eat last Tuesday?")
 
 **Screen:** "Capturing", "Reading the text" with the counter; then each value read off the sheet
 beside the row it came from, with "printed range … to …" under each value that had one, the report
-date, and "Save N values". **P ticks ferritin and haemoglobin and taps Save.**
+date, and "Save N values". **P ticks ferritin and haemoglobin and taps Save. The save takes about
+9 s** *(measured: 9.3 s, `lab report saved: 1 values, regenerated meal 1`)*, because it
+regenerates the last meal's advice with a model call so that Beat 4 is instant; the stage list
+carries it. P uses those seconds to put the paper down.
 
 **P says:**
 
@@ -177,7 +182,7 @@ date, and "Save N values". **P ticks ferritin and haemoglobin and taps Save.**
 ("I have anaemia, what should I eat for iron?") shows a RECOMMEND answering from declared
 conditions and the knowledge file, with the referral sentence set apart beneath it.
 
-### Beat 4. The same meal, different advice. *(budget 20 s)*
+### Beat 4. The same meal, different advice. *(measured 20 Sep 19:41: 0.47 s to the advice after a report, no model call; the first tap before any report is instant only after `ea75984`, not yet measured on the device)*
 
 **P returns to the Talk tab and taps "Advise again on my last meal".**
 
