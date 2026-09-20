@@ -7,8 +7,16 @@ Word and character error rate of the shipped ASR models, on the desktop, through
     python asr_eval.py wer --engine omnilingual <manifest.csv> ...
                                                   same, through Meta Omnilingual ASR CTC-300M (0022): one
                                                   model for every row, and the language column is then a label
+    python asr_eval.py manifest <recordings-dir>  write manifest.csv for a folder of REAL recordings named
+                                                  <speaker>_<te|hi|en>_<01..13>.<any audio ext>, per
+                                                  data-authoring/asr-recording-script.md; references for
+                                                  sentences 1-11 are filled from the script, 12-13 left blank
+                                                  for a person to transcribe (they still run for extraction);
+                                                  non-WAV recordings get a 16 kHz WAV twin for the phone probe
 
-Needs: pip install sherpa-onnx soundfile numpy   (plus piper-tts for `synth`; Windows for its English voices)
+Needs: pip install sherpa-onnx soundfile numpy   (plus piper-tts for `synth`; Windows for its English voices;
+ffmpeg on PATH for phone recordings: libsndfile reads wav/flac/mp3/ogg, ffmpeg decodes m4a/aac/3gp)
+
 Models: data-sources/models/asr/indicconformer/, as tools/fetch-models.ps1 lays them out, and for
 --engine omnilingual data-sources/models/asr/candidates/omnilingual-300m-ctc-int8/{model.int8.onnx,tokens.txt}
 (csukuangfj/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12, Apache-2.0; 0022).
@@ -95,12 +103,28 @@ def recognizer(lang: str, threads: int = 4, engine: str = "indicconformer"):
     )
 
 
-def transcribe(rec, wav: Path) -> tuple[str, list[str], float, float]:
+def load_audio(path: Path):
+    """float32 mono samples and rate. libsndfile first; anything it cannot open (m4a, aac, 3gp) goes
+    through ffmpeg, decoded to 16 kHz mono in memory, which is what a phone recorder hands us."""
+    import numpy as np
     import soundfile as sf
 
-    samples, sr = sf.read(wav, dtype="float32")
-    if samples.ndim > 1:
-        samples = samples.mean(axis=1)
+    try:
+        samples, sr = sf.read(path, dtype="float32")
+        if samples.ndim > 1:
+            samples = samples.mean(axis=1)
+        return samples, sr
+    except Exception:
+        import subprocess
+        out = subprocess.run(
+            ["ffmpeg", "-v", "error", "-i", str(path), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
+            capture_output=True, check=True,
+        ).stdout
+        return np.frombuffer(out, dtype=np.float32), 16000
+
+
+def transcribe(rec, wav: Path) -> tuple[str, list[str], float, float]:
+    samples, sr = load_audio(wav)
     stream = rec.create_stream()
     stream.accept_waveform(sr, samples)
     t = time.perf_counter()
@@ -131,6 +155,10 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
             recs[key] = recognizer(lang, engine=engine)
             print(f"[{key}] recognizer created in {time.perf_counter() - t:.2f}s")
         hyp, tokens, ms, secs = transcribe(recs[key], r["path"])
+        if not r["reference"].strip():
+            print(f"[{lang}] {r['source'].upper():9s} {r['path'].name:32s} {secs:4.1f}s audio  {ms:6.0f} ms  {len(tokens):3d} pieces  (no reference; not in WER)")
+            print(f"      hyp: {hyp}")
+            continue
         ref_w, hyp_w = normalise(r["reference"]), normalise(hyp)
         ref_c, hyp_c = list("".join(ref_w)), list("".join(hyp_w))
         w_err, c_err = edit_distance(ref_w, hyp_w), edit_distance(ref_c, hyp_c)
@@ -265,6 +293,68 @@ def cmd_synth_mixed(out: Path) -> None:
         w.writerows(rows)
     print(f"wrote {len(rows)} clips and manifest.csv to {out}")
 
+# The fixed sentences of data-authoring/asr-recording-script.md, by number. The reference is what the
+# page asks the speaker to read, in the script the page prints it in; a code-mixed row (3, 7) therefore
+# has Latin words inside an Indic sentence, and its WER is script-strict against an Indic-script model.
+# Read CER on those rows. 12 and 13 are the speaker's own words and get a reference only when a person
+# has transcribed the recording.
+SCRIPT_SENTENCES = {
+    1: ("te", "నేను రెండు రొట్టెలు మరియు పప్పు తిన్నాను", "roti;dal"),
+    2: ("te", "ఉదయం మూడు ఇడ్లీ, సాంబార్, కొబ్బరి పచ్చడి తిన్నాను", "idli;sambar;coconut chutney"),
+    3: ("te", "రాత్రి two rotis, dal fry, one glass milk తీసుకున్నాను", "roti;dal;milk"),
+    4: ("te", "నాకు షుగర్ ఉంది, రాత్రి ఏం తినాలి?", ""),
+    5: ("te", "నేను ఒకటి కాదు, రెండు దోసెలు తిన్నాను, పచ్చడితో", "dosa;chutney"),
+    6: ("hi", "मैंने दो रोटी, दाल और थोड़ा चावल खाया", "roti;dal;rice"),
+    7: ("hi", "सुबह one glass milk और दो boiled eggs लिए", "milk;egg"),
+    8: ("hi", "मुझे iron कम है, क्या खाना चाहिए?", ""),
+    9: ("en", "For lunch I had two rotis, some pappu and a katori of curd.", "roti;dal;curd"),
+    10: ("en", "I drank 200 ml of milk and ate one boiled egg.", "milk;egg"),
+    11: ("en", "I have anaemia, what should I eat for iron?", ""),
+    12: (None, "", ""),
+    13: (None, "", ""),
+}
+
+
+def cmd_manifest(folder: Path) -> None:
+    import re
+
+    pattern = re.compile(r"^(?P<speaker>[^_]+)_(?P<lang>te|hi|en)_(?P<n>\d{1,2})\.(?P<ext>[A-Za-z0-9]+)$")
+    rows, skipped = [], []
+    for f in sorted(folder.iterdir()):
+        m = pattern.match(f.name)
+        if not m or f.suffix.lower() in (".csv", ".md", ".txt"):
+            skipped.append(f.name)
+            continue
+        n = int(m["n"])
+        if n not in SCRIPT_SENTENCES:
+            skipped.append(f.name)
+            continue
+        script_lang, reference, foods = SCRIPT_SENTENCES[n]
+        lang = m["lang"]
+        if script_lang and script_lang != lang:
+            print(f"note: {f.name} is sentence {n}, which the script prints as {script_lang}; keeping the file's {lang}")
+        # The phone probe (AsrDeviceTest) reads 16-bit WAV only, so a phone recording gets a 16 kHz
+        # mono WAV twin here and the manifest points at that; the folder then stages on the device as is.
+        name = f.name
+        if f.suffix.lower() != ".wav":
+            import subprocess
+            wav = f.with_suffix(".wav")
+            if not wav.exists():
+                subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(f), "-ac", "1", "-ar", "16000", "-sample_fmt", "s16", str(wav)], check=True)
+            name = wav.name
+        rows.append((name, lang, "recorded", reference, foods))
+    with open(folder / "manifest.csv", "w", encoding="utf-8", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["path", "language", "source", "reference", "expected_foods"])
+        w.writerows(rows)
+    speakers = sorted({r[0].split("_")[0] for r in rows})
+    blank = sum(1 for r in rows if not r[3])
+    print(f"wrote {len(rows)} rows for {len(speakers)} speaker(s) {speakers} to {folder / 'manifest.csv'}")
+    print(f"{blank} own-words row(s) have no reference yet: transcribe them into the csv by hand before quoting WER on them")
+    if skipped:
+        print(f"skipped (name does not match <speaker>_<te|hi|en>_<nn>.<ext>): {skipped}")
+    print(f"RECORDED, {len(speakers)} speaker(s): enough to tell whether it works at all, not an accuracy claim.")
+
 
 if __name__ == "__main__":
     args = sys.argv[1:]
@@ -279,5 +369,7 @@ if __name__ == "__main__":
         cmd_synth_mixed(Path(args[1]))
     elif len(args) >= 2 and args[0] == "wer":
         cmd_wer([Path(p) for p in args[1:]], engine=engine)
+    elif len(args) >= 2 and args[0] == "manifest":
+        cmd_manifest(Path(args[1]))
     else:
         sys.exit(__doc__)

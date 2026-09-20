@@ -23,6 +23,14 @@ import java.util.concurrent.atomic.AtomicBoolean
  * itself was smoke-tested on the desktop (`0021`); its speed and memory on the device are not
  * known and no claim about them is made in this file.
  *
+ * ### Why one model per selected language, and not one model for everything
+ *
+ * `0022`, decided by Vedant on 20 Sep 2026. The user's profile language selects the checkpoint;
+ * words from another language arrive transliterated into that language's script, and the food
+ * matcher carries those renderings. No IndicConformer emits two scripts in one utterance, and the
+ * one engine that does (Omnilingual, `0022` §3) chose the wrong Indic script on most mixed clips.
+ * Reopened only if recorded speakers show this failing on natural code-mixed speech.
+ *
  * ### Where the lease sits
  *
  * [listen] records first and only then asks the arbiter for the model. A lease may not span

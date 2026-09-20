@@ -1,7 +1,43 @@
 # 0022. One model for code-mixed speech: what exists, measured, and the decision it leaves Vedant
 
-Date: 20 September 2026. Status: EVIDENCE FOR A PRODUCT DECISION, not a decision. Nothing here
-ran on a phone; every clip is synthetic and every number is a desktop number on a shared laptop.
+Date: 20 September 2026. Status: **DECIDED by Vedant, 20 September 2026: Option A.** The evidence
+below was gathered before the decision and is unchanged by it. Nothing here ran on a phone; every
+clip is synthetic and every number is a desktop number on a shared laptop.
+
+## The decision, and the gap it knowingly leaves
+
+**Option A. IndicConformer, one checkpoint per the language the user selects in their profile.**
+The output language is the profile setting; the checkpoint is selected from it; one code path
+(`DefaultAsrEngine.listen(language)` -> `AsrModels.handleFor(language)`).
+
+Vedant's reasons, in order:
+
+1. B puts Telugu in Malayalam script on 5 of 6 mixed clips and Hindi in Urdu on 2 of 3, and sits
+   12-27 WER points behind on the same 16 clips. Six days out, with nothing running end to end,
+   we do not ship a 365 MB engine nobody has heard on a real Telugu voice.
+2. The finding that decides it: a Telugu voice saying English words the Telugu way transcribes
+   fine through the te model, and the spliced foreign-accent clips overstate the problem. So the
+   code-mixing failure we actually have is in the MATCHER: 0 of 25 transliterated food words
+   resolving is a matcher bug, and Priya is fixing it.
+3. A does not literally meet "one model for any mix", and nobody is pretending it does.
+
+**KNOWN GAP, IN PLAIN WORDS.** With A, an utterance is decoded by the model for the language the
+user selected. Words from another language come out transliterated into the selected language's
+script (Hindi दाल inside a Telugu sentence becomes దాల్; English "milk" becomes మిల్క్). Food names
+survived that on every synthetic clip, and the matcher is being taught those renderings. What A
+cannot do: produce Devanagari or Latin inside a Telugu transcript, or recognise a sentence spoken
+mostly in a language other than the one selected. A Telugu-profile user who speaks a whole
+sentence in Hindi gets a Telugu-script transliteration of Hindi, not Hindi. That is the gap, and
+it was accepted knowingly, not buried.
+
+**RECORDED DIRECTION IF THE GAP BITES: Option B**, Meta Omnilingual ASR CTC-300M (Apache-2.0,
+365 MB, one output space, English in Latin) plus a deterministic Indic-script normaliser to the
+selected output language. Its evidence is in §3 below and the harness already runs it
+(`tools/asr_eval.py wer --engine omnilingual`).
+
+**REOPEN CONDITION, the only one:** the real speaker recordings show A failing on natural
+code-mixed speech. Not synthetic clips, not spliced voices, not this record's tables: recorded
+people. That is the test and it is the only test.
 
 ## The requirement
 
@@ -192,10 +228,11 @@ through `AsrDeviceTest`. The desktop harness runs both engines today (`--engine 
 the device test and the loader know only IndicConformer, and stay that way until the decision is
 made, on instruction.
 
-## What is NOT decided here
+## What this record decided, and what it left
 
-The routing. `DefaultAsrEngine` still selects a model by `SpeechLanguage` as the contract says. It
-is not changed until Vedant chooses between: IndicConformer per language plus matcher coverage of
-transliterated English and Hindi food words; Omnilingual plus script normalisation to the selected
-language; or something this record did not find. The evidence above is what that choice is made
-with.
+Decided above: Option A, with the gap and the reopen condition stated. `DefaultAsrEngine` selects
+a model by `SpeechLanguage` as the contract always said; the language comes from the profile
+setting through the orchestrator's `SpeechLanguageRef`. Left open, and owned elsewhere: the
+persisted profile language field (there is none in `ProfileEntity` as of this date) and the UI
+that sets it at onboarding; the matcher coverage of transliterated food words; and the recorded
+speakers, without whom every number above stays synthetic.

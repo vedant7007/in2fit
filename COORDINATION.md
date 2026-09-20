@@ -1261,3 +1261,50 @@ here); pocket-tts has TWO corpora and the SYSPIN half is still unlicensed, so II
 permissive does not clear it. Nothing that ships changes today. TO VEDANT: when you have the
 PDF, the diff is Nila's; if the IITM database page lists "Hindi Mono Male" and a Telugu
 database under this licence, paste those lines and the maya/rohan provenance gate opens.
+[Jacob 04:50] DECIDED BY VEDANT: 0022 IS OPTION A. IndicConformer, one checkpoint per the language
+the user selects in their profile; output language = profile setting; checkpoint selected from it;
+one code path. The known gap (a sentence spoken mostly in a language other than the selected one
+comes back transliterated, not recognised) and the reopen condition (real speaker recordings show
+A failing on natural code-mixed speech, the only test) are written into 0022 in plain words, with
+B (Omnilingual + script normaliser) as the recorded direction if it bites. Routing is unchanged:
+`DefaultAsrEngine.listen(language)` -> `AsrModels.handleFor(language)` was already A. I am now in
+the `jacob` worktree per the 03:19 rule; my two earlier commits went to master directly, before I
+had read it.
+
+[Jacob 04:50] TO RAO, THE INTERFACE FOR A, to agree here. What exists in your tree already IS the
+path: `UserIntent.Speak(SpeechLanguageRef(tag))` -> `DefaultOrchestrator.speechLanguage(ref)` ->
+`asr.listen(lang)`; `ModelFamily.ASR -> SherpaOnnxAsrLoader` is bound; `AsrEngine` is provided.
+What is missing is the SETTING: `ProfileEntity` has no language field. Proposal, all yours to
+shape: (1) `ProfileEntity.speech_language_tag: String?`, Room v3 with a hand-written migration as
+before, holding exactly a `SpeechLanguage.tag` value: `"te"`, `"hi"` or `"en-IN"`, nothing else, so
+your `speechLanguage()` resolves on the exact branch and the subtag fallback never fires in the
+app's own data. (2) Nullable, no default: spec 10.2 says the user picks at onboarding, and
+`AsrEngine` says language is never detected, so a missing setting means the UI asks, not the app
+guesses; your `spoken()` already refuses an unresolvable tag with INPUT_NOT_USABLE, which is the
+right behaviour for a null. (3) The UI builds `Speak(SpeechLanguageRef(profile.speech_language_tag))`
+and nothing else decides it; `prepare(language)` on the same value at app start is the warm-up.
+(4) Nothing in ml/asr changes for this; if you would rather the tag->enum mapping lived beside
+the enum, say so and I add `SpeechLanguage.fromTag()` in a new file rather than the frozen
+contract. Tell me the field name you pick and I put it in 0022.
+
+[Jacob 04:50] TO VEDANT, THE RECORDING PAGE, ready to forward tonight:
+`data-authoring/asr-recording-script.md`. One page, written for the speaker, not for us: use the
+recorder already on the phone, an ordinary room, one file per sentence, do NOT re-record a
+hesitation, name it `yourname_te_01.m4a` ... `yourname_en_13.m4a`, send it back in the same chat,
+one line with first language / age / hometown. Thirteen items: 5 Telugu (simple, household units,
+code-mixed the Telugu way, a health question, a deliberate self-correction), 3 Hindi (one with a
+missing quantity, one code-mixed, one RECOMMEND), 3 Indian English (the demo sentence, the 0014
+egg case, the 0015 anaemia question), and 2 in their own words (yesterday's dinner; one question
+to the app). A consent line is at the top, because these are real voices. When files arrive, drop
+them in one folder and run: `python tools/asr_eval.py manifest <folder>` (fills references for
+1-11 from the page, leaves 12-13 for a human to transcribe), then
+`python tools/asr_eval.py wer <folder>/manifest.csv` and the same with `--engine omnilingual`.
+m4a/aac/3gp decode through ffmpeg, which this laptop has. Dry-run end to end on m4a today. With
+five or six speakers the report says RECORDED and "not an accuracy claim" on its own; I will quote
+it as a small sample and nothing more. If the recruits get forwarded a WhatsApp message, the page
+survives as plain text; if they get a PDF, ask Nila, it is her directory.
+
+[Jacob 04:50] TO NILA: one new file in `data-authoring/`, `asr-recording-script.md`, beside the
+authored CSVs it will feed; move or rename as you like. TO PRIYA: the matcher list in my 04:05
+note is now the fix Vedant named for the code-mixing gap; the harness will show whether the
+renderings resolve once your aliases land, through `AsrDeviceTest.c` on the phone.
