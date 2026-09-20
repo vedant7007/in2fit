@@ -1719,3 +1719,46 @@ produces (402 kcal, 18 g protein for two 40 g rotis and a katori of dal tadka). 
 omits sherpa-onnx, the NVIDIA English recogniser and espeak-ng (GPL) while claiming every
 dependency disclosed. The SENSORS tile describes code that does not exist. Details and the
 exact replacement wording per row are in the file.
+[Meera 16:51] THE LADDER INVERTS ON ONE CONDITION. 0019 addendum 5: the battle handset is an
+iQOO nobody has held, the demo is in airplane mode, and a platform voice is a per-device,
+per-install fact that fails silently when it is network-only. Piper ships in the APK. So the
+requirement is "works on an unknown device with the radios off", and only a bundled voice
+meets it. Conditionally ruled: IF the demo handset cannot be in our hands before the 26th,
+rung 2 (Piper Hindi) is the default and the platform voice is the optimisation the probe on the
+real device can switch on. In code it is one constant, `TtsFlags.PLATFORM_VOICE_FIRST`, `true`
+today until the condition is answered. Also in this commit: `AudioSink` and `SentenceChunks`
+split into their own files so the pure-JVM half of `ml/tts` compiles and tests without the
+daemon (Priya's runner: 29 tests OK, 0.7 s), and the whole of `ml/tts` including the Android
+files compiled against android.jar and the sherpa classes.jar standalone, zero warnings, so the
+Locale deprecation cleanup is in too. No laptop Gradle run by me.
+
+[Meera 16:51] TO VEDANT, TWO ANSWERS NEEDED, ONE NOW LOAD-BEARING. (1) Can the actual iQOO
+demo handset be in the team's hands before the 26th, yes or no? "No" flips the ladder and
+`PLATFORM_VOICE_FIRST` to false. (2) The provenance call in 0005 is no longer a preference:
+under the inverted ladder `rohan` or `pratham` IS the shipping Hindi voice. My recommendation,
+for you and not over you: accept the card claim for `rohan` on the padmavathi standard, recorded
+as an accepted claim and not a verified fact; the alternative is not more certainty, which has
+been shown not to exist, it is the non-commercial `pratham` on stage, which the scope ruling
+also permits. Either ships. Listen to `hi-rohan-default-A/B.wav` and `hi-pratham-default-A/B.wav`
+before you choose; you are the Hindi listener. pocket-tts is not part of this and stays blocked
+on SYSPIN.
+
+[Meera 16:51] TO NILA, FOR THE RUN OF SHOW, a numbered pre-demo step, performed by whoever holds
+the phone, days before, ON A NETWORK:
+    1. Settings → System → Languages & input → Text-to-speech output (some OEM skins: Settings →
+       Accessibility → Text-to-speech output), or from a laptop
+       `adb shell am start -a com.android.settings.TTS_SETTINGS`.
+    2. Preferred engine: Speech Services by Google → gear → Install voice data →
+       Hindi (India) and English (India) → download both.
+    3. Airplane mode ON. Run `TtsVoiceProbeTest` (command in its header). The report must show a
+       `hi-IN` and an `en-IN` voice with `network=false` and a WAV written with an RTF. Only then
+       does the platform voice exist on that phone; otherwise the bundled Piper voice speaks.
+Do it on the realme now and on the iQOO the hour it arrives. A step in a decision record is not
+a step anyone performs, which is why this is here.
+
+[Meera 16:51] TO RAO, since you are doing a clean airplane-mode run anyway: run
+`TtsVoiceProbeTest` once with the radios OFF and once online, same day, and paste both "would
+use" lines and the hi-IN RTF. Whether the platform Hindi voice still resolves and synthesises
+with the radios off is the assumption rung 1 rests on, and it is a five-second read from your
+report. Then the staged Piper Hindi voice's RTF on the phone, which decides whether I build
+streaming playback before the 26th.

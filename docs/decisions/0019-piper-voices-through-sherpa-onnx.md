@@ -449,3 +449,76 @@ wired first. What remains is the phone's fact, from the probe, and one preparati
 phone before the day: if the report says `LANG_MISSING_DATA`, the Hindi and English voice data
 are installed once from the phone's text-to-speech settings, on a network, days before the
 demo, so that on stage the build with no INTERNET permission finds them already there.
+
+---
+
+## Addendum 5, 20 September 2026, 16:20: the loaner problem, and the ladder inverted on one condition
+
+### The hole in rung 1
+
+Everything measured so far is a realme RMX3780. The battle runs on an iQOO handset nobody on
+this team has held. The platform voice is a property of that device: its voice data is
+per-device and per-install, the demo runs in airplane mode, and a network-only voice fails
+silently rather than loudly. So rung 1 as written above depends on a fact about a phone we
+cannot inspect, cannot pre-install onto, and meet for the first time on the day.
+
+Rung 2 does not. A Piper voice ships inside the APK: no install, no network, no device lottery.
+**The actual requirement is "works on an unknown device with the radios off", and only a
+bundled model satisfies it.**
+
+### The ruling, conditional, and the condition said out loud
+
+**If this team cannot get hands on the actual demo handset before the 26th, rung 2 is the
+DEFAULT: the bundled Piper Hindi voice speaks, and the platform voice is the optimisation the
+app switches to only if `TtsVoiceProbeTest` on that real device, in airplane mode, reports an
+offline Hindi voice with an RTF below 1.0 and Vedant accepts its sound.** The condition is
+Vedant's to answer: is the handset reachable before the day, or not.
+
+In code the inversion is one constant, `TtsFlags.PLATFORM_VOICE_FIRST` in `SpokenLeadIn.kt`,
+which `AppModule` reads to order `RoutingTtsEngine`'s engines. It is `true` today, because the
+condition has not been answered and flipping it silently would change what Rao's probes on the
+realme exercise; it becomes `false` the day the answer is "no handset". The ladder's rungs are
+otherwise unchanged; only which of the first two is the default moves.
+
+Two consequences, both stated so they are not discovered later:
+
+- **The provenance call in `0005` is now load-bearing, not academic.** Under the inverted
+  ladder `hi_IN-rohan-medium` or `hi_IN-pratham-medium` is the shipping voice. Accepting the
+  card claim puts a permissive licence with a notice on the stage; holding it puts the
+  non-commercial `pratham` there, which the scope ruling permits. Either ships; the choice is
+  which licence footing the demo stands on.
+- **Piper's phone RTF becomes the number that decides streaming playback**, not an
+  optimisation for later. If the staged Hindi voice reads above about 0.5 on the realme, the
+  streaming `AudioTrack` path in addendum 3 is built before the 26th.
+
+### English on the same logic
+
+Indian English is the other permitted stage language and today it has no bundled voice: it
+rides the platform engine alone, which on an unknown device is the same lottery with better
+odds (an offline English voice ships with the platform engine on nearly every GMS phone). The
+insurance is one more Piper voice in the APK. `en_GB-cori-medium`'s card gives its dataset as
+LibriVox, licence "public domain"; `en_US-lessac` points at an Edinburgh licence page unread;
+`en_US-ryan` is CC-BY-NC-SA. Not done: it is about 60 MB more APK and a British voice for an
+Indian-English demo, and it is only needed if the presenter chooses English AND the handset is
+unreachable. Recorded so the decision is a lookup if both turn out true.
+
+### Still done regardless: the voice-data install
+
+It costs nothing and it makes rung 1 real if the handset does arrive early. The numbered step
+is in Nila's run of show; the short form:
+
+1. On the phone, with a network: Settings → System → Languages & input → Text-to-speech output
+   (on some OEM skins: Settings → Accessibility → Text-to-speech output). Or from a laptop:
+   `adb shell am start -a com.android.settings.TTS_SETTINGS`.
+2. Preferred engine: Speech Services by Google → its settings gear → Install voice data →
+   Hindi (India) and English (India) → download both.
+3. Airplane mode on. Run `TtsVoiceProbeTest`. The report must show a `hi-IN` and an `en-IN`
+   voice with `network=false` and a written WAV with an RTF; only then does rung 1 exist on
+   that phone.
+
+### One check for Rao, five seconds, on his own device
+
+With the radios off, does the platform engine's Hindi voice still resolve and synthesise? The
+probe run in airplane mode answers it; a second run online, same day, shows whether anything
+changes. That is the assumption "local means local" that rung 1 rests on, tested rather than
+believed.

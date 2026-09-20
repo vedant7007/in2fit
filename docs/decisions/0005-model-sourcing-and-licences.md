@@ -328,6 +328,15 @@ exists and is bound to nothing.
 missing confirmation; it is a genuinely unlicensed input (a third-party re-upload with no
 licence, SYSPIN's own terms unread). No ruling on the IITM claim touches it.
 
+*16:20, same day:* this call became load-bearing. `0019` addendum 5 inverts the fallback ladder
+if the demo handset cannot be reached before the 26th, and under that ladder the bundled Hindi
+Piper voice IS the shipping voice: `rohan` if the claim is accepted, `pratham` from the register
+if it is held. The recommendation above stands and is sharpened: accept, recorded as an ACCEPTED
+CLAIM and not a verified fact, because a model-card claim is the ordinary standard of evidence in
+this field, the build is not sold, the licence grants free distribution of derivatives, and the
+alternative is not more certainty but a different licence footing on stage. The commercial
+re-audit line at the top of this record covers a future in which that trade is revisited.
+
 ## NON-COMMERCIAL DEPENDENCY REGISTER
 
 **One entry, added 20 September 2026, the day the voice was added.** Everything else shipped

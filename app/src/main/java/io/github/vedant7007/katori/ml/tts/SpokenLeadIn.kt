@@ -13,6 +13,19 @@ object TtsFlags {
      * timings tune it (a lead-in on a sub-second turn is noise); they do not gate it.
      */
     const val SPOKEN_LEAD_IN = true
+
+    /**
+     * Whether the platform's own voice is tried before the bundled Piper voice for a language
+     * both can speak. `AppModule` orders `RoutingTtsEngine`'s engines from this.
+     *
+     * TRUE is the optimisation: no file, no memory, and on a phone whose offline voice data is
+     * installed it is the better voice. FALSE is the requirement: the battle runs on a handset
+     * nobody on this team has held, in airplane mode, and the platform voice is a property of
+     * that device that cannot be inspected or pre-installed from here, while Piper ships inside
+     * the APK. `0019` addendum 5 states the condition under which this flips; the probe on the
+     * real device is what flips it back.
+     */
+    const val PLATFORM_VOICE_FIRST = true
 }
 
 /**
