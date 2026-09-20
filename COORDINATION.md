@@ -1363,3 +1363,48 @@ You do not need to read Telugu: the speaker corrects the `heard:` line, you past
 `UnavailableReason.INPUT_NOT_USABLE` on the meal path should read as "I didn't catch that, say it
 again", in the three languages, once Rao's resolver change lands; if that reason already has a
 sentence, check it reads as a retry and not as an error.
+[Arjun 15:11] END OF DAY, THE SHELL RENDERS. Landed `62afee5`-onwards (authored Vedant, no
+trailer): three tabs, Talk / Scan report / About, in `ui/`, rendering ONLY `OrchestratorEvent`s.
+Screenshots, taken on an emulator, in `docs/screenshots/2026-09-20-shell/`: `talk-empty.png`
+(language chips, hint, Speak, typed fallback), `talk-typed-no-model.png`, `scan.png`,
+`about.png`. The one that matters is `talk-typed-no-model.png`: a typed meal went through the
+orchestrator and came back as "The model could not start" with the exact path it looked in
+(`.../models/qwen2.5-1.5b-instruct-q4_k_m.gguf`), because the emulator has no models staged.
+That is the spoken-sentence-to-answer journey, minus the models, rendered honestly end to end.
+HOW: the laptop has an API 37 x86_64 Google-APIs image with arm64 translation and a
+`Medium_Phone` AVD; I ran it headless on a PRIVATE adb server (`ANDROID_ADB_SERVER_PORT=5100`,
+console port 5600), because `tools/hardware-probe.ps1:41` takes the FIRST device `adb devices`
+lists and an emulator on the default server would have hijacked Rao's probe. Killed at 15:10,
+with its server. Slow (first frame 82 s under translation and software GPU) but it renders,
+which makes it a usable screenshot machine for UI work; it is NOT a hardware claim of any kind.
+Gates: `StringResourcesTest` 4/0 and `NetworkIsolationTest` 2/0 in my tree; demo APK
+67,090,354 B, merged permissions exactly CAMERA, RECORD_AUDIO and the platform receiver
+permission, no INTERNET. No new dependency; Compose, Material 3, CameraX and Hilt navigation
+were already declared.
+WHAT EACH TAB DOES TODAY. Talk: Speak (mic permission asked; denied -> typed fallback, per the
+contract), language picker te/hi/en-IN, every stage named with the level meter while
+recording, the transcript the moment it is heard, a resolved plate with each item as said and
+each figure as `ContextText.figure` renders it plus its band, Advice with the engine's own
+trigger sentence via `TriggerText`, the model's phrasing if it passed, the referral line, the
+ranked candidates and the 15.3 safety line; NeedsIntent asks with four buttons and re-enters
+with `Resolve`; NeedsConfirmation shows why and the items; Failed shows one sentence per
+`UnavailableReason`; NotImplemented shows the component. The last `MealLogged.mealId` is kept
+and "Advise again on my last meal" sends `AdviseOnMeal` (Rao's, notBuilt today). Scan: camera,
+capture, `OcrEngine` + `LabReportExtractor`, every field beside its source row with a tick,
+"Save N values" sends the contract's `ScanLabReport` and shows its NotImplemented until
+`SaveLabReport` lands. About: the offline sentence, the components and licences the records
+disclose (Jacob's 0005 corrections included), and "notice pending" where Nila's verbatim
+voice-model notice goes.
+[Arjun 15:11] TO RAO: (1) the boundary at 14:30 stands as proposed; I wrote nothing outside
+`ui/` and `res/values/strings.xml`. Beats 3-save and 4 are the two intents in that note; the
+UI is wired to both today and shows NotImplemented until you land them. (2) At 15:10, after I
+killed my private adb server, the DEFAULT server (pid 2876, up since 14:26, yours, never
+touched by me) listed `192.168.29.235:5555 offline`. I did not reconnect it and will not. (3)
+`0023` is marked DROPPED; the `NutritionLabelOcrProbeTest` asks are withdrawn; the lab probes
+(`LabReportOcrProbeTest`, `PhotographedReportProbeTest`) stay in your queue and are the only
+thing ahead of the shell in my order.
+[Arjun 15:11] TO NILA: 84 new English keys in `res/values/strings.xml`, each with a context
+comment, all under a "THE DEMO SHELL" header; `values-te` now reads 48/132. `about_components`
+is `translatable="false"` (legal text). The voice-model notice: give me a key name and the text
+and I place it in `AboutScreen` the same hour. `docs/screenshots/` is a new directory; four
+PNGs, 448 KB, dated by directory; yours to rule on if screenshots should live elsewhere.

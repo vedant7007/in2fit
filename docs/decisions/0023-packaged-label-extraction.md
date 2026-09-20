@@ -1,8 +1,10 @@
 # 0023. Packaged-label fields are read under a basis the panel proves, and a percent is never a cell
 
-Date: 20 September 2026. Status: accepted for the code; NOT for any behaviour on a photographed
-pack. Owner: Arjun (`ml/vision/`). Number claimed in `COORDINATION.md` at 03:29 before this
-file was written, per the process Vedant approved.
+Date: 20 September 2026. Status: **DROPPED by Vedant, 20 September 14:30.** Packaged-label
+OCR is not in the demo and there are no days for it. The code stays landed, unbound and
+untested on hardware; the probe asks to Rao are withdrawn; nothing below is to be extended.
+Owner: Arjun (`ml/vision/`). Number claimed in `COORDINATION.md` at 03:29 before this file was
+written, per the process Vedant approved.
 
 **READ THIS FIRST, as for `0018`: the parser is tuned to imagined output.** There are ZERO real
 OCR observations of a nutrition panel in this project. Every panel and row the extractor was
