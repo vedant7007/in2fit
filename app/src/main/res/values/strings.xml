@@ -139,4 +139,108 @@
     <string name="context_never_suggest_vegan">meat, fish, eggs, milk or any dairy (vegan)</string>
     <string name="context_never_suggest_eggetarian">meat or fish (eggetarian)</string>
     <string name="context_never_suggest_jain">meat, fish, eggs, onion, garlic or root vegetables (Jain)</string>
+
+    <!-- THE DEMO SHELL (Arjun, 20 Sep). Three tabs at the bottom of the one screen. -->
+    <string name="tab_talk">Talk</string>
+    <string name="tab_scan">Scan report</string>
+    <string name="tab_about">About</string>
+
+    <!-- Talk tab: the single voice surface for logging a meal, asking a question, a plate you are
+         about to eat, and what to eat. The hint sits under the microphone button. -->
+    <string name="talk_hint">Say what you ate, or ask a question.</string>
+    <string name="mic_speak">Speak</string>
+    <string name="mic_listening">Listening…</string>
+    <string name="mic_permission_needed">Microphone permission was not granted. You can type instead.</string>
+    <string name="type_hint">Type what you ate, or a question</string>
+    <string name="send">Send</string>
+    <!-- Label above the transcript of what the person said, shown as soon as it is heard. -->
+    <string name="said_by_you">You</string>
+    <!-- Offered after a lab report is saved, on the last meal logged in this session (beat 4). -->
+    <string name="advise_again">Advise again on my last meal</string>
+
+    <!-- Progress, one line per Stage, named rather than a bare spinner (Orchestrator contract). -->
+    <string name="stage_recording">Listening</string>
+    <string name="stage_transcribing">Writing down what you said</string>
+    <string name="stage_classifying">Working out what you meant</string>
+    <string name="stage_extracting">Picking out the foods</string>
+    <string name="stage_matching_foods">Matching the foods</string>
+    <string name="stage_computing">Adding up the figures</string>
+    <string name="stage_saving">Saving</string>
+    <string name="stage_evaluating_rules">Checking your records</string>
+    <string name="stage_retrieving_facts">Looking up facts</string>
+    <string name="stage_phrasing">Writing the reply</string>
+    <string name="stage_speaking">Speaking</string>
+    <string name="stage_capturing">Capturing</string>
+    <string name="stage_reading_text">Reading the text</string>
+
+    <!-- A resolved plate. Each item as the person said it; the figures as ContextText renders them,
+         then the confidence band in brackets. -->
+    <string name="meal_logged">Logged</string>
+    <string name="meal_hypothetical">A plate you asked about. Not logged.</string>
+    <!-- 1 spoken name, 2 quantity, 3 unit. -->
+    <string name="meal_item_with_quantity">%1$s: %2$s %3$s</string>
+    <string name="meal_item_no_quantity">%1$s: quantity not stated</string>
+    <!-- 1 the figure line (ContextText.figure), 2 the confidence band word. -->
+    <string name="figure_with_band">%1$s (%2$s)</string>
+
+    <!-- Advice, from the rules engine: the trigger sentence first, the model's phrasing if it
+         passed its guards, the referral line if one is required, then the ranked candidates. -->
+    <string name="advice_title">Advice</string>
+    <string name="advice_no_rule">Nothing in your records changes this.</string>
+    <string name="advice_candidates_title">You could consider</string>
+    <string name="answer_title">Answer</string>
+
+    <!-- The classifier was not sure which of the four the person meant. It asks; it never guesses
+         a log, because a guessed log writes to the timeline. -->
+    <string name="ask_intent_question">Was that a meal you ate, a question, a plate you are about to eat, or a request for what to eat?</string>
+    <string name="intent_log">I ate this</string>
+    <string name="intent_answer">A question</string>
+    <string name="intent_suggest">About to eat this</string>
+    <string name="intent_recommend">What should I eat</string>
+
+    <!-- The plate could not be resolved with confidence. Nothing was saved. -->
+    <string name="confirm_title">Not logged yet</string>
+    <string name="confirm_hint">Say it differently, or type it.</string>
+
+    <!-- One sentence per UnavailableReason (Outcome.kt): a limitation, never a number, never a guess. -->
+    <string name="unavailable_model_not_loaded">The model is not loaded on this phone yet.</string>
+    <string name="unavailable_model_load_failed">The model could not start.</string>
+    <string name="unavailable_insufficient_memory">Not enough memory free to do this now.</string>
+    <string name="unavailable_no_match">I do not know a food in that.</string>
+    <string name="unavailable_known_item_no_data">I know that food and hold no figures for it.</string>
+    <string name="unavailable_below_confidence_threshold">I am not sure enough of what you said.</string>
+    <string name="unavailable_permission_denied">A permission was not granted.</string>
+    <string name="unavailable_hardware_unsupported">This phone cannot run this.</string>
+    <string name="unavailable_input_not_usable">That could not be used. Please try again.</string>
+    <string name="unavailable_cancelled">Cancelled.</string>
+    <string name="unavailable_schema_validation_failed">The reply could not be read. Please try again.</string>
+    <string name="unavailable_internal_error">Something went wrong inside the app.</string>
+    <!-- 1 the component id. Shown whenever a path returns NotImplemented; never a sample instead. -->
+    <string name="not_built">Not built yet: %1$s</string>
+
+    <!-- Scan tab: camera, then every value read off the report beside the row it came from, for
+         the person to confirm. No range printed means nothing is judged against it. -->
+    <string name="scan_title">Scan a lab report</string>
+    <string name="scan_capture">Capture</string>
+    <string name="scan_retake">Retake</string>
+    <string name="scan_reading">Reading the report…</string>
+    <string name="scan_no_fields">No test values could be read. Try a sharper, straighter photo.</string>
+    <string name="camera_permission_needed">Camera permission is needed to scan a report.</string>
+    <!-- 1 test name, 2 value, 3 unit (may be empty). -->
+    <string name="scan_field_line">%1$s: %2$s %3$s</string>
+    <string name="scan_range_both">printed range %1$s to %2$s</string>
+    <string name="scan_range_high_only">printed range up to %1$s</string>
+    <string name="scan_range_low_only">printed range from %1$s</string>
+    <string name="scan_range_none">no range printed, so nothing will be judged against it</string>
+    <string name="scan_report_date">Report date %1$s</string>
+    <string name="scan_report_date_unknown">Report date not read</string>
+    <!-- 1 the number of ticked values. -->
+    <string name="scan_save">Save %1$d values</string>
+
+    <!-- About tab. The notices are legal text and stay as written in every language. -->
+    <string name="about_title">About</string>
+    <string name="about_offline">IN2FIT runs entirely on this phone. The demo build has no internet permission: nothing you say, scan or log leaves the device.</string>
+    <string name="about_licences_title">Licences and notices</string>
+    <string name="about_notices_pending">The verbatim copyright notice for the voice models is being prepared and will appear here.</string>
+    <string name="about_components" translatable="false">IN2FIT application code: Apache License 2.0.\nQwen2.5-1.5B-Instruct (Alibaba Cloud), run with llama.cpp (MIT): Apache License 2.0.\nIndicConformer Telugu and Hindi speech recognition (AI4Bharat): MIT.\nEnglish speech recognition: NVIDIA NeMo FastConformer, CC-BY-4.0.\nPiper voice te_IN-padmavathi (rhasspy/piper-voices): CC-BY-4.0.\nsherpa-onnx (k2-fsa): Apache License 2.0.\nespeak-ng phonemiser data and code: GNU GPL v3 or later.\nText recognition: Google ML Kit, on device.\nNutrition data: USDA FoodData Central, SR Legacy and Foundation Foods (public domain).</string>
 </resources>
