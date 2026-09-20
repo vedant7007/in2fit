@@ -124,6 +124,13 @@ data class ExtractedItem(
 data class PhrasingRequest(
     val evaluation: RuleEvaluation,
     /**
+     * What they logged, as resolved: the items' names. MEASURED on the ten demo sentences (20
+     * Sep): without this the model narrated the allowed-food list as the meal ("The meal
+     * consisted of Cowpeas (catjang), raw, Mungo beans (urad), raw..."), because the plate's own
+     * foods were nowhere in its prompt. Empty when no meal is involved.
+     */
+    val mealItems: List<String> = emptyList(),
+    /**
      * The trigger sentence, ALREADY RENDERED in the user's language by `TriggerText` from the
      * string table. The engine emits a template id and evidence, not words, so the caller renders
      * before phrasing. Null when nothing fired. Every number in it came from the evidence, which

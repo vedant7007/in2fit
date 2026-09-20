@@ -88,6 +88,7 @@ class LlamaCppLlmEngine(
             request.figures.forEach { add(it.text) }
             request.triggerText?.let { add(it) }
             addAll(request.allowedFoodNames)
+            addAll(request.mealItems)
         }
 
         val prompt = Prompts.phrasing(request, permitted)
@@ -201,7 +202,8 @@ class LlamaCppLlmEngine(
 
     private companion object {
         const val EXTRACTION_MAX_TOKENS = 256
-        const val PHRASING_MAX_TOKENS = 160
+        /** One sentence of at most twenty-five words; the cap is the backstop, as SHORT's is. */
+        const val PHRASING_MAX_TOKENS = 60
 
         val NON_LETTERS = Regex("[^a-z]+")
         val CONDITION_WORDS = listOf(

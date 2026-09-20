@@ -145,7 +145,8 @@ class OrchestratorDeviceTest {
                         is OrchestratorEvent.IntentKnown -> this@Rig.intent = e.intent.name
                         is OrchestratorEvent.OwnFigures -> { if (firstFigureMs == null && e.lines.isNotEmpty()) firstFigureMs = ms(); figures = e.lines }
                         is OrchestratorEvent.MealResolved -> {
-                            if (firstFigureMs == null) firstFigureMs = ms()
+                            // For a plate the first figure that answers the turn is the plate's own.
+                            firstFigureMs = ms()
                             extractTimings = runtime.lastTimings()
                             resolved = e.meal.items.joinToString("; ") { "${it.spokenName}=${it.quantity ?: "?"} ${it.unit ?: ""} -> ${it.matchedFoodCode}".trim() }
                             figures = e.figures.filter { f -> f.total.nutrient.name in setOf("ENERGY", "PROTEIN", "IRON") }.map { f -> "${f.total.nutrient.name.lowercase()} ${"%.1f".format(f.total.amount)} ${f.total.unit.name.lowercase()} ${f.total.completeness.name.lowercase()}" }
@@ -226,6 +227,19 @@ class OrchestratorDeviceTest {
         }
         say(""); say("=== summary: the two numbers that are the product ===")
         summary.forEach { say(it) }
+        rig.close()
+    }
+
+    /** One ANSWER with languageTag "hi": the question in roman Hindi, the reply asked for in Hindi. */
+    @Test
+    fun c_oneHindiAnswer() {
+        say(""); say("=== one ANSWER in Hindi (languageTag hi), ${java.time.LocalDateTime.now()} ===")
+        val rig = Rig(conditions = listOf("anaemia"))
+        val hi = SpeechLanguageRef("hi")
+        with(rig) {
+            turn("LOG (en) to give the diary a meal", UserIntent.Type("I had two rotis and a katori of dal", SpeechLanguageRef("en-IN")))
+            turn("ANSWER (hi): aaj maine kitna protein khaya", UserIntent.Type("aaj maine kitna protein khaya", hi))
+        }
         rig.close()
     }
 

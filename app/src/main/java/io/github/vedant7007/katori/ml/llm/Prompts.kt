@@ -122,31 +122,36 @@ internal object Prompts {
      * the candidates, and the database produced the figures. This only puts words around them.
      */
     fun phrasing(request: PhrasingRequest, permitted: List<String>): String {
+        // ONE SENTENCE, and the plate comes first. Measured on the ten demo sentences (20 Sep):
+        // the earlier wording produced "had 467.2 kcal ... totaling 467.2 kcal ..." (every figure
+        // twice, 99 tokens, 26 s) and narrated the allowed list as the meal. The spoken
+        // confirmation names what they logged, gives one or two figures, and stops.
         val system = """
-            You write one short, plain sentence for a person about the meal they just logged.
+            You confirm, in ONE short plain sentence, a meal a person just logged.
 
             Rules:
-            - Use ONLY the numbers given to you below, exactly as written. Never calculate, total,
-              convert or estimate a number. If a number is not in the list, it must not appear.
-            - Suggest only foods from the allowed list. Do not name any other food.
+            - Name the foods they logged, then give at most two of the figures, exactly as written. Never calculate, total, convert or estimate a number.
+            - If a food to add is listed and the note says why, you may end with it. Name no other food.
             - Do not name a disease, diagnose, or tell them to take anything.
-            - No greeting, no sign-off, no markdown. One or two sentences at most.
+            - No greeting, no sign-off, no markdown. One sentence, at most twenty-five words.
         """.trimIndent()
 
         val user = buildString {
             append("Language to reply in: ").append(request.languageTag).append("\n\n")
+            if (request.mealItems.isNotEmpty()) {
+                append("They logged: ").append(request.mealItems.joinToString(", ")).append("\n\n")
+            }
             if (request.figures.isNotEmpty()) {
-                append("Figures you may use, exactly as written:\n")
+                append("Figures for that meal, exactly as written:\n")
                 request.figures.forEach { append("- ").append(it.text).append('\n') }
                 append('\n')
             }
             request.triggerText?.let {
-                append("What changed and why:\n").append(it).append("\n\n")
+                append("Note about their records:\n").append(it).append("\n\n")
             }
             if (request.allowedFoodNames.isNotEmpty()) {
-                append("Foods you may suggest, and no others:\n")
-                request.allowedFoodNames.forEach { append("- ").append(it).append('\n') }
-                append('\n')
+                append("A food they could add next time, if you mention one: ")
+                append(request.allowedFoodNames.joinToString(", ")).append("\n\n")
             }
             append("Write the sentence.")
         }

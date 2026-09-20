@@ -48,6 +48,7 @@ import io.github.vedant7007.katori.ml.llm.PhrasingRequest
 import io.github.vedant7007.katori.ml.llm.RecommendRequest
 import io.github.vedant7007.katori.ml.llm.SafetyLine
 import io.github.vedant7007.katori.ml.tts.TtsEngine
+import io.github.vedant7007.katori.ml.tts.spokenLanguageOf
 import io.github.vedant7007.katori.ml.tts.withSpokenLeadIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -209,7 +210,7 @@ class DefaultOrchestrator(
      */
     private suspend fun <T> withLlmSpoken(leadIn: String?, language: SpeechLanguageRef, block: suspend (LlmEngine) -> Outcome<T>): Outcome<T> {
         val lang = speechLanguage(language)
-        return if (leadIn == null || lang == null) withLlm(block) else tts.withSpokenLeadIn(leadIn, lang) { withLlm(block) }
+        return if (leadIn == null || lang == null) withLlm(block) else tts.withSpokenLeadIn(leadIn, spokenLanguageOf(leadIn, lang)) { withLlm(block) }
     }
 
     // --- LOG and SUGGEST: a plate, saved or hypothetical ---------------------------------------
@@ -276,12 +277,18 @@ class DefaultOrchestrator(
 
         emit(Progress(Stage.EVALUATING_RULES))
         val ctx = contextSource.current()
+        // A LOGGED meal is evaluated AS THE STORE RETURNS IT, not as the resolver built it. The
+        // digest covers the items' names and figures, and the store's snapshot (the spoken name,
+        // the measured amounts) is what AdviseOnMeal will read back: MEASURED on the demo-condition
+        // run (20 Sep), evaluating the resolver's snapshot here made the first AdviseOnMeal a
+        // digest mismatch and a 9 s regeneration instead of the instant read. A hypothetical
+        // plate has no row; 0 is never a Room id.
+        val snapshot = mealId?.let { store.meal(it) }
+            ?: MealSnapshot(mealId = mealId ?: 0L, items = resolved.items.map { it.snapshot }, loggedAt = now)
         val evaluation = rules.evaluate(
             RuleInput(
                 profile = ctx.profile, declaredConditions = ctx.declaredConditions, labValues = ctx.labValues,
-                // 0 is never a Room row id. A hypothetical plate has no id and never gets one.
-                meal = MealSnapshot(mealId = mealId ?: 0L, items = resolved.items.map { it.snapshot }, loggedAt = now),
-                candidates = ctx.candidates, evaluatedAt = now,
+                meal = snapshot, candidates = ctx.candidates, evaluatedAt = now,
             )
         )
         val trigger = evaluation.trigger?.let(triggerText::render)
@@ -292,9 +299,12 @@ class DefaultOrchestrator(
             it.phrase(
                 PhrasingRequest(
                     evaluation = evaluation, triggerText = trigger,
-                    figures = resolved.figures.map { f -> DisplayFigure(contextText.figure(f)) },
+                    mealItems = resolved.items.map { it.snapshot.displayName },
+                    // Energy and protein, and the nutrient a fired rule is about: two or three
+                    // figures, not eight. The screen shows them all; the sentence names two.
+                    figures = resolved.figures.filter { f -> f.total.nutrient in spokenNutrients(evaluation) }.map { f -> DisplayFigure(contextText.figure(f)) },
                     languageTag = language.tag,
-                    allowedFoodNames = evaluation.rankedCandidates.take(ALLOWED_FOODS).map { c -> c.candidate.displayName },
+                    allowedFoodNames = evaluation.rankedCandidates.take(1).map { c -> c.candidate.displayName },
                 )
             )
         }.textOrNull()
@@ -371,8 +381,9 @@ class DefaultOrchestrator(
             it.phrase(
                 PhrasingRequest(
                     evaluation = evaluation, triggerText = trigger, figures = figures.map(::DisplayFigure),
+                    mealItems = meal.items.map { it.displayName },
                     languageTag = language.tag,
-                    allowedFoodNames = evaluation.rankedCandidates.take(ALLOWED_FOODS).map { c -> c.candidate.displayName },
+                    allowedFoodNames = evaluation.rankedCandidates.take(1).map { c -> c.candidate.displayName },
                 )
             )
         }.textOrNull()
@@ -391,6 +402,7 @@ class DefaultOrchestrator(
             RuleInput(ctx.profile, ctx.declaredConditions, ctx.labValues, meal = null, candidates = ctx.candidates, evaluatedAt = now)
         )
         val referral = referralFor(text, evaluation)
+        val locale = Locale.forLanguageTag(language.tag)
         // MEASURED, 20 Sep: with only per-meal figures the model summed two meals' iron itself
         // and the guard refused it, and it read a below-range haemoglobin line as "within the
         // normal range". So the period totals go in, computed by the store, and the rules
@@ -406,11 +418,17 @@ class DefaultOrchestrator(
         // lines for the nutrients the question names (or every period line when it names none),
         // the engine's sentence if one fired, and at most two rows keyed by the question and the
         // fired rules. The person's full lines went out on OwnFigures already.
+        // MEASURED on the ten demo sentences (20 Sep): "what did I eat last Tuesday" answered
+        // with the week's totals, because totals were all it was given. A question that names
+        // no nutrient is about WHAT they ate, so it gets the meal lines with their dates and no
+        // figures; a question that names one gets the period totals and the meals for that
+        // nutrient only. Either way, two or three lines, not sixteen.
         val asked = nutrientsNamed(text)
-        val periodLines = ctx.periodTotals.map { p ->
-            contextText.period(if (asked.isEmpty()) p else p.copy(figures = p.figures.filter { it.total.nutrient in asked }))
-        }.filter { it.isNotBlank() }
-        val given = periodLines + listOfNotNull(evaluation.trigger?.let { triggerText.render(it) })
+        val periodLines = if (asked.isEmpty()) emptyList() else ctx.periodTotals.map { p ->
+            contextText.period(p.copy(figures = p.figures.filter { it.total.nutrient in asked }))
+        }
+        val mealLines = ctx.recentMeals.take(MEAL_LINES).map { contextText.meal(it, locale, only = asked) }
+        val given = periodLines + mealLines + listOfNotNull(evaluation.trigger?.let { triggerText.render(it) })
         val facts = knowledge.find((listOf(text) + declared + ruleWords(evaluation)).joinToString(" "), limit = FACT_ROWS)
         val request = AnswerRequest(
             question = text, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
@@ -487,6 +505,11 @@ class DefaultOrchestrator(
             ctx.labValues.map { contextText.lab(it) }
     }
 
+    /** The figures the spoken confirmation may cite: energy, protein, and whatever a fired rule is about. */
+    private fun spokenNutrients(evaluation: RuleEvaluation): Set<Nutrient> =
+        setOf(Nutrient.ENERGY, Nutrient.PROTEIN) + evaluation.firedRules.mapNotNull { (it.evidence as? Evidence.MealComposition)?.nutrient } +
+            evaluation.constraints.filterIsInstance<io.github.vedant7007.katori.domain.Constraint.PreferNutrient>().map { it.nutrient }
+
     /** The nutrients a question names, by the English word or the locale's, whole-word. */
     private fun nutrientsNamed(text: String): Set<Nutrient> {
         val lower = " " + text.lowercase().replace(Regex("[^\\p{L}\\p{N}]+"), " ") + " "
@@ -523,7 +546,11 @@ class DefaultOrchestrator(
      */
     private suspend fun FlowCollector<OrchestratorEvent>.speak(text: String, language: SpeechLanguageRef) {
         if (text.isBlank()) return
-        val lang = speechLanguage(language)?.takeIf { it in tts.supportedLanguages } ?: return
+        // The voice follows the SCRIPT of the text, not the profile (Meera, 20 Sep): an English
+        // answer read by the Hindi voice is English through Hindi phonology, the mirror of what
+        // the TtsEngine contract forbids. The profile decides only when the text has no letters.
+        val preferred = speechLanguage(language) ?: return
+        val lang = spokenLanguageOf(text, preferred).takeIf { it in tts.supportedLanguages } ?: return
         emit(Progress(Stage.SPEAKING))
         tts.speak(text, lang)
     }
@@ -545,6 +572,8 @@ class DefaultOrchestrator(
         const val FACT_ROWS = 2
         /** Foods the model may name: the top of the ranked list, not the whole of it. */
         const val ALLOWED_FOODS = 4
+        /** Meal lines an ANSWER is given: the most recent few, with their dates. */
+        const val MEAL_LINES = 3
     }
 
     private fun Intent.toDomain(): SpokenIntent = when (this) {

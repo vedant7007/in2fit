@@ -314,7 +314,7 @@ class DefaultOrchestratorTest {
 
         val answered = events.filterIsInstance<OrchestratorEvent.Answered>().single()
         assertTrue("the person's lines ride on the answer too, with the engine's sentence", answered.figures.containsAll(own))
-        assertTrue("every line the model gets is one the person sees", answered.figures.containsAll(figures))
+        assertTrue("nothing the model gets is about a nutrient they did not ask about: $figures", figures.none { it.contains("protein") })
         assertEquals("answered", answered.text)
         assertEquals(listOf("iron.vitc"), answered.factIds)
         assertNull("no referral: haemoglobin at 9.8 is below range, not far below", answered.referral)
@@ -337,7 +337,8 @@ class DefaultOrchestratorTest {
         assertTrue("the number they asked for is in the first lines: $lines", lines.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
         val given = r.llm.answers.single().figures.map { it.text }
         val answerEvent = events[answered] as OrchestratorEvent.Answered
-        assertTrue("the model is given a selection of the person's lines plus the engine's sentence, never others: $given", answerEvent.figures.containsAll(given) && answerEvent.figures.containsAll(lines))
+        assertTrue("the person's own lines ride on the answer", answerEvent.figures.containsAll(lines))
+        assertTrue("the model is given the iron lines only: $given", given.all { it.contains("iron") || it.contains("9.8") })
         // The lead-in was spoken before the answer, and the answer after it.
         assertEquals(listOf("Let me check your records.", "answered"), r.tts.spoken)
     }
@@ -408,8 +409,8 @@ class DefaultOrchestratorTest {
         val request = r.llm.answers.single()
         val given = request.figures.map { it.text }
         assertTrue("the iron total: $given", given.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
-        assertTrue("not the protein total: $given", given.none { it.contains("protein") })
-        assertTrue("not the meal lines: $given", given.none { it.contains("roti, dal") })
+        assertTrue("nothing about protein: $given", given.none { it.contains("protein") })
+        assertTrue("the meal line, restricted to iron: $given", given.any { it.endsWith("roti, dal. iron: 2.5 mg") })
         assertTrue("the engine's sentence about their report: $given", given.any { it.contains("9.8") && it.contains("below") })
         assertTrue("at most two rows", request.facts.size <= 2)
     }

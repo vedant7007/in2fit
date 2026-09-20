@@ -162,6 +162,11 @@ class RoomUserContextSource(
         val forbidden = FORBIDDEN_WORDS[diet].orEmpty()
         fun allowed(key: String, description: String, foodClass: String?): Boolean {
             if (key in avoided) return false
+            // A raw ingredient has no eaten serving: MEASURED on the ten demo sentences (20 Sep),
+            // ranked per a cup of raw pulse, "Cowpeas (catjang), raw" and "Mungo beans (urad), raw"
+            // topped the iron list and were spoken as advice. The cooked food or the dish is
+            // the candidate; the flour and the dry dal are what it is made from.
+            if (foodClass == "GRAIN_RAW" || foodClass == "PULSE_RAW") return false
             if (diet == DietType.VEGAN && foodClass == "DAIRY") return false
             val words = description.lowercase().split(Regex("[^a-z]+")).filter { it.isNotEmpty() }
             return forbidden.none { it in words }

@@ -10,7 +10,6 @@ import io.github.vedant7007.katori.domain.model.Outcome
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Locale
 
 /**
@@ -203,12 +202,20 @@ class ContextText(
         }
     }
 
-    fun meal(m: LoggedMeal, locale: Locale): String {
-        val at = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale)
-            .format(m.snapshot.loggedAt.atZone(zone))
+    /**
+     * One meal as a line. [only] restricts the figures to those nutrients; empty means the
+     * items and the time alone, which is the whole answer to "what did I eat on Tuesday".
+     */
+    fun meal(m: LoggedMeal, locale: Locale, only: Set<io.github.vedant7007.katori.domain.model.Nutrient>? = null): String {
+        // The weekday is written out: MEASURED on the ten demo sentences (20 Sep), "what did I
+        // eat last Tuesday" was answered with Saturday's meals when the lines carried only a
+        // numeric date. A day name is a string the model can match; a date is arithmetic it
+        // cannot do.
+        val at = DateTimeFormatter.ofPattern("EEEE d MMM, h:mm a", locale).format(m.snapshot.loggedAt.atZone(zone))
         val items = m.snapshot.items.joinToString(", ") { it.displayName }
-        val figures = m.figures.joinToString("; ") { figure(it) }
-        return String.format(strings.meal(), at, items, figures)
+        val shown = if (only == null) m.figures else m.figures.filter { it.total.nutrient in only }
+        val figures = shown.joinToString("; ") { figure(it) }
+        return String.format(strings.meal(), at, items, figures).trimEnd().trimEnd('.').let { if (figures.isEmpty()) "$it." else it }
     }
 
     fun period(p: PeriodTotals): String =
