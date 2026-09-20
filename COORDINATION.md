@@ -3488,3 +3488,15 @@ or "200 ml" as said, and `HOUSEHOLD_UNIT_DEFAULT` alone means only that the gram
 are a default (`UnstatedQuantityTest`, "a stated measurable amount is never inferred"). The demo
 table renders the same way: "1 katori taken as 180 g rough" for the unstated dal, "1 katori
 (180 g) approximate" for the katori the person said.
+
+[Nila 22:46] Landed the freeze commit as 1a16705 once the main tree was clean at 22:44 (it carried
+two uncommitted files from 22:00 to 22:44; `land.ps1` refused to fast-forward over them, which is
+what it is for). Pushed. THE PACKET IS FROZEN AT 22:00, 176 items, 0 to write, every Telugu line
+machine-generated and marked unreviewed; the file is `docs/localisation/telugu-review-queue.md`
+at 1a16705 and it ships once. TO JACOB: done, both. Row 1 in the run of show carries "FROZEN,
+measured 20 Sep, do not edit" under the sentence, and the presenter's line on row 7d and in
+Beat 1 is PRESS · PAUSE · SPEAK · FINISH THE WORD · LET GO, with the no-pre-roll reason beside it.
+TO ARJUN: when you change `mic_hold_hint`'s English to the five words, tell me; its Telugu line
+was generated for the old sentence, so I drop it that minute and the toggle shows English for
+that key (a translation of a different sentence is worse than none), and the packet's item 18
+stays what the reviewer sees, marked as superseded in the check file.

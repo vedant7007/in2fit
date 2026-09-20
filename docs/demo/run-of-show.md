@@ -46,7 +46,7 @@ aloud, ticking, at the table, before the first sentence. Ten minutes.
 | 7a | **The wired speaker plugged in: USB-C or 3.5 mm. NEVER Bluetooth.** Bluetooth is a radio and shows an icon beside the airplane one. Run `TtsVoiceProbeTest`: its "routed to" line must name the wired device and the tone must come from it. Unplug, run again: "BUILTIN_SPEAKER". (Meera, 17:24.) | The hall eats sound; the screen carries the answer regardless (`0026`), but the voice is the demo's second channel. |
 | 7b | **One spoken turn heard from the back of the room before the judges arrive.** | The only test of the speaker that counts. |
 | 7c | **A wired headset or lapel microphone in the bag**, rehearsed once through a full turn (Jacob, 19:05). Wired: a cable costs nothing on the airplane-mode claim; anything Bluetooth is a radio. | In a loud hall the microphone must be at the mouth whatever the hand is doing. |
-| 7d | **Push-to-talk, ruled by Vedant (Jacob, 20:05) and shipped in `ml/asr` (`7a6e49d`); Arjun's Talk screen carries the hold.** The presenter's rule, in Jacob's words, the same line as "phone at the mouth": **FINISH THE WORD, THEN LET GO.** Measured (`logs/asr-tail-after-last-word.log` in Jacob's worktree, ten demo sentences, clean and +15 dB babble): a thumb that lifts on the last syllable or up to a second after it costs nothing, 8/8; 100 ms inside the last word 8/7; 200 ms inside 6/5; 300 ms inside 0/0. The code records a 300 ms tail after release, so an early thumb on the last word is covered; a thumb that lifts mid-word is not. Under 300 ms held is a tap, not a sentence. | Jacob's tail run, 20:50; the rehearsal proves P's thumb. |
+| 7d | **Push-to-talk, ruled by Vedant (Jacob, 20:05) and shipped in `ml/asr` (`7a6e49d`); Arjun's Talk screen carries the hold.** The presenter's rule, in Jacob's words (22:00, replacing both earlier versions), the same line as "phone at the mouth": **PRESS · PAUSE · SPEAK · FINISH THE WORD · LET GO.** The pause first because there is no pre-roll: the microphone opens at the press, and a word spoken as the thumb lands is not recorded (hi_06 lost "मैंने पिछले" that way, most likely). Measured (`logs/asr-tail-after-last-word.log` in Jacob's worktree, ten demo sentences, clean and +15 dB babble): a thumb that lifts on the last syllable or up to a second after it costs nothing, 8/8; 100 ms inside the last word 8/7; 200 ms inside 6/5; 300 ms inside 0/0. The code records a 300 ms tail after release, so an early thumb on the last word is covered; a thumb that lifts mid-word is not. Under 300 ms held is a tap, not a sentence. | Jacob's tail run, 20:50; the rehearsal proves P's thumb. |
 | 8 | **Storage: at least 2 GB free.** | The phone was 98–100% full on 19 September; the app copies assets on first run and writes its log. |
 | 9 | **App WARM, not cold.** Open IN2FIT and run one full Beat 1 sentence to the answer, then leave it open on the Talk tab. | Cold model load reads 5.4–8.5 s on this phone; warm is under a second (`logs/hw-report-*.txt`). Spec 7.4: warm every model before the demo begins. |
 | 10 | **Speech language = Hindi; interface = English.** Two settings, two places. SPEECH: the profile's speech language, which the Talk screen must send to the recogniser; on 20 September `TalkViewModel.kt:75` still sends `te` as a constant, and that is Arjun's one-line change TONIGHT, because on the day it would break the demo silently (a Hindi sentence through the Telugu checkpoint comes back transliterated). INTERFACE: the phone's per-app language, Settings > System > Languages & input > App languages > IN2FIT (Android 13+; the app declares `localeConfig`, so IN2FIT is listed). On this realme the menu may sit under "Additional settings"; Rao confirms the path once, and it goes here. English for the demo, Telugu only in Beat 5. | See "Language" above. |
@@ -98,10 +98,14 @@ sentence, the slowest of the ten; thirty-nine seconds is not a pause, it is the 
 The sentence changed, not the system.
 
 **P brings the phone to the mouth (Jacob, 19:05: speak first, THEN show the screen; never both at
-arm's length), HOLDS the microphone button (row 7d) and says, exactly, then finishes the last
-word and lets go:**
+arm's length). Then, in Jacob's five words (row 7d): PRESS · PAUSE · SPEAK · FINISH THE WORD ·
+LET GO. P presses the microphone button, pauses a breath (there is no pre-roll; a word spoken as
+the thumb lands is not recorded), says exactly this, finishes the last word, then lets go:**
 
 > **मैंने दो रोटी और थोड़ी दाल खाई**
+> *(FROZEN, measured 20 Sep, do not edit: row 1 of `demo-utterance-set.csv`, EXACT on Vedant's own
+> voice through the hi checkpoint, `logs/asr-eval-vedant-demo.log` in Jacob's worktree. Nobody
+> rephrases it or makes it more impressive; Jacob's rule, accepted by Vedant, 22:00.)*
 > *(English column: "I had two rotis and a little dal.")*
 
 **What the judge sees, in order** (`0026`): the level meter moving while P speaks; the meter
