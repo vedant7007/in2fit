@@ -2647,3 +2647,38 @@ default purple on lavender, which matches none of them. The splash and the app t
 icon's green, `#1F6F5C` as primary on a cream surface, so icon, splash and About are one thing;
 the theme change is a `lightColorScheme` in `MainActivity` and ships with the splash, not
 before it. Nothing built tonight.
+
+[Arjun 20:15] TO JACOB, PUSH-TO-TALK: YES, the screen can carry a hold gesture, and here is the
+surface so neither of us is blocked in the morning. Ruled by Vedant on your measurement (one
+laugh 300 ms after the sentence, 8 of ten -> 0), and it now sits ahead of the splash.
+THE GESTURE. The Speak button becomes hold-to-speak: press sends `UserIntent.Speak(language)`
+exactly as today; release sends a new `UserIntent.EndSpeech` (a `data object`, Rao's, one line
+in the contract, routed to your `PushToTalk`'s release). The meter is live from `AudioLevel`
+while held and freezes into the flat line on release, which is 0026 step 2 unchanged; your
+`Transcribing` then `Result`/`Unavailable` are the events I already render. Nothing else on
+the screen changes; your 19:05 shape stands as written.
+THREE EDGES, stated so the code agrees before it exists: (1) a release may arrive BEFORE
+capture has started (the model is still warming); `EndSpeech` is accepted at any moment of a
+turn and is a no-op outside one, and your capture treats a release that precedes its first
+frame as an empty clip. (2) Fewer than 300 ms of audio is `INPUT_NOT_USABLE`, as you said; the
+screen shows "That could not be used. Please try again." with a hint line under the button,
+"Hold the button while you speak", so a tap-and-let-go teaches the gesture instead of failing
+silently. (3) A tap is a too-short hold; there is no separate tap mode, and the typed fallback
+stays for a denied microphone. Keys tonight, before 22:00: `mic_speak` -> "Hold to speak" (same
+key, English changed; Nila, the Telugu candidate regenerates), and `mic_hold_hint`. The Compose
+side is `detectTapGestures(onPress = { speak(); tryAwaitRelease(); endSpeech() })`, ten lines,
+built the hour `EndSpeech` is in the contract.
+TO RAO: `UserIntent.EndSpeech` is the one line I need from you for it; your `spoken()` holds
+Jacob's capture handle for the turn and forwards the release. Also `IntentKnown` stays where
+it is: push-to-talk changes when recording ends, not what follows.
+
+[Arjun 20:15] CORRECTION to my 20:09 colour line, from Vedant's sampled logo: the brand green is
+`#252F26` on cream `#ECEBE6`, NOT the icon's `#1F6F5C`; I matched the theme to the icon, which
+predates the logo. Ruled: theme, splash AND About go to `#252F26` on cream; and the launcher
+icon is remade from the logo's "2" running figure, the part that survives 48 dp, same adaptive
+setup, background `#252F26`. TO NILA: I take the icon with the splash commit, tomorrow if the
+day allows and after the handset run and push-to-talk; is the logo file in the repo or the
+packet? An SVG of the wordmark makes the "2" a `pathData` and the icon vector; a PNG means a
+traced glyph or a bitmap foreground, either fine, but I need the file. Order tomorrow, ruled:
+the real-phone run, push-to-talk, then theme + splash + icon in one commit; the splash is the
+item that does not happen if the day goes badly.
