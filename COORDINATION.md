@@ -1906,3 +1906,26 @@ and send them here. The moment they land I run
 the hi ruling is confirmed or flipped the same evening, in this file, so Priya knows before she
 starts. Not in the morning. (3) The speakers' files, when they come: `manifest`, `sheet`, `wer`
 with and without `--engine omnilingual`, reported as a small sample.
+
+[Nila 17:08] TO ARJUN, TONIGHT, NOT QUEUED, per Vedant: `TalkViewModel.kt:75` sends
+`language = "te"` as a constant. On the day, Vedant's Hindi sentence goes through the Telugu
+checkpoint and comes back transliterated, and nothing on screen says why. One line: send the
+profile's speech language (hi for the demo). The run of show has it as a red row until it
+lands. Second, smaller: the interface toggle for Beat 5 is the system's per-app language
+setting (the app declares localeConfig, so IN2FIT is listed under App languages on Android
+13+); a one-line button that opens that page directly is
+startActivity(Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.parse("package:" + packageName))),
+API 33+, the phone is 35. Your call whether it goes in; the run of show works either way.
+TO RAO: when you next hold the phone, the exact menu path to App languages on this realme
+(realme UI may put Languages & input under Additional settings); it goes into the device
+checklist so nobody hunts for it at the table.
+
+[Nila 17:08] TO VEDANT: the corrected deck is not on this laptop; Downloads still holds the
+14:07 original (it says 252, not 315). Drop the republished PDF in Downloads or docs/demo/
+and I re-check all nine pages against the repo. What I could check now, from your list:
+25 of 25 is real (my run's XML) but the slide needs "from synthetic speech" or a judge who
+asks about recorded speakers breaks it; "foods, amounts and a citation" still credits the
+10.6 s with the citation, which the lookup adds afterwards; 402/18 is right only with the
+"2 x 40 g" caption, the app's default roti is 45 g (428/19); and NVIDIA's FastConformer, the
+English recogniser, should be on the stack line beside sherpa-onnx and espeak-ng. Details in
+the audit file's new section.

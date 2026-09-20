@@ -91,6 +91,25 @@ which `ebd88cf` added red by design until the integrator lands four engine fixes
 the honest tile is "315 tests; nine of them are red on purpose, each named for the fix it
 waits on", and "green on every commit" is not true until Rao's fixes land.
 
+## The corrections, re-checked against the repository (17:05)
+
+Vedant corrected and republished the deck at about 17:00 and listed the changes. The corrected
+PDF is not on this laptop (the file in Downloads is still the 14:07 original), so the pages
+themselves are re-checked when it lands; what follows checks each listed correction against the
+repository now.
+
+| correction as listed | repository | verdict |
+| --- | --- | --- |
+| 2.6 s removed; replaced with Priya's 25 of 25 | `CodeMixRenderingsTest`, in my run of 16:43: `25 of 25`, `WRONG FOOD 0`, on `data-authoring/codemix-renderings.csv`, Jacob's exact renderings from the Telugu recogniser. The CSV's own header: "synthetic and one voice: a recorded speaker will vary the vowel signs, and the recorded transcripts replace this file when they exist". | RIGHT, with one word owed on the slide: the 25 are the recogniser's renderings of SYNTHETIC speech. Say "25 of 25 English food words, as the Telugu recogniser renders them from synthetic speech, resolve to the right food" or a judge asking "recorded speakers?" breaks it. |
+| 10.6 s reworded to "the model turns a transcript into foods, amounts and a citation" | Extraction returns foods and amounts (`ExtractionJson`); the citation is the database lookup's, which runs after and is not in the 10.6 s. | Half right. Drop "and a citation" or say "and the database then cites each one". |
+| 315 automated tests, no claim about green | 315 in my run of 16:43, 9 red by design. | RIGHT |
+| 136 machine-translated and marked unreviewed | 136 at 15:21; Arjun adds keys before 22:00, so the number moves tonight. | RIGHT now; re-read the count on the day |
+| three-languages claim replaced on all three pages | Needs the file. | pending the PDF |
+| the clinical causal clause struck from page 4 | Needs the file. | pending the PDF |
+| SENSORS tile replaced | Needs the file to see with what. | pending the PDF |
+| 93 / 626 / 52 and 402 / 18 | `logs/food-db-build.log` today; the meal from the shipped tables at two 40 g rotis. Note: the app's default roti is the recipe's 45 g (`chapati`, 270 g / 6), which gives 428 kcal / 19 g; 402 / 18 is right only with the "2 × 40 g" caption, i.e. a person-corrected weight. | RIGHT as captioned |
+| sherpa-onnx and espeak-ng named, copyleft acknowledged | `0005`. The English recogniser is NVIDIA's FastConformer (CC-BY-4.0), which wants naming wherever models are credited; not in the list of corrections. | RIGHT; check NVIDIA is on the line too |
+
 ## What to do, in order
 
 1. Fix the FIX FIRST rows: the "cold" 2.6 s; the 10.6 s wording; "252 tests green on every

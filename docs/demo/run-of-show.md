@@ -37,7 +37,7 @@ aloud, ticking, at the table, before the first sentence. Ten minutes.
 | 7 | **Brightness full, media volume full, ringer silent.** | The lead-in phrase and the spoken answer must be heard from a metre away. |
 | 8 | **Storage: at least 2 GB free.** | The phone was 98–100% full on 19 September; the app copies assets on first run and writes its log. |
 | 9 | **App WARM, not cold.** Open IN2FIT and run one full Beat 1 sentence to the answer, then leave it open on the Talk tab. | Cold model load reads 5.4–8.5 s on this phone; warm is under a second (`logs/hw-report-*.txt`). Spec 7.4: warm every model before the demo begins. |
-| 10 | **Speech language = Hindi** on the profile, interface = English. | See "Language" above. On 20 September `TalkViewModel` still sends `te` as a constant; this row is red until that follows the profile. |
+| 10 | **Speech language = Hindi; interface = English.** Two settings, two places. SPEECH: the profile's speech language, which the Talk screen must send to the recogniser; on 20 September `TalkViewModel.kt:75` still sends `te` as a constant, and that is Arjun's one-line change TONIGHT, because on the day it would break the demo silently (a Hindi sentence through the Telugu checkpoint comes back transliterated). INTERFACE: the phone's per-app language, Settings > System > Languages & input > App languages > IN2FIT (Android 13+; the app declares `localeConfig`, so IN2FIT is listed). On this realme the menu may sit under "Additional settings"; Rao confirms the path once, and it goes here. English for the demo, Telugu only in Beat 5. | See "Language" above. |
 | 11 | **Backup phone** with the same build, same checklist, in the second person's hand. | Spec 7.4. |
 | 12 | **The recorded video** of the same sequence, on a laptop, ready to play. | Spec 7.4. If the live device fails twice, the video is the demo. |
 
@@ -47,7 +47,7 @@ aloud, ticking, at the table, before the first sentence. Ten minutes.
 | --- | --- | --- | --- |
 | 1 | Models staged on the phone: the LLM, the Hindi ASR model and its `tokens.txt`, the TTS voice, checksums verified. | Rao | staged 19 Sep (`COORDINATION.md`); re-verify after every reinstall, uninstalling wipes them (`0012`) |
 | 2 | The demo build installed: `demo` flavour, permission check green in the build log. | Rao | every assemble asserts it |
-| 3 | Profile: name, Hindi speech, English interface, a declared context if beat 5 is attempted. | Arjun / Rao | no picker screen yet; system Settings > Apps > IN2FIT > Language works on Android 13+ because `localeConfig` is declared |
+| 3 | Profile: name, Hindi speech, English interface, a declared context if beat 5 is attempted. | Arjun / Rao | no in-app picker yet; the interface language is the system's per-app setting (path in row 10 of the device checklist). One line gives the app a button that opens that page directly: `startActivity(Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.parse("package:" + packageName)))`, API 33+, and the phone is 35. That is the cheapest toggle for Beat 5. |
 | 4 | **A meal already logged today**, the Beat 1 meal, so Beat 4's "Advise again on my last meal" has a meal. | presenter, at the table (row 9 above does it) | |
 | 5 | **A week of history**, so a "last Tuesday" question has an answer. | Rao (seed) | spec 7.4; Beat 2 below uses "my lunch" so this is a nice-to-have |
 | 6 | **The printed lab report**, on paper, with a fasting glucose ABOVE the range printed on the same sheet, in someone's bag. Plus a second copy. | Vedant | the trigger fires only on a value outside the range printed beside it (`0018`) |
@@ -172,7 +172,9 @@ first, verbatim from the rules engine, then the candidates:
 
 ### Beat 5, only if Part 1 of the Telugu packet is confirmed. The language toggle. *(budget 10 s)*
 
-**P opens the language setting, chooses తెలుగు, and returns to the Talk tab.**
+**P opens the language setting (the in-app button if Arjun adds the one-liner above; otherwise
+S has Settings > App languages > IN2FIT open on the second phone), chooses తెలుగు, and returns
+to the Talk tab.**
 
 > "The same screen, in Telugu. Every line of this interface is a key in one table; adding a
 > language is one file, reviewed by a speaker, not a rebuild."
@@ -218,7 +220,7 @@ number; every failure state on screen is a sentence the app chose to show. Read 
 | --- | --- |
 | The clean airplane-mode run: a number for every *(budget)* above, per beat, warm, nothing else running. | Rao |
 | Vedant's ten recordings scored; the column chosen. | Vedant, Jacob |
-| `TalkViewModel` sending the profile's speech language instead of `te`. | Arjun / Rao |
-| An in-app language picker, or the decision that the system setting is the toggle. | Arjun |
+| `TalkViewModel` sending the profile's speech language instead of `te`. TONIGHT. | Arjun |
+| The interface toggle: the system per-app setting is the decision; a one-line button that opens it is the nice-to-have. Rao confirms the realme menu path. | Arjun, Rao |
 | Telugu Part 1 confirmed, or Beat 5 cut. | Vedant |
 | The seeded week of history, if the "last Tuesday" alternate is wanted. | Rao |
