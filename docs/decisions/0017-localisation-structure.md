@@ -82,8 +82,9 @@ symbol names encode the package and that rename is deferred until after the hack
 
 Ruled by Vedant, 20 September 2026, as a RULE so that nobody decides it under pressure:
 
-**If the health sentences (`trigger_*`, items 1 to 9 on the sheet) are not confirmed by a fluent
-speaker before the demo build is cut, `values-te` comes out of that build.** The mechanism is one
+**If the nine lines of Part 1 of the packet (the safety line and the eight `trigger_*`
+sentences, items 1 to 9) are not confirmed by a fluent speaker before the demo build is cut,
+`values-te` comes out of that build.** The mechanism is one
 line in `app/build.gradle.kts`: `localeFilters += listOf("en", "te", "hi")` becomes
 `listOf("en", "hi")`, which drops the Telugu table from the APK; every screen falls back to
 the default table. The rule, the line and the reason are here so the cut is a lookup.
@@ -113,6 +114,38 @@ locale filter in place. Test counts are in the JUnit XML under
 
 Twenty-seven is the number of translatable keys on this date, and every one of them is missing in
 every language. That is the true state, and it is the number a fluent speaker starts from.
+
+## The reviewer packet: one packet, one trip, frozen at 22:00 IST on 20 September 2026
+
+Ruled by Vedant on 20 September, owner Nila. Four people were queueing questions for the same
+fluent speaker: the 48 machine lines, the 18 keys with no Telugu, Priya's log-word and
+medicine-word lists, Priya's transliterated food renderings from Jacob's list of 25, and
+Meera's listening ask. Sent separately, a person doing the team a favour is asked three times
+and answers once. So everything goes in one file, `docs/localisation/telugu-review-queue.md`,
+and it ships once. **Freeze: 22:00 IST, 20 September.** Vedant can move the hour, and it moves
+for everyone at once. Anything arriving after the freeze is a second trip, and everyone should
+assume there is no second trip.
+
+Order, because a reviewer with ten minutes reads the top and stops, and the first line of the
+packet says which part matters if they only do one:
+
+1. **Part 1**, the safety line and the eight health sentences, items 1 to 9. These decide
+   whether `values-te` ships at all (the rule above).
+2. **Part 2**, the 18 keys that had no Telugu. On Vedant's ruling, machine candidates were
+   generated for every one and imported with the marker `REVIEW: machine-generated, received
+   via Nila, unreviewed`, so the packet carries no holes and the reviewer corrects a line
+   rather than writing one from nothing. Same provenance line as the 48, same marker, same
+   rule.
+3. **Part 3**, the remaining screen text.
+4. **Part 4**, other sessions' sheets, appended verbatim and labelled lower priority so that
+   skipping them costs nothing: Priya's `data-authoring/log-words-review.md` is included live
+   from where she keeps it; anything else goes in `docs/localisation/packet-extra/*.md` in a
+   session's worktree, landed before the freeze, and the generator appends it.
+
+The generator (`tools/make_review_queue.py`) emits the parts in that order from one sorted
+list, so the numbering is continuous and the importer's cross-check against it still holds.
+All 66 lines in the packet on the freeze date are machine-generated; the XML comment on every
+entry says so, in those words.
 
 ## The review sheet
 
@@ -145,7 +178,8 @@ whole point: `written by <name>` means a fluent speaker wrote or checked the lin
 `REVIEW: received via <name>, author not confirmed` (`--unreviewed`) means the lines arrived
 through someone who cannot verify them. **The first Telugu reply, 20 September, is the second
 case, and its provenance is now known and recorded in these words: MACHINE-GENERATED, AUTHOR
-UNVERIFIABLE, UNREVIEWED.** A model wrote the 48 lines. Nobody on this team can read them. That
+UNVERIFIABLE, UNREVIEWED.** A model wrote the 48 lines, and a model (Nila) wrote the 18
+candidates that followed; the XML comment on every one of the 66 says `machine-generated`. Nobody on this team can read them. That
 is not a reason for caution; it is the reason the `REVIEW` markers on every entry and the
 demo-build rule below (Telugu comes out of the build unless a fluent speaker confirms the
 health sentences) are MANDATORY. Vedant's instruction, verbatim in intent: do not let anyone

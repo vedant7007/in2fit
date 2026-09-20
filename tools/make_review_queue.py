@@ -21,9 +21,11 @@ ROOT = Path(__file__).resolve().parent.parent
 RES = ROOT / "app" / "src" / "main" / "res"
 LANGUAGES = {"te": "Telugu", "hi": "Hindi"}
 
-# Where each group of keys appears, in words a reviewer can picture. Order is priority order.
-# A key whose prefix is not here lands in a final "unplaced" section, so a new group of strings
-# cannot be handed out without someone saying where it is shown.
+# Where each group of keys appears, in words a reviewer can picture. Order is PACKET order,
+# ruled by Vedant on 20 Sep 2026: the packet ships once, and a reviewer with ten minutes reads
+# the top and stops, so what the build depends on comes first. A key whose prefix is not here
+# lands in a final "unplaced" section, so a new group of strings cannot be handed out without
+# someone saying where it is shown.
 PLACES = [
     ("safety_", "Advice screens",
      "A line at the bottom of every screen that gives advice. Always visible, cannot be closed."),
@@ -33,6 +35,16 @@ PLACES = [
      "living situation, or a pattern over days. THESE MATTER MOST. Each must say only what the "
      "data says, never that the person has an illness, never what to take. The slots (%1$s and "
      "so on) are filled by the app with names and numbers; what each slot holds is in the note."),
+    ("about_", "The About screen",
+     "Where the app says where its numbers come from and which open-source parts it contains."),
+    ("context_", "Lines the app writes for its own language model, not for the screen",
+     "Not shown on a screen. When the person asks a question, the app writes their own meals, "
+     "lab values and diet into a few lines like these and gives them to its language model, in "
+     "the person's language, before it answers; the answer may repeat them back. Plain and "
+     "literal, no advice in them: every slot is a name, a number or a date the app fills in."),
+    ("tts_lead_in_", "Spoken while the app works",
+     "The app says one of these aloud while it is thinking, so a ten-second wait sounds like "
+     "work and not like silence. One or two seconds long when spoken. No health content."),
     ("nutrient_", "Nutrient words",
      "Single words dropped into the sentences above and shown next to figures, so they should "
      "read naturally mid-sentence."),
@@ -47,18 +59,35 @@ PLACES = [
      "assumed, such as a standard bowl size; Rough means the figure could be far off."),
     ("confidence_reason_", "Why the label says what it says",
      "Shown when the person taps the confidence label. One sentence explaining it."),
-    ("about_", "The About screen",
-     "Where the app says where its numbers come from and which open-source parts it contains."),
-    ("context_", "Lines the app writes for its own language model, not for the screen",
-     "Not shown on a screen. When the person asks a question, the app writes their own meals, "
-     "lab values and diet into a few lines like these and gives them to its language model, in "
-     "the person's language, before it answers; the answer may repeat them back. Plain and "
-     "literal, no advice in them: every slot is a name, a number or a date the app fills in."),
     ("status_", "TEMPORARY: the build-status screen",
      "A developer screen listing what is built. It will be replaced before the demo. Lowest "
      "priority: do these last, or skip them."),
     ("state_", "TEMPORARY: the build-status screen", ""),
     ("pipeline_", "TEMPORARY: the build-status screen", ""),
+]
+
+# The packet's parts. A prefix's part is decided here; everything not named is Part 3.
+# Part 4 is assembled from files under docs/localisation/packet-extra/ (other sessions' sheets),
+# appended verbatim, lowest priority.
+PARTS = [
+    (1, "PART 1. THE NINE SENTENCES THAT DECIDE WHETHER TELUGU SHIPS",
+     "The safety line and the eight health sentences. If these nine are not confirmed by a "
+     "fluent speaker before the demo build is made, the app ships without Telugu. If you only "
+     "have ten minutes, do these nine and stop.",
+     ("safety_", "trigger_")),
+    (2, "PART 2. NEW LINES THAT ARRIVED TODAY",
+     "Written by a machine as a starting point so the app has no holes; every one needs your "
+     "eye. Correct or confirm each.",
+     ("about_", "context_", "tts_lead_in_")),
+    (3, "PART 3. THE REST OF THE SCREEN TEXT",
+     "Labels, explanations and the words dropped into sentences. Same rules.",
+     ()),
+]
+EXTRA_DIR = "docs/localisation/packet-extra"
+# Sheets that live where their owners keep them, included live so they cannot drift from the
+# copy in the packet. Each is a different kind of question from the strings above.
+EXTRA_FILES = [
+    "data-authoring/log-words-review.md",     # Priya: the log words and the medicine words
 ]
 
 # A word of context where the English uses a term the reviewer may not have met.
@@ -88,6 +117,25 @@ NOTES = {
         "%1$s is one of the living-situation phrases below.",
     "trigger_timeline":
         "%1$s a number of days, %2$s a short description the app supplies.",
+    "context_figure":
+        "%1$s a nutrient word, %2$s a number, %3$s its unit (g, mg, kcal). A line like "
+        "'iron: 4 mg'. Keep it that short.",
+    "context_figure_partial":
+        "Same, when some foods in the meal had no value: %4$s is the names of those foods.",
+    "context_figure_none":
+        "%1$s a nutrient word. The app has no value for it.",
+    "context_meal":
+        "%1$s the time of the meal, %2$s the foods, %3$s the figures. Just the slots and the "
+        "punctuation between them.",
+    "context_period":
+        "%1$s a period (one of the two lines below), %2$s the figures for it.",
+    "context_lab":
+        "%1$s the test's name as printed, %2$s the value, %3$s its unit, %4$s the report's date.",
+    "context_lab_with_range":
+        "Same, plus %4$s and %5$s the low and high limits printed on the report, and %6$s the "
+        "date.",
+    "context_never_suggest_vegetarian":
+        "Completes 'never suggest ...'. The word in brackets is the diet as the person named it.",
     "status_line":
         "A format only. %1$s is the name of a feature and %2$s is its state, so the Telugu is "
         "just those two slots in the right order with whatever goes between them.",
@@ -120,9 +168,11 @@ def place_of(key: str):
     return len(PLACES), "UNPLACED: ask Vedant where this appears", ""
 
 
-def by_priority(keys):
-    """PLACES order first, then the order the keys have in the string table."""
-    return sorted(keys, key=lambda k: place_of(k)[0])
+def part_of(key: str):
+    for number, title, blurb, prefixes in PARTS:
+        if any(key.startswith(pre) for pre in prefixes):
+            return number, title, blurb
+    return PARTS[-1][0], PARTS[-1][1], PARTS[-1][2]
 
 
 def main(tag: str) -> int:
@@ -130,12 +180,17 @@ def main(tag: str) -> int:
     default = read_table(RES / "values" / "strings.xml")
     local = read_table(RES / f"values-{tag}" / "strings.xml")
     keys = [k for k, (_, translatable, _) in default.items() if translatable]
-    missing = by_priority(k for k in keys if k not in local)
-    unreviewed = by_priority(k for k in keys if k in local and local[k][2])
+    missing = [k for k in keys if k not in local]
+    unreviewed = [k for k in keys if k in local and local[k][2]]
+    # ONE list in packet order: parts first, then places, then the table's own order.
+    todo = sorted(missing + unreviewed, key=lambda k: (part_of(k)[0], place_of(k)[0]))
 
-    out = [f"# IN2FIT: {language} strings for review", ""]
+    out = [f"# IN2FIT: {language} reviewer packet", ""]
+    out += ["**If you only do one part, do Part 1.** Those nine lines decide whether the app "
+            f"speaks {language} at all.", ""]
     out += [f"Generated {date.today():%d %B %Y} from the app's English string table. "
-            f"{len(missing)} strings to write, {len(unreviewed)} to check.", ""]
+            f"{len(unreviewed)} lines to check, {len(missing)} to write. One packet, one trip: "
+            "everything the team needs from you is in this file.", ""]
     out += ["Reviewer's name: ______________________", ""]
     out += ["## What the app is", "",
             "IN2FIT is a phone app for people in India who may not read English nutrition labels. "
@@ -144,7 +199,10 @@ def main(tag: str) -> int:
             "figure. It can also read a printed lab report with the camera. It never diagnoses "
             "and never prescribes.", ""]
     out += ["## What we need from you", "",
-            f"For each numbered item, write the {language} on the line that says `{language}:`.", "",
+            f"Most lines below already have {language} on them, WRITTEN BY A MACHINE. Nobody on the "
+            "team can read it. Under each one is a line `Correct " + language + ":`. If the machine's "
+            "line is right, leave that blank. If it is wrong, write the right line there. A line "
+            f"with no {language} yet has a `{language}:` line to write on.", "",
             "1. Write it the way you would say it to a family member. Short: it goes on a phone screen.",
             "2. Keep the meaning exactly. Add no reassurance, no advice and no number. The English was "
             "written so that the app never says a person has a condition and never tells them what to "
@@ -153,46 +211,56 @@ def main(tag: str) -> int:
             f"it in the {language} sentence, wherever {language} needs it.",
             "4. If an English line is unclear or makes no sense to you, write that instead of guessing. "
             "A note beats a wrong string.",
-            "5. Put your name at the top. Because you wrote it, it counts as reviewed.",
+            "5. Put your name at the top. Because you checked it, it counts as reviewed.",
             "6. Replying in a chat instead of in this file is fine: send your name, then one line per "
-            "item starting with its number here, like `7. ...`. The numbers are how your words reach "
-            "the right place, so keep them.", "",
+            "item starting with its number here, like `7. ...`, or `7. ok` for a line that is right. "
+            "The numbers are how your words reach the right place, so keep them.", "",
             "Send it back to Vedant. Your text goes into the app unchanged, and you will get a list "
             "back showing each item next to what landed, so you can check nothing slipped.", ""]
 
-    n = 0  # continuous across sections: a numbered chat reply must be unambiguous
+    n, last_part, last_section = 0, None, None
+    for k in todo:
+        part, title, blurb = part_of(k)
+        if part != last_part:
+            out += [f"## {title}", "", blurb, ""]
+            last_part, last_section = part, None
+        _, section, where = place_of(k)
+        if section != last_section:
+            out += [f"### {section}", ""]
+            if where:
+                out += [where, ""]
+            last_section = section
+        n += 1
+        out += [f"{n}. `{k}`", "", f"   English: {default[k][0]}", ""]
+        if k in NOTES:
+            out += [f"   Note: {NOTES[k]}", ""]
+        if k in local:
+            out += [f"   {language}, as written, unreviewed: {local[k][0]}", "",
+                    f"   Correct {language} (leave blank if the line above is right):", ""]
+        else:
+            out += [f"   {language}:", ""]
+        out += [""]
 
-    def emit(section_keys, heading, show_current):
-        nonlocal out, n
-        if not section_keys:
-            return
-        out += [f"## {heading}", ""]
-        last_section = None
-        for k in section_keys:
-            _, section, where = place_of(k)
-            if section != last_section:
-                out += [f"### {section}", ""]
-                if where:
-                    out += [where, ""]
-                last_section = section
-            n += 1
-            out += [f"{n}. `{k}`", "", f"   English: {default[k][0]}", ""]
-            if k in NOTES:
-                out += [f"   Note: {NOTES[k]}", ""]
-            if show_current:
-                out += [f"   {language}, as written, unreviewed: {local[k][0]}", "",
-                        f"   Correct {language} (leave blank if the line above is right):", ""]
-            else:
-                out += [f"   {language}:", ""]
-            out += [""]
-
-    emit(unreviewed, f"{language} already written but not yet reviewed: please check", True)
-    emit(missing, f"{language} not yet written", False)
+    # Part 4: other sessions' sheets, appended verbatim, lowest priority.
+    extra_dir = ROOT / EXTRA_DIR
+    extras = [ROOT / f for f in EXTRA_FILES if (ROOT / f).is_file()]
+    extras += sorted(extra_dir.glob("*.md")) if extra_dir.is_dir() else []
+    if extras:
+        out += ["## PART 4. LOWER PRIORITY: OTHER QUESTIONS FROM THE TEAM", "",
+                "Each section below was written by another member of the team and is a different "
+                "kind of question. Skipping these costs us nothing you have not already given us "
+                "above; do them if you have time.", ""]
+        for f in extras:
+            body = f.read_text(encoding="utf-8").strip()
+            # Demote the file's own headings one level so the packet keeps its shape.
+            body = "\n".join(("##" + line) if line.startswith("#") else line for line in body.splitlines())
+            out += [body, "", "---", ""]
 
     dest = ROOT / "docs" / "localisation" / f"{language.lower()}-review-queue.md"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text("\n".join(out).rstrip() + "\n", encoding="utf-8", newline="\n")
-    print(f"{dest.relative_to(ROOT)}: {len(missing)} to write, {len(unreviewed)} to check")
+    print(f"{dest.relative_to(ROOT)}: {len(missing)} to write, {len(unreviewed)} to check, "
+          f"{len(extras)} extra section(s)")
     return 0
 
 

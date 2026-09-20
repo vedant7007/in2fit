@@ -61,6 +61,14 @@
          a voice under that licence ships; if one does, it is shown on the About screen. -->
     <string name="licence_notice_iitm_tts" translatable="false">COPYRIGHT 2016 TTS Consortium, TDIL, Meity represented by Hema A Murthy &amp; S Umesh, DEPARTMENT OF Computer Science and Engineering and Electrical Engineering, IIT Madras. ALL RIGHTS RESERVED</string>
 
+    <!-- Spoken by the app while the model works, so a ten-second wait reads as work rather than
+         silence (0014). Status phrases only: no health content, so the safety line is untouched.
+         One to two seconds spoken; the wrapper waits for it before the answer plays. -->
+    <string name="tts_lead_in_log">Noting that down.</string>
+    <string name="tts_lead_in_answer">Let me check your records.</string>
+    <string name="tts_lead_in_suggest">Let me think about what fits.</string>
+    <string name="tts_lead_in_recommend">Let me see what suits you.</string>
+
     <!-- Confidence bands, spec 15.1.1. Shown inline with every figure, never as a percentage. -->
     <string name="confidence_band_good">Good</string>
     <string name="confidence_band_approximate">Approximate</string>

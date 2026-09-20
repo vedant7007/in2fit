@@ -1,6 +1,8 @@
-# IN2FIT: Telugu strings for review
+# IN2FIT: Telugu reviewer packet
 
-Generated 20 September 2026 from the app's English string table. 14 strings to write, 48 to check.
+**If you only do one part, do Part 1.** Those nine lines decide whether the app speaks Telugu at all.
+
+Generated 20 September 2026 from the app's English string table. 66 lines to check, 0 to write. One packet, one trip: everything the team needs from you is in this file.
 
 Reviewer's name: ______________________
 
@@ -10,18 +12,20 @@ IN2FIT is a phone app for people in India who may not read English nutrition lab
 
 ## What we need from you
 
-For each numbered item, write the Telugu on the line that says `Telugu:`.
+Most lines below already have Telugu on them, WRITTEN BY A MACHINE. Nobody on the team can read it. Under each one is a line `Correct Telugu:`. If the machine's line is right, leave that blank. If it is wrong, write the right line there. A line with no Telugu yet has a `Telugu:` line to write on.
 
 1. Write it the way you would say it to a family member. Short: it goes on a phone screen.
 2. Keep the meaning exactly. Add no reassurance, no advice and no number. The English was written so that the app never says a person has a condition and never tells them what to take; the translation must not either.
 3. Anything like `%1$s` or `%2$s` is a slot the app fills in with a name or a number. Keep it in the Telugu sentence, wherever Telugu needs it.
 4. If an English line is unclear or makes no sense to you, write that instead of guessing. A note beats a wrong string.
-5. Put your name at the top. Because you wrote it, it counts as reviewed.
-6. Replying in a chat instead of in this file is fine: send your name, then one line per item starting with its number here, like `7. ...`. The numbers are how your words reach the right place, so keep them.
+5. Put your name at the top. Because you checked it, it counts as reviewed.
+6. Replying in a chat instead of in this file is fine: send your name, then one line per item starting with its number here, like `7. ...`, or `7. ok` for a line that is right. The numbers are how your words reach the right place, so keep them.
 
 Send it back to Vedant. Your text goes into the app unchanged, and you will get a list back showing each item next to what landed, so you can check nothing slipped.
 
-## Telugu already written but not yet reviewed: please check
+## PART 1. THE NINE SENTENCES THAT DECIDE WHETHER TELUGU SHIPS
+
+The safety line and the eight health sentences. If these nine are not confirmed by a fluent speaker before the demo build is made, the app ships without Telugu. If you only have ten minutes, do these nine and stop.
 
 ### Advice screens
 
@@ -128,11 +132,209 @@ One of these is shown when something in the person's data changes what the app s
    Correct Telugu (leave blank if the line above is right):
 
 
+## PART 2. NEW LINES THAT ARRIVED TODAY
+
+Written by a machine as a starting point so the app has no holes; every one needs your eye. Correct or confirm each.
+
+### The About screen
+
+Where the app says where its numbers come from and which open-source parts it contains.
+
+10. `about_licences_title`
+
+   English: Data sources and open-source licences
+
+   Telugu, as written, unreviewed: డేటా మూలాలు మరియు ఓపెన్ సోర్స్ లైసెన్సులు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### Lines the app writes for its own language model, not for the screen
+
+Not shown on a screen. When the person asks a question, the app writes their own meals, lab values and diet into a few lines like these and gives them to its language model, in the person's language, before it answers; the answer may repeat them back. Plain and literal, no advice in them: every slot is a name, a number or a date the app fills in.
+
+11. `context_figure`
+
+   English: %1$s: %2$s %3$s
+
+   Note: %1$s a nutrient word, %2$s a number, %3$s its unit (g, mg, kcal). A line like 'iron: 4 mg'. Keep it that short.
+
+   Telugu, as written, unreviewed: %1$s: %2$s %3$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+12. `context_figure_partial`
+
+   English: %1$s: at least %2$s %3$s (no value for %4$s)
+
+   Note: Same, when some foods in the meal had no value: %4$s is the names of those foods.
+
+   Telugu, as written, unreviewed: %1$s: కనీసం %2$s %3$s (%4$sకు విలువ లేదు)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+13. `context_figure_none`
+
+   English: %1$s: not known
+
+   Note: %1$s a nutrient word. The app has no value for it.
+
+   Telugu, as written, unreviewed: %1$s: తెలియదు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+14. `context_meal`
+
+   English: %1$s: %2$s. %3$s
+
+   Note: %1$s the time of the meal, %2$s the foods, %3$s the figures. Just the slots and the punctuation between them.
+
+   Telugu, as written, unreviewed: %1$s: %2$s. %3$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+15. `context_period`
+
+   English: %1$s: %2$s
+
+   Note: %1$s a period (one of the two lines below), %2$s the figures for it.
+
+   Telugu, as written, unreviewed: %1$s: %2$s
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+16. `context_period_today`
+
+   English: Today so far
+
+   Telugu, as written, unreviewed: ఈరోజు ఇప్పటివరకు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+17. `context_period_last_seven_days`
+
+   English: The last seven days
+
+   Telugu, as written, unreviewed: గత ఏడు రోజులు
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+18. `context_lab`
+
+   English: %1$s: %2$s %3$s (report dated %4$s)
+
+   Note: %1$s the test's name as printed, %2$s the value, %3$s its unit, %4$s the report's date.
+
+   Telugu, as written, unreviewed: %1$s: %2$s %3$s (%4$s తేదీ రిపోర్టు)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+19. `context_lab_with_range`
+
+   English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
+
+   Note: Same, plus %4$s and %5$s the low and high limits printed on the report, and %6$s the date.
+
+   Telugu, as written, unreviewed: %1$s: %2$s %3$s, రిపోర్టులో ముద్రించిన పరిధి %4$s నుండి %5$s (%6$s తేదీ రిపోర్టు)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+20. `context_never_suggest_vegetarian`
+
+   English: meat, fish or eggs (vegetarian)
+
+   Note: Completes 'never suggest ...'. The word in brackets is the diet as the person named it.
+
+   Telugu, as written, unreviewed: మాంసం, చేపలు లేదా గుడ్లు (శాకాహారి)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+21. `context_never_suggest_vegan`
+
+   English: meat, fish, eggs, milk or any dairy (vegan)
+
+   Telugu, as written, unreviewed: మాంసం, చేపలు, గుడ్లు, పాలు లేదా ఏ పాల ఉత్పత్తులు (వీగన్)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+22. `context_never_suggest_eggetarian`
+
+   English: meat or fish (eggetarian)
+
+   Telugu, as written, unreviewed: మాంసం లేదా చేపలు (గుడ్లు తినే శాకాహారి)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+23. `context_never_suggest_jain`
+
+   English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
+
+   Telugu, as written, unreviewed: మాంసం, చేపలు, గుడ్లు, ఉల్లిపాయ, వెల్లుల్లి లేదా దుంప కూరగాయలు (జైన్)
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+### Spoken while the app works
+
+The app says one of these aloud while it is thinking, so a ten-second wait sounds like work and not like silence. One or two seconds long when spoken. No health content.
+
+24. `tts_lead_in_log`
+
+   English: Noting that down.
+
+   Telugu, as written, unreviewed: నోట్ చేసుకుంటున్నాను.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+25. `tts_lead_in_answer`
+
+   English: Let me check your records.
+
+   Telugu, as written, unreviewed: మీ రికార్డులు చూస్తాను.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+26. `tts_lead_in_suggest`
+
+   English: Let me think about what fits.
+
+   Telugu, as written, unreviewed: ఏది సరిపోతుందో ఆలోచిస్తాను.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+27. `tts_lead_in_recommend`
+
+   English: Let me see what suits you.
+
+   Telugu, as written, unreviewed: మీకు ఏది సరిపడుతుందో చూస్తాను.
+
+   Correct Telugu (leave blank if the line above is right):
+
+
+## PART 3. THE REST OF THE SCREEN TEXT
+
+Labels, explanations and the words dropped into sentences. Same rules.
+
 ### Nutrient words
 
 Single words dropped into the sentences above and shown next to figures, so they should read naturally mid-sentence.
 
-10. `nutrient_energy`
+28. `nutrient_energy`
 
    English: energy
 
@@ -141,7 +343,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-11. `nutrient_protein`
+29. `nutrient_protein`
 
    English: protein
 
@@ -150,7 +352,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-12. `nutrient_carbohydrate`
+30. `nutrient_carbohydrate`
 
    English: carbohydrate
 
@@ -159,7 +361,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-13. `nutrient_fat`
+31. `nutrient_fat`
 
    English: fat
 
@@ -168,7 +370,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-14. `nutrient_fibre`
+32. `nutrient_fibre`
 
    English: fibre
 
@@ -177,7 +379,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-15. `nutrient_iron`
+33. `nutrient_iron`
 
    English: iron
 
@@ -186,7 +388,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-16. `nutrient_vitamin_b12`
+34. `nutrient_vitamin_b12`
 
    English: vitamin B12
 
@@ -195,7 +397,7 @@ Single words dropped into the sentences above and shown next to figures, so they
    Correct Telugu (leave blank if the line above is right):
 
 
-17. `nutrient_sodium`
+35. `nutrient_sodium`
 
    English: sodium
 
@@ -208,7 +410,7 @@ Single words dropped into the sentences above and shown next to figures, so they
 
 Dropped into the sentence 'Suggestions are limited to what is realistic for ...' in place of the slot, so each phrase should complete that sentence.
 
-18. `life_context_hostel_student`
+36. `life_context_hostel_student`
 
    English: hostel and canteen food
 
@@ -217,7 +419,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-19. `life_context_pg_own_cooking`
+37. `life_context_pg_own_cooking`
 
    English: cooking for yourself with limited time
 
@@ -226,7 +428,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-20. `life_context_field_or_manual_worker`
+38. `life_context_field_or_manual_worker`
 
    English: long physical shifts and eating out
 
@@ -235,7 +437,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-21. `life_context_desk_professional`
+39. `life_context_desk_professional`
 
    English: a desk day with a full kitchen
 
@@ -244,7 +446,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
    Correct Telugu (leave blank if the line above is right):
 
 
-22. `life_context_homemaker`
+40. `life_context_homemaker`
 
    English: cooking for the household
 
@@ -257,7 +459,7 @@ Dropped into the sentence 'Suggestions are limited to what is realistic for ...'
 
 The heading of the screen where the person picks Telugu, Hindi or English.
 
-23. `language_picker_title`
+41. `language_picker_title`
 
    English: Language
 
@@ -270,7 +472,7 @@ The heading of the screen where the person picks Telugu, Hindi or English.
 
 A one-word label next to every nutrition figure saying how far to trust it. Good means the food and the amount were both clear; Approximate means something was assumed, such as a standard bowl size; Rough means the figure could be far off.
 
-24. `confidence_band_good`
+42. `confidence_band_good`
 
    English: Good
 
@@ -279,7 +481,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
    Correct Telugu (leave blank if the line above is right):
 
 
-25. `confidence_band_approximate`
+43. `confidence_band_approximate`
 
    English: Approximate
 
@@ -288,7 +490,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
    Correct Telugu (leave blank if the line above is right):
 
 
-26. `confidence_band_rough`
+44. `confidence_band_rough`
 
    English: Rough
 
@@ -301,7 +503,7 @@ A one-word label next to every nutrition figure saying how far to trust it. Good
 
 Shown when the person taps the confidence label. One sentence explaining it.
 
-27. `confidence_reason_exact_food_match`
+45. `confidence_reason_exact_food_match`
 
    English: Matched exactly to a food in the database.
 
@@ -310,7 +512,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-28. `confidence_reason_fuzzy_food_match`
+46. `confidence_reason_fuzzy_food_match`
 
    English: Matched to the closest name in the database; check it is the food you meant.
 
@@ -319,7 +521,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-29. `confidence_reason_category_level_match`
+47. `confidence_reason_category_level_match`
 
    English: Matched only to a food category, not a specific food.
 
@@ -328,7 +530,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-30. `confidence_reason_quantity_stated`
+48. `confidence_reason_quantity_stated`
 
    English: You gave the quantity in a unit we can convert.
 
@@ -337,7 +539,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-31. `confidence_reason_household_unit_default`
+49. `confidence_reason_household_unit_default`
 
    English: A household measure was converted with a standard weight. Tap to correct the grams.
 
@@ -348,7 +550,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-32. `confidence_reason_quantity_inferred`
+50. `confidence_reason_quantity_inferred`
 
    English: You did not say how much, so this quantity is a guess. Tap to correct it.
 
@@ -357,7 +559,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-33. `confidence_reason_authored_reference_recipe`
+51. `confidence_reason_authored_reference_recipe`
 
    English: Based on a reference recipe. Edit it to match how you cook.
 
@@ -368,7 +570,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-34. `confidence_reason_user_edited_recipe`
+52. `confidence_reason_user_edited_recipe`
 
    English: Based on the recipe as you edited it.
 
@@ -377,7 +579,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-35. `confidence_reason_weak_source_record`
+53. `confidence_reason_weak_source_record`
 
    English: The source record for this food rests on few samples or on a label.
 
@@ -386,7 +588,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-36. `confidence_reason_substitute_food_record`
+54. `confidence_reason_substitute_food_record`
 
    English: The nearest record is a similar food, not this one.
 
@@ -395,7 +597,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-37. `confidence_reason_low_asr_confidence`
+55. `confidence_reason_low_asr_confidence`
 
    English: Speech recognition was unsure of what it heard. Check the words.
 
@@ -406,7 +608,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
    Correct Telugu (leave blank if the line above is right):
 
 
-38. `confidence_reason_uncorrected_camera_guess`
+56. `confidence_reason_uncorrected_camera_guess`
 
    English: A camera guess that has not been confirmed by you.
 
@@ -419,7 +621,7 @@ Shown when the person taps the confidence label. One sentence explaining it.
 
 A developer screen listing what is built. It will be replaced before the demo. Lowest priority: do these last, or skip them.
 
-39. `status_screen_subtitle`
+57. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
@@ -428,7 +630,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-40. `status_line`
+58. `status_line`
 
    English: %1$s: %2$s
 
@@ -439,7 +641,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-41. `state_not_implemented`
+59. `state_not_implemented`
 
    English: Not implemented
 
@@ -448,7 +650,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-42. `pipeline_voice_logging`
+60. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
@@ -457,7 +659,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-43. `pipeline_nutrition_lookup`
+61. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
@@ -466,7 +668,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-44. `pipeline_timeline_query`
+62. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
@@ -475,7 +677,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-45. `pipeline_lab_report_scan`
+63. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
@@ -484,7 +686,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-46. `pipeline_adaptive_suggestions`
+64. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
@@ -493,7 +695,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-47. `pipeline_dish_first_guess`
+65. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
@@ -502,7 +704,7 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-48. `pipeline_exercise_form`
+66. `pipeline_exercise_form`
 
    English: Exercise form check
 
@@ -511,109 +713,132 @@ A developer screen listing what is built. It will be replaced before the demo. L
    Correct Telugu (leave blank if the line above is right):
 
 
-## Telugu not yet written
+## PART 4. LOWER PRIORITY: OTHER QUESTIONS FROM THE TEAM
 
-### The About screen
+Each section below was written by another member of the team and is a different kind of question. Skipping these costs us nothing you have not already given us above; do them if you have time.
 
-Where the app says where its numbers come from and which open-source parts it contains.
+### IN2FIT: a short word list for a Telugu and Hindi speaker to check
 
-49. `about_licences_title`
+Different from the strings sheet: nothing to write, only yes-or-no answers about single words.
+Ten minutes. Send it with `docs/localisation/telugu-review-queue.md`, or on its own.
 
-   English: Data sources and open-source licences
+Reviewer's name: ______________________
 
-   Telugu:
+#### What this is for
 
+When a person speaks to the app, one rule decides whether they are *telling the app what they
+ate* (which the app writes into their food history) or *asking it something* (which it must
+never write into their history). The rule is written in Roman letters, and Telugu, Hindi and
+English words share those letters. We already found one collision by measuring: English "do"
+(as in "do I need...") is Hindi "do" (two), and every "maine do roti khaya" was being treated
+as a question. There may be others, and they are the kind of thing only a speaker sees.
 
-### Lines the app writes for its own language model, not for the screen
+The rule is deliberately lopsided. Treating a meal as a question costs the person two seconds.
+Treating a question as a meal writes food they never ate into their health history. So:
 
-Not shown on a screen. When the person asks a question, the app writes their own meals, lab values and diet into a few lines like these and gives them to its language model, in the person's language, before it answers; the answer may repeat them back. Plain and literal, no advice in them: every slot is a name, a number or a date the app fills in.
+#### The words that matter most: "I ate" / "I drank"
 
-50. `context_figure`
+The app treats a sentence containing one of these as **certainly a meal**, if nothing else in it
+looks like a question. **A wrong word here is the dangerous kind.** For each word, please answer:
 
-   English: %1$s: %2$s %3$s
+- Does it mean *ate* or *drank*, in the past, the way a person would say what they had?
+- Could the same spelling be a different word in Telugu, Hindi or Telugu-English mixing, that
+  someone might say when asking a question rather than reporting a meal?
+- Is there a common everyday spelling or form we have missed?
 
-   Telugu:
+| # | Word | Meant as | Past-tense ate/drank? (yes/no) | Could mean something else? | Missing form? |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `khaya` | Hindi, ate | | | |
+| 2 | `khayi` | Hindi, ate (fem.) | | | |
+| 3 | `khaye` | Hindi, ate (pl.) | | | |
+| 4 | `khaaya` | Hindi, ate, long-vowel spelling | | | |
+| 5 | `khai` | Hindi, ate, short spelling | | | |
+| 6 | `piya` | Hindi, drank | | | |
+| 7 | `pi` | Hindi, drank, short spelling | | | |
+| 8 | `peeya` | Hindi, drank, long-vowel spelling | | | |
+| 9 | `tinnanu` | Telugu, I ate | | | |
+| 10 | `tinnaanu` | Telugu, I ate, long-vowel spelling | | | |
+| 11 | `thinnanu` | Telugu, I ate, th- spelling | | | |
+| 12 | `tinna` | Telugu, ate, colloquial | | | |
+| 13 | `thinna` | Telugu, ate, th- spelling | | | |
+| 14 | `tinnam` | Telugu, we ate | | | |
+| 15 | `tinnaam` | Telugu, we ate, long-vowel spelling | | | |
+| 16 | `tagaanu` | Telugu, I drank | | | |
+| 17 | `taganu` | Telugu, I drank, short spelling | | | |
+| 18 | `thaganu` | Telugu, I drank, th- spelling | | | |
 
+English words on the same list, for completeness: `ate`, `had`, `drank`, `eaten`, `finished`,
+and the phrases `breakfast was`, `lunch was`, `dinner was`, `snack was`, `tiffin was`.
 
-51. `context_figure_partial`
+#### The words that make the app ask instead
 
-   English: %1$s: at least %2$s %3$s (no value for %4$s)
+A sentence containing any of these is sent to the app's slower, careful path. **A wrong word
+here only costs two seconds**, so guessing is safe, but a common *meal* word on this list would
+slow every meal down. Please only flag one if it is a word people use when *reporting a meal*.
 
-   Telugu:
+Hindi: `kya kitna kitni kitne kaise kaun kaunsa kaunsi kab kahan kyun kyon chahiye karun karoon
+karu sakta sakti sakte hoon raha rahi rahe abhi batao bataye bataiye accha achha behtar sahi
+theek`; phrases `kha raha`, `kha rahi`, `kha rahe`, `hai to`, `hai toh`, `ke liye`.
 
+Telugu: `emi em enti entha enni ela ekkada eppudu evaru endhuku enduku tinali tinaali thinali
+cheyali cheyyali kavali kavaali cheppu cheppandi ippudu tintunna tintunnanu tintunnam manchidi
+manchida bagunda avuna kada`; phrase `kosam`.
 
-52. `context_figure_none`
+English (listed so you can spot a Telugu or Hindi word hiding in it, like "do"): `what whats
+which how why when where who whether should shall can could would will may might must does did
+are am any anything enough add suggest recommend recommendation advice advise avoid better best
+worse help helps need needs want wants prefer instead swap replace option options question tell
+show check compare versus vs ok okay fine good healthy report doctor checked reading level
+medicine tablet tablets remove delete undo cancel correct change edit wrong mistake having eating
+making cooking planning going now tonight later`. And `do` and `is`, only at the start of a
+sentence.
 
-   English: %1$s: not known
+Any English word above that is ALSO an everyday Telugu or Hindi word people would say while
+reporting a meal: write it here.
 
-   Telugu:
+______________________________________________________________________________
 
+#### Second list: words about medicine, illness and diagnosis
 
-53. `context_meal`
+Separate rule, same kind of question. When a person's sentence contains one of these, the app
+adds a line saying a doctor should judge it; and when the app's own reply contains one of the
+phrases, the reply is thrown away. A wrong word here costs one extra sentence or one lost reply,
+never a wrong meal, so this list matters less than the first. Still: is any of these a common
+everyday word that means something else?
 
-   English: %1$s: %2$s. %3$s
+Hindi: `dawai dawa goli goliyan bimari bimar khatra khatarnak ilaj`; phrases `hai kya`, `kya hai`,
+`kya mujhe`, `mujhe kya hua`. Replies thrown away if they contain: `aapko ... hai` / `tumhe ...
+hai` with an illness word, and `goli lo`, `dawai lo`, `goli roz lo`, `dawai lena`.
 
-   Telugu:
+Telugu: `mandu mandulu matra jabbu rogam pramadam pramadakaram vaidyam`; phrases `unda`,
+`vachinda`, `tagginda`, `perigindha`. Replies thrown away if they contain: `meeku ... undi` /
+`neeku ... undi` with an illness word, and `mandu veskondi`, `matra veyandi`, `tablets
+thesukondi`.
 
+Any of these wrong, or a common form missing: write it here.
 
-54. `context_period`
+______________________________________________________________________________
 
-   English: %1$s: %2$s
+Send it back to Vedant. The lists live in `LogPrefilter.kt` and `SafetyLine.kt`, and a test
+keeps this sheet and the log-word list in step, so a word you flag is changed in one place.
 
-   Telugu:
+---
 
+### Two things to listen to, and one sentence to write (from Meera, the voice)
 
-55. `context_period_today`
+This is about the app's VOICE, not its text. Vedant will send you a few short audio files with
+this packet; they are named like `te-padmavathi-default-A.wav`. Each is the same two Telugu words
+said by a different synthetic voice.
 
-   English: Today so far
+1. **Rank them.** Which sounds most like a person speaking Telugu, and which least? A rough order
+   is enough: best to worst, by file name. If the phone's own built-in Telugu voice is among
+   them, rank it too and say so.
 
-   Telugu:
+2. **Write one sentence.** One ordinary Telugu sentence a person would actually say about a meal
+   they ate, the kind of thing someone says to family. It becomes the test sentence every voice
+   is judged on next; two food names is not a fair test of a voice, and nobody on the team can
+   write that sentence.
 
+   Sentence: ______________________________________________________________
 
-56. `context_period_last_seven_days`
-
-   English: The last seven days
-
-   Telugu:
-
-
-57. `context_lab`
-
-   English: %1$s: %2$s %3$s (report dated %4$s)
-
-   Telugu:
-
-
-58. `context_lab_with_range`
-
-   English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
-
-   Telugu:
-
-
-59. `context_never_suggest_vegetarian`
-
-   English: meat, fish or eggs (vegetarian)
-
-   Telugu:
-
-
-60. `context_never_suggest_vegan`
-
-   English: meat, fish, eggs, milk or any dairy (vegan)
-
-   Telugu:
-
-
-61. `context_never_suggest_eggetarian`
-
-   English: meat or fish (eggetarian)
-
-   Telugu:
-
-
-62. `context_never_suggest_jain`
-
-   English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
-
-   Telugu:
+---

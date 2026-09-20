@@ -4,7 +4,7 @@
 
 Each number is the item on the sheet you had, with the English it belongs to and the Telugu now in the app under that English. Nobody else on the team can read the Telugu, so a line that landed under the wrong key is invisible unless you say so. The health sentences deserve the closest read: they are the ones a person acts on.
 
-Received via Vedant, author not yet confirmed; every line below is marked for review until a fluent speaker confirms it. Generated 20 September 2026.
+Machine-generated lines received via Nila; every line below is marked for review until a fluent speaker confirms it. Generated 20 September 2026.
 
 ## Advice screens
 
@@ -73,58 +73,190 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
    Telugu: గత %1$s రోజుల్లో, %2$s.
 
 
+## The About screen
+
+10. `about_licences_title`
+
+   English: Data sources and open-source licences
+
+   Telugu: డేటా మూలాలు మరియు ఓపెన్ సోర్స్ లైసెన్సులు
+
+
+## Lines the app writes for its own language model, not for the screen
+
+11. `context_figure`
+
+   English: %1$s: %2$s %3$s
+
+   Telugu: %1$s: %2$s %3$s
+
+
+12. `context_figure_partial`
+
+   English: %1$s: at least %2$s %3$s (no value for %4$s)
+
+   Telugu: %1$s: కనీసం %2$s %3$s (%4$sకు విలువ లేదు)
+
+
+13. `context_figure_none`
+
+   English: %1$s: not known
+
+   Telugu: %1$s: తెలియదు
+
+
+14. `context_meal`
+
+   English: %1$s: %2$s. %3$s
+
+   Telugu: %1$s: %2$s. %3$s
+
+
+15. `context_period`
+
+   English: %1$s: %2$s
+
+   Telugu: %1$s: %2$s
+
+
+16. `context_period_today`
+
+   English: Today so far
+
+   Telugu: ఈరోజు ఇప్పటివరకు
+
+
+17. `context_period_last_seven_days`
+
+   English: The last seven days
+
+   Telugu: గత ఏడు రోజులు
+
+
+18. `context_lab`
+
+   English: %1$s: %2$s %3$s (report dated %4$s)
+
+   Telugu: %1$s: %2$s %3$s (%4$s తేదీ రిపోర్టు)
+
+
+19. `context_lab_with_range`
+
+   English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
+
+   Telugu: %1$s: %2$s %3$s, రిపోర్టులో ముద్రించిన పరిధి %4$s నుండి %5$s (%6$s తేదీ రిపోర్టు)
+
+
+20. `context_never_suggest_vegetarian`
+
+   English: meat, fish or eggs (vegetarian)
+
+   Telugu: మాంసం, చేపలు లేదా గుడ్లు (శాకాహారి)
+
+
+21. `context_never_suggest_vegan`
+
+   English: meat, fish, eggs, milk or any dairy (vegan)
+
+   Telugu: మాంసం, చేపలు, గుడ్లు, పాలు లేదా ఏ పాల ఉత్పత్తులు (వీగన్)
+
+
+22. `context_never_suggest_eggetarian`
+
+   English: meat or fish (eggetarian)
+
+   Telugu: మాంసం లేదా చేపలు (గుడ్లు తినే శాకాహారి)
+
+
+23. `context_never_suggest_jain`
+
+   English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
+
+   Telugu: మాంసం, చేపలు, గుడ్లు, ఉల్లిపాయ, వెల్లుల్లి లేదా దుంప కూరగాయలు (జైన్)
+
+
+## Spoken while the app works
+
+24. `tts_lead_in_log`
+
+   English: Noting that down.
+
+   Telugu: నోట్ చేసుకుంటున్నాను.
+
+
+25. `tts_lead_in_answer`
+
+   English: Let me check your records.
+
+   Telugu: మీ రికార్డులు చూస్తాను.
+
+
+26. `tts_lead_in_suggest`
+
+   English: Let me think about what fits.
+
+   Telugu: ఏది సరిపోతుందో ఆలోచిస్తాను.
+
+
+27. `tts_lead_in_recommend`
+
+   English: Let me see what suits you.
+
+   Telugu: మీకు ఏది సరిపడుతుందో చూస్తాను.
+
+
 ## Nutrient words
 
-10. `nutrient_energy`
+28. `nutrient_energy`
 
    English: energy
 
    Telugu: శక్తి
 
 
-11. `nutrient_protein`
+29. `nutrient_protein`
 
    English: protein
 
    Telugu: ప్రోటీన్
 
 
-12. `nutrient_carbohydrate`
+30. `nutrient_carbohydrate`
 
    English: carbohydrate
 
    Telugu: కార్బోహైడ్రేట్
 
 
-13. `nutrient_fat`
+31. `nutrient_fat`
 
    English: fat
 
    Telugu: కొవ్వు
 
 
-14. `nutrient_fibre`
+32. `nutrient_fibre`
 
    English: fibre
 
    Telugu: పీచు
 
 
-15. `nutrient_iron`
+33. `nutrient_iron`
 
    English: iron
 
    Telugu: ఇనుము
 
 
-16. `nutrient_vitamin_b12`
+34. `nutrient_vitamin_b12`
 
    English: vitamin B12
 
    Telugu: విటమిన్ B12
 
 
-17. `nutrient_sodium`
+35. `nutrient_sodium`
 
    English: sodium
 
@@ -133,35 +265,35 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
 
 ## Living-situation phrases
 
-18. `life_context_hostel_student`
+36. `life_context_hostel_student`
 
    English: hostel and canteen food
 
    Telugu: హాస్టల్ మరియు క్యాంటీన్ ఆహారం
 
 
-19. `life_context_pg_own_cooking`
+37. `life_context_pg_own_cooking`
 
    English: cooking for yourself with limited time
 
    Telugu: తక్కువ సమయంలో మీ కోసం మీరు వండుకోవడం
 
 
-20. `life_context_field_or_manual_worker`
+38. `life_context_field_or_manual_worker`
 
    English: long physical shifts and eating out
 
    Telugu: ఎక్కువసేపు శారీరక పని చేయడం మరియు బయట తినడం
 
 
-21. `life_context_desk_professional`
+39. `life_context_desk_professional`
 
    English: a desk day with a full kitchen
 
    Telugu: డెస్క్ వద్ద పని చేసే రోజు మరియు పూర్తి వంటగది
 
 
-22. `life_context_homemaker`
+40. `life_context_homemaker`
 
    English: cooking for the household
 
@@ -170,7 +302,7 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
 
 ## Language choice
 
-23. `language_picker_title`
+41. `language_picker_title`
 
    English: Language
 
@@ -179,21 +311,21 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
 
 ## The confidence label
 
-24. `confidence_band_good`
+42. `confidence_band_good`
 
    English: Good
 
    Telugu: మంచిది
 
 
-25. `confidence_band_approximate`
+43. `confidence_band_approximate`
 
    English: Approximate
 
    Telugu: సుమారు
 
 
-26. `confidence_band_rough`
+44. `confidence_band_rough`
 
    English: Rough
 
@@ -202,84 +334,84 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
 
 ## Why the label says what it says
 
-27. `confidence_reason_exact_food_match`
+45. `confidence_reason_exact_food_match`
 
    English: Matched exactly to a food in the database.
 
    Telugu: డేటాబేస్‌లోని ఆహారంతో ఖచ్చితంగా సరిపోలింది.
 
 
-28. `confidence_reason_fuzzy_food_match`
+46. `confidence_reason_fuzzy_food_match`
 
    English: Matched to the closest name in the database; check it is the food you meant.
 
    Telugu: డేటాబేస్‌లోని దగ్గరగా సరిపోలే పేరుతో సరిపోలింది; మీరు ఉద్దేశించిన ఆహారమేనా చూసుకోండి.
 
 
-29. `confidence_reason_category_level_match`
+47. `confidence_reason_category_level_match`
 
    English: Matched only to a food category, not a specific food.
 
    Telugu: నిర్దిష్ట ఆహారంతో కాకుండా, ఆహార వర్గంతో మాత్రమే సరిపోలింది.
 
 
-30. `confidence_reason_quantity_stated`
+48. `confidence_reason_quantity_stated`
 
    English: You gave the quantity in a unit we can convert.
 
    Telugu: మీరు మార్చగలిగే కొలతలో పరిమాణాన్ని చెప్పారు.
 
 
-31. `confidence_reason_household_unit_default`
+49. `confidence_reason_household_unit_default`
 
    English: A household measure was converted with a standard weight. Tap to correct the grams.
 
    Telugu: ఇంట్లో ఉపయోగించే కొలతను ప్రామాణిక బరువుతో మార్చాం. గ్రాములను సరిచేయడానికి నొక్కండి.
 
 
-32. `confidence_reason_quantity_inferred`
+50. `confidence_reason_quantity_inferred`
 
    English: You did not say how much, so this quantity is a guess. Tap to correct it.
 
    Telugu: మీరు ఎంత పరిమాణం చెప్పలేదు, కాబట్టి ఈ పరిమాణం అంచనా మాత్రమే. దాన్ని సరిచేయడానికి నొక్కండి.
 
 
-33. `confidence_reason_authored_reference_recipe`
+51. `confidence_reason_authored_reference_recipe`
 
    English: Based on a reference recipe. Edit it to match how you cook.
 
    Telugu: ఒక ప్రామాణిక వంటకం ఆధారంగా తీసుకున్నది. మీరు ఎలా వండుతారో దానికి అనుగుణంగా మార్చండి.
 
 
-34. `confidence_reason_user_edited_recipe`
+52. `confidence_reason_user_edited_recipe`
 
    English: Based on the recipe as you edited it.
 
    Telugu: మీరు సవరించిన వంటకం ఆధారంగా తీసుకున్నది.
 
 
-35. `confidence_reason_weak_source_record`
+53. `confidence_reason_weak_source_record`
 
    English: The source record for this food rests on few samples or on a label.
 
    Telugu: ఈ ఆహారానికి సంబంధించిన మూల రికార్డు కొన్ని నమూనాలు లేదా ఒక లేబుల్‌పై ఆధారపడి ఉంది.
 
 
-36. `confidence_reason_substitute_food_record`
+54. `confidence_reason_substitute_food_record`
 
    English: The nearest record is a similar food, not this one.
 
    Telugu: దగ్గరగా సరిపోలిన రికార్డు ఇదే ఆహారం కాదు, ఇలాంటి ఆహారానికి సంబంధించినది.
 
 
-37. `confidence_reason_low_asr_confidence`
+55. `confidence_reason_low_asr_confidence`
 
    English: Speech recognition was unsure of what it heard. Check the words.
 
    Telugu: మీరు చెప్పింది ఏమిటో వాయిస్ గుర్తింపు సరిగ్గా నిర్ధారించలేకపోయింది. పదాలను చూసుకోండి.
 
 
-38. `confidence_reason_uncorrected_camera_guess`
+56. `confidence_reason_uncorrected_camera_guess`
 
    English: A camera guess that has not been confirmed by you.
 
@@ -288,178 +420,77 @@ Received via Vedant, author not yet confirmed; every line below is marked for re
 
 ## TEMPORARY: the build-status screen
 
-39. `status_screen_subtitle`
+57. `status_screen_subtitle`
 
    English: Phase 1B scaffold. Contracts are defined; no pipeline is built yet.
 
    Telugu: ఫేజ్ 1B ప్రాథమిక నిర్మాణం. అవసరమైన ఒప్పందాలు నిర్వచించబడ్డాయి; ఇంకా ఏ పైప్‌లైన్ నిర్మించబడలేదు.
 
 
-40. `status_line`
+58. `status_line`
 
    English: %1$s: %2$s
 
    Telugu: %1$s: %2$s
 
 
-41. `state_not_implemented`
+59. `state_not_implemented`
 
    English: Not implemented
 
    Telugu: ఇంకా అమలు చేయలేదు
 
 
-42. `pipeline_voice_logging`
+60. `pipeline_voice_logging`
 
    English: Voice logging (ASR, LLM extract, TTS)
 
    Telugu: వాయిస్ లాగింగ్ (ASR, LLM ఎక్స్‌ట్రాక్ట్, TTS)
 
 
-43. `pipeline_nutrition_lookup`
+61. `pipeline_nutrition_lookup`
 
    English: Nutrition lookup
 
    Telugu: పోషక విలువల శోధన
 
 
-44. `pipeline_timeline_query`
+62. `pipeline_timeline_query`
 
    English: Timeline and voice query
 
    Telugu: టైమ్‌లైన్ మరియు వాయిస్ ప్రశ్న
 
 
-45. `pipeline_lab_report_scan`
+63. `pipeline_lab_report_scan`
 
    English: Lab report scan
 
    Telugu: ల్యాబ్ రిపోర్ట్ స్కాన్
 
 
-46. `pipeline_adaptive_suggestions`
+64. `pipeline_adaptive_suggestions`
 
    English: Adaptive suggestions
 
    Telugu: అనుకూల సూచనలు
 
 
-47. `pipeline_dish_first_guess`
+65. `pipeline_dish_first_guess`
 
    English: Camera dish first guess
 
    Telugu: కెమెరాతో వంటకం మొదటి అంచనా
 
 
-48. `pipeline_exercise_form`
+66. `pipeline_exercise_form`
 
    English: Exercise form check
 
    Telugu: వ్యాయామం చేసే విధానం తనిఖీ
 
 
-## The About screen
-
-49. `about_licences_title`
-
-   English: Data sources and open-source licences
-
-   Telugu: (nothing yet)
-
-
-## Lines the app writes for its own language model, not for the screen
-
-50. `context_figure`
-
-   English: %1$s: %2$s %3$s
-
-   Telugu: (nothing yet)
-
-
-51. `context_figure_partial`
-
-   English: %1$s: at least %2$s %3$s (no value for %4$s)
-
-   Telugu: (nothing yet)
-
-
-52. `context_figure_none`
-
-   English: %1$s: not known
-
-   Telugu: (nothing yet)
-
-
-53. `context_meal`
-
-   English: %1$s: %2$s. %3$s
-
-   Telugu: (nothing yet)
-
-
-54. `context_period`
-
-   English: %1$s: %2$s
-
-   Telugu: (nothing yet)
-
-
-55. `context_period_today`
-
-   English: Today so far
-
-   Telugu: (nothing yet)
-
-
-56. `context_period_last_seven_days`
-
-   English: The last seven days
-
-   Telugu: (nothing yet)
-
-
-57. `context_lab`
-
-   English: %1$s: %2$s %3$s (report dated %4$s)
-
-   Telugu: (nothing yet)
-
-
-58. `context_lab_with_range`
-
-   English: %1$s: %2$s %3$s, printed range %4$s to %5$s (report dated %6$s)
-
-   Telugu: (nothing yet)
-
-
-59. `context_never_suggest_vegetarian`
-
-   English: meat, fish or eggs (vegetarian)
-
-   Telugu: (nothing yet)
-
-
-60. `context_never_suggest_vegan`
-
-   English: meat, fish, eggs, milk or any dairy (vegan)
-
-   Telugu: (nothing yet)
-
-
-61. `context_never_suggest_eggetarian`
-
-   English: meat or fish (eggetarian)
-
-   Telugu: (nothing yet)
-
-
-62. `context_never_suggest_jain`
-
-   English: meat, fish, eggs, onion, garlic or root vegetables (Jain)
-
-   Telugu: (nothing yet)
-
-
 ## Same text under more than one key: confirm this is deliberate
 
 - 2. `trigger_escalate_above_range` and 3. `trigger_escalate_below_range`
+- 15. `context_period` and 58. `status_line`

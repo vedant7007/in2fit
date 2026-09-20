@@ -173,6 +173,9 @@ def main(argv=None) -> int:
     ap.add_argument("--reviewer", help="the fluent speaker's name; read from the sheet if absent")
     ap.add_argument("--unreviewed", action="store_true",
                     help="the author cannot be confirmed: stamp REVIEW instead of 'written by'")
+    ap.add_argument("--origin", choices=["person", "machine"], default="person",
+                    help="with --unreviewed: 'machine' says so in the stamp, because the XML must "
+                         "say what 0017 says and a model's lines are never softened into a person's")
     a = ap.parse_args(argv)
 
     language = LANGUAGES[a.tag]
@@ -223,8 +226,12 @@ def main(argv=None) -> int:
     english = {key: en for _, key, en, _, _ in items}
 
     problems, written = [], []
-    stamp = (f"REVIEW: received via {reviewer}, {date.today():%d %b %Y}, author not confirmed"
-             if a.unreviewed else f"written by {reviewer}, {date.today():%d %b %Y}")
+    if a.unreviewed and a.origin == "machine":
+        stamp = f"REVIEW: machine-generated, received via {reviewer}, {date.today():%d %b %Y}, unreviewed"
+    elif a.unreviewed:
+        stamp = f"REVIEW: received via {reviewer}, {date.today():%d %b %Y}, author not confirmed"
+    else:
+        stamp = f"written by {reviewer}, {date.today():%d %b %Y}"
     for key, text in answers.items():
         if key not in default:
             problems.append((key, "not a key in the default table"))
@@ -255,7 +262,9 @@ def main(argv=None) -> int:
              f"{language} now in the app under that English. Nobody else on the team can read the "
              f"{language}, so a line that landed under the wrong key is invisible unless you say so. "
              f"The health sentences deserve the closest read: they are the ones a person acts on.", "",
-             (f"Received via {reviewer}, author not yet confirmed; every line below is marked for review "
+             (f"Machine-generated lines received via {reviewer}; every line below is marked for review "
+              f"until a fluent speaker confirms it." if a.unreviewed and a.origin == "machine" else
+              f"Received via {reviewer}, author not yet confirmed; every line below is marked for review "
               f"until a fluent speaker confirms it." if a.unreviewed else f"Reviewer: {reviewer}.")
              + f" Generated {date.today():%d %B %Y}.", ""]
     from make_review_queue import place_of
