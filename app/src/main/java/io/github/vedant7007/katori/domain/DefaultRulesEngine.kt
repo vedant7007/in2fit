@@ -216,14 +216,15 @@ class DefaultRulesEngine : RulesEngine {
             )
         }
 
-        // ONLY A POSITIVE SCORE IS A SUGGESTION (Priya's RankingDefectsTest, 20 Sep). A candidate
-        // the preferences argue against scores below zero; one they give no reason to prefer
-        // scores zero; neither is advice, and an alphabetical tail of them under the real
-        // suggestions read as advice on the screen. Nothing to say is an empty list.
+        // RULED (Vedant, 20 Sep evening): MAKE THE TERMS COMPARABLE; DO NOT FILTER BY SIGN. The
+        // preference ORDERS the list, it does not delete from it; with the terms on one scale
+        // (the daily-reference fraction above) the food the preference argues against sinks to
+        // the bottom, and the list is never emptied when real food is on it. Filtering by sign
+        // was the plausible wrong fix, and under additive scoring it left beat 4 empty.
         //
-        // Total order among the rest: score descending, then food code. The final tiebreak is
-        // what stops two equally scored candidates swapping places between runs.
-        return scored.filter { it.score > 0 }.sortedWith(
+        // Total order: score descending, then food code. The final tiebreak is what stops two
+        // equally scored candidates swapping places between runs.
+        return scored.sortedWith(
             compareByDescending<RankedCandidate> { it.score }.thenBy { it.candidate.foodCode }
         )
     }

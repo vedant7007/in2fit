@@ -54,7 +54,9 @@ class ReferralDefectsTest {
 
     /** The same property on RECOMMEND, where "should I take" routes a dose question by the words. */
     @Test fun `a guard failure on a clinical RECOMMEND shows the referral beside the engine's own list`() {
-        val llm = FakeLlm(recommended = Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model invented the number '60'"))
+        // "should I take" is RECOMMEND evidence and the dose makes it clinical, so the evidence
+        // conflicts and the model is asked; it says RECOMMEND here, and LOG would be refused.
+        val llm = FakeLlm(recommended = Outcome.Unavailable(UnavailableReason.INTERNAL_ERROR, "the model invented the number '60'")).apply { intent = Outcome.Ok(Intent.RECOMMEND) }
         val events = run(llm, "how much iron tablet should I take?")
         assertTrue("$events", events.none { it is OrchestratorEvent.Failed })
         val advice = events.filterIsInstance<OrchestratorEvent.Advice>().single()

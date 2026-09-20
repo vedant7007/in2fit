@@ -55,9 +55,13 @@ object IntentRouter {
         val history = (question && logWord) || hit(text, words, HISTORY, HISTORY_PHRASES)
         val plateNow = hit(text, words, PLATE_NOW, PLATE_NOW_PHRASES)
         val recommend = hit(text, words, RECOMMEND, RECOMMEND_PHRASES)
+        // A stated reading or a clinical question is ANSWER evidence (the referral lives there),
+        // and never LOG: "haemoglobin 9.8" with no marker used to be silence, which sent it to
+        // the model, whose LOG verdict would have been believed and written (20 Sep).
+        val clinical = SafetyLine.invitesClinicalJudgement(transcript)
 
         val evidence = buildList {
-            if (history) add(Intent.ANSWER)
+            if (history || clinical) add(Intent.ANSWER)
             if (plateNow) add(Intent.SUGGEST)
             if (recommend) add(Intent.RECOMMEND)
         }
@@ -81,7 +85,8 @@ object IntentRouter {
     fun accept(modelSays: Intent, transcript: String): Intent? {
         // A LOG on a question, or on a sentence that says a food was NOT eaten, is refused
         // whatever the model says: the person is asked.
-        if (modelSays == Intent.LOG && (LogPrefilter.hasMarker(transcript) || LogPrefilter.negatesFood(transcript))) return null
+        // ... and a stated reading is not a meal (LogNeverFromAHealthQuestionTest is the rule).
+        if (modelSays == Intent.LOG && (LogPrefilter.hasMarker(transcript) || LogPrefilter.negatesFood(transcript) || SafetyLine.invitesClinicalJudgement(transcript))) return null
         val d = decide(transcript)
         return when (d) {
             is Decision.Decided -> d.intent
