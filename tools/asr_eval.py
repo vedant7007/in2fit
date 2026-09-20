@@ -24,6 +24,11 @@ Word and character error rate of the shipped ASR models, on the desktop, through
                                                   distance (attenuation + synthetic reverb), and both together;
                                                   prints exact n/N per condition, and runs the energy endpointer on
                                                   the same audio to show where it stops seeing the end of a sentence
+    python asr_eval.py insertions <manifest.csv> [--engine ...]
+                                                  does "foods heard" survive a presenter who says more than the card?
+                                                  per clip: insertions vs foods heard; then a ladder of the same
+                                                  speaker's clips joined end to end (2, 3, 4 at a time, up to the
+                                                  push-to-talk cap) so the x axis reaches where one clip cannot
     python asr_eval.py tail <manifest.csv>         push-to-talk's thumb question: cut each clip N ms after (or, negative, before) the last
                                                   word (N = -300..1000), clean and in +15 dB babble, and
                                                   print exact n/N per cut, so "let go a beat after the last word"
@@ -762,6 +767,75 @@ def _last_word_end(x, frame=320, floor=0.01, hang_frames=10):
     return int((loud[-1] + 1) * frame) if len(loud) else len(x)
 
 
+
+def cmd_insertions(manifest: Path, engine: str = "indicconformer") -> None:
+    """Insertions are the presenter's extra words; foods heard is the demo's question. If the second
+    holds while the first grows, he may talk to the judges instead of reciting. Joined clips are the same
+    voice saying more, which is the only way to push the x axis past what he happened to record."""
+    import numpy as np
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8", newline="")))
+    rows = [r for r in rows if r["reference"].strip()]
+    langs = {r["language"] for r in rows}
+    recs = {lang: recognizer(lang, engine=engine) for lang in langs}
+    clips = []
+    for r in rows:
+        x, sr = load_audio(manifest.parent / r["path"])
+        if sr != 16000:
+            x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
+        clips.append((r, x))
+
+    def score(lang, x, reference, foods):
+        stream = recs[lang].create_stream(); stream.accept_waveform(16000, x); recs[lang].decode_stream(stream)
+        hyp = stream.result.text
+        S, D, I = edit_ops(normalise(reference), normalise(hyp))
+        fh, fe, missing = foods_heard(foods, hyp)
+        return hyp, S, D, I, fh, fe, missing
+
+    print(f"engine: {engine}; {len(clips)} clips. SYNTHETIC only in the joining: the voice is the recorded speaker's.")
+    print("\nper clip: what the presenter added, and whether the foods survived it")
+    print(f"{'clip':22s} {'secs':>5s} {'ins':>4s} {'sub':>4s} {'del':>4s}   foods heard")
+    points = []
+    for r, x in clips:
+        hyp, S, D, I, fh, fe, missing = score(r["language"], x, r["reference"], r.get("expected_foods", ""))
+        foods = f"{fh}/{fe}" + (f"  missing {', '.join(missing)}" if missing else "") if fe else "(no food in the sentence)"
+        print(f"{Path(r['path']).name:22s} {len(x) / 16000:5.1f} {I:4d} {S:4d} {D:4d}   {foods}")
+        if fe:
+            points.append((I, fh, fe))
+
+    print("\njoined clips of the same speaker and language, end to end with 300 ms between, up to the 20 s push-to-talk cap")
+    print(f"{'clips joined':40s} {'secs':>5s} {'ins':>4s} {'sub':>4s} {'del':>4s}   foods heard")
+    gap = np.zeros(int(0.3 * 16000), np.float32)
+    by_lang = {}
+    for r, x in clips:
+        by_lang.setdefault(r["language"], []).append((r, x))
+    rng = np.random.default_rng(20260920)
+    for lang, items in by_lang.items():
+        food_items = [(r, x) for r, x in items if r.get("expected_foods", "").strip()]
+        for k in (2, 3, 4):
+            for _ in range(3):
+                if len(food_items) < k:
+                    break
+                picks = [food_items[i] for i in rng.choice(len(food_items), size=k, replace=False)]
+                x = np.concatenate(sum([[c, gap] for _, c in picks], [])[:-1])
+                if len(x) > 20 * 16000:
+                    x = x[: 20 * 16000]
+                reference = " ".join(r["reference"] for r, _ in picks)
+                foods = ";".join(f for r, _ in picks for f in r["expected_foods"].split(";") if f)
+                hyp, S, D, I, fh, fe, missing = score(lang, x, reference, foods)
+                names = "+".join(Path(r["path"]).stem.split("_")[-1] for r, _ in picks)
+                print(f"{lang + ' ' + names:40s} {len(x) / 16000:5.1f} {I:4d} {S:4d} {D:4d}   {fh}/{fe}" + (f"  missing {', '.join(missing)}" if missing else ""))
+                points.append((I, fh, fe))
+
+    print("\nfoods heard against insertions, all rows above pooled (insertion bands):")
+    bands = [(0, 0), (1, 4), (5, 9), (10, 19), (20, 99)]
+    for lo, hi in bands:
+        sel = [(fh, fe) for I, fh, fe in points if lo <= I <= hi]
+        if sel:
+            h = sum(f for f, _ in sel); e = sum(e for _, e in sel)
+            print(f"  {lo:2d}-{hi:<2d} insertions: {len(sel):2d} rows, foods heard {h}/{e}" + ("" if h == e else f"  <- {e - h} missed"))
+    print("\nJoined clips are the same voice saying more, not a person free-talking; the per-clip rows are the only")
+    print("natural evidence. Report as 'foods heard n/N at k insertions', never as a rate the presenter is guaranteed.")
+
 def cmd_tail(manifest: Path, engine: str = "indicconformer") -> None:
     import numpy as np
     rng = np.random.default_rng(20260920)
@@ -861,6 +935,8 @@ if __name__ == "__main__":
         cmd_synth_mixed(Path(args[1]))
     elif len(args) >= 2 and args[0] == "wer":
         cmd_wer([Path(p) for p in args[1:]], engine=engine)
+    elif len(args) >= 2 and args[0] == "insertions":
+        cmd_insertions(Path(args[1]), engine=engine)
     elif len(args) >= 2 and args[0] == "tail":
         cmd_tail(Path(args[1]), engine=engine)
     elif len(args) >= 2 and args[0] == "robustness":

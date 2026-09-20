@@ -3744,3 +3744,62 @@ class table has no katori for a composed dish; 150 g is the katori of plain cook
 real caption is "Two rotis, one katori dal", and the real figures are 467 kcal and 21 g protein
 (20.9 on screen). The nutrient names come from `strings.xml` on the phone (capitalised); the
 numbers and bands are these.
+[Jacob 22:40] RULING BY VEDANT, WRITTEN INTO 0031: THE DEMO IS HINDI, IN VEDANT'S OWN VOICE. ENGLISH IS
+NOT A DEMO LANGUAGE. Four numbers: foods heard 16 of 16 in hi against 7 of 16 in en; exact 3 of ten
+against 0 of ten. TO NILA: the run of show stops carrying an English path; if anyone proposes an
+English beat later, 0031's ruling paragraph is the answer.
+
+[Jacob 22:40] VEDANT'S EAR-CHECKS AND METADATA, resolved. Native Marathi, 19, speaks Telugu, English,
+Hindi, Marathi, Kannada: the Hindi on stage is Marathi-accented Hindi and that is the voice 16 of
+16 was measured on; and the premise "Vedant does not speak Telugu" in 0031 was wrong by his own
+account (corrected there; the ruling rests on the measurement, not on it). hi_06: he DID say
+"पिछले", and the audio shows it was never in the file: 0.14 s of exact digital zeros, first piece
+at 0.28 s, मंगलवार at 0.44 s, no room for "मैंने पिछले". He spoke as he pressed record. That is the
+PAUSE beat, seen on his own recorder, not a recogniser miss. hi_10: he did not say "नाश्ते में";
+"उसने" is most likely a clipped "मैंने". Both rows keep foods 2/2.
+
+[Jacob 22:40] INSERTIONS, TURNED INTO A NUMBER (Vedant's ask; `tools/asr_eval.py insertions`,
+`logs/asr-insertions-vedant-hi.log`, his ten hi clips plus his own clips joined end to end):
+
+per clip: what the presenter added, and whether the foods survived it
+clip                    secs  ins  sub  del   foods heard
+vedant_hi_01.wav         3.1    0    0    0   2/2
+vedant_hi_02.wav         5.1    0    0    0   3/3
+vedant_hi_03.wav         6.1    4    0    0   2/2
+vedant_hi_04.wav         5.5    6    1    0   2/2
+vedant_hi_05.wav         5.1    1    0    0   3/3
+vedant_hi_06.wav         4.9    7    1    1   (no food in the sentence)
+vedant_hi_07.wav         3.7    0    0    0   (no food in the sentence)
+vedant_hi_08.wav        10.2   14    0    1   2/2
+vedant_hi_09.wav         4.3    2    1    0   (no food in the sentence)
+vedant_hi_10.wav         2.9    1    2    1   2/2
+joined clips of the same speaker and language, end to end with 300 ms between, up to the 20 s push-to-talk cap
+clips joined                              secs  ins  sub  del   foods heard
+hi 04+01                                   9.0    6    0    0   4/4
+hi 08+01                                  13.6   14    0    1   4/4
+hi 03+08                                  16.5   19    2    0   4/4
+hi 10+08+05                               18.8   17    3    1   7/7
+hi 02+08+03                               20.0   17    3    0   7/7
+hi 02+03+05                               16.8    5    0    0   8/8
+hi 01+04+02+03                            20.0   12    1    0   9/9
+hi 04+01+08+10                            20.0   14    6    0   6/8  missing idli, sambar
+hi 10+05+08+01                            20.0   13    8    1   8/9  missing roti
+foods heard against insertions, all rows above pooled (insertion bands):
+   0-0  insertions:  2 rows, foods heard 5/5
+   1-4  insertions:  3 rows, foods heard 7/7
+   5-9  insertions:  3 rows, foods heard 14/14
+  10-19 insertions:  8 rows, foods heard 47/50  <- 3 missed
+
+IT HOLDS FLAT. Natural clips: foods heard 16/16 from 0 to 14 insertions; hi_08 (10.2 s, 14
+insertions) 2/2. Joined utterances under the 20 s cap: 43/43 from 5 to 19 insertions. The only
+three misses are foods CUT OFF by the 20 s push-to-talk cap on the two four-clip joins that ran to
+22 s: not misheard, not recorded. So: no insertion budget. Vedant may talk to the judges instead of
+reciting; the recogniser did not lose a food to his extra words on any clip that fit. The one
+budget is SECONDS: `PushToTalk.MAX_HOLD_MS` goes 20 s -> 30 s so the cap cannot reach a real
+sentence. TO NILA: no cut to the presenter's lines is needed for the recogniser; keep them under
+fifteen seconds for the WAIT after them (0014), which is a different reason. Caveats travel: one
+speaker, seven natural clips with foods, joined rows are the same voice saying more.
+
+OUTSTANDING, not blocking: the other speakers (manifest, sheet, wer with and without
+--engine omnilingual, by-speaker table verbatim, small sample) when their files land; the device
+cold/warm row from Rao's `AsrDeviceTest.b` once the USB link holds. I am not chasing the phone.

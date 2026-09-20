@@ -98,6 +98,78 @@ heard 7 of 16 (`logs/asr-eval-vedant-demo.log`). The harness prints those column
 now, so "3 of ten exact" cannot leave the tool without the insertions and the foods beside it.
 The paragraph below is kept as it was written before his voice was heard.**
 
+## RULING, 20 September: the demo is Hindi, in Vedant's own voice. English is not a demo language.
+
+Decided by Vedant on the re-scored twenty (`logs/asr-eval-vedant-demo.log`), on four numbers:
+**foods heard 16 of 16 in hi against 7 of 16 in en; exact 3 of ten in hi against 0 of ten in en.**
+Not a close call. The run of show carries no English path; if anyone proposes an English beat
+later, this paragraph is the answer.
+
+Two premises corrected by the presenter himself, neither of which the ruling rests on: he is a
+**native Marathi speaker** (19; speaks Telugu, English, Hindi, Marathi, Kannada), so the Hindi on
+stage is Marathi-accented Hindi, and that is the voice the 16 of 16 was measured on; and "Vedant
+does not speak Telugu", stated above, is wrong by his own account. His Telugu was never recorded
+or measured; the ruling stands on the Hindi measurement, not on that premise.
+
+His two ear-checks, resolved against the audio: hi_06, he did say "पिछले"; the file begins with
+0.14 s of exact digital zeros (the recorder's padding) and the first piece lands at 0.28 s with
+मंगलवार at 0.44 s, so "मैंने पिछले" (0.6-0.8 s of speech) was **not in the file**: he began speaking
+as he pressed record. Not a recogniser miss; the failure the push-to-talk PAUSE beat exists for,
+seen on his own recorder. hi_10, he did not say "नाश्ते में"; "उसने" is most likely a clipped
+"मैंने" of the same kind. Foods 2/2 on that row either way.
+
+## Insertions: does "foods heard" survive a presenter who talks instead of reciting?
+
+He added words to the card in six of ten rows (35 insertions against 5 substitutions). On stage he
+will add more, talking to judges. Whether the food words survive that is the thing that could
+still break the demo live, so it was measured (`tools/asr_eval.py insertions`,
+`logs/asr-insertions-vedant-hi.log`): per clip, insertions against foods heard; then his own clips
+joined end to end, two to four at a time, to push the axis past what he happened to record.
+
+per clip: what the presenter added, and whether the foods survived it
+clip                    secs  ins  sub  del   foods heard
+vedant_hi_01.wav         3.1    0    0    0   2/2
+vedant_hi_02.wav         5.1    0    0    0   3/3
+vedant_hi_03.wav         6.1    4    0    0   2/2
+vedant_hi_04.wav         5.5    6    1    0   2/2
+vedant_hi_05.wav         5.1    1    0    0   3/3
+vedant_hi_06.wav         4.9    7    1    1   (no food in the sentence)
+vedant_hi_07.wav         3.7    0    0    0   (no food in the sentence)
+vedant_hi_08.wav        10.2   14    0    1   2/2
+vedant_hi_09.wav         4.3    2    1    0   (no food in the sentence)
+vedant_hi_10.wav         2.9    1    2    1   2/2
+joined clips of the same speaker and language, end to end with 300 ms between, up to the 20 s push-to-talk cap
+clips joined                              secs  ins  sub  del   foods heard
+hi 04+01                                   9.0    6    0    0   4/4
+hi 08+01                                  13.6   14    0    1   4/4
+hi 03+08                                  16.5   19    2    0   4/4
+hi 10+08+05                               18.8   17    3    1   7/7
+hi 02+08+03                               20.0   17    3    0   7/7
+hi 02+03+05                               16.8    5    0    0   8/8
+hi 01+04+02+03                            20.0   12    1    0   9/9
+hi 04+01+08+10                            20.0   14    6    0   6/8  missing idli, sambar
+hi 10+05+08+01                            20.0   13    8    1   8/9  missing roti
+foods heard against insertions, all rows above pooled (insertion bands):
+   0-0  insertions:  2 rows, foods heard 5/5
+   1-4  insertions:  3 rows, foods heard 7/7
+   5-9  insertions:  3 rows, foods heard 14/14
+  10-19 insertions:  8 rows, foods heard 47/50  <- 3 missed
+
+**It holds flat.** On the natural clips, foods heard is 16 of 16 from 0 to 14 insertions; hi_08,
+10.2 s of him talking freely with 14 insertions, heard both foods. On the joined utterances that
+fit under the 20 s push-to-talk cap, 43 of 43 across 5 to 19 insertions. The only three misses in
+the table are foods **physically cut off by the 20 s cap**: the two four-clip joins ran to 22 s,
+the cap took the last 2 s, and the last clip's foods (idli and sambar in one, roti in the other)
+were not misheard but not recorded. No insertion budget follows from this; Vedant may speak
+naturally on stage. **The one budget is seconds, not words**: the cap. It is raised from 20 s to
+30 s in `PushToTalk` so it cannot reach a sentence a judge would sit through, and a presenter's
+line should still be under fifteen seconds for the wait that follows it (`0014`), not for the
+recogniser.
+
+Caveats that travel with this: one speaker, ten natural clips, seven of them with foods in them;
+the joined rows are the same voice saying more, not a person free-talking; substitutions rose in
+the longest joins (3 to 8) and some of those are the cap cutting a word in half.
+
 **FROZEN, 20 September, by rule: Beat 1's sentence.** Row 1, "मैंने दो रोटी और थोड़ी दाल खाई", exact
 on the presenter's voice through the hi checkpoint, is the one measured thing in the demo. Nobody
 improves it, rephrases it, or makes it more impressive.

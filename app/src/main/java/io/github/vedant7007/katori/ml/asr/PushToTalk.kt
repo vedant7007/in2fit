@@ -128,8 +128,14 @@ class PushToTalk(
         /** Under this the button was tapped, not held through a sentence. Same figure as the open-listening minimum. */
         const val MIN_HOLD_MS = DefaultAsrEngine.MIN_SPEECH_MS
 
-        /** A thumb that never lets go still gets a transcript of this much and no more. */
-        const val MAX_HOLD_MS = 20_000
+        /**
+         * A thumb that never lets go still gets a transcript of this much and no more. Thirty, not
+         * twenty: joining the presenter's own recordings past a 20 s cap cut foods off the END of the
+         * utterance and they were counted as missed when they had simply not been recorded
+         * (`0031`, "Insertions"); a sentence to a judge is never thirty seconds, so the cap cannot
+         * reach a real sentence, and only a stuck thumb finds it.
+         */
+        const val MAX_HOLD_MS = 30_000
 
         /** Recorded after the thumb lifts. Covers a thumb up to this early on the last word; see the class comment. */
         const val RELEASE_TAIL_MS = 300
