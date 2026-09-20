@@ -35,9 +35,9 @@ would be decided by measurement with the interface kept pluggable. This is that.
 
 | Role | Source | Licence | Size |
 | --- | --- | --- | --- |
-| ASR Telugu | `parismitaglobalsolutions/indicconformer-sherpa-onnx` `te/model.int8.onnx` | Apache-2.0 | 197,595,693 B |
-| ASR Hindi | same repo, `hi/model.int8.onnx` | Apache-2.0 | 197,595,593 B |
-| ASR English | same repo, `en/model.int8.onnx` | Apache-2.0 | 174,610,057 B |
+| ASR Telugu | `parismitaglobalsolutions/indicconformer-sherpa-onnx` `te/model.int8.onnx` | **MIT (AI4Bharat)**; the repo's `apache-2.0` tag covers the repackaging only | 197,595,693 B |
+| ASR Hindi | same repo, `hi/model.int8.onnx` | **MIT (AI4Bharat)**, as above | 197,595,593 B |
+| ASR English | same repo, `en/model.int8.onnx`, which is **not IndicConformer**: it is `sherpa-onnx-nemo-fast-conformer-ctc-en-24500`, NVIDIA's `stt_en_fastconformer_hybrid_large_pc` re-quantised | **CC-BY-4.0** (NVIDIA); attribution owed wherever models are credited | 174,610,057 B |
 | TTS Telugu | `rhasspy/piper-voices` `te/te_IN/padmavathi/medium` | CC-BY-4.0 | 63,516,050 B |
 | LLM | `Qwen/Qwen2.5-1.5B-Instruct-GGUF` `qwen2.5-1.5b-instruct-q4_k_m.gguf` | Apache-2.0 | 1,117,320,736 B |
 
@@ -49,10 +49,18 @@ Notes that matter later:
 - The IndicConformer models are **NeMo CTC conformers, not Whisper**. They load through
   sherpa-onnx's NeMo CTC API, not its Whisper API, and `te/` and `hi/` share the repo-root
   `tokens.txt` while `en/` has its own. Getting this wrong looks like a model failure.
-- That repository has 4 likes and no recorded downloads. It is one person's export, stated
-  as derived from AI4Bharat (MIT) and NVIDIA NeMo (CC-BY-4.0). Apache-2.0 is its own claim.
-  **It needs a smoke test on hardware before anyone trusts it**, which is why Q3 in
-  STATUS.md asked before proceeding.
+- That repository has 4 likes and no recorded downloads. It is one person's export. Its
+  `apache-2.0` tag is the REPACKAGING's claim, not the models'. **Corrected 20 Sep 2026 on
+  Jacob's evidence (`0021`, `0022-one-model-for-mixed-speech`):** the repo's own README table
+  says "Licence of source: MIT (AI4Bharat)", the te export's ONNX metadata reads
+  `model_author=ai4bharat`, and the English file's metadata reads `model_author=NeMo`,
+  `vocab_size=1024`: it is NVIDIA's `stt_en_fastconformer_hybrid_large_pc`, whose card says
+  "License to use this model is covered by the CC-BY-4.0" (`license: cc-by-4.0` in the header).
+  The earlier line here, "derived from AI4Bharat (MIT) and NVIDIA NeMo (CC-BY-4.0)", was half
+  right for the wrong reason: the NVIDIA part is the English model itself, not a training
+  dependency of the Indic ones. Neither MIT nor CC-BY-4.0 is non-commercial, so no register
+  entry; CC-BY-4.0 wants NVIDIA credited on the About screen. The hardware smoke test this
+  bullet asked for has since been done (`0021`).
 - The Qwen filename is **lowercase** `q4_k_m`, not `Q4_K_M`.
 
 ## Excluded, and why
@@ -62,6 +70,10 @@ Notes that matter later:
   found". Upstream Whisper is MIT, but this repository says nothing, and absence of a
   licence is absence of a grant. This is the same reasoning that removed IFCT. English ASR
   now comes from the Apache-2.0 IndicConformer export instead, so nothing was lost.
+- **Whisper multilingual, `small` and `large-v3-turbo`**, licensed (Apache-2.0 and MIT) but
+  **unusable for Telugu**, measured 20 Sep 2026: empty output on 7 of 13 and 11 of 13 clips when
+  forced to Telugu, and hallucinated food sentences when forced to English, which is a WRONG
+  FOOD by construction. Table and logs in `0022-one-model-for-mixed-speech`.
 - **`ai4bharat/vits-multilingual-itts` and `vits-multilingual-all`: `license: null`**, and
   they ship raw Coqui `.pth` checkpoints with no config or vocab. Unusable and ungranted.
 - **AI4Bharat FastPitch plus HiFi-GAN, which spec 10.3 names: no ONNX exists.** The PyTorch
