@@ -92,7 +92,21 @@ rows 1, 2 and 7 exact; the en checkpoint broke the food words in 8 of 10 on his 
 3 of ten because he did not read verbatim: he added words in six rows, as the instruction invited,
 and the recogniser transcribed the additions as fluent Hindi that the reference does not contain.
 Two rows lost a content word (hi_06 "पिछले", hi_10 "नाश्ते में") and are with him to check by ear.
-The paragraph below is kept as it was written before his voice was heard.** The Windows voice is not the presenter. If his
+Re-scored with the error split: hi 5 substitutions / 3 deletions / 35 insertions, "reference words
+all present" 5 of ten, **expected food words heard 16 of 16**; en 21 / 4 / 54, 2 of ten, food words
+heard 7 of 16 (`logs/asr-eval-vedant-demo.log`). The harness prints those columns in every table
+now, so "3 of ten exact" cannot leave the tool without the insertions and the foods beside it.
+The paragraph below is kept as it was written before his voice was heard.**
+
+**FROZEN, 20 September, by rule: Beat 1's sentence.** Row 1, "मैंने दो रोटी और थोड़ी दाल खाई", exact
+on the presenter's voice through the hi checkpoint, is the one measured thing in the demo. Nobody
+improves it, rephrases it, or makes it more impressive.
+
+**The presenter's instruction, three beats, all measured: PRESS · PAUSE · SPEAK · FINISH THE WORD ·
+LET GO.** The pause after the press because push-to-talk has no pre-roll (the microphone is not open
+before the press; hi_06 is most likely a word spoken as the thumb landed); the finish before the lift
+because a cut inside the last word costs the sentence and a late lift costs nothing (the tail table
+below); the capture's 300 ms release tail covers the thumb that is early anyway. The Windows voice is not the presenter. If his
 recording disagrees with it, the ruling flips to `en-IN` the same evening and Priya's Devanagari
 work changes shape, which is why that recording is his highest-priority task tonight and why this
 paragraph says provisional rather than settled. Provisional in a second way too: it assumes Vedant

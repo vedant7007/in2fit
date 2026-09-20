@@ -14,6 +14,10 @@
 # Hindi sentence came out as एक, the number one, on both synthetic runs (logs/asr-hi-emitted-forms.log),
 # and a plate that hears "one" where a food was is the wrong kind of error to bring on stage.
 #
+# ROW 1 IS FROZEN (rule, 20 Sep 2026): "मैंने दो रोटी और थोड़ी दाल खाई" came back exact on the presenter's own
+# voice through the hi checkpoint (logs/asr-eval-vedant-demo.log). It is the one measured thing in the demo.
+# Do not edit, rephrase or improve it. The other rows may change; row 1 may not.
+#
 # HONESTY NOTE: any WER on synthesised versions of these rows is a smoke test. The number that
 # matters is Vedant's own voice saying them, recorded with the same naming as the speaker script
 # (vedant_hi_01 ...), through tools/asr_eval.py. Until that exists, nothing here is a demo guarantee.

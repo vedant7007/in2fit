@@ -97,6 +97,31 @@ def normalise(text: str) -> list[str]:
     return text.lower().split()
 
 
+def edit_ops(ref: list, hyp: list) -> tuple[int, int, int]:
+    """(substitutions, deletions, insertions) on the minimal alignment. An exact count alone cannot
+    tell a recogniser that got the reference right and heard MORE (insertions only) from one that
+    got it wrong (substitutions, deletions); this can, and every table below prints it."""
+    n, m = len(ref), len(hyp)
+    d = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        d[i][0] = i
+    for j in range(1, m + 1):
+        d[0][j] = j
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (ref[i - 1] != hyp[j - 1]))
+    S = D = I = 0
+    i, j = n, m
+    while i > 0 or j > 0:
+        if i > 0 and j > 0 and d[i][j] == d[i - 1][j - 1] + (ref[i - 1] != hyp[j - 1]):
+            S += int(ref[i - 1] != hyp[j - 1]); i -= 1; j -= 1
+        elif i > 0 and d[i][j] == d[i - 1][j] + 1:
+            D += 1; i -= 1
+        else:
+            I += 1; j -= 1
+    return S, D, I
+
+
 def edit_distance(a: list, b: list) -> int:
     prev = list(range(len(b) + 1))
     for i, x in enumerate(a, 1):
@@ -105,6 +130,45 @@ def edit_distance(a: list, b: list) -> int:
             cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (x != y)))
         prev = cur
     return prev[-1]
+
+
+_ALIASES = None
+
+
+def food_aliases():
+    """food key -> every alias_norm the shipped database holds for it, any script. Read once from the
+    same .db the app ships, so 'was the food word heard' means what the matcher would mean by it."""
+    global _ALIASES
+    if _ALIASES is None:
+        import sqlite3
+        from collections import defaultdict as dd
+        db = sqlite3.connect(str(REPO / "app/src/main/assets/food/katori-food.db"))
+        by_key = dd(set)
+        for table, key in (("food_aliases", "food_key"), ("recipe_aliases", "recipe_key")):
+            for alias, k in db.execute(f"select alias_norm, {key} from {table}"):
+                by_key[k].add(alias)
+        _ALIASES = dict(by_key)
+    return _ALIASES
+
+
+def foods_heard(expected: str, hyp: str) -> tuple[int, int, list[str]]:
+    """How many of the `expected_foods` (English canonical names, ';'-separated) have SOME alias, in
+    any script, present as a whole word run in the hypothesis. Returns (heard, expected, missing)."""
+    names = [e.strip() for e in expected.split(";") if e.strip()]
+    if not names:
+        return 0, 0, []
+    aliases = food_aliases()
+    hyp_words = normalise(hyp)
+    hyp_text = " " + " ".join(hyp_words) + " "
+    heard, missing = 0, []
+    for name in names:
+        keys = [k for k, al in aliases.items() if name.lower() in al]
+        candidates = set().union(*(aliases[k] for k in keys)) if keys else {name.lower()}
+        if any((" " + " ".join(normalise(a)) + " ") in hyp_text for a in candidates if a):
+            heard += 1
+        else:
+            missing.append(name)
+    return heard, len(names), missing
 
 
 def recognizer(lang: str, threads: int = 4, engine: str = "indicconformer"):
@@ -172,7 +236,8 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
     print("DESKTOP TIMINGS. Not phone numbers. See the module docstring about free RAM.\n")
 
     def bucket():
-        return {"w_err": 0, "w_ref": 0, "c_err": 0, "c_ref": 0, "n": 0, "exact": 0, "ms": 0.0, "audio": 0.0, "pieces": 0, "sources": set()}
+        return {"w_err": 0, "w_ref": 0, "c_err": 0, "c_ref": 0, "n": 0, "exact": 0, "S": 0, "D": 0, "I": 0,
+                "ins_only": 0, "foods_heard": 0, "foods_expected": 0, "ms": 0.0, "audio": 0.0, "pieces": 0, "sources": set()}
 
     per_lang = defaultdict(bucket)
     per_speaker = defaultdict(bucket)   # (speaker, lang) for recorded rows: the second-presenter comparison
@@ -192,24 +257,41 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
         ref_w, hyp_w = normalise(r["reference"]), normalise(hyp)
         ref_c, hyp_c = list("".join(ref_w)), list("".join(hyp_w))
         w_err, c_err = edit_distance(ref_w, hyp_w), edit_distance(ref_c, hyp_c)
+        S, D, I = edit_ops(ref_w, hyp_w)
+        fh, fe, missing = foods_heard(r.get("expected_foods", ""), hyp)
         targets = [per_lang[lang]]
         if r["source"].lower().startswith("recorded") and "_" in r["path"].stem:
             targets.append(per_speaker[(r["path"].stem.split("_")[0], lang)])
         for s in targets:
             s["w_err"] += w_err; s["w_ref"] += len(ref_w); s["c_err"] += c_err; s["c_ref"] += len(ref_c)
-            s["n"] += 1; s["exact"] += int(w_err == 0); s["ms"] += ms; s["audio"] += secs; s["pieces"] += len(tokens); s["sources"].add(r["source"].upper())
-        mark = "exact" if w_err == 0 else f"{w_err} word err, {c_err} char err"
+            s["n"] += 1; s["exact"] += int(w_err == 0); s["S"] += S; s["D"] += D; s["I"] += I
+            s["ins_only"] += int(w_err > 0 and S == 0 and D == 0)
+            s["foods_heard"] += fh; s["foods_expected"] += fe
+            s["ms"] += ms; s["audio"] += secs; s["pieces"] += len(tokens); s["sources"].add(r["source"].upper())
+        if w_err == 0:
+            mark = "exact"
+        elif S == 0 and D == 0:
+            mark = f"reference words all present, {I} extra word(s) spoken"
+        else:
+            mark = f"{S} sub, {D} del, {I} ins"
+        if fe:
+            mark += f"; foods heard {fh}/{fe}" + (f" (missing: {', '.join(missing)})" if missing else "")
         print(f"[{lang}] {r['source'].upper():9s} {r['path'].name:32s} {secs:4.1f}s audio  {ms:6.0f} ms  {len(tokens):3d} pieces  {mark}")
         print(f"      ref: {r['reference']}")
         print(f"      hyp: {hyp}")
 
     def table(title, rows):
         print(f"\n{title}")
-        print(f"{'':22s} source            exact     WER      CER   pieces/s  decode ms/clip")
+        print(f"{'':22s} source            exact   ref words all present   sub/del/ins   foods heard    WER      CER   decode ms/clip")
         for key, s in rows:
             wer = 100.0 * s["w_err"] / max(1, s["w_ref"])
             cer = 100.0 * s["c_err"] / max(1, s["c_ref"])
-            print(f"{key:22s} {'+'.join(sorted(s['sources'])):16s} {s['exact']:3d}/{s['n']:<3d}  {wer:5.1f}%  {cer:5.1f}%    {s['pieces'] / s['audio']:5.1f}     {s['ms'] / s['n']:6.0f}")
+            present = s["exact"] + s["ins_only"]
+            foods = f"{s['foods_heard']}/{s['foods_expected']}" if s["foods_expected"] else "-"
+            print(f"{key:22s} {'+'.join(sorted(s['sources'])):16s} {s['exact']:3d}/{s['n']:<3d}     {present:3d}/{s['n']:<3d}            {s['S']:3d}/{s['D']:<3d}/{s['I']:<3d}    {foods:>7s}     {wer:5.1f}%  {cer:5.1f}%     {s['ms'] / s['n']:6.0f}")
+        print("'ref words all present' = exact, plus rows where the only errors are INSERTIONS: the speaker said more than the")
+        print("reference and the recogniser got the reference words right. An exact count read alone undercounts those rows.")
+        print("'foods heard' = expected foods with some alias of theirs, any script, present in the hypothesis: the demo's question.")
 
     table("by language", sorted(per_lang.items()))
     if per_speaker:

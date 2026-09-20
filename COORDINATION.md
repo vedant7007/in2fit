@@ -3408,3 +3408,39 @@ TO NILA, RUN OF SHOW: Beat 1's sentence, row 1, came back EXACT on the presenter
 too; your alias covers it. TO ARJUN: if hi_06 turns out to be a clipped start, the push-to-talk
 instruction gains a word: "PRESS, then speak; finish the word, then let go" (the capture has no
 pre-roll, the mic is not open before the press). Metadata line from Vedant still to come.
+
+[Jacob 22:00] RULE, UNDER MY NAME, ACCEPTED BY VEDANT: BEAT 1'S SENTENCE IS FROZEN. Row 1 of
+`data-authoring/demo-utterance-set.csv`, "मैंने दो रोटी और थोड़ी दाल खाई", came back EXACT on the
+presenter's own voice through the hi checkpoint on 20 Sep (`logs/asr-eval-vedant-demo.log`). That
+sentence, on that voice, through that checkpoint, is the one measured thing in the demo. Nobody
+improves it, rephrases it, or makes it more impressive. TO NILA: write "frozen, measured 20 Sep, do
+not edit" beside row 1 in the run of show; the CSV header now says the same.
+
+[Jacob 22:00] TO NILA AND ARJUN, THE PRESENTER INSTRUCTION, three beats, all measured, replacing both
+earlier versions ("wait a beat" was wrong; "finish the word, then let go" was right but incomplete):
+    PRESS · PAUSE · SPEAK · FINISH THE WORD · LET GO
+Why the first pause: push-to-talk has no pre-roll, the microphone is not open before the press, so a
+word spoken as the thumb lands is simply not recorded; hi_06 ("ने मंगलवार को" for "मैंने पिछले
+मंगलवार को") is most likely exactly that and is with Vedant to confirm by ear. Why the last: a cut
+inside the last word costs the sentence (200 ms inside, 6 and 5 of ten; 300 ms, 0), a late lift
+costs nothing, and the capture adds 300 ms after the thumb anyway. Nila: one line in the run of
+show, same line as "phone at the mouth". Arjun: the hint under the button (`mic_hold_hint`) says
+the same five words; the words are the instruction.
+
+[Jacob 22:00] THE FIGURE WITH ITS REASON, so "3 of ten exact" never travels alone. `tools/asr_eval.py`
+now prints, in every table, the error split (substitutions / deletions / insertions), "reference
+words all present" (exact PLUS rows whose only errors are insertions: the speaker said more and the
+recogniser got the reference words right), and "foods heard" (expected foods with some alias of
+theirs, any script, present in the hypothesis, read from the shipped .db). Vedant's twenty, re-scored,
+verbatim:
+
+by language
+                       source            exact   ref words all present   sub/del/ins   foods heard    WER      CER   decode ms/clip
+en                     RECORDED-DEMO      0/10        2/10              21/4  /54        7/16      88.8%   81.1%       1039
+hi                     RECORDED-DEMO      3/10        5/10               5/3  /35       16/16      53.8%   49.6%        352
+
+Read: hi's 35 insertions against 5 substitutions is the presenter speaking more than the card, and 16
+of 16 expected food words were heard; en's 21 substitutions are the recogniser mishearing, and 9 of 16
+food words were lost. The exact column is the least informative of the three and the tool no longer
+lets it stand by itself. Desktop decode times on this run were on an un-starved laptop (hi 352 ms
+mean); still not phone numbers.
