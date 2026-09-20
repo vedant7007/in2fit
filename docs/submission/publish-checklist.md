@@ -46,14 +46,15 @@ that name survives, so the file tree does not surprise a reader.
 
 | where | state |
 | --- | --- |
-| Repository name | **[Vedant]**. The working directory is `IQOOOOO`, which means nothing to a reader. Recommend `in2fit`, lowercase, matching the app; the deck and the form say IN2FIT. |
+| Repository name | **Settled: `in2fit`**, created 20 Sep 19:41 as `https://github.com/vedant7007/in2fit`, PRIVATE, `master` pushed at `83e7375`. The working directory is still `IQOOOOO` locally, which nobody but the team sees. |
 | README title, STATUS title, the form, the deck | IN2FIT |
 | `HANDOVER.md` title | "Katori — handover report", with a dated addendum at the top saying the product is IN2FIT. Left as history. |
 | Package `io.github.vedant7007.katori`, class names (`KatoriDatabase`, `KatoriApp`), `katori-food.db`, `katori_llama.cpp`, `Theme.Katori` | **stay**, by ruling (`0015`): the JNI symbol names encode the package. A reader of the file tree sees them; the README explains in one line. Not reader-visible on the phone: the app is labelled IN2FIT and the launcher icon is the app's own. |
 
 ## 6. Public or private, and how a judge is given access
 
-**[Vedant]**. Recommendation: **public**. The reasons: judges are not known in advance, and a
+**[Vedant]**. State on 20 Sep 19:45: **private**, by ruling, until 7a is answered; it goes
+public before submission and not before. Recommendation for that moment: **public**. The reasons: judges are not known in advance, and a
 private repository on GitHub needs each reader added as a collaborator by name, which nobody
 will be doing during judging; the GPL duties in `0005` are about the APK and are satisfied
 more simply when the source is public; the form's answer says "a reader will find", which is a
@@ -121,8 +122,11 @@ appended, never overwritten.
 
 1. Decide 7a and 7b (they decide what the README says).
 2. Edit or accept the five `vedan` paths and the LAN address (item 1); Rao's one-line script fix.
-3. Create the repository under the settled name, public or private per item 6, push `master`,
-   and set the remote in the main tree so `git remote -v` answers.
+3. ~~Create the repository under the settled name~~ Done, private, `origin` set in the shared
+   git config so every worktree sees it. Pushing is a separate step from landing:
+   `tools\land.ps1` fast-forwards `master` locally and nothing pushes it; `git push origin
+   master` from any worktree does, and it should be run after the commit that is meant to be
+   read. Making it public is `gh repo edit vedant7007/in2fit --visibility public`, after 7a.
 4. Open the URL in a private browser window and read what a judge reads: the README first, then
    `docs/demo/`, then `docs/decisions/`.
 5. Paste the URL into the form, and re-read `docs/submission/form-answers.md`'s "prototype URL"

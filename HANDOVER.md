@@ -58,6 +58,7 @@ question it cares most about: whether anything has run on a phone. Something has
 > | The string rules for anyone writing a screen | `docs/localisation/string-conventions.md` | `StringResourcesTest` enforces the ones a test can |
 > | Licence texts and duties | `docs/licences/`, `docs/decisions/0005` | the IITM PDF diff is recorded there before anyone rules from the text |
 > | The demo | `docs/demo/run-of-show.md`, `docs/demo/deck-audit-2026-09-20.md` | budgets are replaced by rows from the clean run; the deck is re-read against the repo before every resubmission |
+> | The remote | `git push origin master` from any worktree, after landing; `https://github.com/vedant7007/in2fit`, private until ruled otherwise | landing does not push; pushing is deliberate |
 
 There is no README at the repo root and **no copy of the spec anywhere in the repository**, yet 30
 distinct spec sections (`spec 2.3` through `spec 18.3`) are cited as the authority across the code

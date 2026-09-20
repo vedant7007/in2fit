@@ -36,7 +36,13 @@ Sources: `HANDOVER.md` §1, `docs/decisions/0001`, `0002`, `0004`, `0015`, `0018
 We are a mobile app with no hosted build, so the strongest link is the repository, and the answer
 should say what a reader finds there.
 
-    https://github.com/vedant7007/<repository>          [confirm: the repository name; no remote is configured in the working clone]
+    https://github.com/vedant7007/in2fit
+
+Created 20 September 2026 at 19:41 IST, PRIVATE, default branch `master`, pushed at `83e7375`
+(141 commits, every author and committer Vedant Manmath Idlgave, no attribution anywhere in
+the history). **It stays private until Vedant answers the six-voices question in
+`docs/submission/publish-checklist.md` §7a; it goes public before submission and not before.**
+A private link in the form is a dead link to a judge, so the form is filled only after that.
 
 Proposed text beside the link, if the form allows one:
 
