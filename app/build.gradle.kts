@@ -135,6 +135,10 @@ android {
                 .withPropertyName("candidatesByContext")
             it.inputs.file(rootProject.file("data-authoring/us-record-sweep.csv"))
                 .withPropertyName("usRecordSweep")
+            // Beat 3's fixture sheets and sidecars: LabReportFixturesTest reads them on the JVM;
+            // LabReportOcrTest reads the same files from the test APK on the device.
+            it.inputs.dir(rootProject.file("app/src/androidTest/assets/lab-reports"))
+                .withPropertyName("labReportFixtures")
             // And the string tables: StringResourcesTest reads res/values*/strings.xml directly,
             // and without this a Telugu import left the test task UP-TO-DATE and its report
             // reading "0 awaiting review" over a file with 48 REVIEW markers in it.

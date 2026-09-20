@@ -1,0 +1,11 @@
+# kind: rendered
+# one column, spaced range, unit separate, sans-serif: the clean sheet, and the one to print and photograph
+# name|value|unit|low|high|printed row (the row exactly as printed, for the JVM extractor test)
+Fasting Glucose|142|mg/dL|70|100|Fasting Glucose 142 mg/dL 70 - 100
+HbA1c|6.4|%|4|5.6|HbA1c 6.4 % 4 - 5.6
+Haemoglobin|13.8|g/dL|13|17|Haemoglobin 13.8 g/dL 13 - 17
+Total Cholesterol|192|mg/dL||200|Total Cholesterol 192 mg/dL < 200
+Triglycerides|148|mg/dL||150|Triglycerides 148 mg/dL < 150
+Vitamin B12|250|pg/mL|200|900|Vitamin B12 250 pg/mL 200 - 900
+Creatinine|0.9|mg/dL|0.7|1.3|Creatinine 0.9 mg/dL 0.7 - 1.3
+TSH|2.1|uIU/mL|0.4|4.2|TSH 2.1 uIU/mL 0.4 - 4.2
