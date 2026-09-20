@@ -1126,3 +1126,49 @@ things are yours if the demo wants them: hidden-sugar/palm-oil flags as rules ov
 non-raw string wrote a BACKSPACE byte (0x08) into a Kotlin regex in my tree; the file looked
 right in every grep and compiled to a regex that could never match. Same class as the heredoc
 newline. Kotlin source is written with the editor tools, never through a shell or a script.
+
+[Arjun 14:30] REASSIGNED BY VEDANT. Packaged-label OCR is DROPPED: not in the demo, no days for
+it. `0023` code stays landed and unbound; the `NutritionLabelOcrProbeTest` asks to Rao are
+WITHDRAWN. My scope is now the demo shell: the smallest set of screens that carries all four
+beats (speak a meal and see it logged; ask by voice and hear the answer; scan a lab report; the
+same meal back with different advice), plus an About/licences screen. Order: (1) beat-3 probes
+finished and reported, not extended; (2) the shell; (3) About. `ui/` is mine; nothing else.
+Constraint unchanged: no INTERNET, no library that needs the network, no remote font or image,
+no analytics. End of day: a screenshot of whatever renders.
+
+[Arjun 14:30] TO RAO, THE UI/ORCHESTRATOR BOUNDARY, ruled by Vedant to be agreed HERE before
+either of us writes to it. You own classified intent -> returned response; I call in. Proposal:
+(1) I call ONLY `Orchestrator.handle(intent)` and render ONLY the `OrchestratorEvent`s the
+contract defines today. I inject `Orchestrator`, `TriggerText` (to render
+`Advice.evaluation.trigger` on screen exactly as you render it for speech), `ContextText`
+(`figure()` lines for the figures, so the screen and the prompt never say a number two ways),
+`OcrEngine` and `FrameStore`. Nothing else from `domain/`, `data/`, `ml/`, `orchestration/`.
+(2) BEAT 3, capture is mine, the write is yours. The Scan screen captures (CameraX), runs
+`OcrEngine` + `LabReportExtractor`, shows every field beside its source row for the person to
+confirm or untick, and hands the orchestrator the CONFIRMED values. Ask: `UserIntent.ScanLabReport`
+(a `data object` today) becomes `UserIntent.SaveLabReport(values: List<LabValue>)`, domain
+types only, report date from the extractor or the person; you write through the store
+(`LabValueDao.insertAll` exists) and emit `OrchestratorEvent.LabReportSaved(count: Int)` then
+`Completed`. Until it lands I send the data object and show your `NotImplemented` honestly.
+(3) BEAT 4 is `UserIntent.AdviseOnMeal(mealId)`, yours (`notBuilt` today): load the snapshot,
+re-evaluate against the CURRENT context (which now holds the report), phrase, emit `Advice`,
+speak, `Completed`. I keep the last `MealLogged.mealId` and offer "advise again on this meal"
+after a scan. The trigger sentence you emit is what proves the change on stage.
+(4) UTENSIL CALIBRATION: `unit_conversions` overrides are written by nobody and read by nobody
+(`OverridesDao.upsertUnitConversion` exists; `SqliteFoodLookup.resolveUnit` does not consult
+it). The logging screen only needs "my katori is 150 g" if the resolver honours it: the read
+is yours, and the write should go through you too (`UserIntent.CalibrateUnit(unit, grams)` or a
+seam you name). I build the dialog the day the read exists, not before (rule 6).
+(5) Language: I pass `SpeechLanguageRef("te" | "hi" | "en-IN")` from a picker; you map.
+(6) I collect `handle()` in a ViewModel on `Dispatchers.Default`; if any stage needs Main, say.
+(7) You speak inside the flow (`Stage.SPEAKING`); I never call `TtsEngine`. The spec 15.3
+safety line is on every advice surface, from the string table, mine.
+(8) I do not touch `di/`; `AppModule` already provides everything in (1). If (2)-(4) need a
+provider it is yours. Reply here with amendments or "agreed"; I am building against the
+contract as it stands today and will not write to any of it.
+
+[Arjun 14:30] TO NILA: I will add English keys to `res/values/strings.xml` for the shell
+(screen titles, stage names, the twelve `UnavailableReason` sentences, the four intent
+questions), English only, context comments on each, per your rule. And the About screen needs
+the copyright notice you are producing for the voice models, verbatim, plus the disclosed
+dependencies from `0005`: send the text or the key names and I place them.
