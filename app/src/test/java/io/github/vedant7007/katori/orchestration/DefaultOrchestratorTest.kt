@@ -26,6 +26,7 @@ import io.github.vedant7007.katori.domain.ResolvedMeal
 import io.github.vedant7007.katori.domain.Sex
 import io.github.vedant7007.katori.domain.SpeechLanguageRef
 import io.github.vedant7007.katori.domain.SpokenIntent
+import io.github.vedant7007.katori.domain.Stage
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.UserContext
 import io.github.vedant7007.katori.domain.UserContextSource
@@ -130,10 +131,11 @@ class DefaultOrchestratorTest {
 
     private class SilentTts : TtsEngine {
         val spoken = mutableListOf<String>()
+        var stops = 0
         override val supportedLanguages = setOf(SpeechLanguage.ENGLISH_INDIA)
         override suspend fun prepare(language: SpeechLanguage) = Outcome.Ok(Unit)
         override suspend fun speak(text: String, language: SpeechLanguage): Outcome<Unit> { spoken += text; return Outcome.Ok(Unit) }
-        override suspend fun stop() {}
+        override suspend fun stop() { stops++ }
     }
 
     private class ScriptedAsr(private val events: List<AsrEvent>) : AsrEngine {
@@ -292,6 +294,30 @@ class DefaultOrchestratorTest {
         assertEquals(OrchestratorEvent.Completed, events.last())
     }
 
+    @Test fun `the person's own figures are on screen before the model is asked, with the intent and the lead-in`() {
+        val r = rig(FakeLlm(intent = Outcome.Ok(Intent.ANSWER)))
+        val events = r.run(UserIntent.Type("did I get enough iron this week", en))
+        val known = events.indexOfFirst { it is OrchestratorEvent.IntentKnown }
+        val own = events.indexOfFirst { it is OrchestratorEvent.OwnFigures }
+        val retrieving = events.indexOfFirst { it == OrchestratorEvent.Progress(Stage.RETRIEVING_FACTS) }
+        val answered = events.indexOfFirst { it is OrchestratorEvent.Answered }
+        assertTrue("$events", known in 0 until own && own < retrieving && retrieving < answered)
+        assertEquals(OrchestratorEvent.IntentKnown(SpokenIntent.ANSWER, "Let me check your records."), events[known])
+        val lines = (events[own] as OrchestratorEvent.OwnFigures).lines
+        assertTrue("the number they asked for is in the first lines: $lines", lines.any { it.startsWith("The last seven days: iron: at least 4.6 mg") })
+        assertEquals("the same lines the model is then given", lines, r.llm.answers.single().figures.map { it.text })
+        // The lead-in was spoken before the answer, and the answer after it.
+        assertEquals(listOf("Let me check your records.", "answered"), r.tts.spoken)
+    }
+
+    @Test fun `StopSpeaking stops the voice and writes nothing`() {
+        val r = rig()
+        val events = r.run(UserIntent.StopSpeaking)
+        assertEquals(listOf<OrchestratorEvent>(OrchestratorEvent.Completed), events)
+        assertEquals(1, r.tts.stops)
+        assertEquals(0, r.store.saved.size)
+    }
+
     @Test fun `RECOMMEND carries their conditions, situation, diet, report line and the allowed list`() {
         val r = rig(FakeLlm(intent = Outcome.Ok(Intent.RECOMMEND)))
         val events = r.run(UserIntent.Type("what should I eat for more iron", en))
@@ -332,7 +358,7 @@ class DefaultOrchestratorTest {
         assertNotNull(advice.referral)
         assertTrue(advice.referral!!.contains("worth showing to a doctor"))
         assertEquals("the help is not dropped", "recommended", advice.phrased)
-        assertTrue("the referral is spoken after the help", r.tts.spoken.single().endsWith(advice.referral!!))
+        assertTrue("the referral is spoken after the help", r.tts.spoken.last().endsWith(advice.referral!!))
     }
 
     @Test fun `a question asking for a clinical judgement gets the fixed referral line with no report on file`() {
@@ -354,7 +380,7 @@ class DefaultOrchestratorTest {
         assertNotNull("the referral stands whatever the model did", answered.referral)
         assertTrue("the person still gets their own lines: ${answered.figures}", answered.figures.any { it.contains("Fasting glucose: 260 mg/dL") })
         assertEquals(OrchestratorEvent.Completed, events.last())
-        assertEquals("the referral is still spoken", listOf(answered.referral), r.tts.spoken)
+        assertEquals("the referral is still spoken", answered.referral, r.tts.spoken.last())
     }
 
     @Test fun `ANSWER still carries the referral when the rules require one`() {

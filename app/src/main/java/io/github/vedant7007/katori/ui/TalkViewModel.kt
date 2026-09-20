@@ -113,6 +113,9 @@ class TalkViewModel @Inject constructor(
             is OrchestratorEvent.Progress -> _state.update { it.copy(stage = event.stage) }
             is OrchestratorEvent.AudioLevel -> _state.update { it.copy(level = event.rms.coerceIn(0f, 1f)) }
             is OrchestratorEvent.Transcribed -> add(Entry.Said(event.text))
+            // The two events the 0026 screen asked for; rendering them is Arjun's next step.
+            is OrchestratorEvent.IntentKnown -> Unit
+            is OrchestratorEvent.OwnFigures -> Unit
             is OrchestratorEvent.NeedsIntent -> add(Entry.AskIntent(event.transcript))
             is OrchestratorEvent.NeedsConfirmation -> add(Entry.Confirm(event.why, event.parsed.items))
             is OrchestratorEvent.MealResolved -> add(

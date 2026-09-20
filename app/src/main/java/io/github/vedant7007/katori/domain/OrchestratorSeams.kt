@@ -145,6 +145,8 @@ class ContextText(
          * generated; appended by the orchestrator, shown and spoken whatever the model said.
          */
         fun referral(): String
+        /** The phrase spoken while the model works on this intent. Status only; no health content. */
+        fun leadIn(intent: SpokenIntent): String
     }
 
     fun figure(f: NutritionFigure): String {
@@ -184,6 +186,8 @@ class ContextText(
 
     fun referral(): String = strings.referral()
 
+    fun leadIn(intent: SpokenIntent): String = strings.leadIn(intent)
+
     private fun unit(u: NutrientUnit): String = when (u) {
         NutrientUnit.KCAL -> "kcal"
         NutrientUnit.GRAM -> "g"
@@ -217,6 +221,12 @@ class ContextText(
                 DietType.NON_VEGETARIAN -> null
             }
             override fun referral() = "That is a question for a doctor, who can look at it with you."
+            override fun leadIn(intent: SpokenIntent): String = when (intent) {
+                SpokenIntent.LOG -> "Noting that down."
+                SpokenIntent.ANSWER -> "Let me check your records."
+                SpokenIntent.SUGGEST -> "Let me think about what fits."
+                SpokenIntent.RECOMMEND -> "Let me see what suits you."
+            }
         }
     }
 }

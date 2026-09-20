@@ -52,6 +52,13 @@ import kotlinx.coroutines.flow.Flow
  * does not, and the difference is the product. The context goes in as finished strings the model
  * may quote and cannot compute with, the same defence the phrasing path uses.
  *
+ * THE ANSWER IS ON SCREEN BEFORE THE MODEL RUNS. Ruled 20 Sep after the first measured
+ * conversational turn (22.8 s at best, 30 s typical): "how much protein today" is a number in
+ * the database and needs no model, so ANSWER and RECOMMEND emit [OrchestratorEvent.OwnFigures],
+ * the person's own rendered lines, the moment the store is read and before any retrieval or
+ * generation, while the lead-in phrase is spoken. What arrives later, as [OrchestratorEvent.Answered]
+ * or [OrchestratorEvent.Advice], is the phrasing, not the answer.
+ *
  * WHEN THE CLASSIFIER IS NOT SURE it emits [OrchestratorEvent.NeedsIntent] and stops. It never
  * guesses LOG, because a guessed LOG writes to the timeline. The UI asks, and re-enters with
  * [UserIntent.Resolve], which carries the person's own answer and skips the classifier.
@@ -106,6 +113,9 @@ sealed interface UserIntent {
 
     data class ScanPackagedLabel(val barcode: String?) : UserIntent
     data class CheckExerciseForm(val movement: String) : UserIntent
+
+    /** Stop whatever is being spoken. The screen's stop control; nothing is written or undone. */
+    data object StopSpeaking : UserIntent
 }
 
 /**
@@ -123,6 +133,21 @@ sealed interface OrchestratorEvent {
 
     /** What was heard, once endpointed. Shown immediately so the user sees they were understood. */
     data class Transcribed(val text: String) : OrchestratorEvent
+
+    /**
+     * Which of the four the turn became, once decided (by the pre-filter, the classifier, or the
+     * person's own [UserIntent.Resolve]), and the lead-in phrase being spoken while the route
+     * runs, from the string table; null when no lead-in is spoken.
+     */
+    data class IntentKnown(val intent: SpokenIntent, val leadIn: String?) : OrchestratorEvent
+
+    /**
+     * The person's own figures, rendered by `ContextText`, straight from the store, BEFORE any
+     * model call: on ANSWER and RECOMMEND these are on screen within the first second and are
+     * the answer to "how much X today"; the model's sentence that follows is phrasing. The same
+     * lines are given to the model and carried again on [Answered.figures].
+     */
+    data class OwnFigures(val lines: List<String>) : OrchestratorEvent
 
     /**
      * The classifier could not tell which of the four they meant. The UI asks and re-enters with

@@ -1773,3 +1773,73 @@ machine: one shot of the launcher with it, please, so somebody has seen it rende
 Part 3 (team screens, not the person's), so they do not land UNPLACED when you land them; say
 "keys added" here and I regenerate before 22:00. TO PRIYA: HANDOVER's addendum now says
 fifteen no-data items, 93 ingredients, 626 aliases, 52 recipes, with your record cited.
+
+[Rao 16:50] RULED BY VEDANT, from the batch report (section above, 14:47-14:56). The
+conversational turn is 22.8 s at best (4 threads, warm, idle phone), 30 s typical, 40-133 s on
+the hot, in-use phone of this afternoon; a spoken ANSWER never came under 20 s. "30 seconds is
+not a conversation." We change the architecture, not the tuning, in this order:
+(a) PRECOMPUTE RECOMMEND. Advice is generated when the meal is logged and regenerated when a
+lab report is saved; the save is the trigger, and the scan's own pause hides the regeneration.
+Beat 4 becomes instant. PRIYA: I need the invalidation rule agreed with you: my proposal is
+`RuleEvaluation.inputDigest`, which the engine already computes over profile, conditions, labs,
+meal and candidates, so a stored advice row is valid while the digest of the current context for
+that meal equals the digest it was generated under, and dirty the moment any of those change.
+Say if a stored fact outside the digest should dirty it.
+(b) STOP SENDING THE MODEL A CHOICE. Six rows, two meals, a lab line and totals is the model
+deciding which applies, and the design claim is that it does not decide. Code selects the one or
+two rows the rules engine's fired rules point at, and only the figures those rules used go in.
+Target under 250 prompt tokens (about 7 s of prompt, not 24). PRIYA: the request side is mine;
+the system block is yours, and it needs to be short to make 250. Tell me the row-selection key
+you want (I will use the fired rules' evidence: nutrient, test name, condition) so the file's
+tags can carry it.
+(c) Then the tail: SHORT as default (yours, c10df07, landed), KV-cache prefix reuse for the
+constant system block (native, mine), and 8 THREADS PINNED for the demo build: at 4 threads the
+model computed "14.6" on every pass and the guard had to refuse it; at 8 it quoted the period
+total correctly and was faster. Thread count changing the model's output goes in the record as
+a flag; nobody chases it this week.
+AND THE TURN SHAPE, which is a screen contract as much as an engine one. ARJUN: for "how much
+protein today" the number is in the database and needs no model. The turn will emit the
+person's figures FIRST, before any model call, as `OrchestratorEvent.OwnFigures(lines)`, your name (the same
+`ContextText` lines the model is then given), with Meera's lead-in speaking; the model's
+sentence arrives later as `Answered` and is spoken. The person has the answer in under a
+second and a 12-second model is phrasing, not waiting. I add the event to the contract today;
+render it as the answer card's first state and let `Answered` fill in below it. Say if you want
+a different shape before I land it.
+RE-MEASURE UNDER DEMO CONDITIONS after (a) and (b): USB, airplane mode ON, nothing else
+running, screen held, phone at ambient. Every number so far was airplane OFF with Instagram in
+the foreground and thermal at SEVERE. That run's number goes in the deck.
+
+[Rao 16:50] TO MEERA, good news, all measured: the platform engine has OFFLINE voices for all
+three languages on this phone (te-IN-language + te-in-x-tee/teg-local; hi-in-x-hia/hic/hid/hie-
+local; en-in-x-ena/enc/end/ene-local), and steady-state RTF is 0.04 (Telugu, 195 ms for 4.81 s
+of audio) to 0.70 (en-IN). Only the FIRST call is slow (RTF 1.87-3.60: 2.3-3.5 s). So: warm the
+platform engine at app start and the cost disappears. Platform voice wins your ladder; Vedant
+concurs. The four WAVs are in my worktree's logs/tts-probe/ for the listeners (untracked by
+design; say where you want them). Your lead-in wraps the three model calls next, with the
+Figures event above so it speaks over a number that is already on screen.
+
+[Rao 16:50] TO JACOB: (1) test c wrote its heading and nothing: `transcripts` is an instance
+field and JUnit makes a new instance per test, so c sees an empty map and its own "run test b
+first" precondition fails. Companion object, as the LLM probe keeps `llmRuntime`. (2) STAGED
+TODAY, sha256 verified: `asr/en/model.int8.onnx` (28b9261a…fbc6f, 174,610,057 B) with its own
+`tokens.txt` (11,433 B), and `asr/hi/model.int8.onnx` (915c71e0…05fa) with the shared tokens
+(ee609676…6dfb2). te unchanged. (3) Re-ran your test b with English in: 4 clips, 244-596 ms
+each (mean 339 ms at 4 threads), WER 25.0%, CER 16.5%, and every error is the shape you
+predicted: "two rotees in Dal", "three idly and sombre", "two rutis and pap you", "two hundred
+ml" for "200 ml". te: WER 8.3%, CER 1.5%, 1,279 ms/clip this time (the phone was hot). English
+is the demo language as ruled today, so those four renderings are alias-table work for the
+matcher (Priya's 5144f8f is the pattern); "two hundred" for "200" is extraction's to read. The
+en model is NVIDIA FastConformer, as 0021 says; its licence line is on the About screen.
+
+[Rao 16:50] TO PRIYA: 2a, 2b, 2c are green on master (`0463557`, `3a32642`), your
+`ReferralDefectsTest` and `EngineDefectsTest` pass unchanged bar the `AnswerLength` parameter
+on your fake. The refused-answer line is `answer_refused`: "I can't put a number or a judgement
+on that. Here is what your diary shows." followed by the person's own lines; amend the words
+here if you want others. 2d: there is no red test for the tie-break on master; land it and I
+take it. Also: the condition check now permits every word the request contains, the numeric
+guard's list exactly, so the two paraphrased rows can revert to their source wording.
+
+[Rao 16:50] TO NILA: the B12 ruling is 0028 (0026 is taken twice and Arjun claimed 0027), written
+now: a digit run glued to a letter is a word, not a figure, in the template digit test as in
+the guard; the MEAL_COMPOSITION sample switches to VITAMIN_B12 so the case is exercised; "B12"
+stays a Latin token in every locale and the reviewer's sheet says so.

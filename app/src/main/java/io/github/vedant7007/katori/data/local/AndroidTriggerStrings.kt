@@ -6,6 +6,7 @@ import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.DietType
 import io.github.vedant7007.katori.domain.LifeContext
 import io.github.vedant7007.katori.domain.Period
+import io.github.vedant7007.katori.domain.SpokenIntent
 import io.github.vedant7007.katori.domain.TriggerTemplate
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.model.Nutrient
@@ -87,6 +88,15 @@ class AndroidContextStrings(context: Context) : ContextText.Strings {
     override fun labWithRange(): String = res.getString(R.string.context_lab_with_range)
 
     override fun referral(): String = res.getString(R.string.context_referral)
+
+    override fun leadIn(intent: SpokenIntent): String = res.getString(
+        when (intent) {
+            SpokenIntent.LOG -> R.string.tts_lead_in_log
+            SpokenIntent.ANSWER -> R.string.tts_lead_in_answer
+            SpokenIntent.SUGGEST -> R.string.tts_lead_in_suggest
+            SpokenIntent.RECOMMEND -> R.string.tts_lead_in_recommend
+        }
+    )
 
     override fun neverSuggest(diet: DietType): String? = when (diet) {
         DietType.VEGETARIAN -> R.string.context_never_suggest_vegetarian

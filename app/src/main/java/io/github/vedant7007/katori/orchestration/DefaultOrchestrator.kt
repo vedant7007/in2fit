@@ -41,6 +41,7 @@ import io.github.vedant7007.katori.ml.llm.PhrasingRequest
 import io.github.vedant7007.katori.ml.llm.RecommendRequest
 import io.github.vedant7007.katori.ml.llm.SafetyLine
 import io.github.vedant7007.katori.ml.tts.TtsEngine
+import io.github.vedant7007.katori.ml.tts.withSpokenLeadIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
@@ -101,6 +102,7 @@ class DefaultOrchestrator(
             UserIntent.ScanLabReport -> notBuilt("orchestration.ScanLabReport")
             is UserIntent.ScanPackagedLabel -> notBuilt("orchestration.ScanPackagedLabel")
             is UserIntent.CheckExerciseForm -> notBuilt("orchestration.CheckExerciseForm")
+            UserIntent.StopSpeaking -> { tts.stop(); emit(OrchestratorEvent.Completed) }
         }
     }
 
@@ -154,21 +156,37 @@ class DefaultOrchestrator(
                 is Outcome.NotImplemented -> return notBuilt(c.component)
             }
         }
+        // The intent is known; the screen shows it as a heading and the lead-in is spoken over
+        // whatever follows, so the wait reads as work. The lead-in is a status phrase from the
+        // string table (`tts_lead_in_*`), never health content.
+        val leadIn = contextText.leadIn(intent).takeIf { speechLanguage(language)?.let { l -> l in tts.supportedLanguages } == true }
+        emit(OrchestratorEvent.IntentKnown(intent, leadIn))
         when (intent) {
-            SpokenIntent.LOG -> plate(text, language, heard, save = true)
-            SpokenIntent.SUGGEST -> plate(text, language, heard, save = false)
-            SpokenIntent.ANSWER -> answer(text, language)
-            SpokenIntent.RECOMMEND -> recommend(text, language)
+            SpokenIntent.LOG -> plate(text, language, heard, save = true, leadIn)
+            SpokenIntent.SUGGEST -> plate(text, language, heard, save = false, leadIn)
+            SpokenIntent.ANSWER -> answer(text, language, leadIn)
+            SpokenIntent.RECOMMEND -> recommend(text, language, leadIn)
         }
+    }
+
+    /**
+     * Run one model call with the lead-in phrase spoken over it (Meera's `withSpokenLeadIn`):
+     * the phrase starts as generation starts, and the call returns only after the phrase has
+     * finished, so the answer never talks over it. With no lead-in, or no voice for the
+     * language, the call runs alone.
+     */
+    private suspend fun <T> withLlmSpoken(leadIn: String?, language: SpeechLanguageRef, block: suspend (LlmEngine) -> Outcome<T>): Outcome<T> {
+        val lang = speechLanguage(language)
+        return if (leadIn == null || lang == null) withLlm(block) else tts.withSpokenLeadIn(leadIn, lang) { withLlm(block) }
     }
 
     // --- LOG and SUGGEST: a plate, saved or hypothetical ---------------------------------------
 
     private suspend fun FlowCollector<OrchestratorEvent>.plate(
-        text: String, language: SpeechLanguageRef, heard: AsrConfidence, save: Boolean,
+        text: String, language: SpeechLanguageRef, heard: AsrConfidence, save: Boolean, leadIn: String?,
     ) {
         emit(Progress(Stage.EXTRACTING))
-        val extracted = when (val e = withLlm { it.extract(ExtractionRequest(text, language.tag)) }) {
+        val extracted = when (val e = withLlmSpoken(leadIn, language) { it.extract(ExtractionRequest(text, language.tag)) }) {
             is Outcome.Ok -> e.value
             is Outcome.Unavailable -> return fail(e.reason, e.detail)
             is Outcome.NotImplemented -> return notBuilt(e.component)
@@ -238,7 +256,7 @@ class DefaultOrchestrator(
         val referral = trigger.takeIf { evaluation.referralRequired }
 
         emit(Progress(Stage.PHRASING))
-        val phrased = withLlm {
+        val phrased = withLlmSpoken(leadIn, language) {
             it.phrase(
                 PhrasingRequest(
                     evaluation = evaluation, triggerText = trigger,
@@ -255,7 +273,7 @@ class DefaultOrchestrator(
 
     // --- ANSWER: their diary and their reports, in the request ----------------------------------
 
-    private suspend fun FlowCollector<OrchestratorEvent>.answer(text: String, language: SpeechLanguageRef) {
+    private suspend fun FlowCollector<OrchestratorEvent>.answer(text: String, language: SpeechLanguageRef, leadIn: String?) {
         emit(Progress(Stage.EVALUATING_RULES))
         val now = clock.instant()
         val ctx = contextSource.current()
@@ -264,29 +282,31 @@ class DefaultOrchestrator(
             RuleInput(ctx.profile, ctx.declaredConditions, ctx.labValues, meal = null, candidates = ctx.candidates, evaluatedAt = now)
         )
         val referral = referralFor(text, evaluation)
+        val locale = Locale.forLanguageTag(language.tag)
+        // MEASURED, 20 Sep: with only per-meal figures the model summed two meals' iron itself
+        // and the guard refused it, and it read a below-range haemoglobin line as "within the
+        // normal range". So the period totals go in, computed by the store, and the rules
+        // engine's own sentence about the value goes in with them, in words the model can
+        // repeat rather than a range it has to compare.
+        val lines = ctx.periodTotals.map { contextText.period(it) } +
+            ctx.recentMeals.map { contextText.meal(it, locale) } +
+            ctx.labValues.map { contextText.lab(it) } +
+            listOfNotNull(evaluation.trigger?.let { triggerText.render(it) })
+        // THE ANSWER, before the model: these lines are the number the person asked for.
+        emit(OrchestratorEvent.OwnFigures(lines))
 
         emit(Progress(Stage.RETRIEVING_FACTS))
         val declared = ctx.declaredConditions.map { it.name }
-        val locale = Locale.forLanguageTag(language.tag)
         val facts = knowledge.find((listOf(text) + declared).joinToString(" "))
-        // MEASURED, 20 Sep (`logs/hw-report-conversational.txt`): with only per-meal figures the
-        // model summed two meals' iron itself and the guard refused it, and it read a below-range
-        // haemoglobin line as "within the normal range". So the period totals go in, computed by
-        // the store, and the rules engine's own sentence about the value goes in with them, in
-        // words the model can repeat rather than a range it has to compare.
         val request = AnswerRequest(
             question = text, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
-            figures = ctx.periodTotals.map { DisplayFigure(contextText.period(it)) } +
-                ctx.recentMeals.map { DisplayFigure(contextText.meal(it, locale)) } +
-                ctx.labValues.map { DisplayFigure(contextText.lab(it)) } +
-                listOfNotNull(evaluation.trigger?.let { DisplayFigure(triggerText.render(it)) }),
+            figures = lines.map(::DisplayFigure),
             facts = facts,
             referralFollows = referral != null,
         )
 
         emit(Progress(Stage.PHRASING))
-        val lines = request.figures.map { it.text }
-        val answered = when (val a = withLlm { it.answer(request, answerLength) }) {
+        val answered = when (val a = withLlmSpoken(leadIn, language) { it.answer(request, answerLength) }) {
             is Outcome.Ok -> OrchestratorEvent.Answered(a.value.text, facts.map { it.id }, referral, figures = lines)
             // A guard refused every attempt. The person still gets a turn: the UI's own
             // `answer_refused` line, their own figures, and the referral. Never nothing (0024).
@@ -309,7 +329,7 @@ class DefaultOrchestrator(
 
     // --- RECOMMEND: their profile, their reports, the allowed list, in the request ---------------
 
-    private suspend fun FlowCollector<OrchestratorEvent>.recommend(text: String, language: SpeechLanguageRef) {
+    private suspend fun FlowCollector<OrchestratorEvent>.recommend(text: String, language: SpeechLanguageRef, leadIn: String?) {
         emit(Progress(Stage.EVALUATING_RULES))
         val now = clock.instant()
         val ctx = contextSource.current()
@@ -318,6 +338,9 @@ class DefaultOrchestrator(
         )
         val trigger = evaluation.trigger?.let(triggerText::render)
         val referral = referralFor(text, evaluation)
+        // Their own figures first, as on ANSWER: the ranked list and the sentence are the
+        // engine's and need no model; the prose is what arrives later.
+        emit(OrchestratorEvent.OwnFigures(ctx.periodTotals.map { contextText.period(it) } + ctx.labValues.map { contextText.lab(it) } + listOfNotNull(trigger)))
 
         emit(Progress(Stage.RETRIEVING_FACTS))
         val declared = ctx.declaredConditions.map { it.name }
@@ -332,7 +355,7 @@ class DefaultOrchestrator(
         emit(Progress(Stage.PHRASING))
         // A guard failure here is not a failure of the turn: the ranked list and the trigger
         // sentence are the engine's own and need no model. The prose is what is lost.
-        val phrased = withLlm { it.recommend(request, answerLength) }.textOrNull()
+        val phrased = withLlmSpoken(leadIn, language) { it.recommend(request, answerLength) }.textOrNull()
         emit(OrchestratorEvent.Advice(evaluation, phrased, referral, facts.map { it.id }))
         speak(listOfNotNull(phrased ?: trigger, referral.takeIf { phrased != null }).joinToString(" "), language)
         emit(OrchestratorEvent.Completed)
