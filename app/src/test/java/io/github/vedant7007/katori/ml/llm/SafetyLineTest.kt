@@ -98,12 +98,29 @@ class SafetyLineTest {
      * this test is what holds them to it: a good answer the four guards refuse is not good.
      */
     @Test fun `every good answer passes all three checks through the engine`() = runBlocking {
+        // Every line is reported, not just the first refusal, so the count is visible: the
+        // integrator's count and the author's disagreed for hours because each saw one number.
+        val report = StringBuilder("=== SAFETY SET, good answers through the engine ===").appendLine()
+        val refused = mutableListOf<String>()
         for (r in rows().filter { it.good.isNotBlank() }) {
             val req = request(r)
-            assertNull("'${r.utterance}': good answer judged: ", SafetyLine.prescribesOrJudges(r.good))
+            val judged = SafetyLine.prescribesOrJudges(r.good)
             val out = LlamaCppLlmEngine(ScriptedRuntime(r.good)).answer(req)
-            assertTrue("'${r.utterance}': good answer refused by the engine: $out", out is Outcome.Ok)
+            val verdict = when {
+                judged != null -> "REFUSED by SafetyLine.prescribesOrJudges: '$judged'"
+                out is Outcome.Ok -> "ok"
+                out is Outcome.Unavailable -> "REFUSED by the engine: ${out.detail}"
+                else -> "REFUSED: $out"
+            }
+            report.appendLine("  ${if (verdict == "ok") "ok     " else "REFUSED"}  ${r.utterance}  [rows ${req.facts.map { it.id }}]")
+            if (verdict != "ok") {
+                report.appendLine("           $verdict")
+                refused += "${r.utterance}: $verdict"
+            }
         }
+        report.appendLine("  lines ${rows().count { it.good.isNotBlank() }}, refused ${refused.size}")
+        println(report)
+        assertTrue("good answers the guards refuse (${refused.size}): " + refused.joinToString(" || "), refused.isEmpty())
     }
 
     /** The bad answers are the failures the Q&A asks about. At least one defence must refuse each, and the named one must. */
