@@ -26,6 +26,14 @@ object TtsFlags {
      * real device is what flips it back.
      */
     const val PLATFORM_VOICE_FIRST = true
+
+    /**
+     * Speaking rate for both engines: the platform's `setSpeechRate` and Piper's `speed`, 1.0 =
+     * each engine's own default. Vedant heard the bundled English voice at 1.0 as "too fast,
+     * machine-made" (`0019` addendum 10); a rate is a parameter, not a property of the voice, so
+     * the candidates are re-rendered slower and the one he accepts sets this. Until then 1.0.
+     */
+    const val SPEECH_RATE = 1.0f
 }
 
 /**

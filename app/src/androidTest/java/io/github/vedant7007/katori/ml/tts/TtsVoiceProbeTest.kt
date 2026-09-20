@@ -112,15 +112,26 @@ class TtsVoiceProbeTest {
     fun b_synthesiseSamplesToWav() {
         val tts = bind()
         for ((language, texts) in SAMPLES) {
-            val voice = AndroidTtsEngine.offlineVoiceFor(tts, language)
-            if (voice == null) {
+            val picked = AndroidTtsEngine.offlineVoiceFor(tts, language)
+            if (picked == null) {
                 say("$language: no offline voice on this device, no sample written")
                 continue
             }
+            // English: every offline en-IN voice at every rate, for the ear that decides. The other
+            // languages: the voice the engine would pick, at the shipped rate.
+            val english = language == SpeechLanguage.ENGLISH_INDIA
+            val voices = if (english) {
+                runCatching { tts.voices }.getOrNull().orEmpty()
+                    .filter { it.locale.toLanguageTag() == "en-IN" && !it.isNetworkConnectionRequired && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features }
+                    .sortedBy { it.name }.ifEmpty { listOf(picked) }
+            } else listOf(picked)
+            val rates = if (english) ENGLISH_RATES else listOf(TtsFlags.SPEECH_RATE)
+            for (voice in voices) for (rate in rates) {
             val set = tts.setVoice(voice)
-            say("$language: voice ${voice.name} (setVoice=$set)")
+            tts.setSpeechRate(rate)
+            say("$language: voice ${voice.name} rate $rate (setVoice=$set)")
             for ((key, text) in texts) {
-                val out = File(outDir, "platform-${language.tag}-${voice.name}-$key.wav")
+                val out = File(outDir, "platform-${language.tag}-${voice.name}-rate$rate-$key.wav")
                 out.delete()
                 val id = "probe-${language.tag}-$key"
                 val done = CompletableDeferred<String>()
@@ -147,9 +158,11 @@ class TtsVoiceProbeTest {
                 val rtf = if (seconds > 0) "%.2f".format(ms / 1000.0 / seconds) else "n/a"
                 say("   $key: $result in $ms ms for ${"%.2f".format(seconds)} s of audio, RTF $rtf, ${out.length()} B  ${out.name}")
             }
+            }
         }
         tts.shutdown()
         say("pull with: adb pull ${outDir.absolutePath} logs/tts-probe")
+        say("note: the first synthesis after binding is the slow one (RTF 1.9-3.6 on the realme, 14:47); read RTF from the second and later lines")
     }
 
     @Test
@@ -247,7 +260,16 @@ class TtsVoiceProbeTest {
                 "B" to "ఇడ్లీ, సాంబార్, పెరుగన్నం, కోడి కూర, బిర్యానీ.",
             ),
             SpeechLanguage.HINDI to listOf("A" to "रोटी दाल"),
-            SpeechLanguage.ENGLISH_INDIA to listOf("A" to "I had two rotis and a katori of dal with some curd"),
+            // The same three sentences as the bundled English candidates in logs/tts-candidates/,
+            // so Vedant compares the platform voices with what he already rejected, like for like.
+            SpeechLanguage.ENGLISH_INDIA to listOf(
+                "leadin" to "Noting that down.",
+                "plate" to "Two rotis, a katori of dal and two spoons of oil: 428 kilocalories and 19 grams of protein.",
+                "answer" to "Today so far you have had 2.9 milligrams of iron; your report from 19 September shows haemoglobin below the range printed on it.",
+            ),
         )
+
+        /** English is the language the app speaks back; every offline en-IN voice gets a hearing, at three rates. */
+        val ENGLISH_RATES = listOf(1.0f, 0.9f, 0.85f)
     }
 }

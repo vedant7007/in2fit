@@ -28,7 +28,7 @@ class SherpaPiperVoice private constructor(private val tts: OfflineTts) : PiperV
         // callback, then returns all of it concatenated. It never truncates, which the TtsEngine
         // contract requires. The callback's return is its only cancellation point: 1 continues,
         // 0 stops after the current sentence, and what came back so far is discarded upstream.
-        return tts.generateWithCallback(text, sid = 0, speed = 1.0f) { if (keepGoing()) 1 else 0 }.samples
+        return tts.generateWithCallback(text, sid = 0, speed = TtsFlags.SPEECH_RATE) { if (keepGoing()) 1 else 0 }.samples
     }
 
     override fun close() {

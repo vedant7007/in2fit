@@ -2908,3 +2908,39 @@ halved system blocks are desktop numbers until you run them. On the demo-conditi
 report for one RECOMMEND turn and one ANSWER turn: prompt tokens, generation tokens, and the
 text, so the budget is a phone number by tonight. If the RECOMMEND text is still a bare food
 name at 88, the number is wrong, not the ruling; say so and I move it.
+
+[Meera 20:39] VEDANT'S VERDICT ON THE BUNDLED ENGLISH VOICE: all bad, too fast, machine-made. Taken
+as the answer on cori as a shipping voice. Two things follow, 0019 addendum 10: (1) the PLATFORM
+voice is the English path. Rao's 14:47 probe on the realme: four offline `en-in-x-*-local`
+voices, `en-in-x-enc-local` picked, RTF 0.70 on the FIRST call and 0.04 steady-state on the
+Telugu second call, so `PLATFORM_VOICE_FIRST` stays true and the engine is warmed at launch
+(`prepare()`; Rao already binds once). (2) Cori stays in `byLanguage` as the insurance for a
+handset with no English voice data, and the record says plainly that the fallback is a voice
+Vedant rejected: if we ever fall through, the demo sounds worse and we know why. "Too fast" is
+a parameter: `TtsFlags.SPEECH_RATE` now drives the platform's `setSpeechRate` and Piper's
+`speed`, 1.0 until an ear sets it; the probe renders every offline en-IN voice at 1.0/0.9/0.85 on
+the three demo sentences next run. Main and androidTest compile standalone.
+
+[Meera 20:39] TO VEDANT, TWO ZIPS, ONE WORD EACH: `logs/tts-candidates/for-vedant-platform-english.zip`
+is the phone's OWN Google English voice from Rao's probe (`en-in-x-enc-local`, default rate);
+this is the voice the demo will use, and you judged the wrong candidates before, so this is the
+one that matters: acceptable on stage, yes or no? `for-vedant-english-slower.zip` is the
+bundled voice you rejected, slowed to 0.9 / 0.85 / 0.8: does slowing turn "machine" into
+"fine", or is it the voice? Three more Google en-IN voices at three rates come with Rao's next
+run; whichever you accept sets the rate constant.
+
+[Meera 20:39] TO NILA, THE VERY TOP OF THE HANDSET-ARRIVAL LIST, above everything else:
+    0. FIRST FIVE MINUTES WITH THE iQOO IN HAND, ON WHATEVER NETWORK THE HALL HAS, BEFORE
+       AIRPLANE MODE: Settings > (System >) Languages & input > Text-to-speech output >
+       Speech Services by Google > gear > Install voice data > English (India), and Hindi
+       (India). Then run `TtsVoiceProbeTest` and read the "-- ENGLISH_INDIA" block: an
+       `en-in-x-*-local` line with `network=false` and a written WAV with an RTF. If it cannot be
+       installed there and then, the decision is made in those five minutes: the rejected bundled
+       voice, or the realme from the bag. Not on stage.
+
+[Meera 20:39] TO RAO: `TtsVoiceProbeTest` test b now renders every offline en-IN voice at rates
+1.0 / 0.9 / 0.85 on the three demo sentences (leadin, plate, answer), named
+`platform-en-IN-<voice>-rate<r>-<key>.wav`; the other languages stay one voice at the shipped
+rate. Please pull the set next run so Vedant has the four Google voices to choose from; and
+your "warm the platform engine at app start" is the right call, `prepare(ENGLISH_INDIA)` at
+launch does it.

@@ -55,6 +55,7 @@ class AndroidTtsEngine(private val context: Context) : TtsEngine {
         if (tts.setVoice(voice) != TextToSpeech.SUCCESS) {
             return Outcome.Unavailable(UnavailableReason.MODEL_NOT_LOADED, "system engine refused voice ${voice.name}")
         }
+        tts.setSpeechRate(TtsFlags.SPEECH_RATE)
         return Outcome.Ok(Unit)
     }
 

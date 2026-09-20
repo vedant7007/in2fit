@@ -746,3 +746,54 @@ This is a first-class item in the countdown and the pre-demo checklist, not a co
 - The voice-data install, the volume, the wired speaker and the route check are done on the
   realme this week and on the loaner the hour it arrives; the realme's results are the ones the
   deck can quote.
+
+---
+
+## Addendum 10, 20 September 2026, 19:50: the platform voice is the English path, and the fallback is a voice Vedant rejected
+
+### The two verdicts
+
+**Vedant on the bundled English voice** (`en_GB-cori-medium`, the three clips at its default
+rate): all bad, too fast, sounds machine-made. Taken as the answer on cori as a shipping voice:
+if he can hear it is wrong, it is wrong.
+
+**Rao's probe on the realme** (`logs/tts-probe/katori-tts-report.txt` in his worktree, 14:47,
+quoted): the platform engine is `com.google.android.tts`, 473 voices; for `en-IN`,
+`isLanguageAvailable=1` and four offline voices, `en-in-x-{ena,enc,end,ene}-local`, plus the
+legacy `en-IN-language`; `AndroidTtsEngine would use: en-in-x-enc-local`; the sample rendered
+`done in 2562 ms for 3.66 s of audio, RTF 0.70`. Hindi and Telugu likewise offline. Rao's
+reading, which the report supports: only the FIRST synthesis after binding is slow (RTF 1.87 to
+3.60 across the three languages, 2.3 to 3.5 s); the second Telugu call ran at RTF 0.04 (195 ms
+for 4.81 s). So **rung 1 applies on the realme: `PLATFORM_VOICE_FIRST` stays `true`**, the
+platform engine is warmed at app start so the first-call cost is paid before anyone speaks
+(`prepare()` at launch; Rao's suggestion, the engine already binds once and keeps it), and the
+English voice the demo uses is one of the four Google voices, chosen by Vedant's ear.
+
+### What the fallback is, said plainly
+
+`PiperVoices.ENGLISH_CORI` stays in `byLanguage` as the insurance for a handset with no English
+voice data installed, which on an unseen iQOO is a real possibility. **That fallback is a voice
+Vedant has rejected on quality.** If the app ever falls through to it, the demo sounds worse
+than rehearsed, and this record is where the reason is: the ladder is not uniform, and it is
+written that way rather than pretended otherwise. Falling through is a recoverable state (the
+text is on screen, the voice is intelligible if machine-made); having no English voice at all
+would not be.
+
+### "Too fast" is a parameter
+
+Speaking rate is `TtsFlags.SPEECH_RATE`, applied as the platform's `setSpeechRate` and Piper's
+`speed`, 1.0 today. The bundled voice is re-rendered at 0.9, 0.85 and 0.8 on the same three
+sentences (`for-vedant-english-slower.zip`), so the second verdict separates the rate from the
+voice. `TtsVoiceProbeTest` now renders every offline `en-IN` voice at 1.0, 0.9 and 0.85 on the
+same three sentences, so the platform candidates arrive in the same form from Rao's next run;
+the one Vedant accepts sets the constant. His first platform sample, `en-in-x-enc-local` at the
+default rate, is already in `for-vedant-platform-english.zip`.
+
+### The handset-arrival list, top item
+
+On the iQOO, before anything else and before airplane mode goes on: is English voice data
+installed for the platform engine? Five minutes, on whatever network the hall has, in the
+phone's text-to-speech settings; then the probe's `-- ENGLISH_INDIA` block must show an
+`en-in-x-*-local` with `network=false`. If it cannot be installed, the demo speaks through the
+rejected fallback or through the realme, which is the backup device (addendum 9), and that
+decision is made in those five minutes, not on stage.
