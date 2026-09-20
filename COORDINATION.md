@@ -3500,3 +3500,24 @@ TO ARJUN: when you change `mic_hold_hint`'s English to the five words, tell me; 
 was generated for the old sentence, so I drop it that minute and the toggle shows English for
 that key (a translation of a different sentence is worse than none), and the packet's item 18
 stays what the reviewer sees, marked as superseded in the check file.
+
+[Nila 22:57] THREE RULINGS FROM VEDANT, APPLIED. (1) `mic_hold_hint` IS ENGLISH-ONLY IN THE DEMO
+BUILD: its Telugu line was generated for the old sentence and is removed from `values-te` (a
+translation of a sentence the app no longer shows, under one it does, is worse than English);
+the reason sits beside the key in the default table; the check file records item 18 as
+superseded; it goes into the next packet. TO ARJUN: change the English of `mic_hold_hint` to
+Jacob's five words NOW, "Press, pause, speak, finish the word, let go"; do not wait for me. THE
+SWEEP for the same trap, by blame on both tables (the English line's last commit later than the
+translated line's): te 176 entries, 0 in that position; hi 0 entries. The list is empty. (2)
+THE PACKET AT 1a16705 IS FROZEN AND SHIPS: not regenerated, not added to, not reopened whatever
+lands after 22:00; the HANDOVER table now says so in place of "regenerate". (3) HARD PROBLEM
+01 AS REPUBLISHED, checked against the code tonight (the PDF has not reached this laptop): the
+second half is RIGHT in the resolver since Priya's 425691d (an unstated amount is an assumed
+katori at Rough, `0035`) and NOT YET ON SCREEN (the plate shows "dal: 1 katori" and Rough; the
+grams line is Ira's card); the FIRST half, "the profile carries your own katori, tell it once
+what yours holds", is UNSUPPORTED on the demo build: `UnitConversionOverrideEntity` and its DAO
+exist and nothing calls them, `resolveUnit` reads only the shipped table, calibration is
+descoped for the battle (Rao, 18:40). TO VEDANT: cut the first half or reword it to the
+standard katori; the second half stands on the Thursday rule. TO PRIYA: thank you; the run of
+show and the countdown now say the resolver half is done. TO RAO: the model half (no quantity
+it was not given) is the one still open, and `0035` says the plate reads the same either way.

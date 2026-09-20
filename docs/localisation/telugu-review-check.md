@@ -1293,3 +1293,12 @@ Machine-generated lines received via Nila (machine); every line below is marked 
 - 12. `tab_about` and 89. `about_title`
 - 39. `meal_item_with_quantity` and 79. `scan_field_line` and 94. `context_figure`
 - 98. `context_period` and 165. `status_line`
+
+---
+
+**Superseded after the freeze (22:57, 20 September):** item 18, `mic_hold_hint`. The English sentence
+is being replaced by the measured instruction "Press, pause, speak, finish the word, let go" (Jacob,
+22:00), so the Telugu line above was generated for a sentence the app will not show. It has been
+removed from the app; the key is English in the demo build and goes into the next packet. The
+reviewer may skip item 18, or review it anyway: a reviewed line for the old sentence is still a
+data point about the machine's Telugu.

@@ -145,6 +145,19 @@ the phone and the two resolver changes are green. **Vedant's rule, to be held to
 on screen by Thursday 24 September, the sentence comes off the slide.** The countdown carries
 the row. The third claim today moved to match the code rather than the other way round.
 
+## Hard problem 01 as republished, checked against the code before the PDF arrived (22:57)
+
+Vedant's wording of the republished card (the PDF is not on this laptop; the wording is re-read
+when it lands): *"the profile carries your own katori, tell it once what yours holds, and when
+an amount is missing the plate shows the grams it assumed rather than hiding the guess inside
+the number."* Checked against `LookupMealResolver` at `425691d` (Priya's `0035`, the
+moisture-class fix) and `TalkScreen`, not against the old card.
+
+| half | the code | verdict |
+| --- | --- | --- |
+| "the profile carries your own katori, tell it once what yours holds" | The table exists: `UnitConversionOverrideEntity` (`unit_conversions`, the person's grams per unit and class) with `upsertUnitConversion` / `allUnitConversions` in the DAO. **Nothing calls either.** `SqliteFoodLookup.resolveUnit` reads the shipped conversions in the bundled food database only, so a personal katori would not be used even if one were stored, and no screen or spoken turn sets one. Rao's 18:40 ruling: the demo profile is pre-seeded with the bundled defaults and calibrating a utensil is descoped for the battle. | **UNSUPPORTED** on the demo build: there is no "tell it once", and the katori is the shipped default (150 g for a cooked pulse in `household-units.csv`; a served dish takes its recipe's serving, 180 g for the dal), not "your own". Cut, or reword to "a standard katori, and it says so". |
+| "when an amount is missing the plate shows the grams it assumed rather than hiding the guess inside the number" | Resolver: RIGHT since `425691d`. A number with no unit on a served dish is an assumed katori, QUANTITY_INFERRED and HOUSEHOLD_UNIT_DEFAULT, band Rough, the assumed quantity and unit written back onto the item; never QUANTITY_STATED (`UnstatedQuantityTest`, `DemoSentencesTest`: dal, 1 katori, taken as 180 g, Rough). Screen: `TalkScreen.ItemLine` renders "dal: 1 katori" and the band word beside the figure; **the grams are not on screen**; `plate_unit_taken_as` is in the string table and no screen uses it (Ira's card, Thursday). | **RIGHT in the resolver, NOT YET ON SCREEN.** The plate shows the assumed katori and the Rough band; it does not yet show "taken as 180 g". True when Ira's card lands; Vedant's Thursday rule applies to the words "the grams it assumed". |
+
 ## Three numbers from the demo-condition run, verified against the log (20:15)
 
 Asked for at `ea75984`. Checked against the device report itself, not Rao's summary of it:

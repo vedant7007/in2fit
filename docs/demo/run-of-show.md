@@ -129,14 +129,20 @@ unstated amount is never marked as stated, and the plate shows what it assumed, 
 katori · taken as 180 g"**, in the person's view, correctable (Ira's §8.4 idea 4; the deck's own
 "Approximate · tap to correct"). The weakness becomes the thing the presenter points at.
 
-Two changes, both smaller than asking, neither in the app on 20 September (the demo-condition
-log, row #1, `dal=1.0 none`: the model wrote the 1, `weigh()` marked it QUANTITY_STATED, 467.2
-kcal at full confidence):
+Two changes, both smaller than asking. The demo-condition log at 19:41 (row #1, `dal=1.0 none`)
+showed neither: the model wrote the 1, `weigh()` marked it QUANTITY_STATED, 467.2 kcal at full
+confidence. **As of `425691d` (Priya, `0035`, landed before 22:57)** the resolver half is in: a
+number with no unit on a served dish is an assumed katori, QUANTITY_INFERRED, band Rough, and
+the assumed quantity and unit are written back onto the item; `UnstatedQuantityTest` and
+`DemoSentencesTest` say so on the shipped database (dal: 1 katori, taken as 180 g, Rough). What
+the screen shows today is "dal: 1 katori" with the band Rough; the "taken as 180 g" line is
+Ira's card and is not on screen yet.
 
-- the model must not write a quantity it was not given; "a little" is an unstated amount (Rao);
-- a unitless quantity on an authored dish is an assumed serving, not QUANTITY_STATED, and the
-  band says so (whoever owns `weigh()`, Priya or Rao). This one matters even if the first slips:
-  it is the difference between a wrong confidence and an honest one.
+- the model must not write a quantity it was not given; "a little" is an unstated amount (Rao;
+  open, and `0035` says the plate reads the same whether it writes `1.0` or `null`);
+- DONE, `425691d`: a unitless quantity on a served dish is an assumed serving, not
+  QUANTITY_STATED, and the band says so. This one mattered even if the first slipped: it is the
+  difference between a wrong confidence and an honest one.
 
 The grams on the card: 180 g is the authored recipe's serving (`recipes.csv`, dal tadka, 720 g
 over 4), which is what the piece path computes today; the katori default for cooked pulses is

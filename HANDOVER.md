@@ -49,7 +49,7 @@ question it cares most about: whether anything has run on a phone. Something has
 >
 > | thing | the command, from a worktree | then |
 > | --- | --- | --- |
-> | The Telugu reviewer packet (regenerate, freeze) | `python tools/make_review_queue.py te` | commit `docs/localisation/telugu-review-queue.md`, `tools\land.ps1` |
+> | The Telugu reviewer packet: FROZEN at 22:00 on 20 Sep at `1a16705`, 176 items; it ships once and is not regenerated, added to or reopened while the reviewer has it. The next packet, when Vedant opens one: | `python tools/make_review_queue.py te` | commit `docs/localisation/telugu-review-queue.md`, `tools\land.ps1` |
 > | A reviewer's reply into the app | `python tools/import_review_queue.py te --reply <file> --reviewer "<name>"`, or `--sheet <file>`; add `--unreviewed --origin machine` for model output | send back `docs/localisation/telugu-review-check.md`; regenerate the packet; commit; land |
 > | The APK size ledger | `powershell -File tools\apk-size.ps1` after any assemble (build.ps1 does it) | quote only rows of `logs/apk-size.log` in the main tree |
 > | Models, the sherpa AAR, espeak data, with hashes checked | `tools\4-fetch-models.bat` (before `3-build.bat` on a fresh clone) | MISMATCH deletes the file and exits 1; run again |

@@ -161,6 +161,9 @@
     <string name="mic_listening">Listening…</string>
     <!-- Push-to-talk (Jacob, 20 Sep 19:05; ruled 20 Sep evening): the button label while the gesture is hold-to-speak, and the hint under it after a hold too short to carry a sentence. -->
     <string name="mic_hold_to_speak">Hold to speak</string>
+    <!-- ENGLISH-ONLY IN THE DEMO BUILD (Vedant, 20 Sep 2026): the sentence becomes Jacob's measured
+         "Press, pause, speak, finish the word, let go"; its Telugu line was generated for the earlier
+         sentence and was removed, so the key waits for the next packet. Arjun changes the English. -->
     <string name="mic_hold_hint">Hold the button while you speak, then let go.</string>
     <string name="mic_permission_needed">Microphone permission was not granted. You can type instead.</string>
     <string name="type_hint">Type what you ate, or a question</string>
