@@ -14,6 +14,13 @@ class and file names, and in the older records, because the native symbol names 
 package and that rename is deferred (`docs/decisions/0015`). Everything a person sees on the
 phone says IN2FIT.
 
+This repository was written by one person, Vedant Manmath Idlgave, who authored every commit.
+The working records — COORDINATION.md, the decision records under docs/decisions, and some
+source comments — are written in six named voices: Rao, Nila, Priya, Jacob, Meera and Arjun.
+Those are labels for separate AI assistant sessions used as tooling during the build, not
+people. They are kept because they are the record of how each decision was made, what was
+measured, and what was found to be wrong and corrected.
+
 ## Where to look
 
 Every claim in this repository traces to a file a machine wrote: a build log, a test report or a

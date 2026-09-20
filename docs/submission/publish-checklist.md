@@ -80,22 +80,24 @@ says what they are.
 Two facts bear on the choice:
 
 - The standing rule says no AI name or attribution anywhere in the repository. Two committed
-  files already contain one: `docs/spec.md` §17.3 ("Working with Claude Code and Cowork", the
-  original plan to have assistant sessions drive the build, committed by Vedant in `df82e35`),
-  and `HANDOVER.md` §6 rule 7, which quotes the rejected trailer with a model name in it. So the
-  repository as it stands both discloses the tooling in one place and names it in two.
+  files contained one when this was written: `docs/spec.md` §17.3 (the original plan to have
+  assistant sessions drive the build, whose heading named the tooling by product name,
+  committed by Vedant in `df82e35`), and `HANDOVER.md` §6 rule 7, which quoted the rejected
+  trailer with a model name in it. **Ruled 20 Sep, done at 20:04: both edited; the guidance and
+  the rule stay, the names are gone.** So the repository discloses the tooling in exactly one
+  place, the README paragraph below.
 - Nothing in the repository claims the six names are people, and nothing may be written that
   does.
 
 The options:
 
-1. **Keep every record as it is, and add one paragraph, once, where a reader lands** (the
-   README's "Where to look" table, beside `COORDINATION.md`), saying in plain words that the
-   names in the log and the records are labels for assistant sessions used as tooling, that
-   every commit is authored by the one person who directed them, and that the records are kept
-   because they are the evidence for every number. This needs Vedant to lift the standing rule
-   for that one paragraph, and to reconcile it with `spec.md` §17.3, which already says the same
-   thing at length. **Recommended.** It is true, it is cheap, it makes the strongest evidence
+1. **Keep every record as it is, and add one paragraph, once, where a reader lands**, saying
+   in plain words that the names in the log and the records are labels for assistant sessions
+   used as tooling, that every commit is authored by the one person who directed them, and
+   that the records are kept because they are the evidence for every number. **RULED 20 Sep,
+   this option; the paragraph is in the README in Vedant's words, before "Where to look", and
+   it is the single authorised exception to the standing rule.** The rest of this section is
+   kept as the record of the choice. It is true, it is cheap, it makes the strongest evidence
    readable instead of suspicious, and a judge who works it out unaided later will assume the
    worst.
 2. **Keep every record as it is and say nothing.** Consistent with the rule as written;
@@ -112,13 +114,11 @@ The options:
 Whatever is chosen, the README's one line about Katori is the model: a reader told once, plainly,
 does not have to guess.
 
-### 7b. The standing rule and the two files that already break it
+### 7b. The standing rule and the two files that broke it
 
-`docs/spec.md` §17.3 and `HANDOVER.md` §6 rule 7 (lines 405–410) name an AI tool. **[Vedant]**:
-either the rule applies to commits, PRs and attribution from here on and these two historical
-passages stand, or they are edited before publishing. Not edited here; both are records of
-what was planned and what was decided, and this checklist's rule is that a correction is
-appended, never overwritten.
+`docs/spec.md` §17.3 and `HANDOVER.md` §6 rule 7 named an AI tool. **Ruled 20 Sep: delete
+both mentions, keep the guidance and the rule readable. Done at 20:04.** The one authorised
+exception in the whole repository is the README paragraph under 7a, in Vedant's words.
 
 ## The order to do it in
 

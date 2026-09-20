@@ -18,7 +18,7 @@ question it cares most about: whether anything has run on a phone. Something has
 >   `COORDINATION.md` and `STATUS.md` carry the measured figures; `0011`–`0014` the findings.
 > - §3: `ModelArbiter` is implemented (`0c20de3`, `DefaultModelArbiter.kt`, 19 tests).
 > - §6 rule 7 (commit authorship): resolved by Vedant. Commits are authored solely by him, with
->   no `Co-Authored-By` trailer and no attribution line. Every commit since follows this.
+>   no co-author trailer and no attribution line. Every commit since follows this.
 > - §7 "Documentation that disagrees with the code": every row in that table is reconciled as of
 >   this date; see the commit that added this addendum.
 > - The product is now IN2FIT (`0015`). Display strings only; the package stays `katori`.
@@ -408,15 +408,15 @@ attached, and in several cases the reason is a bug that was actually found.
    stub is how a not-implemented state quietly becomes a fake one. (`0001`, `0007`, `Outcome.kt`,
    `MainActivity.kt`)
 
-7. **Commit authorship.** All twelve existing commits are authored
-   `Vedant Manmath Idlgave <vedantidlgave16@gmail.com>` with **no `Co-Authored-By` trailer** and no
-   attribution lines. **The repository records no authorship convention at all** — there is no
-   `CLAUDE.md`, no contributing guide, nothing in the decision records. The instruction in force in
-   the session that produced this handover is that new commits end with
-   `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>` and PR descriptions end with
-   the Claude Code generation line. That instruction comes from the harness, not from this repo, so
-   **confirm with Vedant which convention applies before committing** — adopting it silently would
-   make the history inconsistent from commit 13 onward.
+7. **Commit authorship.** Every commit is authored AND committed as
+   `Vedant Manmath Idlgave <vedantidlgave16@gmail.com>`. Commits carry no co-author trailer and no
+   generation line; no attribution of any kind appears in commits, pull requests, contributors,
+   comments or files, with one authorised exception: the paragraph in `README.md` that says what
+   the six named voices in the working records are. When this handover was written the repository
+   recorded no convention and the tooling's default was to add a trailer; Vedant ruled against
+   it before the thirteenth commit, and an audit of the whole history before the first push
+   (141 commits, 20 September) found every author and committer to be him and no trailer
+   anywhere. A commit that fails that audit is reported, not rewritten.
 
 8. **`Unknown` is never collapsed to zero.** Not on import, not in a sum, not in the UI. There is
    deliberately no `getOrZero()` helper and no default value anywhere on `NutrientValue`. USDA states

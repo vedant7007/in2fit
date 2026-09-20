@@ -371,7 +371,7 @@ All models ship in the APK or download once on first run, then never touch the n
 | React Native | Not recommended | React Native ExecuTorch exists and supports Qwen 3, Llama 3.2 and Whisper via a `useLLM` hook, so it is not impossible. But camera plus pose plus OCR plus LLM across a bridge is too many failure points |
 | Web or PWA | Rejected | Cannot access NPU, sensors, or run local models at usable speed. Also scores zero on device usage |
 
-The familiarity argument cuts the other way here. An unfamiliar stack with one native path beats a familiar stack with four bridges. Claude Code closes the Kotlin gap faster than it closes a broken platform channel.
+The familiarity argument cuts the other way here. An unfamiliar stack with one native path beats a familiar stack with four bridges. Assistant tooling closes the Kotlin gap faster than it closes a broken platform channel.
 
 ### 9.2 Component map
 
@@ -818,9 +818,9 @@ In priority order, drop from the bottom:
 
 Items 1 to 5 are the four demo beats. Everything else is score on top.
 
-### 17.3 Working with Claude Code and Cowork
+### 17.3 Working with parallel assistant sessions
 
-The plan is to hand this document to Claude Cowork and let it drive VS Code across multiple parallel sessions. Some guidance for that:
+The plan is to hand this document to parallel assistant sessions in the editor and let them drive the build. Some guidance for that:
 
 - **Parallelise by package, not by feature.** The `ml/asr`, `ml/llm`, `data/food` and `ui` packages have clean boundaries. Two sessions touching the same package will conflict.
 - **Define the interfaces first**, in one session, before parallel work starts. Every parallel session then codes against a fixed contract.
@@ -885,7 +885,7 @@ Stated honestly, because a risk you have named is a risk you can plan around.
 | 6 | Novelty challenge in Q&A: calorie apps and posture coaching already exist | Certain | Moderate | Section 3.4. Pre-empt it in the pitch rather than defending it under questioning |
 | 7 | Health overclaim in the Q&A | Medium | Severe | Section 15. Rehearse the answer to "can it tell me if I have diabetes?" It is no, and here is why |
 | 8 | Stub data in the UI quietly becomes demo data | High | Severe | Every result type carries an explicit unavailable state from day one, so the UI worker cannot render a plausible fake number. Frozen into the Phase 2 contracts |
-| 9 | Kotlin is unfamiliar | Certain | Moderate | Claude Code closes this. A bridged stack has worse failure modes under time pressure |
+| 9 | Kotlin is unfamiliar | Certain | Moderate | Assistant tooling closes this. A bridged stack has worse failure modes under time pressure |
 | 10 | Loaner device behaves differently from test devices | Medium | Moderate | Develop for the weakest device. Measured tier detection, not chipset name. Carry your own phone as demo backup |
 | 11 | Parallel sessions conflict | Medium | Moderate | Parallelise by package with fixed interfaces. One integrator session. Section 17.3 |
 | 12 | Model size makes the APK impractical | Medium | Moderate | Budget \~2 GB, tracked as a hard number. `demo` flavour bundles, `full` flavour downloads. Section 14.4 |
@@ -933,7 +933,7 @@ What she can start now without blocking: the visual identity, the colour and typ
 
 ### 21.3 On Abhinav
 
-Even with Claude Cowork driving most of the build, there is real work that does not conflict with parallel code generation and cannot be automated:
+Even with assistant sessions driving most of the build, there is real work that does not conflict with parallel code generation and cannot be automated:
 
 - **Building the voice test set.** 100+ recorded meal logs from different speakers. This is the highest-value task in the project, it needs a human recruiting real people, and section 10.6 depends on it entirely.
 - **Weighing real meals** for the nutrition accuracy validation in section 18.4.

@@ -2574,8 +2574,8 @@ by-design set. PRIYA, ccc6483 is the one I would look at first.
 [Nila 19:42] THE REPOSITORY EXISTS: https://github.com/vedant7007/in2fit, PRIVATE, default
 branch master, pushed at 83e7375, 141 commits. Authorship audit over the whole history before
 the push: every author AND every committer is Vedant Manmath Idlgave
-<vedantidlgave16@gmail.com>, zero commit bodies match claude / anthropic / co-authored /
-generated-with, no trailers. Checklist re-run at 83e7375: no secrets or token shapes in any
+<vedantidlgave16@gmail.com>, zero commit bodies match the audit's four attribution patterns,
+no trailers. Checklist re-run at 83e7375: no secrets or token shapes in any
 tracked file; no model binary anywhere in history (largest blob 0.5 MB); LICENSE blob is the
 canonical Apache-2.0 text (the working copy shows CRLF from autocrlf, the blob is LF); README
 is the landing page; nothing a phone user sees says Katori. Still open for Vedant before it
@@ -2614,3 +2614,15 @@ the phase-1b packet, this log, the publish checklist, `tools/hardware-probe.ps1`
 same on this machine and works on another. This edited lines of this log that were not mine;
 that is the one exception to the append-only rule, ruled, and this line records it. Nothing
 else changed.
+
+[Nila 20:04] BOTH RULED, BOTH LANDED. (1) The README carries the one authorised paragraph, in
+Vedant's words exactly, placed before "Where to look" so a reader meets it before the working
+records: one author, six named voices that are assistant-session labels and not people, kept
+because they are the record. It is the single authorised exception in the repository. (2) The
+two old mentions are gone: `docs/spec.md` 17.3 keeps its guidance under "Working with parallel
+assistant sessions" and its three other passing mentions read "assistant tooling" / "assistant
+sessions"; HANDOVER's rule 7 states the ban without quoting a trailer, in a form anyone can
+follow: every commit authored and committed as Vedant, no co-author trailer, no generation
+line, no attribution anywhere but that paragraph, audited over 141 commits before the first
+push. The residue scan is below. THE REPOSITORY IS CLEAR TO GO PUBLIC ON VEDANT'S WORD; it is
+still private, and the word is his to say out loud.
