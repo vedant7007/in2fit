@@ -19,11 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,17 +30,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import io.github.vedant7007.katori.R
-import io.github.vedant7007.katori.ml.vision.LabField
+import io.github.vedant7007.katori.ui.components.FailedCard
+import io.github.vedant7007.katori.ui.components.Label
+import io.github.vedant7007.katori.ui.components.PrimaryButton
+import io.github.vedant7007.katori.ui.components.ReportField
+import io.github.vedant7007.katori.ui.components.ScreenTitle
+import io.github.vedant7007.katori.ui.components.SecondaryButton
+import io.github.vedant7007.katori.ui.components.StageIndicator
+import io.github.vedant7007.katori.ui.theme.In2fitColors
+import io.github.vedant7007.katori.ui.theme.In2fitText
+import io.github.vedant7007.katori.ui.theme.Space
 
-/** Beat 3: the camera, then every value read off the report beside its row, for the person to confirm. */
+/**
+ * Beat 3: the camera, then every value read off the report beside its row, for the person to
+ * confirm. State and the boundary are Arjun's `ScanViewModel`; the look is `ui/components` (Ira).
+ */
 @Composable
 fun ScanScreen(vm: ScanViewModel = hiltViewModel()) {
     val state by vm.state.collectAsState()
@@ -55,14 +63,12 @@ fun ScanScreen(vm: ScanViewModel = hiltViewModel()) {
     val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
     LaunchedEffect(Unit) { if (!granted) ask.launch(Manifest.permission.CAMERA) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.scan_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 8.dp))
+    Column(modifier = Modifier.fillMaxSize().padding(horizontal = Space.l), verticalArrangement = Arrangement.spacedBy(Space.s)) {
+        ScreenTitle(stringResource(R.string.scan_title), modifier = Modifier.padding(top = Space.m))
         when {
-            !granted -> Text(stringResource(R.string.camera_permission_needed))
-            state.reading -> {
-                Text(stringResource(R.string.scan_reading))
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
+            !granted -> Text(stringResource(R.string.camera_permission_needed), style = In2fitText.body)
+            // 0026's rule holds here too: the wait is named, with a counter, never a bare bar.
+            state.reading -> StageIndicator(done = emptyList(), current = stringResource(R.string.scan_reading), elapsed = { 0 })
             state.report == null && state.failure == null && state.notBuilt == null ->
                 CameraCapture(onCaptured = vm::captured, onFailed = vm::captureFailed)
             else -> Results(state, onToggle = vm::toggle, onRetake = vm::retake, onSave = vm::save)
@@ -78,9 +84,10 @@ private fun CameraCapture(onCaptured: (android.graphics.Bitmap, Int) -> Unit, on
     var provider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
     DisposableEffect(Unit) { onDispose { provider?.unbindAll() } }
 
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(Space.m)) {
+        Text(stringResource(R.string.scan_instruction), style = In2fitText.bodySmall, color = In2fitColors.inkSecondary)
         AndroidView(
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+            modifier = Modifier.weight(1f).fillMaxWidth().clip(MaterialTheme.shapes.medium),
             factory = { ctx ->
                 PreviewView(ctx).also { view ->
                     val future = ProcessCameraProvider.getInstance(ctx)
@@ -95,8 +102,9 @@ private fun CameraCapture(onCaptured: (android.graphics.Bitmap, Int) -> Unit, on
                 }
             },
         )
-        Button(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        PrimaryButton(
+            label = stringResource(R.string.scan_capture),
+            modifier = Modifier.fillMaxWidth().padding(bottom = Space.l),
             onClick = {
                 imageCapture.takePicture(ContextCompat.getMainExecutor(context), object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(image: ImageProxy) {
@@ -109,60 +117,33 @@ private fun CameraCapture(onCaptured: (android.graphics.Bitmap, Int) -> Unit, on
                     override fun onError(exception: ImageCaptureException) = onFailed(exception.toString())
                 })
             },
-        ) { Text(stringResource(R.string.scan_capture)) }
+        )
     }
 }
 
 @Composable
 private fun Results(state: ScanViewModel.State, onToggle: (Int) -> Unit, onRetake: () -> Unit, onSave: () -> Unit) {
     val report = state.report
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        state.failure?.let {
-            Text(stringResource(Sentences.unavailable(it)))
-            state.failureDetail?.let { d -> Text(d, style = MaterialTheme.typography.bodySmall) }
-        }
-        state.notBuilt?.let { Text(stringResource(R.string.not_built, it)) }
-        state.savedCount?.let { Text(stringResource(R.string.scan_saved, it), style = MaterialTheme.typography.titleMedium) }
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(Space.s)) {
+        state.failure?.let { FailedCard(stringResource(Sentences.unavailable(it)), state.failureDetail) }
+        state.notBuilt?.let { Text(stringResource(R.string.not_built, it), style = In2fitText.bodySmall) }
+        state.savedCount?.let { Text(stringResource(R.string.scan_saved, it), style = In2fitText.body) }
         if (report != null) {
-            Text(
+            Label(
                 report.reportDate?.let { stringResource(R.string.scan_report_date, it.toString()) }
                     ?: stringResource(R.string.scan_report_date_unknown),
-                style = MaterialTheme.typography.labelLarge,
             )
-            if (state.fields.isEmpty()) Text(stringResource(R.string.scan_no_fields))
-            LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                itemsIndexed(state.fields) { i, f -> FieldRow(f.field, f.ticked) { onToggle(i) } }
+            if (state.fields.isEmpty()) Text(stringResource(R.string.scan_no_fields), style = In2fitText.body)
+            LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Space.s)) {
+                itemsIndexed(state.fields, key = { i, _ -> i }) { i, f -> ReportField(f.field, f.ticked, onToggle = { onToggle(i) }) }
             }
         }
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onRetake, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.scan_retake)) }
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = Space.l), horizontalArrangement = Arrangement.spacedBy(Space.s)) {
+            SecondaryButton(stringResource(R.string.scan_retake), onClick = onRetake, modifier = Modifier.weight(1f))
             val ticked = state.fields.count { it.ticked }
             if (ticked > 0 && state.savedCount == null) {
-                Button(onClick = onSave, enabled = !state.saving, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.scan_save, ticked))
-                }
+                PrimaryButton(stringResource(R.string.scan_save, ticked), onClick = onSave, enabled = !state.saving, modifier = Modifier.weight(1f))
             }
-        }
-    }
-}
-
-@Composable
-private fun FieldRow(field: LabField, ticked: Boolean, onToggle: () -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Checkbox(checked = ticked, onCheckedChange = { onToggle() })
-        Column {
-            Text(stringResource(R.string.scan_field_line, field.testName, Sentences.number(field.value), field.unit.orEmpty()))
-            val lo = field.referenceLow
-            val hi = field.referenceHigh
-            val range = when {
-                lo != null && hi != null -> stringResource(R.string.scan_range_both, Sentences.number(lo), Sentences.number(hi))
-                hi != null -> stringResource(R.string.scan_range_high_only, Sentences.number(hi))
-                lo != null -> stringResource(R.string.scan_range_low_only, Sentences.number(lo))
-                else -> stringResource(R.string.scan_range_none)
-            }
-            Text(range, style = MaterialTheme.typography.bodySmall)
-            // The row as read, so the person can check the parse against the print.
-            Text(field.sourceRow, style = MaterialTheme.typography.labelSmall)
         }
     }
 }

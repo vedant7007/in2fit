@@ -735,3 +735,25 @@ Outside:
 - Typefaces: [IBM Plex on GitHub](https://github.com/IBM/plex) (script coverage); [IBM Plex Sans Devanagari, Google Fonts](https://fonts.google.com/specimen/IBM+Plex+Sans+Devanagari); [Carbon typography](https://carbondesignsystem.com/elements/typography/overview/) (Plex, `tnum`); [Hind Guntur, Google Fonts](https://fonts.google.com/specimen/Hind%2BGuntur); [OpenType `tnum`](https://www.preusstype.com/techdata/otf_tnum.php).
 - Localisation of Hindi strings: [Reverie, mobile app localisation](https://reverieinc.com/blog/best-practices-for-mobile-app-localization/); [SimpleLocalize, text expansion](https://simplelocalize.io/blog/posts/text-expansion-ui-localization/).
 - The realme RMX3780 display: [Amazon listing, realme 11 5G](https://www.amazon.com/realme-RMX3780-Display-Unlocked-Carriers/dp/B0CGF21RCY) (6.72-inch 120 Hz LCD); [chooseyourmobile](https://www.chooseyourmobile.com/realme-11-5g/) (2400×1080, 550 nits).
+
+---
+
+## Corrections, appended and dated (the rule: never overwrite)
+
+**20 September, 21:58, Ira.**
+
+- §0, the row "the realme RMX3780 is the backup": Nila 20:58 corrected the role. Vedant's 20:45
+  facts make the realme the rehearsal and fallback-video device, staged with the same build and in
+  the bag; whether it may stand in front of the judges is unruled. The display facts in the row
+  (6.72-inch IPS LCD, 120 Hz, 550 nits) are unchanged and still the only panel anyone has measured on.
+- §6.1 rule 1 and §6.2 option B said Plex "has `tnum`". Measured with fontTools on 20 September:
+  neither IBM Plex Sans nor IBM Plex Sans Devanagari lists a `tnum` feature; their digits are
+  **tabular by default** (every digit 600 units per em), so the alignment holds with no feature
+  set. Hind and Hind Guntur have proportional digits (323 to 544 units) and no `tnum` to switch on,
+  which is the measured reason they lose for a numbers app before any rendering. Also measured:
+  Plex Sans Devanagari carries Plex's Latin at the same x-height (516/520/522), so one family of
+  three files covers Latin and Devanagari; the separate Plex Sans Latin files are not bundled.
+- §8.6 asked for a private adb server on the emulator. Withdrawn: on 20 September at 21:39 a
+  private server took the phone from the default one on a USB re-enumeration (COORDINATION 21:45).
+  The emulator is attached to the default server only inside a stated window, after the phone,
+  with `-s` on every command.

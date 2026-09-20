@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.vedant7007.katori.R
+import io.github.vedant7007.katori.ui.components.BottomTabs
+import io.github.vedant7007.katori.ui.components.Splash
 import io.github.vedant7007.katori.ui.demo.DemoFeed
+import io.github.vedant7007.katori.ui.theme.In2fitTheme
 
 /**
  * The demo shell: three tabs, no more. Talk carries beats 1, 2 and 4; Scan carries beat 3;
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            In2fitTheme {
                 Surface { Shell() }
             }
         }
@@ -59,6 +60,11 @@ private fun Shell() {
     val demo by DemoFeed.enabled.collectAsState()
     BackHandler(enabled = preflight) { preflight = false }
 
+    // The splash (Ira): an overlay, never a gate. `ready` is true today; it becomes the 0028
+    // warm-up signal when that reaches the screen (Arjun's state), and the splash then ends at
+    // the next expand after warm-up finishes.
+    var splash by rememberSaveable { mutableStateOf(true) }
+    Box {
     Scaffold(
         topBar = {
             if (demo) {
@@ -71,16 +77,11 @@ private fun Shell() {
             }
         },
         bottomBar = {
-            NavigationBar {
-                tabs.forEachIndexed { i, title ->
-                    NavigationBarItem(
-                        selected = tab == i && !preflight,
-                        onClick = { tab = i; preflight = false },
-                        icon = {},
-                        label = { Text(stringResource(title)) },
-                    )
-                }
-            }
+            BottomTabs(
+                titles = tabs.map { stringResource(it) },
+                selected = if (preflight) -1 else tab,
+                onSelect = { tab = it; preflight = false },
+            )
         },
     ) { padding ->
         val content = Modifier.padding(padding)
@@ -92,5 +93,7 @@ private fun Shell() {
                 else -> AboutScreen(onPreflight = { preflight = true })
             }
         }
+    }
+    if (splash) Splash(ready = { true }, onFinished = { splash = false })
     }
 }

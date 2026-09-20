@@ -318,4 +318,11 @@
     <string name="demo_banner">SCRIPTED DEMO FEED. Nothing on this screen is a real result.</string>
     <!-- Shown on the pre-flight check in the demo build, where the feed does not exist. -->
     <string name="demo_absent">Not in this build. The demo build carries no scripted feed.</string>
+    <!-- THE DESIGN (Ira, 20 Sep, after the 22:00 freeze: English only). Talk tab chrome. -->
+    <!-- One static line under the Talk title: the demo build has no internet permission. Never changes. -->
+    <string name="talk_offline_mark">Offline by build. No internet permission.</string>
+    <!-- The small text button that opens the typed fallback under the microphone. -->
+    <string name="talk_type_instead">Type instead</string>
+    <!-- Scan tab, over the camera: how to hold the page so the reader can read it (the playbook's own advice). -->
+    <string name="scan_instruction">Lay the report flat, whole page in frame, light from the side.</string>
 </resources>

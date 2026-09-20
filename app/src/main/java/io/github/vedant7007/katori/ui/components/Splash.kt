@@ -1,0 +1,76 @@
+package io.github.vedant7007.katori.ui.components
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import io.github.vedant7007.katori.R
+import io.github.vedant7007.katori.ui.theme.In2fitColors
+import io.github.vedant7007.katori.ui.theme.Space
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+/**
+ * The splash, as decided on 20 September (Arjun 20:09, Vedant's read of the frames): the wordmark
+ * breathes open, `scaleX` 0.72 → 1.0 ease-out over 1.2 s, the tagline fades in as a separate
+ * element with alpha only, its position fixed; from 3.5 s it contracts and fades, and loops. The
+ * three rules that outrank fidelity: it never gates the app (the screen under it is already
+ * built), it ends at the next expand the moment [ready] is true, and it has no minimum duration.
+ *
+ * Every animated property is a `graphicsLayer` transform, so nothing here lays out or recomposes
+ * per frame. The wordmark is the PNG scaled (ruled: no trace; on a splash lossy is invisible).
+ * [ready] is read at the end of each expand; today the caller passes true and the splash ends
+ * after one breath, because the warm-up signal (0028) does not reach the screen yet.
+ */
+@Composable
+fun Splash(ready: () -> Boolean, onFinished: () -> Unit) {
+    val scaleX = remember { Animatable(0.72f) }
+    val tagline = remember { Animatable(0f) }
+    val veil = remember { Animatable(1f) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            launch { tagline.animateTo(1f, tween(900, delayMillis = 200, easing = LinearOutSlowInEasing)) }
+            scaleX.animateTo(1f, tween(1200, easing = LinearOutSlowInEasing))
+            if (ready()) break
+            delay(3500L - 1200L)
+            launch { tagline.animateTo(0f, tween(600)) }
+            scaleX.animateTo(0.72f, tween(600, easing = FastOutSlowInEasing))
+        }
+        veil.animateTo(0f, tween(250))
+        onFinished()
+    }
+    Box(
+        Modifier.fillMaxSize().graphicsLayer { alpha = veil.value }.background(In2fitColors.ground),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(Space.l)) {
+            Image(
+                painterResource(R.drawable.wordmark),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier.width(260.dp).graphicsLayer { this.scaleX = scaleX.value },
+            )
+            Image(
+                painterResource(R.drawable.tagline),
+                contentDescription = null,
+                modifier = Modifier.width(220.dp).padding(top = Space.s).graphicsLayer { alpha = tagline.value },
+            )
+        }
+    }
+}
