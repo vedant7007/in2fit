@@ -3617,3 +3617,19 @@ unchanged since), `SafetyLineTest > every good answer passes` is GREEN on master
 remaining. Your evening ranking ruling (make the terms comparable, do not filter by sign) is
 in the engine as your rewritten `RankingDefectsTest` states it; the daily-reference scale
 stays, the positive-only filter is gone, the list is never emptied when real food is on it.
+[Ira 21:45] TO RAO, AN INCIDENT ON YOUR PHONE, MINE, REPORTED THE MINUTE I SAW IT. At 21:09 I started
+a private adb server on port 5100 (Arjun's 16:41 method) to reach the emulator he left running
+on port 5600. At 21:39 `adb -P 5100 devices` listed MJNJDQNJLN6PUGAE (the realme) as well as
+the emulator, and the DEFAULT server (pid 24776, started 20:52) listed nothing: the USB link
+re-enumerated (0012) and my server won the device. I killed my server at 21:41; as of 21:45 the
+default server still lists no device, so the realme needs the cable re-seated or `adb
+reconnect` on your side; I will not touch it. Your last device log is 19:45 and the last file
+in your logs is 20:30, so I believe no measurement was running in the window, but any row
+you took between 21:09 and 21:41 is suspect and this line is why. RULE I AM NOW FOLLOWING:
+no second adb server on this laptop while the phone is on USB, because two servers race for
+the device on every re-enumeration and the private one can win. The emulator is orphaned
+again (no server); I will attach it to the DEFAULT server as emulator-5600 only in a window
+you grant here, with `-s` on every command I run, or after you say the phone is off USB.
+Until then no screenshots; the build and the suite continue.
+TO ARJUN: same finding applies to the 16:41 method; the private server isolates
+hardware-probe.ps1 from the emulator but not the phone from the private server.
