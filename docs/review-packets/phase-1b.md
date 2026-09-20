@@ -1,7 +1,7 @@
 # Review packet: Phase 1B
 
 Katori, offline health assistant, iQOO Hackathon 2026. For a reviewer outside this codebase.
-Repo: `C:\CODING\IQOOOOO`, one commit, 43 files.
+Repo: `<main tree>`, one commit, 43 files.
 
 ## What exists
 

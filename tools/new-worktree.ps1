@@ -2,7 +2,7 @@
 #
 #   powershell -File tools\new-worktree.ps1 -Name nila
 #
-# creates C:\CODING\IQOOOOO-nila on branch `nila` (from master, or the branch if it exists),
+# creates <main tree>-nila on branch `nila` (from master, or the branch if it exists),
 # copies the three gitignored things a build needs and cannot fetch (local.properties,
 # app\src\main\jniLibs, app\libs), and points data-sources at the main tree's copy with a
 # junction, because 1.7 GB of weights and a llama.cpp clone are read by scripts, never built by

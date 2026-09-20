@@ -21,7 +21,7 @@ function Log($m) {
 Set-Content -Path $log -Value "=== hardware probe $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ===" -Encoding UTF8
 
 $env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot'
-$sdk = 'C:\Users\vedan\AppData\Local\Android\Sdk'
+$sdk = Join-Path $env:LOCALAPPDATA 'Android\Sdk'
 $adb = Join-Path $sdk 'platform-tools\adb.exe'
 $pkg = 'io.github.vedant7007.katori'
 $gw  = Join-Path $root 'gradlew.bat'

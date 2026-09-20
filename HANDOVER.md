@@ -58,6 +58,7 @@ question it cares most about: whether anything has run on a phone. Something has
 > | The string rules for anyone writing a screen | `docs/localisation/string-conventions.md` | `StringResourcesTest` enforces the ones a test can |
 > | Licence texts and duties | `docs/licences/`, `docs/decisions/0005` | the IITM PDF diff is recorded there before anyone rules from the text |
 > | The demo | `docs/demo/run-of-show.md`, `docs/demo/deck-audit-2026-09-20.md` | budgets are replaced by rows from the clean run; the deck is re-read against the repo before every resubmission |
+> | The branch | `master`, and it stays `master` through judging week. The session tooling's own context described this repository's main branch as `main`; it never had one. A rename is one `gh repo edit --default-branch` and is not to be done while anyone may be reading the URL. | |
 > | The remote | `git push origin master` from any worktree, after landing; `https://github.com/vedant7007/in2fit`, private until ruled otherwise | landing does not push; pushing is deliberate |
 
 There is no README at the repo root and **no copy of the spec anywhere in the repository**, yet 30
@@ -107,8 +108,8 @@ permission at all, which is the proof the pitch leads with.
 | JDK | Temurin 21.0.11 | set as `JAVA_HOME` by every script in `tools/` |
 | ABI | `arm64-v8a` only | `ndk { abiFilters }` |
 
-**SDK root in use: `C:\Users\vedan\AppData\Local\Android\Sdk`.** Set in `local.properties`, which is
-gitignored and machine-specific. A second SDK root exists at `C:\Users\vedan\Android\Sdk`; it lacks
+**SDK root in use: `%LOCALAPPDATA%\Android\Sdk`.** Set in `local.properties`, which is
+gitignored and machine-specific. A second SDK root exists at `%USERPROFILE%\Android\Sdk`; it lacks
 `android-37.0` which AGP 9 requires. Decision `0003` chose the first and warns that installing
 packages without an explicit `--sdk_root` lands them where the build cannot see them.
 

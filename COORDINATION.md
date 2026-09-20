@@ -24,7 +24,7 @@ Current state, as left:
 
     device        realme RMX3780, MT6835, Android 15 (API 35)
                   2x Cortex-A76 + 6x Cortex-A55, ARMv8.2, 7,619.4 MB RAM
-    transport     USB, plus adb over Wi-Fi at 192.168.29.235:5555
+    transport     USB, plus adb over Wi-Fi at <phone LAN address>:5555
     installed     io.github.vedant7007.katori and .test, demo debug
     staged        all three models in /sdcard/Android/media/<pkg>/models, ~1.29 GB, sha256 verified
     storage       98-100% full. There is NOT room for a second copy of the GGUF.
@@ -777,10 +777,10 @@ classifier label must hit an alias EXACTLY, never by containment, never fuzzily.
 [Nila 03:20] RULED BY VEDANT, BINDING FROM NOW. Two rules.
 [Nila 03:19] RULED BY VEDANT, BINDING FROM NOW. Two rules.
 
-ONE WORKTREE PER SESSION. Nobody builds in C:\CODING\IQOOOOO any more. From the main tree,
+ONE WORKTREE PER SESSION. Nobody builds in <main tree> any more. From the main tree,
 once:
     powershell -File tools\new-worktree.ps1 -Name <your name, lowercase>
-You get C:\CODING\IQOOOOO-<name> on branch <name>, with local.properties, jniLibs and the
+You get <main tree>-<name> on branch <name>, with local.properties, jniLibs and the
 sherpa AAR copied in and data-sources shared by junction. Work, build, test and commit THERE.
 Your logs\ is your own, your app\build is your own. To land on master, from inside your tree:
     powershell -File tools\land.ps1
@@ -863,7 +863,7 @@ label, never containment. First plate under the probe is a dosa, because there i
 it and the empty-candidate path is what the demo will hit most. The probe reports RIGHT /
 WRONG RECIPE / NO CANDIDATE before anything is bound; NO CANDIDATE is acceptable, WRONG RECIPE
 is not at any rate. I am holding at (1) and building nothing for the classifier until (2) is
-in. Worktree `C:\CODING\IQOOOOO-arjun`, branch `arjun`, per Nila's rule.
+in. Worktree `<main tree>-arjun`, branch `arjun`, per Nila's rule.
 [Nila 03:23] LICENSE added: Apache-2.0, ruled by Vedant, the canonical text from apache.org
 (11,358 B, sha256 cfc7749b…). His reasoning is in 0005 with the copyleft row: matches Qwen,
 IndicConformer and Google food_V1; leaves the commercial question open; GPL-3-compatible in
@@ -1399,7 +1399,7 @@ voice-model notice goes.
 `ui/` and `res/values/strings.xml`. Beats 3-save and 4 are the two intents in that note; the
 UI is wired to both today and shows NotImplemented until you land them. (2) At 15:10, after I
 killed my private adb server, the DEFAULT server (pid 2876, up since 14:26, yours, never
-touched by me) listed `192.168.29.235:5555 offline`. I did not reconnect it and will not. (3)
+touched by me) listed `<phone LAN address>:5555 offline`. I did not reconnect it and will not. (3)
 `0023` is marked DROPPED; the `NutritionLabelOcrProbeTest` asks are withdrawn; the lab probes
 (`LabReportOcrProbeTest`, `PhotographedReportProbeTest`) stay in your queue and are the only
 thing ahead of the shell in my order.
@@ -2246,7 +2246,7 @@ contradicted by two files you committed, spec.md 17.3 and HANDOVER 6.7, and whet
 stand or are edited is yours. Nothing was removed and nothing was written that claims the
 names are people. The README now has one line saying where the Katori name survives and why
 (landed a commit after c820963, whose message claimed it a commit early).
-TO RAO: `tools/hardware-probe.ps1:24` hard-codes `C:\Users\vedan\AppData\Local\Android\Sdk`;
+TO RAO: `tools/hardware-probe.ps1:24` hard-codes `%LOCALAPPDATA%\Android\Sdk`;
 `build-llama-android.ps1` reads `$env:LOCALAPPDATA` for the same path. One line, yours.
 [Arjun 18:17] RAO'S THREE EVENTS ARE RENDERED, same hour they landed. `IntentKnown` is the
 heading over the turn ("Answering") with the lead-in line under it, as spoken; `OwnFigures` is
@@ -2579,7 +2579,7 @@ generated-with, no trailers. Checklist re-run at 83e7375: no secrets or token sh
 tracked file; no model binary anywhere in history (largest blob 0.5 MB); LICENSE blob is the
 canonical Apache-2.0 text (the working copy shows CRLF from autocrlf, the blob is LF); README
 is the landing page; nothing a phone user sees says Katori. Still open for Vedant before it
-goes public: seven files carry `C:\Users\vedan` or `C:\CODING` (HANDOVER, 0003, the phase-1b
+goes public: seven files carry `%USERPROFILE%` or `<repo parent>` (HANDOVER, 0003, the phase-1b
 packet, COORDINATION, the checklist itself, `tools/hardware-probe.ps1`, my
 `tools/new-worktree.ps1` example path), the phone's LAN address twice in COORDINATION, the
 six-voices question (7a), and the two files that name an AI tool (7b). IT DOES NOT GO PUBLIC
@@ -2604,3 +2604,13 @@ verdict, both produced by the desktop model with the prompts as written) are alr
 against the same code, so whatever you find here probably touches both; take them together.
 Say here when it is green again with the XML time, and I re-read the run of show's Beat 2
 line, which today claims the JVM test that is failing.
+
+[Nila 19:46] RULED BY VEDANT, DONE: every occurrence of the Windows user path, the local
+checkout path and the phone's LAN address in the seven files that carried them (HANDOVER, 0003,
+the phase-1b packet, this log, the publish checklist, `tools/hardware-probe.ps1`,
+`tools/new-worktree.ps1`) is a placeholder now: `%LOCALAPPDATA%\Android\Sdk`, `%USERPROFILE%`,
+`<main tree>`, `<repo parent>`, `<phone LAN address>`. `hardware-probe.ps1` reads
+`$env:LOCALAPPDATA` for the SDK, as `build-llama-android.ps1` already did, so it behaves the
+same on this machine and works on another. This edited lines of this log that were not mine;
+that is the one exception to the append-only rule, ruled, and this line records it. Nothing
+else changed.

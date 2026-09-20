@@ -6,10 +6,10 @@ Status: accepted, verified on disk.
 
 | Root | Contents found |
 | --- | --- |
-| `C:\Users\vedan\AppData\Local\Android\Sdk` | build-tools 35.0.0 and 36.0.0, platforms android-36 and android-37.0, emulator, platform-tools, sources, system-images, skins, licenses |
-| `C:\Users\vedan\Android\Sdk` | build-tools, cmdline-tools, platform-tools, platforms (android-36 only), licenses |
+| `%LOCALAPPDATA%\Android\Sdk` | build-tools 35.0.0 and 36.0.0, platforms android-36 and android-37.0, emulator, platform-tools, sources, system-images, skins, licenses |
+| `%USERPROFILE%\Android\Sdk` | build-tools, cmdline-tools, platform-tools, platforms (android-36 only), licenses |
 
-CHOSEN: `C:\Users\vedan\AppData\Local\Android\Sdk`.
+CHOSEN: `%LOCALAPPDATA%\Android\Sdk`.
 
 Reasons. It is Android Studio's default location on Windows and carries the marks of the
 install Studio actually manages: emulator, system images, sources and skins. It has
