@@ -246,6 +246,8 @@ class DefaultOrchestratorTest {
         assertTrue("$events", resolvedAt in 0 until loggedAt && loggedAt < adviceAt)
         assertEquals(42L, (events[loggedAt] as OrchestratorEvent.MealLogged).mealId)
         assertEquals(false, (events[resolvedAt] as OrchestratorEvent.MealResolved).hypothetical)
+        // The grams ride the event, one per item in item order (Ira, 20 Sep: the "taken as" caption).
+        assertEquals(listOf(150.0, 150.0), (events[resolvedAt] as OrchestratorEvent.MealResolved).grams)
         assertEquals(OrchestratorEvent.Completed, events.last())
         // Rules ran before the model phrased: the phrasing request carries the evaluation.
         assertEquals(1, r.llm.phrasings.size)

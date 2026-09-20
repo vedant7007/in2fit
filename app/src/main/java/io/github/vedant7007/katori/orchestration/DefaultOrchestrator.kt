@@ -262,7 +262,7 @@ class DefaultOrchestrator(
             }
             is Outcome.NotImplemented -> return notBuilt(r.component)
         }
-        emit(OrchestratorEvent.MealResolved(resolved.parsed, resolved.figures, hypothetical = !save))
+        emit(OrchestratorEvent.MealResolved(resolved.parsed, resolved.figures, hypothetical = !save, grams = resolved.items.map { it.snapshot.grams }))
 
         val now = clock.instant()
         // THE ONLY WRITE. `save` is true on LOG and false on SUGGEST; a hypothetical plate never

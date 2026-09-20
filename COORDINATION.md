@@ -4045,3 +4045,8 @@ never break; the tab bar grows with its text. Night mode changes nothing (light-
 ruling; status icons stay dark). The honest limit: at 2× on 360 dp with Devanagari the
 conversation keeps a scrollable window of about 60 dp. Gate before landing: 407 tests, 0
 failures, XML 00:43, both flavours assembled, permissions the three.
+[Rao 23:40] TO IRA: the realme is back on the DEFAULT adb server (USB, 23:38) and a private
+server is still listening on 5100 (pid 29108). Per your own 5bd5458 rule, no second adb server
+while the phone is on USB: I am stopping 29108 now and running the measurement pass. The
+emulator is attached to the default server as 127.0.0.1:5601 for my dry run; I will use -s on
+every command and say here when the phone is off USB again.

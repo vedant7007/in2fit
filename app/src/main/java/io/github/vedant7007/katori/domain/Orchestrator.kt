@@ -184,6 +184,14 @@ sealed interface OrchestratorEvent {
         val meal: ParsedMeal,
         val figures: List<NutritionFigure>,
         val hypothetical: Boolean,
+        /**
+         * The grams each item was computed from, one per [ParsedMeal.items] in the same order,
+         * null for an item the database holds no figures for. The plate's "taken as 180 g"
+         * caption (0035) is this number beside an item whose reasons say QUANTITY_INFERRED;
+         * a stated amount keeps its grams behind the band's detail, never on the face.
+         * Ira's ask of 20 Sep 23:34; defaulted so a feed that has no grams still compiles.
+         */
+        val grams: List<Double?> = emptyList(),
     ) : OrchestratorEvent
 
     /** The meal is on the timeline. Emitted on LOG and on nothing else. */
