@@ -2136,3 +2136,49 @@ Nothing in either file is a claim the repository does not hold; the counts are f
 section; never overwrite. The deck audit carries its re-check as an appended section already,
 and any record that corrects itself from now on does the same. The history of being wrong and
 corrected is the evidence that the checking works.
+
+[Rao 17:55] LANDED, in order: `0463557` + `3a32642` (Priya's four defects, all green), `28ebaeb`
+(the turn shape: `OwnFigures`, `IntentKnown`, `StopSpeaking`, the lead-in wired), `71fa6b8`
+(0014 carries the conversational measurement and Vedant's correction in his words; 0028 rules
+B12), `f2297a6` (PRECOMPUTED RECOMMEND, the trimmed request, the router, and the first
+END-TO-END RUN ON THE HANDSET). 350 JVM tests, 0 failures, every XML from my run.
+
+THE FIRST END-TO-END RUN (`OrchestratorDeviceTest`, 17:25, real orchestrator over Room, the food
+DB, the rules engine, the knowledge file and the model; typed turns; thermal 0 rising to
+SEVERE with Swiggy in the foreground) found five things, four fixed in `f2297a6`:
+1. "I had two rotis and a katori of dal" was NO_MATCH on "rotis": one edit at four letters is
+   rightly refused by the matcher, so an English plural is now taken off and retried. Tested
+   against the real database ("rotis", "idlis", "eggs"). The demo language is English; this
+   would have failed beat 1 on stage.
+2. The classifier alone is 6-8 s per turn. `OwnFigures` now goes out BEFORE it, and Priya's
+   `IntentRouter` (landed red, now wired and green) decides most sentences from the words, so
+   a decided turn never pays it.
+3. Ranked by iron per 100 g, the top four candidates for low haemoglobin were cumin, turmeric,
+   bay leaf and fenugreek. Spices and cooking fats are no longer candidates. The per-context
+   list of spec 4.3 is still unauthored; this is the interim.
+4. Prompt tokens after the trim: 394 (RECOMMEND) and 457, down from 779. PRIYA: the rest is the
+   system block; 250 needs it roughly halved, yours to cut, and the SHORT RECOMMEND came back as
+   the bare words "Spices, cumin seed" (6 tokens), which is not "the one food and why".
+5. The classifier routed "did I get enough iron this week" and the SUGGEST sentence to
+   RECOMMEND, as your 23/53 predicted. Both are decided by the words now.
+Timings from that run are not usable as numbers (thermal SEVERE by the end; generation fell
+to 0.24 tok/s on the last turn); the demo-condition run is what gives the number. The phone
+dropped off Wi-Fi at 17:50 and I am waiting for it; VEDANT: the demo-condition run needs the
+phone on USB, airplane mode on, nothing else running, cool, for ten minutes. Say when.
+
+[Rao 17:55] TO ARJUN: everything you asked for is in the contract and landed: `OwnFigures`
+(now before classification, so it really is under a second), `IntentKnown(intent, leadIn)`,
+`UserIntent.StopSpeaking`, `UserIntent.SaveLabReport(values)` with `LabReportSaved(count,
+regeneratedMealId)`, `AdviseOnMeal` live and instant when the digest matches, and
+`Answered.text` nullable with `refused` and `figures`. Your `TalkViewModel` has the new
+branches as no-ops and your `ScriptedOrchestrator` handles the two intents; both yours to
+render. `CalibrateUnit` is next on my list, not landed.
+
+[Rao 17:55] TO PRIYA: your `RoutingDefectsTest` and `ReferralDefectsTest` are green with three
+sentences changed, because the router decides them before the model is reached: "how many
+rotis have I eaten today" is ANSWER by the words (question + eating word), so the LOG refusal
+is exercised on "I'm having rice now, what did I eat yesterday?" (conflicting evidence, model
+asked, LOG refused); "how much iron tablet should I take?" is RECOMMEND by "should i take", so
+the refused-clinical-answer property is asserted on an ANSWER sentence and again on that
+RECOMMEND. Also: `MinimalRig` gained the `AdviceStore` and `LabStore` seams. The invalidation
+rule for the precomputed advice is `RuleEvaluation.inputDigest` unless you say otherwise.
