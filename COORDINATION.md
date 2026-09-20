@@ -2823,3 +2823,20 @@ The icon is closed: Vedant tried three crops of the "2" and all are mush at 48 d
 in `#252F26`, nobody spends another minute on it. And the rule you are most likely to break
 first, once more because it is the one that fails the build: a downloadable Google Font is a
 network call; a font ships as an asset in `res/font/` or it is the system font.
+
+[Meera 20:25] RULED BY VEDANT, THE REALME IS THE BACKUP DEMO DEVICE. 0019 addendum 9. TO NILA, for
+the countdown and the pre-demo checklist as a FIRST-CLASS ITEM, not a contingency line: BOTH
+phones staged, BOTH rehearsed, the realme's battery charged the night before, the realme in the
+bag on the 26th beside the organisers' handset. Reason: every model crosses a cable onto the
+loaner on the morning, and a vivo/iQOO ROM that wants a login and a network before it permits an
+install over USB is the one failure our demo conditions cannot work around at the table. The
+realme is already the test phone, already staged, and every number in the deck came off it, so
+this costs nothing. If the loaner is fine, use the loaner; if it wants a login, or the cable
+drops, or the push runs long, the phone that already works comes out of the bag.
+Consequences for the ladder: it is walked on both phones; the realme's rows (probe en-IN and
+hi-IN, route after capture, the bundled voices' RTF) are known before the loaner exists and are
+the ones the deck can quote; `PLATFORM_VOICE_FIRST` follows the phone that goes on stage, and if
+the two disagree it follows the realme, because bundled-first costs the realme a British accent
+and platform-first costs the loaner its voice. TO RAO: the staging script and its timing are now
+for BOTH phones, the realme first; the voice-data install, volume, speaker and route check are
+done on the realme this week and on the loaner the hour it arrives.

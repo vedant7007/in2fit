@@ -706,3 +706,43 @@ reader who wrote either side is the same circularity the safety set's own header
 **Nila reads them first** — she wrote neither, auditing is her established role, and the deck
 audit is the evidence she does it. **Vedant signs off after her.** Recorded here and in the case
 file so the reader is named before the run rather than volunteered after it.
+
+---
+
+## Addendum 9, 20 September 2026, 19:20: the realme is the backup demo device. Ruled.
+
+### Why
+
+Every model reaches a phone by cable (addendum 8), so the handset the organisers provide is
+loaded at a table on the morning. One step in that chain can fail in a way no cable, port or
+Wi-Fi works around: a vivo or iQOO ROM that wants a vivo account and a network before it allows
+an install over USB. Our own demo conditions forbid both. A demo that depends on a device nobody
+has touched, prepared in a hall under time pressure, is one failure away from nothing.
+
+### The ruling (Vedant, 20 Sep)
+
+**The realme RMX3780 is the backup demo device: fully staged, fully rehearsed, in the bag on the
+26th beside whatever handset the organisers provide.** It is already the test phone, the models
+are already on it, and every number in the deck came off it, so it costs nothing. If the loaner
+is fine, the loaner is used. If the loaner wants a login, or the cable drops, or the push takes
+twenty minutes instead of four, the phone that already works comes out of the bag and the demo
+carries on.
+
+This is a first-class item in the countdown and the pre-demo checklist, not a contingency line:
+**both phones staged, both rehearsed, the realme's battery charged the night before.**
+
+### What that changes in this record
+
+- The ladder (addenda 4, 5, 8) is walked on BOTH phones. On the realme every rung is a
+  measurement already scheduled: the probe's `en-IN` and `hi-IN` rows, the route after capture,
+  the bundled voices' RTF. The realme's answer is known before the loaner exists; the loaner's
+  answer, if it arrives, is a lookup against the same rows.
+- `TtsFlags.PLATFORM_VOICE_FIRST` is set for the phone that goes on stage. If the two phones
+  disagree (the realme has an offline English voice, the loaner does not, say), the flag follows
+  the realme, because a bundled-first order costs the realme nothing but a British accent while
+  a platform-first order costs the loaner its voice; `demoTtsEngine` makes that one constant.
+- The staging script Rao is asked for (addendum 8's log entry) is run once on each phone, timed
+  on the realme first, so the loaner's push has a number to be compared against.
+- The voice-data install, the volume, the wired speaker and the route check are done on the
+  realme this week and on the loaner the hour it arrives; the realme's results are the ones the
+  deck can quote.
