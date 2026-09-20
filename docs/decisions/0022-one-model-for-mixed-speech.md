@@ -70,8 +70,8 @@ English; `tools/asr_eval.py synth-csv` then `wer`; `logs/asr-eval-demo-synthetic
 
 | checkpoint | exact | WER | CER | what broke |
 | --- | ---: | ---: | ---: | --- |
-| hi on the Hinglish rows | 7 of 10 | 6.2 % | 1.8 % | एग→एक once, करूँ→करू, इडली और सांबर→इरली और सांबा |
-| en on the Indian-English rows | 2 of 10 | 19.1 % | 13.0 % | **every Indic food word**: rotis→rotees (x3), dal→dell (x5), katori→catery, idlis→idies, sambar→sombre |
+| hi on the Hinglish rows (before the row-3 edit) | 7 of the ten | 6.2 % | 1.8 % | एग→एक once, करूँ→करू, इडली और सांबर→इरली और सांबा |
+| en on the Indian-English rows | 2 of the ten | 19.1 % | 13.0 % | **every Indic food word**: rotis→rotees (x3), dal→dell (x5), katori→catery, idlis→idies, sambar→sombre |
 
 Every रोटी, दाल, चावल, दही, दूध from the hi checkpoint arrived in the Devanagari the alias table
 already holds (`रोटी->chapati`, `दाल->toor_dal_tadka`, `चावल->rice_cooked`, `दही->curd`,
@@ -88,14 +88,30 @@ the 26th.
 Vedant's own recording of the ten sentences.** The Windows voice is not the presenter. If his
 recording disagrees with it, the ruling flips to `en-IN` the same evening and Priya's Devanagari
 work changes shape, which is why that recording is his highest-priority task tonight and why this
-paragraph says provisional rather than settled. Consequence recorded for Rao: staging
+paragraph says provisional rather than settled. Provisional in a second way too: it assumes Vedant
+does the speaking. If a teammate speaks Hindi or Telugu more fluently, the right presenter for the
+voice beats may not be him, and that changes the profile default we ship. The harness scores a
+second presenter's twenty files against the same references in one command (`manifest` on a folder
+holding both speakers' files, `wer` prints a by-speaker table), so that comparison is an evening,
+not an afternoon. Consequence recorded for Rao: staging
 `asr/en/model.int8.onnx` on the phone is off the critical path; keep it as the fallback the flip
 would need, not as an urgent item.
 
 The demo set was re-measured after one edit: "boiled egg" said inside a Hindi sentence came out as
 **एक**, the number one, twice (`logs/asr-hi-emitted-forms.log`), so row 3 now says उबला अंडा. With
-that, the hi column reads 2.5 % WER / 1.1 % CER over the ten synthetic rows (this regeneration;
-Piper is not bit-stable between runs) and the en column is unchanged at 19.1 %.
+that, the hi checkpoint gets **8 of the ten demo sentences** exact (2.5 % WER / 1.1 % CER on this
+regeneration; Piper is not bit-stable between runs) and the en checkpoint **2 of the ten**
+(19.1 % WER, unchanged).
+
+**THE CAVEAT THAT TRAVELS WITH THAT NUMBER.** Changing row 3 was legitimate: a presenter chooses
+their words, and choosing words the recogniser handles is preparation, not cheating. But the
+number is now **the accuracy of ten sentences we selected, on synthetic audio, after tuning the
+sentences to the model. It is not the accuracy of the system on arbitrary speech**, and in two
+weeks somebody will quote it as if it were. It is reported, always, as "n of the ten demo
+sentences", never as a WER figure standing alone, and `tools/asr_eval.py` prints that sentence
+itself on any demo-set run so the bare figure cannot come out of the tool. Nila's deck audit has
+the same line and rejects the figure if it appears on a slide as a general claim. The general
+claim, when there is one, comes from the recorded speakers.
 
 ### What the hi checkpoint emits, exactly, for Priya's matcher and classifier
 

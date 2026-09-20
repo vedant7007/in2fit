@@ -19,6 +19,8 @@ Word and character error rate of the shipped ASR models, on the desktop, through
     python asr_eval.py sheet-import <recordings-dir>
                                                   read the filled sheet back into manifest.csv
     python asr_eval.py manifest <recordings-dir> [set.csv]
+                                                  (two presenters? name the files <name>_hi_01 .. for each, same folder;
+                                                  `wer` then prints a by-speaker table against the same references)
                                                   write manifest.csv for a folder of REAL recordings named
                                                   <speaker>_<te|hi|en>_<nn>.<any audio ext>. Without set.csv the
                                                   numbers are the 13 sentences of data-authoring/asr-recording-script.md
@@ -159,7 +161,11 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
     print(f"machine: {platform.processor() or platform.machine()}, {platform.system()}; sherpa-onnx desktop, 4 threads; engine: {engine}")
     print("DESKTOP TIMINGS. Not phone numbers. See the module docstring about free RAM.\n")
 
-    per_lang = defaultdict(lambda: {"w_err": 0, "w_ref": 0, "c_err": 0, "c_ref": 0, "n": 0, "ms": 0.0, "audio": 0.0, "pieces": 0, "sources": set()})
+    def bucket():
+        return {"w_err": 0, "w_ref": 0, "c_err": 0, "c_ref": 0, "n": 0, "exact": 0, "ms": 0.0, "audio": 0.0, "pieces": 0, "sources": set()}
+
+    per_lang = defaultdict(bucket)
+    per_speaker = defaultdict(bucket)   # (speaker, lang) for recorded rows: the second-presenter comparison
     recs = {}
     for r in rows:
         lang = r["language"]
@@ -176,21 +182,35 @@ def cmd_wer(manifests: list[Path], engine: str = "indicconformer") -> None:
         ref_w, hyp_w = normalise(r["reference"]), normalise(hyp)
         ref_c, hyp_c = list("".join(ref_w)), list("".join(hyp_w))
         w_err, c_err = edit_distance(ref_w, hyp_w), edit_distance(ref_c, hyp_c)
-        s = per_lang[lang]
-        s["w_err"] += w_err; s["w_ref"] += len(ref_w); s["c_err"] += c_err; s["c_ref"] += len(ref_c)
-        s["n"] += 1; s["ms"] += ms; s["audio"] += secs; s["pieces"] += len(tokens); s["sources"].add(r["source"].upper())
+        targets = [per_lang[lang]]
+        if r["source"].lower().startswith("recorded") and "_" in r["path"].stem:
+            targets.append(per_speaker[(r["path"].stem.split("_")[0], lang)])
+        for s in targets:
+            s["w_err"] += w_err; s["w_ref"] += len(ref_w); s["c_err"] += c_err; s["c_ref"] += len(ref_c)
+            s["n"] += 1; s["exact"] += int(w_err == 0); s["ms"] += ms; s["audio"] += secs; s["pieces"] += len(tokens); s["sources"].add(r["source"].upper())
         mark = "exact" if w_err == 0 else f"{w_err} word err, {c_err} char err"
         print(f"[{lang}] {r['source'].upper():9s} {r['path'].name:32s} {secs:4.1f}s audio  {ms:6.0f} ms  {len(tokens):3d} pieces  {mark}")
         print(f"      ref: {r['reference']}")
         print(f"      hyp: {hyp}")
 
-    print("\nlang  source     clips   WER      CER    pieces/s  decode ms/clip")
-    for lang, s in sorted(per_lang.items()):
-        wer = 100.0 * s["w_err"] / max(1, s["w_ref"])
-        cer = 100.0 * s["c_err"] / max(1, s["c_ref"])
-        print(f"{lang:4s}  {'+'.join(sorted(s['sources'])):9s} {s['n']:5d}  {wer:5.1f}%  {cer:5.1f}%    {s['pieces'] / s['audio']:5.1f}     {s['ms'] / s['n']:6.0f}")
-    if any("SYNTHETIC" in s["sources"] for s in per_lang.values()):
+    def table(title, rows):
+        print(f"\n{title}")
+        print(f"{'':22s} source            exact     WER      CER   pieces/s  decode ms/clip")
+        for key, s in rows:
+            wer = 100.0 * s["w_err"] / max(1, s["w_ref"])
+            cer = 100.0 * s["c_err"] / max(1, s["c_ref"])
+            print(f"{key:22s} {'+'.join(sorted(s['sources'])):16s} {s['exact']:3d}/{s['n']:<3d}  {wer:5.1f}%  {cer:5.1f}%    {s['pieces'] / s['audio']:5.1f}     {s['ms'] / s['n']:6.0f}")
+
+    table("by language", sorted(per_lang.items()))
+    if per_speaker:
+        table("by speaker (recorded rows)", sorted(((f"{sp} / {lg}", v) for (sp, lg), v in per_speaker.items())))
+    sources = {src for s in per_lang.values() for src in s["sources"]}
+    if any("SYNTHETIC" in src for src in sources):
         print("\nSYNTHETIC rows are circular by construction and are not an accuracy claim. See the docstring.")
+    if any(src.endswith("-DEMO") or "DEMO" in src for src in sources):
+        print("DEMO SET: report this as 'n of the ten demo sentences', never as a WER figure standing alone. These are ten")
+        print("sentences we selected, tuned to the recogniser after it misheard one of them; the number is the accuracy of")
+        print("those sentences, on this audio, and says nothing about the system on arbitrary speech (0022).")
     print("extraction accuracy: NOT MEASURED HERE. It needs the LLM, which runs on the phone: AsrDeviceTest.")
 
 
@@ -492,7 +512,7 @@ def cmd_manifest(folder: Path, set_csv: Path | None = None) -> None:
             if not wav.exists():
                 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(f), "-ac", "1", "-ar", "16000", "-sample_fmt", "s16", str(wav)], check=True)
             name = wav.name
-        rows.append((name, lang, "recorded", reference, foods))
+        rows.append((name, lang, "recorded-demo" if set_csv is not None else "recorded", reference, foods))
     with open(folder / "manifest.csv", "w", encoding="utf-8", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["path", "language", "source", "reference", "expected_foods"])

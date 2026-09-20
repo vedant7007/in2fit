@@ -1929,3 +1929,35 @@ asks about recorded speakers breaks it; "foods, amounts and a citation" still cr
 "2 x 40 g" caption, the app's default roti is 45 g (428/19); and NVIDIA's FastConformer, the
 English recogniser, should be on the stack line beside sherpa-onnx and espeak-ng. Details in
 the audit file's new section.
+
+[Jacob 07:10] TO NILA, FOR THE DECK AUDIT, one line to reject a slide with: the demo-set figure
+(hi checkpoint, 8 of the ten demo sentences, 2.5 % WER on synthetic audio) is **the accuracy of
+ten sentences we selected, on synthetic audio, after tuning the sentences to the model. It is
+not the accuracy of the system on arbitrary speech.** Row 3 was changed from "boiled egg" to
+उबला अंडा after the model misheard it: legitimate preparation, a presenter chooses their words,
+but it makes the number ours, not the system's. It is reported ONLY as "n of the ten demo
+sentences", never as a WER figure standing alone; `tools/asr_eval.py` now prints that caveat
+itself on any demo-set run so the bare figure cannot come out of the tool. If it appears on a
+slide as a general claim, reject it and point at 0022 §"The caveat that travels with that
+number". The general claim, when we have one, is the recorded speakers, small sample, labelled.
+
+[Jacob 07:10] TO RAO, ROW 202'S "TEN SECONDS", with the batch, so the run of show can show the
+parts rather than a guess. Three thirds: (1) ASR, mine to supply: `AsrDeviceTest.b` now prints
+per language COLD first transcribe (load + first decode), `prepare()` (load + 1 s silent decode),
+and WARM transcribe; the hi checkpoint is the one that matters. (2) LLM, yours: cold load is in
+0012 (2.6-7 s by page cache); first-token latency after one warm-up generation is not. (3) TTS,
+yours with Meera: the first-call RTF 1.87-3.60 you measured, and Piper's first synthesis after
+`prepare`. Launch-to-microphone = the three loads in series plus one warm-up inference each;
+when you have them, row 202 gets "N seconds" with the parts, and 0028's table gets its device
+row. Same run as the ASR probe if you like: stage `models/asr/hi/{model.int8.onnx,tokens.txt}`
+and the hi rows of `data-sources/asr-test-set/synthetic-demo/` (10 WAVs + manifest.csv), or
+Vedant's own recordings when they land, which are the better clips.
+
+[Jacob 07:10] TO VEDANT, SECOND PRESENTER READY: if a teammate speaks Hindi or Telugu more fluently
+and might take the voice beats, have them record the same ten `spoken` sentences with their own
+name in the file, `<name>_hi_01.m4a` .. `_10`, into the SAME folder as yours. Then one command,
+`python tools/asr_eval.py manifest <folder> data-authoring/demo-utterance-set.csv` and `wer`,
+prints a by-speaker table against the same references: exact n/10, WER, CER per person. Dry-run
+today on two fake speakers. That table is how the presenter for the voice beats gets chosen if
+it is not you, and it changes which checkpoint we ship as the profile default; 0022 says so. The
+en column is also open to whoever wants to try it: `<name>_en_01..10`.
