@@ -34,11 +34,40 @@ figures (plausible per-100 g values, not database rows), the model's phrasing, a
 lines. The scripted phrasing obeys the numeric guard's rule by construction: the only number in
 its answer is taken from the same totals the diary line shows.
 
+## The guard that outranks the others: ABSENT FROM THE DEMO BUILD
+
+Ruled by Vedant on the evening of 20 September: the feed must not be reachable in the demo
+build at all. Not hard to switch on, not hidden behind a gesture; absent. If it shipped, the one
+path that can produce guard-violating text would be in the judges' hands.
+
+So `ScriptedOrchestrator.kt` and the real `DemoFeed` live in `app/src/full/java/`, and
+`app/src/demo/java/` carries a `DemoFeed` with the same surface and nothing behind it:
+`available` false, `orchestrator()` null, `scriptedReport()` null, `enabled` a flow that can
+never become true. The same pattern as INTERNET, which is declared only in the `full`
+manifest. `DemoFeedAbsentTest` runs in the demo flavour's suite and asserts every line of that,
+plus that `ScriptedOrchestrator.kt` is under neither `src/main` nor `src/demo`; the feed's own
+test moved to `src/testFull/`. Measured: `ScriptedOrchestrator.class` is in
+`kotlin-classes/fullDebug` and not in `kotlin-classes/demoDebug`. The pre-flight screen in the
+demo build shows "Not in this build" where the switch would be.
+
+Consequence for the 16:41 rule: a screenshot with the feed on comes from the `full` flavour
+APK (`assembleFullDebug`, 67,250,403 B tonight), never from the demo APK.
+
+## The guard the feed obeys: the same ones as the real path
+
+Ruled by Vedant the same evening, standing for everyone: any mock, scripted or demo data path
+obeys the same guards as the real one, by construction. The case that made the rule: the
+script's first answer said "about 22 g" beside a diary line saying 15.9 g, which is exactly what
+the numeric guard exists to refuse, and the guard could not see it because the screen never
+asked. The script now takes its one number from the same totals the diary line shows. If a fake
+answer can say something the real system would refuse, the fake answer is a liability, not a
+convenience.
+
 ## The five guards
 
 1. **Never injected.** `AppModule` provides the real orchestrator and nothing else. The scripted
-   one is constructed inside the two view-models and chosen only when `DemoFeed.enabled` is
-   true, per turn.
+   one is handed to the two view-models by the flavour's `DemoFeed` (null in `demo`) and chosen
+   only when `DemoFeed.enabled` is true, per turn.
 2. **Off by default, process-wide.** `DemoFeed.enabled` starts false on every launch and is a
    `StateFlow` nothing persists.
 3. **Reachable only by a long-press.** The switch lives on the pre-flight screen, which opens

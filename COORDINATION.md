@@ -2394,3 +2394,46 @@ refuses now (indicates / suggests / consistent with + a condition name), tested 
 shapes; the "9.5 mg" subtraction is what the numeric guard exists for and is refused in the
 app, since the 9.5 is in no input. Thank you for the log. TO VEDANT: the standing rule is at the
 top of `data-authoring/qualified-dishes.csv`, where it reads as a rule.
+[Arjun 18:46] RULED BY VEDANT, STANDING FOR EVERYONE: ANY MOCK, SCRIPTED OR DEMO DATA PATH
+OBEYS THE SAME GUARDS AS THE REAL ONE, BY CONSTRUCTION. The case: my scripted answer said
+"about 22 g" beside a diary line that said 15.9 g, which is exactly what the numeric guard
+exists to refuse, and the guard could not see it because the screen never asked. If a fake
+answer can say something the real system would refuse, the fake answer is a liability, not a
+convenience. The script now takes its one number from the same totals the diary line shows.
+
+[Arjun 18:46] THE SCRIPTED FEED IS ABSENT FROM THE DEMO BUILD, by construction, ruled by
+Vedant tonight. `ScriptedOrchestrator.kt` and the real `DemoFeed` now live in `app/src/full/java/`;
+`app/src/demo/java/` carries a `DemoFeed` with the same surface and nothing behind it (available
+false, orchestrator null, report null, enabled never true). Same pattern as INTERNET in the
+`full` manifest. `DemoFeedAbsentTest` runs in the demo suite and asserts every line, plus that
+the file is under neither `src/main` nor `src/demo`; the feed's own beat-4 test moved to
+`src/testFull/` and passes there (2/0). Measured: `ScriptedOrchestrator.class` is in
+`kotlin-classes/fullDebug` and NOT in `kotlin-classes/demoDebug`. Demo suite 355/0/0, XML
+18:34; `assembleDemoDebug` exit 0; `assembleFullDebug` exit 0, 67,250,403 B, the first full-
+flavour APK this project has built. The pre-flight in the demo build says "Not in this build"
+where the switch would be. COROLLARY to the 16:41 rule: a screenshot with the feed on comes
+from the FULL flavour APK, never the demo one. TO NILA: two new source-set directories,
+`app/src/demo/java` and `app/src/full/java`, plus `src/testDemo` and `src/testFull`; no
+gradle change, AGP picks them up; your build docs may want the line. Keys: `demo_absent`,
+`speak_in_label`. LAUNCHER ICON: closed, the stale state was mine; my screenshot came from a
+tree rebased before `289d380`; your bowl is in the manifest on master.
+
+[Arjun 18:46] TO NILA, RUN OF SHOW: the beat-4 sentence the engine says is about FERRITIN ("Your
+report from 2026-09-12 shows Ferritin at 8.2 ng/mL, below the 15 printed on it"), not
+haemoglobin, because both are below range on the scripted report and the engine takes the
+first test name alphabetically. Ruled by Vedant: the presenter says what the app says; change
+the line to ferritin, and ferritin 8.2 against a printed 15 is the better iron story anyway.
+TO RAO, the cause, flagged not fixed: `DefaultRulesEngine` sorts lab values by test name before
+choosing the trigger, so with two values below range the sentence goes to the alphabetically
+first. Same class as Priya's file-order tie-break this morning: alphabetical is arbitrary. The
+principled rule is to lead with the value furthest outside its printed range (the ferritin here
+is 45% below its bound, the haemoglobin 25%). Your call and your file; if it does not change
+this week it goes in the record as known and arbitrary rather than looking deliberate.
+
+[Arjun 18:46] TWO RULINGS CONFIRMED ON THE SCREENS. (1) Meera's: the full answer is text on
+screen on every beat, always; audio is a bonus. `Advice.phrased`, the trigger sentence, the
+referral, `Answered.text`, the diary lines and the ranked candidates are all rendered in full
+before `Stage.SPEAKING` begins, and Stop stops speech only. (2) Output is English whatever the
+input language (`489f973`): the picker is now labelled "Speak in" before the chips, so nothing
+on the screen implies the answer follows the chip. `CalibrateUnit`: descoped, the dialog is
+dropped from my list.

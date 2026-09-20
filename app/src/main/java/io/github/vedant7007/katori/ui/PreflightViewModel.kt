@@ -70,6 +70,8 @@ class PreflightViewModel @Inject constructor(
         val voices: String = "",
         val residency: String = "",
         val demo: Boolean = false,
+        /** False in the demo build: there is no feed to switch on (0027). */
+        val demoAvailable: Boolean = DemoFeed.available,
     )
 
     private val _state = MutableStateFlow(State())

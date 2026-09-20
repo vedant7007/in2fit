@@ -155,6 +155,8 @@
     <!-- Talk tab: the single voice surface for logging a meal, asking a question, a plate you are
          about to eat, and what to eat. The hint sits under the microphone button. -->
     <string name="talk_hint">Say what you ate, or ask a question.</string>
+    <!-- Label before the language chips: the language the person will SPEAK in. The app answers in English on screen and aloud whatever is chosen (0019 addendum 7). -->
+    <string name="speak_in_label">Speak in</string>
     <string name="mic_speak">Speak</string>
     <string name="mic_listening">Listening…</string>
     <string name="mic_permission_needed">Microphone permission was not granted. You can type instead.</string>
@@ -304,4 +306,6 @@
     <string name="demo_switch_title">Scripted demo feed</string>
     <string name="demo_switch_hint">Feeds the screens scripted events instead of the real pipeline. For building and photographing screens only. Every figure it shows is script.</string>
     <string name="demo_banner">SCRIPTED DEMO FEED. Nothing on this screen is a real result.</string>
+    <!-- Shown on the pre-flight check in the demo build, where the feed does not exist. -->
+    <string name="demo_absent">Not in this build. The demo build carries no scripted feed.</string>
 </resources>

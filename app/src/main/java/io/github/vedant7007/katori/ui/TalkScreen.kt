@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -61,7 +62,10 @@ fun TalkScreen(vm: TalkViewModel = hiltViewModel()) {
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 8.dp)) {
+        // The chips choose the language the person will SPEAK in. Answers are English, on screen and
+        // aloud, whatever is chosen (0019 addendum 7); the label says "speak in" so nothing implies otherwise.
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
+            Text(stringResource(R.string.speak_in_label), style = MaterialTheme.typography.labelLarge)
             LanguageChip(state.language, "te", R.string.language_telugu, vm::setLanguage)
             LanguageChip(state.language, "hi", R.string.language_hindi, vm::setLanguage)
             LanguageChip(state.language, "en-IN", R.string.language_english, vm::setLanguage)

@@ -68,9 +68,12 @@ fun PreflightScreen(vm: PreflightViewModel = hiltViewModel()) {
         Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.demo_switch_title), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.demo_switch_hint), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    stringResource(if (state.demoAvailable) R.string.demo_switch_hint else R.string.demo_absent),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-            Switch(checked = state.demo, onCheckedChange = vm::setDemo)
+            if (state.demoAvailable) Switch(checked = state.demo, onCheckedChange = vm::setDemo)
         }
         OutlinedButton(onClick = vm::refresh, modifier = Modifier.padding(bottom = 16.dp)) { Text(stringResource(R.string.preflight_refresh)) }
     }

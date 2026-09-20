@@ -19,7 +19,6 @@ import io.github.vedant7007.katori.domain.UserIntent
 import io.github.vedant7007.katori.domain.model.ConfidenceBand
 import io.github.vedant7007.katori.domain.model.UnavailableReason
 import io.github.vedant7007.katori.ui.demo.DemoFeed
-import io.github.vedant7007.katori.ui.demo.ScriptedOrchestrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,9 +42,10 @@ import javax.inject.Inject
  * every stage is named and ticked as it completes, and an elapsed-seconds counter runs beside
  * the current stage so a long wait reads as work. Text lands before speech.
  *
- * THE SCRIPTED FEED (`0027`) is used only while [DemoFeed.enabled] is on, which only the
- * pre-flight screen can do, and the banner on every tab says so. [RulesEngine] is injected for
- * that feed alone: the script runs the real engine over scripted input.
+ * THE SCRIPTED FEED (`0027`) exists only in the `full` flavour and is used only while
+ * [DemoFeed.enabled] is on, which only the pre-flight screen can do, with the banner on every
+ * tab. In the demo build the flavour's `DemoFeed` hands back null and this class never sees a
+ * script. [RulesEngine] is injected for that feed alone.
  */
 @HiltViewModel
 class TalkViewModel @Inject constructor(
@@ -56,7 +56,8 @@ class TalkViewModel @Inject constructor(
     @ApplicationContext context: Context,
 ) : ViewModel() {
 
-    private val scripted = ScriptedOrchestrator(
+    /** Null in the demo build: the flavour's `DemoFeed` has nothing behind it (0027). */
+    private val scripted: Orchestrator? = DemoFeed.orchestrator(
         rules, contextText, triggerText,
         leadIns = mapOf(
             SpokenIntent.LOG to context.getString(R.string.tts_lead_in_log),
@@ -130,7 +131,7 @@ class TalkViewModel @Inject constructor(
 
     /** 0026 step 8: stops speech only; the turn and its text are untouched. Sent while busy, by design. */
     fun stopSpeaking() {
-        val source = if (DemoFeed.enabled.value) scripted else orchestrator
+        val source = scripted?.takeIf { DemoFeed.enabled.value } ?: orchestrator
         viewModelScope.launch(Dispatchers.Default) { source.handle(UserIntent.StopSpeaking).catch { }.collect { } }
     }
 
@@ -139,7 +140,7 @@ class TalkViewModel @Inject constructor(
     private fun run(intent: UserIntent) {
         if (state.value.busy) return
         _state.update { it.copy(busy = true, stages = emptyList(), elapsedSeconds = 0, level = 0f) }
-        val source = if (DemoFeed.enabled.value) scripted else orchestrator
+        val source = scripted?.takeIf { DemoFeed.enabled.value } ?: orchestrator
         viewModelScope.launch(Dispatchers.Default) {
             val ticker = launch {
                 while (true) { delay(1000); _state.update { it.copy(elapsedSeconds = it.elapsedSeconds + 1) } }
