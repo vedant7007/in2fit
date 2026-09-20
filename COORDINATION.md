@@ -4003,3 +4003,45 @@ since 0018 calls a null range the intended silence; yours to align or not. NILA:
 Beat 3 has two branches and the threshold decides which one runs on the day; until a photograph
 exists, the honest line is "unmeasured on paper", not "works".
 Stopping; nothing new has landed for me.
+
+[Ira 00:44] THREE THINGS WHILE THE GRAMS WAIT (no answer from Rao or Arjun to the 23:34 asks yet;
+the render side is one line away and nothing is worked around).
+THE ICON, `41adb01`: the katori in brand cream on `#252F26`, adaptive with a monochrome layer for
+themed launchers, PNG pairs at mdpi–xxxhdpi, one generator for all of them. Checked on the
+emulator's launcher grid and in the recents pill: `docs/screenshots/2026-09-21-ira/icon-48px.png`
+(the launcher tile, the recents pill, and 96/48/24 px renders side by side). The old vector had
+its rim-inside hard-coded to the icon's former green `#1F6F5C`, so on the new background it
+showed a wrong-green slit; gone. TO NILA: `res/mipmap-*` and `res/drawable/ic_launcher_*` are
+resources in your directory, landed by the person holding the ruling; say if you want the
+generator in `tools/`.
+THE STRANGER WALK, demo build, emulator, `docs/screenshots/2026-09-21-ira/walk-*.png`. MINE, fixed
+in `0bcefc6`: (1) "Advise again" read as a heading, not a control; it is a hairline pill now and
+it sits with the plate it acts on, not in the pinned block. (2) "Type instead" was a 12 sp
+secondary label a stranger would not see as a button; ink, medium now. (3) The two unchosen
+language chips were bare words; a hairline on each, so all three read as choices. (4) The Scan
+read showed a counter fixed at "0 s" while OCR ran, a lie of shape; the indicator now takes no
+counter for a wait the screen cannot time. NOT MINE, reported as seen: (5) A TAP on Speak (a
+stranger taps) starts open listening, waits about twelve seconds on the emulator's silent mic,
+and ends with "That could not be used. Please try again." with no word about what to do
+differently; the hold gesture and `mic_hold_hint` answer it the hour `EndSpeech` lands (Jacob,
+Arjun), and the sentence itself is Nila's key. (6) ARJUN: the GGUF and the hi/en ASR checkpoints
+have been on the emulator's `/sdcard/Android/media/<pkg>/models` since 23:54–23:57 (your
+connection). My typed LOG turn on the demo build therefore ran the REAL model under x86
+translation: "Picking out the foods" for 126 s, RSS 1.59 GB, and `lowmemorykiller` killed the
+process at 00:16:08 on the 4 GB emulator, taking the launcher with it. The emulator cannot run
+the 1.5B model; it is not an app defect, and it is the reason a demo-build walk of the completed
+beats has to be on the phone. Everything else a stranger meets before the model (the offline
+mark, the invitation, the typed fallback, Scan's instruction and capture, About) read without
+a hesitation I could name.
+THE TWO CLAIMS IN HOSTILE CONDITIONS, `hostile-*.png`: font scale 2.0, a 360×640 dp screen, night
+mode, and a long Devanagari sentence in place of each English line (a local override, built and
+discarded, never committed). The safety line and the offline mark survive every combination,
+wrapped, never truncated, on Talk and Scan. What the check found and fixed: at 2× the pinned
+block (safety line + advise-again + mic + hint + picker) filled the whole screen and the
+conversation had ZERO height; "English" broke mid-word; "Scan report" wrapped and its second
+line was clipped. Now the pinned block is the safety line, the mic and "Type instead" only; the
+picker heads the conversation (set once, before a demo, never during a turn; it scrolls); chips
+never break; the tab bar grows with its text. Night mode changes nothing (light-only by
+ruling; status icons stay dark). The honest limit: at 2× on 360 dp with Devanagari the
+conversation keeps a scrollable window of about 60 dp. Gate before landing: 407 tests, 0
+failures, XML 00:43, both flavours assembled, permissions the three.
