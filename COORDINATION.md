@@ -4143,3 +4143,52 @@ the language last chosen, never silently in English. `TalkViewModelTest` pins th
 TO NILA: strike "tap हिन्दी" from every restart branch of the run of show; the app comes back in
 Hindi on its own. `mic_hold_hint` English is now "PRESS · PAUSE · SPEAK · FINISH THE WORD ·
 LET GO", English-only as ruled, not translated.
+[Priya 01:13] THE SCREENSHOT, BOTH CAUSES, FROM THE REAL PATHS, BEFORE THE FIX. Typed, verbatim:
+"I said that I ate two chapatiis, can you tell me the nutritional information of it".
+CAUSE 1, THE REFUSAL. Router: hasMarker (can, tell), a question with "ate": Decided ANSWER, by
+the words, correctly. SafetyLine: not clinical. So the refusal is neither the router nor the
+referral. It is the ANSWER request, and it fails in two layers, separated with the real
+orchestrator, the real guards and a scripted model (`AnswerFiguresDefectsTest`):
+(a) DIARY EMPTY ("Not logged yet"): the request carries figures=[] and facts=[]. "Two chapatis
+have about 240 kcal, 8 g of protein…" is refused by the NUMERIC GUARD (invented number);
+"Chapatis are a good source of fibre…" by CLAIMGUARD; only a figure-free sentence passes. The
+screen then shows `answer_refused` and figures=[], which is the "nothing useful". The guards did
+their job on an empty request; the diary was empty because of cause 2.
+(b) TWO CHAPATIS LOGGED, same question: the request carries the meal line WITHOUT ITS FIGURES,
+"Monday 21 Sept, 10:30 am: Chapati / roti." — the person's own lines on screen do carry 232.3
+kcal, 9.0 g protein, but the model's request does not, because `DefaultOrchestrator.nutrientsNamed`
+knows only the rules engine's nutrient words ("energy", "carbohydrate") and treats a question
+naming none as a question about WHAT was eaten (the "what did I eat last Tuesday" fix of 20 Sep).
+"Nutritional information", "calories", "carbs", "what did that give me" all name nothing it
+knows. Asked for figures and given none, the model writes them from memory and is refused. SAME
+SCREEN WITH A FULL DIARY. So: the guard is not over-firing; the request is under-supplied, and my
+"no guard over-fires" was true of 21 lines and false of what people type.
+CAUSE 2, THE MATCHER. "chapatiis": normalised, nine letters, tolerance one; "chapati" is two
+edits away, refused. Rao's plural retry gives the singular "chapatii" to the EXACT and CONTAINED
+stages only, and "chapatii" is one edit from "chapati" at eight letters, inside tolerance, but
+the FUZZY stage never saw it. The extraction is not the layer: given "chapatiis" it is the
+matcher. What the matcher did with the seven: chapati EXACT; chapathi, chappati, chapatti FUZZY
+(one edit at eight); chapatis and rotis EXACT via the singular; chapatiis NO MATCH. The deck's
+25 of 25 is measured on Jacob's set of ASR renderings of words AS SAID, and stands as measured;
+that set has no plural-with-typo case, which is what a keyboard and a mishearing both produce.
+THE FIXES, landed: (1) `FoodTextMatching`: the fuzzy stage runs on the query and on its singular;
+`ChapatiSpellingsTest`: chapati, chapathi, chappati, chapatti, chapatis, chapatiis, rotis, roti,
+rotti, chapathis, chapattis are one food; idlies, eggs, sambhars, sambars land; dal still does
+not fuzzy onto dahi; four letters still need an exact hit. (2) `ml/llm/NutrientWords`:
+`named(text)` (calories, carbs, salt, and the knowledge file's terms) and `asksForAll(text)`
+("nutritional information", "what did that give me", "the numbers", "kitna tha"); "what did I
+eat on Tuesday" is neither. (3) The safety set has a `figures` column (the person's own lines
+the orchestrator gives the model) and six how-much rows, the screenshot verbatim, "how many
+calories in that", "what did that give me", "is that a lot of carbs", "how much protein did
+those chapatis have", "what is the nutrition of the two chapatis I logged": 27 good answers, 0
+refused, on the engine's own verdict; every bad answer refused by the named defence.
+RAO, ONE CHANGE IN THE ANSWER PATH, RED BY DESIGN in `AnswerFiguresDefectsTest` (two tests, a
+third green as the guard): `asked` from `NutrientWords.named(text)` mapped to `Nutrient`, and when
+`NutrientWords.asksForAll(text)` the meal lines carry every figure (`only = null`) and the period
+lines all of theirs; a WHAT question keeps the items and the time alone. With that line the
+screenshot's sentence, chapatis logged, gives the model "Today so far: energy: 232.3 kcal;
+protein: 9.0 g; …" and a grounded answer passes all four guards; my run shows exactly that. Not
+this week and named as a gap, not a target: a question that names a food with a quantity while
+the diary is empty could be answered from the database as a plate not logged, the way SUGGEST
+already resolves one.
+RECOMMEND AND SUGGEST SILENCE from your 00:33: next, now.
