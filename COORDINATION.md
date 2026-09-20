@@ -3169,3 +3169,48 @@ Then send back, in the same chat as the files:
   2. One line: your first language, your age (roughly), and the town you grew up in.
 
 I score them the moment they land; the demo language is confirmed or flipped tonight.
+
+[Ira 21:01] PHASE 1 PASSED, PHASE 2 STARTS. RULED BY VEDANT, relayed so nobody waits on me: (1) the
+typeface is IBM Plex Sans + IBM Plex Sans Devanagari as assets in `res/font/`, Telugu on the
+system's Noto; rendered against Hind + Hind Guntur on the emulator first, and if Plex loses on
+Devanagari at body size we take Hind and the deck follows the app. (2) The accent rule stands:
+`#E5522D` for marks only, never text under 24 sp, never a filled button with a small label; green
+on cream carries every word. (3) Light only for the battle. (4) The pre-flight is theme only.
+(5) Cut order by value per hour: (a) the figures arrive and the sentence catches up, (b) the mic
+is the meter, (c) the offline mark on the Talk screen; a to c ship; (d) the printed range under
+every lab value and (e) the katori's gram assumption only if the days allow.
+THREE FINDINGS THAT ARE NOT MINE ALONE, said in Vedant's words:
+TO RAO AND ARJUN, A PERFORMANCE DEFECT, not a style note: `TalkScreen.kt:103` runs M3's
+indeterminate `LinearProgressIndicator` for every stage that is not RECORDING or TRANSCRIBING,
+which is a continuous animation on the RenderThread for the exact ten seconds the model has
+eight threads pinned (0014, Rao 16:50). Android 15's adaptive refresh drops the panel on a static
+screen and holds it at 120 Hz on a moving one. Every frame the bar draws during EXTRACTING and
+PHRASING is time on the model's cores. It comes out with my Talk screen; until then, Rao, it is
+in every timing row you have taken from the shell, and `dumpsys gfxinfo <pkg> framestats` over
+one LOG turn, before and after, is the row that says how much.
+TO ARJUN, RAO AND NILA, THE FACE IN THE SCREENSHOTS: every PNG in `docs/screenshots/` is Roboto,
+the emulator's face. realme UI and Funtouch OS each map `sans-serif` to their own face, so the
+realme shows a third face and the iQOO a fourth, and no screenshot so far shows what a judge
+sees. Bundling Plex is the fix; Rao, one screenshot of the Talk tab from the realme (`adb exec-out
+screencap -p`) in your next window puts the phone's face in the record beside the emulator's.
+TO NILA AND VEDANT, THE ACCENT'S CONTRAST, for the deck as much as the app: `#E5522D` on
+`#ECEBE6` is 3.15:1 and white on `#E5522D` is 3.77:1, both under WCAG AA's 4.5 for body text;
+`#252F26` on `#ECEBE6` is 11.63:1. If the corrected deck sets a paragraph in orange on cream, or
+white on an orange block, it is below the line the app now holds; orange headings at 24 pt and
+up pass. Nila: yours to check against the corrected PDF when it lands.
+TO ARJUN: I TAKE `TalkScreen.kt`, `ScanScreen.kt` and `AboutScreen.kt` AT 21:01, and `Shell()` in
+`MainActivity.kt` (the layout inside it only; the routing, tabs and banner condition stay
+yours), per your 20:23 rule. Your trees are clean and nothing of yours is in flight there. From
+this hour you do not touch those four; I do not touch a `State`, an `Entry`, `Sentences.kt` or a
+ViewModel. Push-to-talk: the composable side of the hold (`detectTapGestures` on the mic) is
+mine now; you add `endSpeech()` to `TalkViewModel` the hour `UserIntent.EndSpeech` lands and I
+wire it the same hour. The six asks stand (§8.5 of the research); the one that gates a component
+is the first: `Entry.Plate` and `Entry.Figures` carrying the `NutritionFigure` (or its parts:
+nutrient word, formatted number, unit, band, partial) beside the rendered line, formatted by the
+same `ContextText.num()`. Until it lands the plate card shows the lines as they are, with the
+band said once; the figure row waits for the parts.
+TO NILA: the files I bundle, with hashes, follow in my next line once they are on disk and
+checked; the OFL is one licence for both families. `tools/apk-size.ps1` after every assemble,
+understood. Five keys, English, grepped first; `scan_`, `talk_`, `plate_` and `about_` are
+placed prefixes so nothing lands UNPLACED. Your 20:58 correction is taken: the research row
+"the realme is the backup" is amended in a dated note at the end of the file, not overwritten.
