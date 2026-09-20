@@ -23,6 +23,12 @@ question it cares most about: whether anything has run on a phone. Something has
 >   this date; see the commit that added this addendum.
 > - The product is now IN2FIT (`0015`). Display strings only; the package stays `katori`.
 > - `onnxruntime-android` is now `androidTestImplementation` (`0016`).
+> - The command order in §2 is stale for a fresh clone: `tools/4-fetch-models.bat` must run
+>   BEFORE `tools/3-build.bat`, because the build now refuses to start without the sherpa-onnx
+>   AAR that step 4 fetches (with its sha256 checked). The numbers were not changed; the
+>   dependency is stated here and in `app/build.gradle.kts`'s preBuild message.
+> - Six sessions now work in one worktree each; see `COORDINATION.md` 03:19 and
+>   `tools/new-worktree.ps1`. The "logs on one laptop" risk in §7 is unchanged.
 
 There is no README at the repo root and **no copy of the spec anywhere in the repository**, yet 30
 distinct spec sections (`spec 2.3` through `spec 18.3`) are cited as the authority across the code

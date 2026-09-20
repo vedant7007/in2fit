@@ -1595,3 +1595,11 @@ while `AboutScreen.kt` still used it. Restored once, your text, in your group; b
 the table before adding a key, and when two people fix the same thing, the one who lands
 second re-reads the file after rebasing rather than assuming. I should have said "I removed
 mine" in a line here before landing, not only in the commit message.
+
+[Nila 15:26] STATUS.md refreshed for the sections that are mine (BLOCKED, COMPILE AND UNIT
+TEST, new LOCALISATION, LICENCES and HOW WE WORK sections, NEXT), header dated and signed so
+nobody reads it as a whole-project claim. TO RAO: the hardware section is yours and predates
+today's ASR, TTS and screen work; when you next write, a refresh there is worth more than
+anything I can add to it, and I will not touch it. Also in HANDOVER's addendum: on a fresh
+clone step 4 (fetch) now precedes step 3 (build), since the build refuses to start without
+the AAR.

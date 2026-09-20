@@ -1,20 +1,29 @@
 # IN2FIT status
 
-Updated 20 Sep 2026, 01:30. The product was renamed from Katori on 20 September (`0015`);
-display strings carry the new name, the package and `applicationId` keep `katori` until after
-the hackathon because the JNI symbol names encode it.
+Updated 20 Sep 2026, 15:30, by Nila, for the sections that are hers: BLOCKED, COMPILE AND
+UNIT TEST, LOCALISATION, LICENCES, HOW WE WORK, NEXT. The hardware section is Rao's and is as
+he last wrote it. What the other five sessions built today is in their records, `0018` to
+`0024`, and in `COORDINATION.md`; this file does not restate their claims.
+
+The product was renamed from Katori on 20 September (`0015`); display strings carry the new
+name, the package and `applicationId` keep `katori` until after the hackathon because the JNI
+symbol names encode it.
 
 ---
 
 ## BLOCKED ON VEDANT
 
-**A fluent Telugu speaker, for half an hour.** Hand them
-`docs/localisation/telugu-review-queue.md`: 48 strings, each with its English and where it
-appears, the eight health sentences first, no repo needed. They reply in the file or as a
-numbered chat message. The reply goes in through `python tools/import_review_queue.py te`, never
-by editing XML by hand, and the check file it writes goes back to the speaker so they can see
-each item next to what landed. The rule is that no Telugu ships unreviewed (`0017`). Same for
-Hindi via `hi`, at lower priority.
+**A fluent Telugu speaker, once.** The reviewer packet is `docs/localisation/telugu-review-queue.md`,
+frozen at 22:00 IST tonight, one file, one trip (`0017`). Its first line says which part
+matters if they only do one: the nine lines of Part 1 decide whether the app ships Telugu at
+all. Every one of its 136 lines is machine-generated and marked so; the reviewer confirms or
+corrects, in the file or as a numbered chat reply, and it goes in through
+`python tools/import_review_queue.py te`, never by hand. The check file it writes goes back to
+the speaker with its question at the top.
+
+**The IITM licence PDF**, to diff against the machine-converted text now in
+`docs/licences/iitm-tts-eula.txt`. Nothing is ruled from that text until the diff is recorded
+in `0005`. Vedant has it as his task.
 
 **The domain question from `HANDOVER.md`.** If a domain is still coming, the package rename gets
 more expensive with every commit that touches JNI. Deferred until after the hackathon by ruling,
@@ -110,22 +119,23 @@ Nothing. Not built.
 
 ## COMPILE AND UNIT TEST ONLY
 
-**246 tests in 22 classes, 0 failures, 0 errors**, summed from the per-class JUnit XML under
-`app/build/test-results/testDemoDebugUnitTest/`, every file written at 03:02 on 20 Sep by the
-run in `logs/nila-sherpa-test.log`. That "every file written by the same run" check is now
-necessary: six sessions build in one tree, and a Gradle run started by another session while
-yours is in flight clears and rewrites that directory, so a count read after a collision is a
-count of somebody else's run (it happened at 02:57, and the directory held 13 tests). The
-earlier "103 tests" figure was a count of `@Test` methods in source, not a number read from a
-log; the Gradle logs it cited print no count.
+**300 tests in 27 classes, 0 failures, 0 errors**, summed from the per-class JUnit XML under
+`app/build/test-results/testDemoDebugUnitTest/` in the `IQOOOOO-nila` worktree, every file
+written at 15:23 on 20 Sep by the run in `logs/packet3-build.log`. A test count is valid only
+if every XML in that directory was written by your own run (binding rule, `COORDINATION.md`
+03:19); before the worktree rule, a run from another session cleared that directory under one
+of mine and it held 13 tests where 245 had run. The earlier "103 tests" figure was a count of
+`@Test` methods in source, not a number read from a log; the Gradle logs it cited print no
+count.
 
-**Demo APK 66,889,734 bytes**, `lib/arm64-v8a` only, commit `d871c0f` with other sessions'
-uncommitted edits in the tree, sha256 `28c2a1d7…`, row of 03:00:32 in `logs/apk-size.log`. Every
-APK figure from now on is a row in that append-only log, written by `tools/apk-size.ps1` after
-each `tools/3-build.bat`, with the commit and the APK's own hash; a size that is not a row there
-is not a figure. Composition, read from the file: 46,401,680 B of native libraries stored
-uncompressed (sherpa-onnx 24.2 MB, ML Kit OCR 11.1 MB, barcode 4.9 MB, llama.cpp 6.1 MB),
-44,544,336 B of dex deflated to 17,057,717, 3.8 MB of assets, 0.6 MB else.
+**Demo APK 67,201,412 bytes**, `lib/arm64-v8a` only, sha256 `26d81ef9…`, row of 15:21:46 in
+`logs/apk-size.log` (main tree), built in `IQOOOOO-nila` at `046df66` with the string tables
+of that moment. Every APK figure is a row in that append-only ledger, written by
+`tools/apk-size.ps1` after each assemble with the commit, a dirty flag, the APK's own hash and
+the tree that built it; a size that is not a row there is not a figure. Composition of the
+03:00 build, read from the file (the later ones differ by string tables only): 46,401,680 B of
+native libraries stored uncompressed (sherpa-onnx 24.2 MB, ML Kit OCR 11.1 MB, barcode
+4.9 MB, llama.cpp 6.1 MB), 44,544,336 B of dex deflated to 17,057,717, 3.8 MB of assets.
 
 Two earlier figures do not survive: "46 MB" was a container build with no NDK and no `jniLibs`;
 76,661,867 B (01:28, `logs/nila-ort-final.log`, before sherpa-onnx) is 9.8 MB LARGER than
@@ -226,6 +236,52 @@ red one.
 
 ---
 
+## LOCALISATION
+
+Three string tables, English default, Telugu and Hindi overlays; a missing key falls back to
+English visibly (`0017`). `StringResourcesTest` refuses a literal in a composable and prints
+the translation state per locale on every run; `res/values*/strings.xml` are declared test
+inputs so that report cannot be a previous run's. Today's report: **values-te 136/136
+present, 136 awaiting review, 0 missing; values-hi 0/136.**
+
+**Every Telugu line in the app is MACHINE-GENERATED, AUTHOR UNVERIFIABLE, UNREVIEWED**, and
+the XML comment on every entry says so. 48 arrived via Vedant; 89 were generated by Nila on
+Vedant's ruling that the packet should carry candidates rather than holes. Nobody on the team
+can read them. **Rule (`0017`): if the nine lines of Part 1 are not confirmed by a fluent
+speaker before the demo build is cut, `values-te` leaves that build** (one `localeFilters`
+line). A partial-review middle shape is recorded there and not built.
+
+The reviewer packet ships once, frozen 22:00 IST 20 Sep, owned by Nila: Part 1 the nine
+sentences, Part 2 the screens the demo shows, Part 3 the rest, Part 4 Priya's word lists and
+Meera's listening ask, lower priority. Anything added after the freeze is English-only in the
+demo build by default; `docs/localisation/string-conventions.md` says so to whoever writes a
+screen.
+
+## LICENCES
+
+The repository is **Apache-2.0** (`LICENSE`, canonical text, ruled by Vedant). espeak-ng
+(GPL-3.0-or-later, inside the sherpa-onnx AAR and as the `espeak-ng-data` asset) attaches
+duties on CONVEYING the APK, recorded concretely in `0005`: demoing on a phone the team holds
+is not conveying, handing a judge an APK file is. The question is separable: if the TTS
+probe finds an offline Google Telugu voice, Piper and espeak-ng drop out with the duties. The
+IITM Indic TTS EULA text is filed under `docs/licences/` with its provenance header; nothing
+is ruled from it until the PDF diff. ASR rows corrected on Jacob's evidence: MIT (AI4Bharat)
+for te/hi, NVIDIA CC-BY-4.0 for English. The About screen exists and lists most of this;
+what it still owes is in the conventions file.
+
+## HOW WE WORK, RULED TODAY
+
+- One worktree per session (`tools/new-worktree.ps1`), landed on master by fast-forward only
+  (`tools/land.ps1`). Nobody builds in the main tree.
+- A test count is valid only if every XML was written by your own run.
+- Any file whose content changes what a test reports is a declared input of the test task.
+- Every APK size is a row in `logs/apk-size.log` or it is not a figure.
+- A small documented build-config edit by the person holding the facts is fine; a feature
+  change to build config, resources or strings comes to Nila.
+- Claim a decision-record number in `COORDINATION.md` before writing the file; two files were
+  numbered 0022 today.
+- Commits authored solely by Vedant Manmath Idlgave, no trailer, no attribution anywhere.
+
 ## DECIDED WITHOUT ASKING
 
 - Bare dish names mean the dish; the plain ingredient keeps a name that says so. `0008`
@@ -293,12 +349,12 @@ Six sessions from 20 September, per `COORDINATION.md`: Rao on `domain/` and the 
 orchestrator, after the arbiter), Priya on conversation and the knowledge file, Jacob on ASR,
 Meera on TTS, Arjun on vision, Nila on tools, docs, build and strings.
 
-Open on the build and documentation side:
+Open on the build and documentation side, 15:30:
 
-- Telugu strings, by a fluent speaker. 27 keys. See BLOCKED.
-- The rules engine's eight sentences are built in English inside `domain/RuleTemplates.kt`.
-  Localising them needs the engine to emit a template id plus arguments; that is Rao's.
-- When sherpa-onnx lands it brings its own ONNX Runtime, and the test-scope dependency in
-  `app/build.gradle.kts` goes away rather than moving back. `0016`
-- The first probe run after `0016` is on a different build tag; its co-residency row is a new
-  row in `0013`, not a confirmation.
+- The reviewer packet freezes at 22:00; the check file comes back; confirmations drop markers
+  per line; the count of Part 1 confirmed is the number that decides the build.
+- The IITM PDF diff, then Meera's re-ruling of maya, rohan and pocket-tts.
+- The espeak-ng corresponding-source pointer, parked until the TTS probe reports.
+- The About screen's USDA citation and disclosure lines (Arjun, from the database's `meta`).
+- The hardware section of this file is Rao's to refresh; it predates today's ASR, TTS and
+  screen work.
