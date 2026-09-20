@@ -663,3 +663,46 @@ answer invented "9.5 mg" and did the subtraction out loud (the numeric guard's c
    measure on the phone, against a 1.5B model whose Hindi has never been seen) or the string
    table gets a Hindi column (`values-hi`, ruled not to be built this week). Neither is on the
    critical path once the deck says what the app does.
+
+---
+
+## Addendum 8, 20 September 2026, 18:50: both branches of the handset question, checked to be a flip
+
+### A correction to addendum 5 first
+
+Addendum 5 says a Piper voice "ships inside the APK: no install, no network, no device lottery".
+The first clause is wrong and is corrected here rather than left. **No model ships in the APK.**
+The LLM, the recogniser and every voice are staged in the app's external media directory by
+`adb push` (`AppModule`, `0012`); the `full` flavour's downloader is a manifest comment, not
+code. So the demo phone, whichever it is, has to be in the team's hands with a cable once before
+the day for the 1 GB LLM regardless, and in that same session a 63 MB voice is pushed the same
+way. What addendum 5 got right is the reason the ladder inverts: the bundled voice is
+DETERMINISTIC (the same file, the same sound, tested on the realme), and the platform voice is
+DEVICE-DEPENDENT (never heard on the iQOO until that session, per-install data, silent when
+network-only). "No install" was the wrong word for it; "same on every device" is the right one.
+The condition and the ruling stand on that ground.
+
+### The two branches, as they are on master tonight
+
+| | branch A: the handset is in hand and rung 1 passes on it | branch B: no handset, or rung 1 fails |
+| --- | --- | --- |
+| the flip | `TtsFlags.PLATFORM_VOICE_FIRST = true` (as it is) | `= false` |
+| where the order is applied | `demoTtsEngine(platform, bundled)` in `ml/tts`, ordered by the flag; **`AppModule` still constructs `RoutingTtsEngine(listOf(...))` directly** (Rao's one-line swap is asked for below); until then branch B is two lines, the flag and his | same |
+| the English voice | the platform's; `AndroidTtsEngine` takes any offline English voice, `en-IN` first | `PiperVoices.ENGLISH_CORI`, now IN `byLanguage`, so even with the flag `true` a phone with no offline English voice falls through to it, and with the flag `false` it is first |
+| what must be on the phone | Hindi and English platform voice data installed once, on a network (run-of-show step) | `tts/en_GB-cori-medium/{model.onnx,tokens.txt}` pushed like the LLM; `espeak-ng-data` is in the APK's assets (Nila, landed); the `ModelFamily.TTS` loader entry is wired (Rao, landed) |
+| what is measured | the probe on the iQOO: `en-IN` voice, `network=false`, RTF, and the route after capture | the same probe reports the bundled voice's RTF once staged; the realme run is the stand-in until then |
+| the one thing that is not a flip | none | if the bundled voice's phone RTF is above about 0.5, streaming playback (addendum 3) is an evening's work before the 26th; the seam is shaped for it and it is not built until that number exists |
+| Vedant's one word on the clips | irrelevant to A | "no" removes the `ENGLISH_INDIA` line from `byLanguage` (one line) and branch B has no English voice: English is text on screen, and the ladder's third rung is the demo |
+
+So: A is a constant. B is a constant plus files that are pushed in the same cable session the LLM
+needs anyway, with one conditional evening hanging on a number nobody has yet. Nothing in either
+branch is a project by construction; the only project is conditional on the phone's speed.
+
+### The reader of the guarded outputs, named before the run
+
+Vedant's ruling on the two forbidden outputs (addendum 7) said a person reads the device
+outputs and did not say which person. Rao wrote the prompts and Priya wrote the guards, and a
+reader who wrote either side is the same circularity the safety set's own header warns about.
+**Nila reads them first** — she wrote neither, auditing is her established role, and the deck
+audit is the evidence she does it. **Vedant signs off after her.** Recorded here and in the case
+file so the reader is named before the run rather than volunteered after it.

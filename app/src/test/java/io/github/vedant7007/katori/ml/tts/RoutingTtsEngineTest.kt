@@ -73,6 +73,16 @@ class RoutingTtsEngineTest {
     }
 
     @Test
+    fun `the demo engine's order is one constant, platform first or bundled first`() = runBlocking {
+        val platform = Recorder(all)
+        val bundled = Recorder(all)
+        demoTtsEngine(platform, bundled, platformFirst = true).speak("a", SpeechLanguage.ENGLISH_INDIA)
+        assertEquals(1, platform.spoken.size); assertEquals(0, bundled.spoken.size)
+        demoTtsEngine(platform, bundled, platformFirst = false).speak("b", SpeechLanguage.ENGLISH_INDIA)
+        assertEquals(1, platform.spoken.size); assertEquals(1, bundled.spoken.size)
+    }
+
+    @Test
     fun `supported languages are the union, and stop reaches every engine`() = runBlocking {
         val platform = Recorder(setOf(SpeechLanguage.ENGLISH_INDIA))
         val piper = Recorder(setOf(SpeechLanguage.TELUGU, SpeechLanguage.HINDI))

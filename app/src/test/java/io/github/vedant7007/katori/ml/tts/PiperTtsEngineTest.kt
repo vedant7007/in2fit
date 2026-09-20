@@ -121,7 +121,8 @@ class PiperTtsEngineTest {
     fun `a language with no voice is MODEL_NOT_LOADED and nothing is loaded or played`() = runBlocking {
         val loader = FakeLoader()
         val sink = FakeSink()
-        val result = engine(loader, sink).speak("hello", SpeechLanguage.ENGLISH_INDIA)
+        val teluguOnly = PiperTtsEngine(arbiter(loader), sink, voices = mapOf(SpeechLanguage.TELUGU to PiperVoices.TELUGU), synthesisDispatcher = Dispatchers.Default)
+        val result = teluguOnly.speak("hello", SpeechLanguage.ENGLISH_INDIA)
         assertEquals(UnavailableReason.MODEL_NOT_LOADED, (result as Outcome.Unavailable).reason)
         assertEquals(0, loader.loads)
         assertTrue(sink.played.isEmpty())
@@ -129,7 +130,7 @@ class PiperTtsEngineTest {
 
     @Test
     fun `supported languages are exactly the voices it was given`() {
-        assertEquals(setOf(SpeechLanguage.TELUGU, SpeechLanguage.HINDI), engine().supportedLanguages)
+        assertEquals(SpeechLanguage.entries.toSet(), engine().supportedLanguages)
     }
 
     @Test

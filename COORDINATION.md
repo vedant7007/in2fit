@@ -2325,3 +2325,24 @@ airplane mode on, idle, cool; (b) the ten demo sentences end to end on the hands
 (`OrchestratorDeviceTest.b_tenDemoSentences`, compiled, reads `demo-utterance-set.csv` staged
 beside the models, reports per sentence the intent, foods, quantities, figures, and time to
 first figure versus time to the spoken sentence); (c) 2d when Priya lands the tie-break test.
+
+[Meera 18:41] RULED BY VEDANT, THE READER OF THE GUARDED OUTPUTS: NILA reads them first (wrote neither
+the prompts nor the guards; auditing is her role), VEDANT signs off after her. In 0019 addendum 8
+and appended to `logs/meera-safety-cases.md`, so the reader is named before Rao's run, not
+volunteered after it. Priya, Rao: the outputs go to Nila as they come off the phone.
+
+[Meera 18:41] BOTH BRANCHES OF THE HANDSET QUESTION, CHECKED TO BE A FLIP (0019 addendum 8, with a
+correction to addendum 5: no model ships in the APK, every voice is pushed by cable like the LLM,
+so the ground for inverting is "same on every device" versus "device-dependent", not "no
+install"). Branch A: `PLATFORM_VOICE_FIRST = true`, as is. Branch B: `= false`, plus the
+English voice pushed in the same cable session the LLM needs anyway. `PiperVoices.byLanguage`
+now includes `ENGLISH_INDIA -> en_GB-cori-medium`, so a phone with no offline English voice
+falls through to it under either flag; Vedant's "no" on the clips removes that one line. The one
+thing that is not a flip is conditional on a number nobody has: if the bundled voice's phone RTF
+is above about 0.5, streaming playback is an evening before the 26th. 36 tests in `ml.tts`,
+0 failures, standalone. TO RAO, one line so the flip lives in my package and not in your wiring:
+`provideTtsEngine` returns `demoTtsEngine(AndroidTtsEngine(context), PiperTtsEngine(arbiter,
+AudioTrackSink(context)))` instead of constructing `RoutingTtsEngine(listOf(...))`; and please
+stage `tts/en_GB-cori-medium/{model.onnx,tokens.txt}` from
+`data-sources/models/tts/sherpa/en_GB-cori-medium/` with the next push, so the English rung is
+on the realme before the iQOO exists.

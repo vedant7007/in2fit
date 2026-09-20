@@ -73,9 +73,10 @@ object PiperVoices {
 
     /**
      * `en_GB-cori-medium`: dataset LibriVox, "public domain" on its card, a British voice. The
-     * airplane-mode insurance for ENGLISH, which is the language the app speaks back today
-     * (`0019` addendum 7). NOT in [byLanguage] until the handset question is answered; staged
-     * and stamped so the switch is one line. Stamped size 63,531,536 B.
+     * insurance for ENGLISH, which is the language the app speaks back (`0019` addendum 7). In
+     * [byLanguage] so that a phone with no offline English voice of its own still speaks; with
+     * the platform engine first it is reached only then. Comes out again in one line if Vedant's
+     * word on the clips is no. Stamped size 63,531,536 B.
      */
     val ENGLISH_CORI = ModelHandle(
         id = "tts.piper-en_GB-cori-medium",
@@ -88,5 +89,6 @@ object PiperVoices {
     val byLanguage: Map<SpeechLanguage, ModelHandle> = mapOf(
         SpeechLanguage.TELUGU to TELUGU,
         SpeechLanguage.HINDI to HINDI,
+        SpeechLanguage.ENGLISH_INDIA to ENGLISH_CORI,
     )
 }

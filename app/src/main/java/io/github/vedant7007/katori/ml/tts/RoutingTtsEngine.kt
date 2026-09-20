@@ -49,3 +49,15 @@ class RoutingTtsEngine(private val engines: List<TtsEngine>) : TtsEngine {
         )
     }
 }
+
+/**
+ * The app's one [TtsEngine], ordered by [TtsFlags.PLATFORM_VOICE_FIRST], so the flip `0019`
+ * addendum 5 describes is a constant in this package and not an edit to the wiring. `AppModule`
+ * passes the platform engine and the bundled (Piper) engine; which is tried first for a language
+ * both can speak is decided here.
+ */
+fun demoTtsEngine(
+    platform: TtsEngine,
+    bundled: TtsEngine,
+    platformFirst: Boolean = TtsFlags.PLATFORM_VOICE_FIRST,
+): TtsEngine = RoutingTtsEngine(if (platformFirst) listOf(platform, bundled) else listOf(bundled, platform))
