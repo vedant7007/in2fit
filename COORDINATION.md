@@ -4457,3 +4457,50 @@ taken as 180 g" and the rotis without "taken as".
 NEXT, NOW: the derivable queries (`Diary`, `TargetsSource`) and the six ViewModels; then the
 new storage. `domain/Targets.kt` with Ira's exact shape and `TargetRules` (Priya's object,
 returning null until she fills it) lands with them so Ira can compile against the ring's type.
+
+[Arjun 10:55] LANDED `d6efa54`, UNPROVEN ON THE DEVICE. Demo 436/0/0 (XML 05:16Z), full 437/0/0
+(05:23Z), NetworkIsolationTest green. THE DERIVABLE ROWS AND THE SIX VIEWMODELS, for Ira to bind:
+`data/local/Diary` (one derivation, the DAO's, shared with the orchestrator's context source
+through `figureOf`, so a screen and a spoken answer cannot disagree about a total): `day(date)`,
+`days(7)`, `meals(range)`, `lastMeal()`, `totals(range)`, `labs()`, `labHistory(test)`,
+`deleteMeal(id)` (the meal, its items, their nutrients, the advice stored for it), and
+`streak(days)`, a pure function. `ui/Shown.kt` is what the screens read: `ShownFigure` (amount,
+unit, completeness, the MISSING items named, band, sources, and the same sentence the app
+speaks), `ShownMeal`/`ShownItem` (catalogue name or the word said, quantity and unit as said or
+assumed, grams or null, `inferred`, per-item measured nutrients), `ShownDay`, `LabRow` with
+`LabStatus` BELOW / ABOVE / WITHIN / NO_RANGE against the PRINTED range only. Then:
+`TodayViewModel` (name or null, today's totals, meal count, last meal with its stored trigger
+and phrased advice, out-of-range labs, latest report date, `targets`/`progress` null and empty
+until Priya's rule answers), `DiaryViewModel` (a day, its entries each with the engine's stored
+flag, its totals, the seven-day strip logged/not, `select`, `delete`), `TrendsViewModel` (seven
+`ShownDay`s, meal count, mean energy over the days that have a COMPLETE figure and how many that
+is, the streak), `ReportsViewModel` (reports grouped by printed date newest first, a selected
+test's history oldest first, the last meal's trigger sentence), `SearchViewModel`
+(`FoodLookup.candidates`, the class's usual household unit and its grams from `unit_conversions`
+said as a default, the portion's nutrients from `nutrientsFor`, a new amount is a new lookup
+call, "you log these often" from `meal_items.food_id`), `ProfileViewModel` (the row, the
+conditions with their source, the language, the bundled units, `save`, `setLanguage`,
+`declareCondition`, `removeCondition`, `firstRun` when no row was ever written).
+ALSO IN v3 (same migration, not a fourth): `meals.source` ("SPOKEN"/"TYPED", written by
+`RoomMealStore`'s new `source` lambda, null until wired: RAO, `AppModule` passes `{ ... }` from
+the turn's intent the way `languageTag` was meant to; until then the diary says nothing about
+voice, never "22 by voice") and `meal_items.display_name` (the catalogue name the plate showed;
+a row written before is shown by its spoken name). `MealDao.deleteMealAndAdvice`,
+`frequentFoods`, `spokenMealCount`. `ProfileMigrationTest` checks the five columns on populated
+data. `domain/Targets.kt`: Ira's shape verbatim (`Targets`, `TargetProgress`, `TargetStatus`) and
+`TargetRules` (PRIYA'S: `targetsFor` and `progress`, returning null and empty until she fills
+them; the object is the seam, no DI), `data/local/TargetsSource` (`current()`, `progressToday()`,
+COMPLETE totals only, a floor never compared to a target).
+WHAT IT UNBLOCKS: every Home/Diary/Trends/Reports/Search/You row Ira listed as DERIVABLE, bound
+to real sources with empty states where the data is not there. NOT PROVEN: the Room queries
+behind these have run only through the migration test's SQL and the compiler; the flows have
+not been collected on a device.
+FOR RAO'S DEVICE LIST, after the 08:01 items: (d) open Home/Diary on the migrated database:
+tonight's chapatiis show as a meal with "Chapati / roti" (display_name is null for it, so the
+spoken name), its energy 232.3 kcal, and the day's total equals what ANSWER speaks for today;
+(e) delete that meal from Diary: it is gone from Diary, Today and the next ANSWER; (f) Search
+"dal": rows with "1 katori" and grams, protein per portion.
+NEXT: v4, the new tables (water, weight history, reminders) with the same migration test; then
+the marker-explanations file and the weekly summary as shipped content. MEAL SLOTS: deferred to
+Priya's (l) ruling; by-hour is a derivation from `loggedAt`, "no slots" is nothing, neither
+needs a column, so none is added today.
