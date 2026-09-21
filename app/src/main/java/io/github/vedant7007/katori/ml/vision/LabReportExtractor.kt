@@ -74,6 +74,17 @@ object LabReportExtractor {
         return LabReport(fields, reportDate(rows))
     }
 
+    /**
+     * A multi-page PDF is one report: the pages' fields in page order, a row that a summary page
+     * repeats verbatim (same name, value and unit) kept once, the first date read kept. Two
+     * rows with the same name and different values are two rows, because a report can print a
+     * test twice (a repeat sample), and dropping one would be a guess.
+     */
+    fun merge(pages: List<LabReport>): LabReport = LabReport(
+        fields = pages.flatMap { it.fields }.distinctBy { Triple(it.testName.lowercase(), it.value, it.unit?.lowercase()) },
+        reportDate = pages.firstNotNullOfOrNull { it.reportDate },
+    )
+
     // --- one row ---------------------------------------------------------------------------------
 
     /**

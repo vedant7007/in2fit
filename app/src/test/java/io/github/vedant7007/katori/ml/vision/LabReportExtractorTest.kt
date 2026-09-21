@@ -228,4 +228,21 @@ class LabReportExtractorTest {
 
     private fun parse(row: String): LabField? =
         LabReportExtractor.extract(RecognisedText(listOf(line(row, 0, 0)))).fields.singleOrNull()
+
+    /** A PDF's pages are one report: repeats kept once, a repeat sample kept twice, the first date wins. */
+    @Test
+    fun `pages merge into one report without dropping a genuine repeat`() {
+        val hb = LabField("Haemoglobin", 9.8, "g/dL", 13.0, 17.0, "Haemoglobin 9.8 g/dL 13-17")
+        val hbAgain = LabField("Haemoglobin", 9.8, "g/dL", 13.0, 17.0, "Haemoglobin 9.8 g/dL 13.0-17.0")
+        val hbRepeat = LabField("Haemoglobin", 10.4, "g/dL", 13.0, 17.0, "Haemoglobin 10.4 g/dL 13-17")
+        val vitD = LabField("Vitamin D", 18.5, "ng/mL", 30.0, 100.0, "Vitamin D 18.5 ng/mL 30-100")
+        val merged = LabReportExtractor.merge(listOf(
+            LabReport(listOf(hb), reportDate = null),
+            LabReport(listOf(hbAgain, vitD), reportDate = LocalDate.of(2026, 9, 12)),
+            LabReport(listOf(hbRepeat), reportDate = LocalDate.of(2026, 9, 13)),
+        ))
+        assertEquals(listOf(hb, vitD, hbRepeat), merged.fields)
+        assertEquals(LocalDate.of(2026, 9, 12), merged.reportDate)
+        assertEquals(LabReport(emptyList(), null), LabReportExtractor.merge(emptyList()))
+    }
 }

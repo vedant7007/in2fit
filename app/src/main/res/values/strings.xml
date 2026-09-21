@@ -411,4 +411,6 @@
     <!-- Reports: the heading over a marker's explanation (knowledge/markers.csv), and its citation. 1 the source as written in the file. -->
     <string name="marker_explanation_title">What this measures</string>
     <string name="marker_explanation_source">Source: %1$s</string>
+    <!-- Scan: the button that opens the system document picker for a PDF report (Arjun, 21 Sep). -->
+    <string name="scan_open_pdf">Open a PDF report</string>
 </resources>

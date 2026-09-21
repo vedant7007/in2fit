@@ -92,7 +92,7 @@ class ProfileMigrationTest {
             v3.forEach { (table, createSql) -> assertEquals(table, declared(createSql), columns(db, table)) }
 
             // Then 3 -> 4 on the same populated database: three new tables, nothing else touched.
-            KatoriDatabase.MIGRATION_3_4_SQL.forEach { db.createStatement().execute(it) }
+            migrate3To4(db)
             before.forEach { (table, n) -> assertEquals(table, n, count(db, table)) }
             val v4 = tables(4)
             assertEquals(v3.keys + setOf("water", "weights", "reminders"), v4.keys)
@@ -106,6 +106,37 @@ class ProfileMigrationTest {
             assertEquals(1, count(db, "water"))
         }
     }
+
+    /**
+     * The first shape of version 3 (`da67d04`: the profile columns only, no `meals.source`, no
+     * `meal_items.display_name`) reaches version 4 through the same migration, with its rows.
+     */
+    @Test
+    fun `a database left at the first v3 shape migrates to v4 with its rows`() {
+        DriverManager.getConnection("jdbc:sqlite::memory:").use { db ->
+            tables(2).values.forEach { db.createStatement().execute(it) }
+            indices(2).values.forEach { db.createStatement().execute(it) }
+            KatoriDatabase.MIGRATION_2_3_SQL.take(3).forEach { db.createStatement().execute(it) }
+            db.createStatement().apply {
+                execute("INSERT INTO meals (id, logged_at_epoch_ms, raw_transcript, confidence_band, language_tag) VALUES (7, 1758400100000, 'chapatiis', 'GOOD', 'en-IN')")
+                execute("INSERT INTO meal_items (id, meal_id, spoken_name, quantity, unit, grams, food_source, food_id, confidence_band, confidence_reasons) VALUES (11, 7, 'chapatiis', 2.0, 'piece', 90.0, 'AUTHORED_RECIPE', 'chapati', 'GOOD', 'EXACT_FOOD_MATCH,QUANTITY_STATED')")
+            }
+            assertEquals(declared(tables(2).getValue("meals")), columns(db, "meals"))
+
+            migrate3To4(db)
+
+            val v4 = tables(4)
+            v4.forEach { (table, createSql) -> assertEquals(table, declared(createSql), columns(db, table)) }
+            db.createStatement().executeQuery("SELECT source, raw_transcript FROM meals WHERE id = 7").use { rs -> rs.next(); assertNull(rs.getString("source")); assertEquals("chapatiis", rs.getString("raw_transcript")) }
+            db.createStatement().executeQuery("SELECT display_name, grams FROM meal_items WHERE id = 11").use { rs -> rs.next(); assertNull(rs.getString("display_name")); assertEquals(90.0, rs.getDouble("grams"), 0.0) }
+            // And running it on the second shape (columns already there) neither fails nor duplicates a column.
+            migrate3To4(db)
+            assertEquals(declared(v4.getValue("meals")), columns(db, "meals"))
+        }
+    }
+
+    private fun migrate3To4(db: Connection) =
+        KatoriDatabase.migrate3To4({ db.createStatement().execute(it) }) { table -> columns(db, table).toSet() }
 
     /** The hand-written 3 -> 4 statements are the export's, string for string, so Room's open-time validation passes. */
     @Test

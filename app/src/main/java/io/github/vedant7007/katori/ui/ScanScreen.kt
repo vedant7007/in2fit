@@ -66,18 +66,22 @@ fun ScanScreen(vm: ScanViewModel = hiltViewModel()) {
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = Space.l), verticalArrangement = Arrangement.spacedBy(Space.s)) {
         ScreenTitle(stringResource(R.string.scan_title), modifier = Modifier.padding(top = Space.m))
         when {
-            !granted -> Text(stringResource(R.string.camera_permission_needed), style = In2fitText.body)
+            !granted -> Column(verticalArrangement = Arrangement.spacedBy(Space.m)) {
+                Text(stringResource(R.string.camera_permission_needed), style = In2fitText.body)
+                // A PDF needs no camera (Arjun, 21 Sep): the picker's one-file grant is enough.
+                PdfPickButton(onPicked = vm::pdf, modifier = Modifier.fillMaxWidth())
+            }
             // 0026's rule holds here too: the wait is named, with a counter, never a bare bar.
             state.reading -> StageIndicator(done = emptyList(), current = stringResource(R.string.scan_reading), elapsed = null)
             state.report == null && state.failure == null && state.notBuilt == null ->
-                CameraCapture(onCaptured = vm::captured, onFailed = vm::captureFailed)
+                CameraCapture(onCaptured = vm::captured, onFailed = vm::captureFailed, onPdf = vm::pdf)
             else -> Results(state, onToggle = vm::toggle, onRetake = vm::retake, onSave = vm::save)
         }
     }
 }
 
 @Composable
-private fun CameraCapture(onCaptured: (android.graphics.Bitmap, Int) -> Unit, onFailed: (String) -> Unit) {
+private fun CameraCapture(onCaptured: (android.graphics.Bitmap, Int) -> Unit, onFailed: (String) -> Unit, onPdf: (android.net.Uri) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember { ImageCapture.Builder().build() }
@@ -102,6 +106,7 @@ private fun CameraCapture(onCaptured: (android.graphics.Bitmap, Int) -> Unit, on
                 }
             },
         )
+        PdfPickButton(onPicked = onPdf, modifier = Modifier.fillMaxWidth())
         PrimaryButton(
             label = stringResource(R.string.scan_capture),
             modifier = Modifier.fillMaxWidth().padding(bottom = Space.l),

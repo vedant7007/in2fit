@@ -152,8 +152,27 @@ abstract class KatoriDatabase : RoomDatabase() {
             "CREATE TABLE IF NOT EXISTS `reminders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kind` TEXT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `created_at_epoch_ms` INTEGER NOT NULL)",
         )
 
+        /**
+         * THE TWO SHAPES OF VERSION 3 (Ira, 21 Sep 11:55). `da67d04` shipped version 3 with the three
+         * profile columns; `d6efa54` added `meals.source` and `meal_items.display_name` to the same
+         * version 3 instead of a version 4. A database opened by the first build is at version 3
+         * WITHOUT those two columns, and Room refuses it ("cannot verify the data integrity") with
+         * no migration to run, which is the app not opening at all. So 3 -> 4 adds the two columns
+         * when they are missing, checking the table first because `ADD COLUMN` is not idempotent,
+         * and both shapes arrive at the exported version 4. `ProfileMigrationTest` runs both.
+         */
+        fun migrate3To4(exec: (String) -> Unit, columnsOf: (String) -> Set<String>) {
+            if ("source" !in columnsOf("meals")) exec("ALTER TABLE `meals` ADD COLUMN `source` TEXT")
+            if ("display_name" !in columnsOf("meal_items")) exec("ALTER TABLE `meal_items` ADD COLUMN `display_name` TEXT")
+            MIGRATION_3_4_SQL.forEach(exec)
+        }
+
         val MIGRATION_3_4 = object : Migration(3, 4) {
-            override fun migrate(db: SupportSQLiteDatabase) = MIGRATION_3_4_SQL.forEach(db::execSQL)
+            override fun migrate(db: SupportSQLiteDatabase) = migrate3To4(db::execSQL) { table ->
+                db.query("PRAGMA table_info(`$table`)").use { c ->
+                    generateSequence { if (c.moveToNext()) c.getString(c.getColumnIndexOrThrow("name")) else null }.toSet()
+                }
+            }
         }
 
         /** Every migration, in order. AppModule passes this to the builder. */
