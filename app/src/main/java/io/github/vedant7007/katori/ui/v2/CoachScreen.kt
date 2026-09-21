@@ -41,11 +41,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.domain.ParsedItem
 import io.github.vedant7007.katori.domain.SpokenIntent
 import io.github.vedant7007.katori.ui.Sentences
+import io.github.vedant7007.katori.ui.LabStatus
 import io.github.vedant7007.katori.ui.TalkViewModel
+import io.github.vedant7007.katori.ui.TodayViewModel
 import io.github.vedant7007.katori.ui.TalkViewModel.Entry
 import io.github.vedant7007.katori.ui.components.FigureLine
 import io.github.vedant7007.katori.ui.theme.micro
@@ -62,9 +68,10 @@ import io.github.vedant7007.katori.ui.theme.serif
  *
  * WORDS CHANGED, on the ruling of 21 Sep: the design's typing dots are the stage list (0026:
  * named stages and a counter, never a spinner); the design's context line under the title
- * ("Knows your Sept blood report · HbA1c 6.4 · Vit D low") is the offline mark, because the
- * app never originates "low" (amendment 2) and the report's attributed line waits on a source.
- * The safety line sits above the chips, once, in the design's caption style.
+ * ("Knows your Sept blood report · HbA1c 6.4 · Vit D low") is attributed (amendment 2): the
+ * report by its printed date, each value outside its printed range in those words, from
+ * `TodayViewModel`; the offline mark stands there while no report is saved. The safety line
+ * sits above the chips, once, in the design's caption style.
  */
 @Composable
 fun CoachScreen(
@@ -73,8 +80,10 @@ fun CoachScreen(
     elapsed: State<Int>,
     onTitleLongPress: () -> Unit,
     modifier: Modifier = Modifier,
+    today: TodayViewModel = hiltViewModel(),
 ) {
     val s = scheme()
+    val known by today.state.collectAsState()
     var draft by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
     val itemCount = state.entries.size + if (state.stages.isNotEmpty()) 1 else 0
@@ -89,7 +98,16 @@ fun CoachScreen(
                 .padding(start = 22.dp, end = 22.dp, bottom = 16.dp),
         ) {
             T(stringResource(R.string.v2_coach_title), serif(27f, 1.2f), color = s.text)
-            T(stringResource(R.string.talk_offline_mark), sans(12.5f, FontWeight.Normal, 1.45f), color = s.text2, modifier = Modifier.padding(top = 4.dp))
+            // The design's context line, attributed: the report by its printed date, then each
+            // value outside its printed range in those words; the offline mark when there is no report.
+            val report = known.latestReport
+            val line = if (report == null) stringResource(R.string.talk_offline_mark) else {
+                val flags = known.outOfRange.filter { it.reportDate == report }.map { row ->
+                    row.testName + " " + stringResource(if (row.status == LabStatus.ABOVE) R.string.scan_above_range else R.string.scan_below_range)
+                }
+                (listOf(stringResource(R.string.v2_coach_knows_report, DateTimeFormatter.ofPattern("d MMM", Locale.getDefault()).format(report))) + flags).joinToString(" · ")
+            }
+            T(line, sans(12.5f, FontWeight.Normal, 1.45f), color = s.text2, modifier = Modifier.padding(top = 4.dp))
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(s.text.copy(alpha = 0.06f)))
         LazyColumn(

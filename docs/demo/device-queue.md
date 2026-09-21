@@ -52,6 +52,9 @@ returns to 8.
 | 29 | Ira's Reports | Reports (You → Reports until the v2 You screen lands) on the realme's own scanned report: every saved value on a card under its printed date, each flag matching the printed range the row shows, no word but "above / below / within the printed range" | Reports on real extractor rows; the attributed wording | LANDED AND UNPROVEN (Ira, 11:55) |
 | 30 | Ira's marker screen | tap a value: the marker screen, that report's bar in the warm colour when out of range, the safety line | `labHistory` on the device | LANDED AND UNPROVEN (Ira, 11:55) |
 | 31 | Ira's Discard | after a spoken LOG: Discard on the sheet; Diary and the next ANSWER no longer carry the meal | the sheet's Discard on `deleteMealAndAdvice` | LANDED AND UNPROVEN (Ira, 11:55) |
+| 32 | Ira's Today | Today on the realme's own database: the ring's number equals what ANSWER speaks for today, the macros match Diary's day, the last meal is the last meal, no ring fill and no "/ target" anywhere (Priya's rule is not in) | Today on real rows; the empty states where the data is not there | LANDED AND UNPROVEN (Ira, 12:25) |
+| 33 | Ira's water | "+" on the water card twice: 0.5 appears; kill and reopen: still 0.5 | `logWater` through the v2 card | LANDED AND UNPROVEN (Ira, 12:25) |
+| 34 | Ira's nudge card | after Beat 1 with a rule fired: the nudge card carries the engine's sentence, "Ask about this" opens Coach; Coach's line under the title names the report by date and each value outside its printed range | the stored advice and the attributed context line | LANDED AND UNPROVEN (Ira, 12:25) |
 
 Struck lines stay in the table with the date and the log path, so the next person sees what was
 run and when.

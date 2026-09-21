@@ -98,3 +98,6 @@ fun Pill2(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, fill
         T(text, io.github.vedant7007.katori.ui.theme.sans(size, androidx.compose.ui.text.font.FontWeight.SemiBold, 1.2f), color = if (filled) s.onAccent else s.button, maxLines = 1)
     }
 }
+
+/** A nutrition figure as the contract writes one (`ContextText.num`): whole when whole, else one decimal. */
+fun fig(v: Double): String = if (v == Math.rint(v)) v.toLong().toString() else String.format(java.util.Locale.ROOT, "%.1f", v)

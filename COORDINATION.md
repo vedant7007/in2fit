@@ -4810,3 +4810,47 @@ out the foods". There is no cancel while the model works; a stall and a slow tur
 until the counter passes a minute, and the way out is the playbook's restart. My reading is that
 this is already honest and legible and we leave it; what P says during the wait is written down.
 Demo suite 445, 0 failures; demo, androidTest and full APKs build. Master after landing.
+
+[Ira 12:25] LANDED, UNPROVEN ON THE DEVICE: TODAY (item 4), EVERY ELEMENT, on `TodayViewModel`;
+the Coach context line on the same ViewModel (Arjun's 11:48 pointer); the marker screen's
+explanation card on the shipped file. Demo suite 457/0/0 from my own run (XML 06:47Z),
+NetworkIsolationTest 2/0/0, the demo APK's permissions unchanged. Today is the v2 Today tab now;
+the old Talk is behind the legacy switch only.
+WHAT IS BUILT (`ui/v2/TodayScreen.kt`): the date in the tracked label, the greeting in serif 30
+by the clock ("Morning" / "Afternoon" / "Evening", with the name after it when the profile has
+one, alone when it does not, exactly as Arjun hands it); the bell and the initial's circle; the
+26 dp energy card: the 108 dp ring (an 11 dp track, the accent fill clamped at a full turn),
+today's energy in Plex at the serif's size with "KCAL IN" under it, three macro bars (Protein
+accent, Carbs teal, Fat warm, 6 dp tracks) reading "57 / 95 g" from `TargetProgress` and the
+"kcal left today" line from its `remaining`; the water card (litres in Plex, "/ 3.0 L" from the
+water target, six glasses each a sixth of it, "+" logging 250 ml through `logWater`); the last
+meal card (the items' shown names, "2 items · 430.2 kcal · 18.5 g protein", the logged time);
+"Add manually" (opens Coach, the typed path, until Search lands) and "Today's diary"; the nudge
+card (the gradient panel, the pill "Reading your report · 12 Sep", the sentence, "Ask about
+this →" into Coach); the safety line.
+EMPTY, AND WHY, each verified in `emulator-v2-today-empty.png`: the ring's fill, every bar's
+fill and denominator and the "left today" line wait on Priya's `TargetRules` (the consumed
+figure shows alone until then: "18.5 g", never "18.5 / 0"); the water number waits on the first
+glass and its denominator and filled glasses on the water target; the last-meal card and the
+nudge card wait on a meal (the nudge is the model's guarded sentence stored for the last meal,
+else the engine's trigger sentence, else nothing: the design's target-based nudge is MISSING and
+is not imitated); the bell's dot waits on nudges; the initial waits on the name. WORDS: "dinner
+still to log" ends at "kcal left today" (meal slots deferred to Priya); the pill cites the
+report by its printed date, never by a marker's word (amendment 2).
+COACH'S CONTEXT LINE, attributed: "Knows your report of 12 Sep · LDL cholesterol above the
+printed range · Vitamin D below the printed range · HbA1c above the printed range", each from
+`LabRow.status` against the PRINTED range; the offline mark stands there while no report is
+saved (`emulator-v2-coach-report-line-seeded-rows.png`).
+SCREENSHOTS, EMULATOR, LAYOUT ONLY: `emulator-v2-today-empty.png` is the app on an empty
+database. `emulator-v2-today-seeded-rows.png` is the app on ONE MEAL I INSERTED BY HAND
+(chapati 2 pieces 90 g, dal 1 katori 180 g inferred, their nutrients, a stored advice row) plus
+two real taps of "+" on water; every figure on it is mine, not the pipeline's. I tried the real
+pipeline on the emulator first (`emulator-v2-coach-typed-real-pipeline.png`: the typed turn
+running, "Picking out the foods · 4 s"); the process was killed under the model as before, so
+the seeded rows stand in for layout only.
+FOR RAO'S DEVICE LIST, items 32-34: (32) Today on the realme's own database: the day's energy
+in the ring equals what ANSWER speaks for today, the macros match Diary's day, the last meal is
+the last meal, no ring fill and no "/ target" anywhere (Priya's rule is not in); (33) "+" on
+water twice: 0.5 appears, survives a kill and reopen; (34) after Rao's Beat 1 with a rule fired:
+the nudge card carries the engine's sentence and "Ask about this" opens Coach.
+NEXT, NOW: You (5) with the dark/cream switch and the language; then Welcome and first run (6).

@@ -49,6 +49,7 @@ object Glyphs {
     val chevron = Glyph(24f, Stroke2("M9 6l6 6-6 6"))
     val upload = Glyph(18f, Stroke2("M9 13V4m0 0L5.5 7.5M9 4l3.5 3.5M3.5 14.5h11", width = 1.6f))
     val arrowLeft = Glyph(14f, Stroke2("M11 7H3m0 0 3.5-3.5M3 7l3.5 3.5", width = 1.6f))
+    val arrowRight = Glyph(14f, Stroke2("M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5", width = 1.6f))
     val back = Glyph(24f, Stroke2("M15 6l-6 6 6 6"))
 }
 

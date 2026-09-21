@@ -44,7 +44,6 @@ import io.github.vedant7007.katori.ui.AboutScreen
 import io.github.vedant7007.katori.ui.DiaryViewModel
 import io.github.vedant7007.katori.ui.PreflightScreen
 import io.github.vedant7007.katori.ui.ScanScreen
-import io.github.vedant7007.katori.ui.TalkScreen
 import io.github.vedant7007.katori.ui.TalkViewModel
 import io.github.vedant7007.katori.ui.TalkViewModel.Entry
 import io.github.vedant7007.katori.ui.components.Splash
@@ -68,8 +67,9 @@ import java.util.Date
  * transition). A turn that ends in anything but a plate closes the sheet and opens Coach, where
  * every turn's text lives.
  *
- * UNTIL THEIR STEPS LAND (today, in order): Today, Diary and You open the old Talk, Scan and
- * About screens in their own cream theme, so nothing the phone could do yesterday is lost.
+ * UNTIL THEIR STEPS LAND (today, in order): Diary and You open the old Scan and About screens
+ * in their own cream theme, so nothing the phone could do yesterday is lost; the old Talk is
+ * behind the legacy switch.
  */
 @Composable
 fun Shell2() {
@@ -165,7 +165,14 @@ fun Shell2() {
                         over == "marker" -> MarkerScreen(marker, onBack = { over = "reports" })
                         over == "scan" -> Legacy { ScanScreen() }
                         tab == Tab2.COACH -> CoachScreen(vm, state, elapsed, onTitleLongPress = { ThemePreference.setLegacy(context, true) })
-                        tab == Tab2.TODAY -> Legacy { TalkScreen(vm) }
+                        tab == Tab2.TODAY -> TodayScreen(
+                            onNudges = {},
+                            onProfile = { tab = Tab2.YOU },
+                            onLastMeal = { tab = Tab2.DIARY },
+                            onAddManually = { tab = Tab2.COACH },
+                            onDiary = { tab = Tab2.DIARY },
+                            onCoach = { tab = Tab2.COACH },
+                        )
                         tab == Tab2.DIARY -> Legacy { ScanScreen() }
                         else -> Legacy { AboutScreen(onPreflight = { preflight = true }, onReports = { over = "reports" }) }
                     }

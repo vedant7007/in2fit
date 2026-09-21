@@ -156,8 +156,8 @@ private fun AddReport(onScan: () -> Unit) {
  * One marker as drawn: the back link, the test's name in serif 29, the latest value in serif 44
  * (Plex, ×1.02) with its unit and its standing against the printed range, the "Last four tests"
  * bars (every report of this test, oldest first, the newest in the warm colour when it is out
- * of its printed range), and the explanation card, which waits on Priya's sourced file and is
- * absent until then.
+ * of its printed range), and the explanation card from the shipped, cited file, absent for a
+ * test the file does not carry.
  */
 @Composable
 fun MarkerScreen(test: String, onBack: () -> Unit, modifier: Modifier = Modifier, vm: ReportsViewModel = hiltViewModel()) {
@@ -203,6 +203,17 @@ fun MarkerScreen(test: String, onBack: () -> Unit, modifier: Modifier = Modifier
                             }
                         }
                     }
+                }
+            }
+        }
+        // The explanation as drawn (14.5 at 1.6), from the shipped, cited file (Arjun's loader,
+        // Priya's rows); the source named under it; absent when the file has no row for the test.
+        val explanation = latest?.explanation
+        if (explanation != null) {
+            Card2(Modifier.fillMaxWidth().padding(bottom = 14.dp), radius = 26.dp) {
+                Column(Modifier.padding(20.dp)) {
+                    T(explanation.explanation, sans(14.5f, FontWeight.Normal, 1.6f), color = s.onMessage)
+                    T(stringResource(R.string.v2_marker_source, explanation.source), sans(12f, FontWeight.Normal, 1.45f), color = s.text3, modifier = Modifier.padding(top = 12.dp))
                 }
             }
         }

@@ -367,6 +367,34 @@
     <string name="v2_marker_history">Last four tests</string>
     <!-- A value inside the range the report printed (amendment 2: the app never says "normal"). -->
     <string name="v2_within_range">within the printed range</string>
+    <!-- The marker screen's explanation card: the cited source under the shipped explanation. 1 the source name. -->
+    <string name="v2_marker_source">Source: %1$s</string>
+    <!-- Today (the design's words). The greeting by the clock; 1 the greeting, 2 the name. -->
+    <string name="v2_greeting_morning">Morning</string>
+    <string name="v2_greeting_afternoon">Afternoon</string>
+    <string name="v2_greeting_evening">Evening</string>
+    <string name="v2_greeting_with_name">%1$s, %2$s</string>
+    <string name="v2_kcal_in">kcal in</string>
+    <!-- The design's "kcal left today · dinner still to log"; the slot clause waits on meal slots. -->
+    <string name="v2_kcal_left_today">kcal left today</string>
+    <!-- A macro bar's value: consumed of target, or consumed alone while there is no target. 1 consumed, 2 target. -->
+    <string name="v2_macro_of">%1$s / %2$s g</string>
+    <string name="v2_macro_alone">%1$s g</string>
+    <string name="v2_water">Water</string>
+    <!-- Water today in litres, and its target when the rule has one. 1 litres. -->
+    <string name="v2_water_litres">%1$s L</string>
+    <string name="v2_water_of">/ %1$s L</string>
+    <string name="v2_plus" translatable="false">+</string>
+    <string name="v2_last_meal">Last meal</string>
+    <!-- 1 the number of items in the meal. -->
+    <string name="v2_items_count">%1$d items</string>
+    <string name="v2_add_manually">Add manually</string>
+    <string name="v2_todays_diary">Today\'s diary</string>
+    <!-- The nudge card's pill: the report cited by its printed date, never by a marker's word. 1 the date. -->
+    <string name="v2_reading_report">Reading your report · %1$s</string>
+    <string name="v2_ask_about_this">Ask about this</string>
+    <!-- Coach's line under the title, from the saved report: the date, then each value outside its printed range with the attributed words. 1 the date. -->
+    <string name="v2_coach_knows_report">Knows your report of %1$s</string>
     <string name="v2_new_screens">New screens</string>
 
     <!-- SHIPPED CONTENT FOR THE V2 SCREENS (Arjun, 21 Sep, post-freeze: English only). The weekly

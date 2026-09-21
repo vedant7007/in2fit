@@ -320,9 +320,6 @@ private fun PortionChip(text: String) {
     }
 }
 
-/** A figure as the contract writes one: whole when whole, else one decimal. */
-private fun fig(v: Double): String = if (v == Math.rint(v)) v.toLong().toString() else String.format(java.util.Locale.ROOT, "%.1f", v)
-
 /** The item as said, before the resolved rows reach the entry. */
 @Composable
 private fun ItemRow(item: ParsedItem) {
