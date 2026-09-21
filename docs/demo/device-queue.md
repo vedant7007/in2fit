@@ -30,6 +30,13 @@ Build once: `assembleDemoDebug` + `assembleDemoDebugAndroidTest`, install both, 
 | 14 | Arjun's screens, (e) | delete that meal from Diary: gone from Diary, Today and the next ANSWER | `deleteMealAndAdvice` | LANDED AND UNPROVEN (Arjun, 10:55) |
 | 15 | Arjun's screens, (f) | Search "dal": rows with "1 katori" and grams, protein per portion | the search query | LANDED AND UNPROVEN (Arjun, 10:55) |
 | 16 | The meal's source | after a spoken LOG and a typed LOG, `meals.source` reads SPOKEN then TYPED and `language_tag` the picker's tag (`run-as` + sqlite, or Arjun's Diary row) | `CurrentTurn` feeding the store's lambdas (Rao, 21 Sep) | LANDED AND UNPROVEN |
+| 17 | Ira's v2 shell, (d) | install the demo build over the existing data: the app opens in the DARK v2 shell (five-place bar, lime microphone), the status icons light, Today shows the old Talk in cream inside it | the shell, the window theme, the bundled Instrument faces | LANDED AND UNPROVEN (Ira, 11:15) |
+| 18 | Ira's voice sheet, listening, (e) | hold the microphone on any tab: the sheet opens ON THE PRESS with the pulse, the thirteen bars move with the voice, "LISTENING · हिन्दी" | the held FAB feeds `speak()`; the bars are real level samples | LANDED AND UNPROVEN (Ira, 11:15) |
+| 19 | Ira's voice sheet, the plate, (e) | say Beat 1, release: the quoted transcript, the stage rows ticking with the counter, then the plate: "taken as 180 g" under the dal ONLY, the rotis as said, per-item kcal and protein on the right, "Added to today" | the sheet follows `TalkViewModel.State`; the rows on the real path (item 12 seen through v2) | LANDED AND UNPROVEN (Ira, 11:15) |
+| 20 | Ira's voice sheet, a question, (f) | hold and ask Beat 4's question: the sheet closes by itself and Coach opens with the answer bubble | a turn that is not a plate lands in Coach | LANDED AND UNPROVEN (Ira, 11:15) |
+| 21 | Ira's Coach, typed, (g) | Coach: type a question, Send: the stage rows appear where the design has typing dots, then the answer | the Coach input feeds `type()` | LANDED AND UNPROVEN (Ira, 11:15) |
+| 22 | Ira's old-shell switch, (h) | Coach title long-press: the old three-tab shell in cream; old About, "New screens": back to v2 | nothing the phone could do yesterday is lost | LANDED AND UNPROVEN (Ira, 11:15) |
+| 23 | Ira's hostile checks, (i)-(j) | animator scale 0: the sheet appears without the rise, no pulse; 2× font: tabs whole, stage rows wrap; then `dumpsys gfxinfo` for the worst frame with the sheet up | reduce motion end to end; the frame cost of the blur behind the sheet | LANDED AND UNPROVEN (Ira, 11:15) |
 
 Struck lines stay in the table with the date and the log path, so the next person sees what was
 run and when.

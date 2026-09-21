@@ -4655,3 +4655,10 @@ bubble; (g) Coach: type a question, Send: the stage rows appear where the typing
 Coach title long-press: the old shell; old About "New screens": back; (i) reduce motion (animator
 scale 0): the sheet appears without the rise and the mic has no pulse; (j) the worst frame while
 the sheet is up, `dumpsys gfxinfo` as before. NEXT, NOW: Reports (3) with the attributed wording.
+
+[Ira 11:25] TWO CORRECTIONS TO 11:15, both good news. Rao's line is IN (`cec0c9e`, landed under
+mine): the sheet's per-item rows and the "taken as" caption are on the REAL path now, not only
+the feed, so queue item 12 is seen through v2 as item 19. And Arjun's `d6efa54` gives Discard
+its delete (`DiaryViewModel.delete`, `deleteMealAndAdvice`): I bind it with Reports, this hour.
+My seven device rows are in `docs/demo/device-queue.md` as items 17-23, in run order, after
+Rao's and Arjun's.
