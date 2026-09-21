@@ -5143,3 +5143,34 @@ diary" (Rao's `LogItems`), "Delete everything" (a store wipe), the welcome pill'
 and dimmed, or absent, and named in its landing entry. THE EMULATOR WARM-UP CRASH (13:20) still
 stands for Rao. FOR RAO'S DEVICE LIST: item 48. I stop here for a memory note; the queue
 carries every v2 check in order, items 17-23, 29-34, 38-48.
+[Rao 13:58] THE ABANDON RULE IS WRITTEN, above block 0 in `docs/demo/device-queue.md`. Triggers,
+each with what happens: install refused three times; the app killed twice while idle after the
+skin settings; `lowmemorykiller` names the app once more after the voice is dropped from the
+warm-up; block 0 not READY by T-45 (the realme needs about fifteen minutes to be READY and five
+for one rehearsal beat, so forty-five carries a cable's margin). No voice data by T-60 is NOT a
+trigger: the bundled Piper voice is the insurance (0019 addendum 10) and P is told once. At any
+trigger the same three moves: stop and say "realme" out loud; the realme's own "Reboot, wait,
+check, then demo"; the iQOO stays on the table, screen up, and P says ONE sentence, true on the
+day (it must not claim the build is on the loaner if the install never succeeded). What is lost
+by demoing on the realme: nothing technical; every number and screenshot is the realme's. I
+agree with the default. NOT KNOWN: whether the rules require the loaner. Nothing in the repo
+says so (spec 7.4: "have a backup phone with the same build installed"; the loaner is "most
+likely an iQOO"). VEDANT: that answer has to come from the organisers before the day; if the
+loaner is required, the table is a fallback for a demo that would otherwise not happen, not a
+choice, and the run of show says so.
+NILA: the run of show needs both branches, written, so P is not inventing a sentence about which
+phone he is holding while people watch. Branch A, the iQOO: block 0 READY, P holds the loaner,
+nothing is said about phones. Branch B, the realme: one sentence, yours to write, something like
+"We are running this on the phone we measured on; the loaner is here on the table", said once
+at Beat 0 and never again; rows 9 and 10 of the checklist apply to the realme (it is already
+seeded, so the warm-up row is the only one). And every time-figure on a slide names the
+handset or carries none.
+TWO SMALL THINGS, LANDED: (1) IRA, the warm-up now skips itself under translation
+(`Build.SUPPORTED_ABIS[0] != "arm64-v8a"`) and logs `katori-warmup: skipped: primary ABI x86_64
+…`; the emulator launches and stays up (pid alive after 13 s at 13:52); drop your private guard.
+On an arm64 phone nothing changes. (2) Beat 3 by PDF is queue item 5a, right after Beat 1
+through the microphone, because both photograph thresholds failed and a page rendered from a
+PDF has no angle.
+VEDANT: run `tools\cold-phone.ps1` the moment the iQOO is in your hand on the 26th, not on demo
+morning, and do the voice-data card on a network before the radios go off; it is written into
+the queue above block 0.

@@ -18,6 +18,40 @@ re-threads the live model before the next call, and the `katori-llama: generate:
 line says which count each number was made at; `settings delete global katori_llama_threads`
 returns to 8.
 
+## The abandon rule: when the iQOO stops being the demo phone
+
+Block 0 assumes the iQOO eventually cooperates. It may not, and on the morning someone has ten
+seconds to decide. Vedant's realme is set up, measured, seeded and warm, and every number the
+team holds came off it. So the rule is written here, before the day, not invented at the table.
+`T` is the team's slot; Vedant writes the clock time beside it the evening before.
+
+| Trigger | What happens |
+|---------|--------------|
+| **Install refused three times** (the script's third try, after the "Install via USB" card) | Stop work on the iQOO. Demo on the realme. |
+| **The app killed twice while idle** after the skin settings (battery optimisation off, autostart on, background allowed) | Stop. Demo on the realme. A phone that kills the warm model between the table and the first word is not a demo phone. |
+| **`lowmemorykiller` names the app once more** after the voice is dropped from the warm-up (PSS over the ceiling) | Stop. Demo on the realme. |
+| **No platform voice data by T-60** (no usable network at the venue) | NOT an abandon trigger by itself: the bundled Piper voice is the insurance (0019 addendum 10) and the pre-flight does not check the voice. Say it once to the presenter so the English answer's voice is not a surprise. |
+| **Block 0 not READY by T-45** | Stop trying regardless. The realme needs: reboot, ten quiet minutes, one Beat 1, the pre-flight (about fifteen minutes), then one rehearsal beat (five). Forty-five is that with margin for a cable. |
+
+At any trigger, the same three moves: (1) stop touching the iQOO and say "realme" out loud so
+nobody keeps trying; (2) the realme's own checklist from "Reboot, wait, check, then demo" in the
+run of show; (3) the iQOO stays ON THE TABLE, screen up, so the offer to run on the loaner is
+visible rather than hidden, and P says one sentence to the judges, the one Nila writes, and
+nothing else about phones. The sentence must be true on the day it is said: if the install
+never succeeded, it does not claim the build is on the loaner.
+
+What is lost by demoing on the realme: nothing technical. Every number, every screenshot and
+every rehearsal is the realme's; the iQOO would only ever have been faster and unmeasured.
+Rao agrees with the default. WHAT IS NOT KNOWN: whether the hackathon's rules require the
+loaner to be used. Nothing in the repo says so (spec 7.4 says "have a backup phone with the
+same build installed", and the loaner is named only as "most likely an iQOO"); if the rules do
+require it, this table is a fallback for a demo that would otherwise not happen, not a choice,
+and Vedant needs that answer from the organisers before the day. Both branches are in the run
+of show (Nila), and P rehearses the sentence for each.
+
+Vedant: run `tools\cold-phone.ps1` the moment the iQOO is in your hand on the 26th, not on demo
+morning, and do the voice-data card on a network before the radios go off.
+
 ## Block 0: the cold phone (runs first on the iQOO, before anything else is attempted on it)
 
 Every number the team holds is the realme's. The demo handset is an iQOO collected on the day:
@@ -84,6 +118,7 @@ handset produced it; Nila has the list of what does not (COORDINATION, 21 Sep).
 | 3a | The pre-flight's numbers | `tools/preflight.ps1` before every item above, its log kept | what READY looks like on this phone | LANDED AND UNPROVEN (21 Sep; dry-run on the emulator only) |
 | 4 | Task 2, transliteration on the phone | `OrchestratorDeviceTest.d_hindiLogRows` (now with `IcuRomaniser`): rows 1, 2, 5 and the Hinglish row | the frozen Beat 1 sentence extracts on the device through the platform's ICU (the JVM proved icu4j) | LANDED AND UNPROVEN, 21 Sep |
 | 5 | Task 2, Beat 1 end to end through the microphone | `measure_case.ps1` with `vedant_hi_01.wav`, three runs: plate and spoken times, the plate's items | the demo's first beat, with the microphone in the path | UNPROVEN |
+| 5a | Beat 3 by PDF (Arjun's PDF input; weighted high because both photograph thresholds failed and an angled shot reads nothing; a page rendered from a PDF has no angle) | Scan (old shell) or wherever Ira places `PdfPickButton`: "Open a PDF report", pick any lab-report PDF on the phone: the same results list as a photograph, pages merged, then Save; a password-protected PDF says so and saves nothing | `PdfPages` (platform `PdfRenderer`) into the same recogniser and extractor; no permission, the whitelist unchanged | LANDED AND UNPROVEN (Arjun, 12:25) |
 | 6 | The transliteration's nine words on the device | `DevanagariDeviceTest` (androidTest, ml/asr): `IcuRomaniser` over the nine words and the four demo rows, asserting the JVM's strings (android.icu vs icu4j 75.1) | the phone's ICU writes what the JVM's did | LANDED AND UNPROVEN, 21 Sep |
 | 7 | The measurement pass, with the microphone | `tools/measurement-pass.ps1` after items 1-5, for the record; the pass itself types | the deck's numbers on the landed code | UNPROVEN |
 | 8 | Duplicate transcription on a long hold | `cap_case.ps1` twice more (37 s hold, hi_06 at 2 s), with the per-second level log | reproduces or goes on the hazard list | one hour, not more (Vedant) |
@@ -113,7 +148,6 @@ handset produced it; Nila has the list of what does not (COORDINATION, 21 Sep).
 | 32 | Ira's Today | Today on the realme's own database: the ring's number equals what ANSWER speaks for today, the macros match Diary's day, the last meal is the last meal, no ring fill and no "/ target" anywhere (Priya's rule is not in) | Today on real rows; the empty states where the data is not there | LANDED AND UNPROVEN (Ira, 12:25) |
 | 33 | Ira's water | "+" on the water card twice: 0.5 appears; kill and reopen: still 0.5 | `logWater` through the v2 card | LANDED AND UNPROVEN (Ira, 12:25) |
 | 34 | Ira's nudge card | after Beat 1 with a rule fired: the nudge card carries the engine's sentence, "Ask about this" opens Coach; Coach's line under the title names the report by date and each value outside its printed range | the stored advice and the attributed context line | LANDED AND UNPROVEN (Ira, 12:25) |
-| 35 | Arjun's PDF input | Scan (old shell) or wherever Ira places `PdfPickButton`: "Open a PDF report", pick any lab-report PDF on the phone: the same results list as a photograph, pages merged, then Save; a password-protected PDF says so and saves nothing | `PdfPages` (platform `PdfRenderer`) into the same recogniser and extractor; no permission, the whitelist unchanged | LANDED AND UNPROVEN (Arjun, 12:25) |
 | 36 | ARJUN'S ITEMS AS ONE SCRIPTED RUN | `powershell -File toolsrjun-checks.ps1` (default adb server, stops the app, runs `ArjunDeviceChecksTest` against the phone's OWN database through the app's migrations, prints every `ARJUN-CHECK <item> PASS/FAIL …` line, log in `logs/arjun-checks-*.txt`). Covers 10/24 (real DB at version 4 with its rows; the FIRST v3 shape from `da67d04` is migrated too), 11 (the language read from the row), 13 (Diary's day figures equal the context source's TODAY figures, i.e. what ANSWER speaks), 14/26 (a two-item meal it writes: item delete re-derives the band, meal delete leaves nothing), 15 (search: match, katori grams, protein), 25 (water +500 then restored; a weight row then the profile, restored), 27 (markers from the APK), 28 (export line counts), 35 (a PDF it draws, rendered, read by ML Kit ON THE DEVICE, Haemoglobin 9.8 [13-17] extracted). Runs first, before the by-eye items; a FAIL line names the item | every item of mine that a human would otherwise have to notice, in one command | LANDED AND UNPROVEN (Arjun, 12:25) |
 | 37 | Arjun's warm-up gate | cold launch, hold the microphone within the first seconds: nothing starts and the label reads "Getting ready…" (once Ira binds `state.ready`); after the `katori-warmup: … total N ms` line, a hold starts a turn; with the scripted feed on, the gate never applies | `TalkViewModel.speak` refuses before `WarmUp.ready` (0032, the screen's half) | LANDED AND UNPROVEN (Arjun, 12:42) |
 | 38 | Ira's You | You on the realme: the rig's row as "19 · 62 kg", Language reads the picker's choice; Edit details: change the weight, Save: You shows it | You and the profile's write path on the device | LANDED AND UNPROVEN (Ira, 12:50) |

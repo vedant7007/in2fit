@@ -41,6 +41,13 @@ class WarmUp @Inject constructor(
 
     fun start(language: SpeechLanguage) {
         if (_ready.value) return
+        // An x86 emulator runs the arm64 libraries through translation and dies with SIGILL in
+        // the first model load, before the first frame (Ira, 21 Sep 12:53). The emulator is a
+        // layout tool; it gets no warm-up and says so. On an arm64 phone nothing changes.
+        if (android.os.Build.SUPPORTED_ABIS.firstOrNull() != "arm64-v8a") {
+            Log.i(TAG, "skipped: primary ABI ${android.os.Build.SUPPORTED_ABIS.firstOrNull()} is not arm64-v8a (translation); the models load on first use")
+            return
+        }
         scope.launch {
             val t0 = System.nanoTime()
             fun ms() = (System.nanoTime() - t0) / 1_000_000
