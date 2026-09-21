@@ -188,6 +188,7 @@ fun Shell2() {
                         over == "scan" -> Legacy { ScanScreen() }
                         over == "edit" -> EditDetailsScreen(onBack = { over = null })
                         over == "trends" -> TrendsScreen(onBack = { over = null })
+                        over == "search" -> SearchScreen(onBack = { over = null }, onVoice = { over = null; tab = Tab2.COACH })
                         over == "meal" -> MealScreen(mealId, mealDate.takeIf { it.isNotEmpty() }?.let(java.time.LocalDate::parse), onBack = { over = null })
                         over?.startsWith("list:") == true -> ListScreen(YouList.valueOf(over!!.removePrefix("list:")), onBack = { over = null })
                         tab == Tab2.COACH -> CoachScreen(vm, state, elapsed, onTitleLongPress = { ThemePreference.setLegacy(context, true) })
@@ -195,7 +196,7 @@ fun Shell2() {
                             onNudges = {},
                             onProfile = { tab = Tab2.YOU },
                             onLastMeal = { id, date -> mealId = id; mealDate = date.toString(); over = "meal" },
-                            onAddManually = { tab = Tab2.COACH },
+                            onAddManually = { over = "search" },
                             onDiary = { tab = Tab2.DIARY },
                             onCoach = { tab = Tab2.COACH },
                         )

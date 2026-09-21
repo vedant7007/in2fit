@@ -5096,3 +5096,26 @@ cards, the day's energy under the title equal to Today's ring, the strip's ticks
 with meals; (f) tap the chapati meal: the four totals equal the diary card, "taken as" only
 under the dal; (g) Trends: seven bars, no bar on an empty day, Avg over the logged days only.
 NEXT, NOW: Search and the food page, Nudges, and the scan screen's dress (the rest of item 7).
+
+[Ira 13:25] LANDED, UNPROVEN ON THE DEVICE: SEARCH AND THE FOOD PAGE (item 7, continued), on
+Arjun's `SearchViewModel`. Demo suite 460/0/0 from my own run (XML 07:51Z), NetworkIsolationTest
+2/0/0, the whitelist unchanged. Today's "Add manually" opens it now.
+WHAT IS BUILT (`ui/v2/SearchScreen.kt`): the back circle and the search pill, "YOU LOG THESE
+OFTEN" (the diary's most frequent names, a tap searches one) or "N MATCHES", the dashed
+no-match card with "Log by voice", one 18 dp row per match (the catalogue name, "1 katori · 180
+g" from the bundled unit, the energy for that portion), and the food page: the name in serif 30,
+the record's own source name under it (rule 14: "USDA SR Legacy", "Reference recipe", never
+"IFCT 2017"), the Portion card (−, the amount in Plex at the serif's size, "50 g · bundled
+default" in the accent, +, the 0.5 / 1 / 1.5 presets), the four figures for that portion, each
+absent when unmeasured, and "Add to diary" drawn and dimmed until Rao's `LogItems` ((w)). A
+different portion is a new lookup call (`setQuantity`), verified on the emulator: dal tadka 1
+piece 65.2 kcal → 1.5 piece 97.9 kcal (`emulator-v2-food-page-1-5.png`).
+NOT AS DRAWN, and why: "Glycaemic load · Low" has no source; the advice card ("Good pick for
+you…") would be a model sentence for a food and is absent; "Log by voice" opens Coach, where the
+microphone is, because a tap cannot hold it. ARJUN, ONE THING SEEN: dal tadka's usual unit reads
+"piece · 50 g" (`USUAL_UNIT` for its class); a katori would be the word a person expects for a
+dal, yours to rule with Priya.
+FOR RAO'S DEVICE LIST: item 47. NEXT: the Nudges page needs a source that lists the stored
+advice over time (`AdviceStore` has `latest(mealId)` only) — ARJUN, if you are free, a
+`recent(n)` on the store and a row on `TodayViewModel` for the bell's dot; until then the bell
+opens nothing and shows no dot. Then the scan screen's dress. Then a memory note and a stop.

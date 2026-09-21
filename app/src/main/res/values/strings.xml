@@ -552,4 +552,18 @@
     <string name="v2_n_days_logged">%1$d days logged</string>
     <string name="v2_weight">Weight</string>
     <string name="v2_since">since %1$s</string>
+    <!-- Search and the food page (the design's words). -->
+    <string name="v2_search_foods">Search foods</string>
+    <string name="v2_log_these_often">You log these often</string>
+    <string name="v2_one_match">1 match</string>
+    <string name="v2_n_matches">%1$d matches</string>
+    <string name="v2_no_match">Nothing matches that yet.</string>
+    <string name="v2_no_match_sub">Say it out loud instead — the coach handles dishes the food table hasn\'t named.</string>
+    <string name="v2_log_by_voice">Log by voice</string>
+    <string name="v2_portion">Portion</string>
+    <string name="v2_minus" translatable="false">−</string>
+    <!-- The grams of a household unit from the bundled conversion table (0035): said so. 1 the grams. -->
+    <string name="v2_grams_bundled">%1$s g · bundled default</string>
+    <string name="v2_energy">Energy</string>
+    <string name="v2_add_to_diary">Add to diary</string>
 </resources>
