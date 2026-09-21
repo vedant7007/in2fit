@@ -8,6 +8,8 @@ import io.github.vedant7007.katori.domain.RuleIds
 import io.github.vedant7007.katori.domain.SpeechLanguageRef
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.UserIntent
+import io.github.vedant7007.katori.domain.model.ConfidenceBand
+import io.github.vedant7007.katori.domain.model.ConfidenceReason
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -38,7 +40,7 @@ class ScriptedOrchestratorTest {
 
     @Test
     fun `the same meal comes back with different advice once the report is in`() {
-        val logged = events(UserIntent.Type("Two rotis, a katori of dal, and I used two spoons of oil.", en))
+        val logged = events(UserIntent.Type("I had two rotis and a little dal.", en))
         assertTrue(logged.any { it is OrchestratorEvent.MealLogged })
         val before = logged.filterIsInstance<OrchestratorEvent.Advice>().single()
 
@@ -50,6 +52,31 @@ class ScriptedOrchestratorTest {
         assertTrue(after.evaluation.firedRules.any { it.id == RuleIds.LAB_BELOW_RANGE })
         assertNotEquals(before.evaluation.trigger, after.evaluation.trigger)
         assertEquals(OrchestratorEvent.Completed, again.last())
+    }
+
+    /** 0035 on the feed, the same as on the resolver: the feed may not present an unstated amount as said. */
+    @Test
+    fun `beat 1's dal is an assumed katori at 180 g and its rotis are as said`() {
+        val plate = events(UserIntent.Type("I had two rotis and a little dal.", en))
+            .filterIsInstance<OrchestratorEvent.MealResolved>().single()
+        assertEquals(plate.meal.items.size, plate.items.size)
+
+        val roti = plate.items[0]
+        assertEquals("Chapati / roti", roti.snapshot.displayName)
+        assertEquals(2.0, plate.meal.items[0].quantity)
+        assertTrue(ConfidenceReason.QUANTITY_STATED in roti.confidence.reasons)
+        assertTrue(ConfidenceReason.QUANTITY_INFERRED !in roti.confidence.reasons)
+
+        val dal = plate.items[1]
+        assertEquals("Dal tadka", dal.snapshot.displayName)
+        assertEquals(180.0, dal.snapshot.grams)
+        assertEquals("katori", plate.meal.items[1].unit)
+        assertTrue(ConfidenceReason.QUANTITY_INFERRED in dal.confidence.reasons)
+        assertTrue(ConfidenceReason.HOUSEHOLD_UNIT_DEFAULT in dal.confidence.reasons)
+        assertTrue(ConfidenceReason.QUANTITY_STATED !in dal.confidence.reasons)
+        assertEquals(ConfidenceBand.ROUGH, dal.confidence.band)
+        // The plate's figures are as rough as their roughest item, never better.
+        plate.figures.forEach { assertEquals(ConfidenceBand.ROUGH, it.confidence.band) }
     }
 
     @Test

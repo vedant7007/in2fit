@@ -210,6 +210,15 @@ sealed interface OrchestratorEvent {
          * Ira's ask of 20 Sep 23:34; defaulted so a feed that has no grams still compiles.
          */
         val grams: List<Double?> = emptyList(),
+        /**
+         * The resolved items, one per [ParsedMeal.items] in the same order, exactly as the
+         * resolver built them (`LookupMealResolver.one()` makes one per parsed item): the name
+         * as shown, the grams, the per-item nutrients, the source and the reasons, with the
+         * amount as said on the parsed item beside it. Supersedes [grams]. Added by Arjun
+         * 21 Sep 07:33 with its default so the entry and the feed can carry it; the emit line
+         * that fills it is Rao's.
+         */
+        val items: List<ResolvedItem> = emptyList(),
     ) : OrchestratorEvent
 
     /** The meal is on the timeline. Emitted on LOG and on nothing else. */

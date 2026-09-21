@@ -7,6 +7,7 @@ import io.github.vedant7007.katori.domain.LabValue
 import io.github.vedant7007.katori.domain.LifeContext
 import io.github.vedant7007.katori.domain.MealItemSnapshot
 import io.github.vedant7007.katori.domain.MealSnapshot
+import io.github.vedant7007.katori.domain.ResolvedItem
 import io.github.vedant7007.katori.domain.Orchestrator
 import io.github.vedant7007.katori.domain.OrchestratorEvent
 import io.github.vedant7007.katori.domain.OrchestratorEvent.Progress
@@ -26,8 +27,10 @@ import io.github.vedant7007.katori.domain.model.ConfidenceReason
 import io.github.vedant7007.katori.domain.model.ConfidenceRules
 import io.github.vedant7007.katori.domain.model.DataSource
 import io.github.vedant7007.katori.domain.model.Nutrient
+import io.github.vedant7007.katori.domain.model.NutrientProfile
 import io.github.vedant7007.katori.domain.model.NutrientTotal
 import io.github.vedant7007.katori.domain.model.NutrientUnit
+import io.github.vedant7007.katori.domain.model.NutrientValue
 import io.github.vedant7007.katori.domain.model.NutritionFigure
 import io.github.vedant7007.katori.domain.model.UnavailableReason
 import kotlinx.coroutines.delay
@@ -128,12 +131,14 @@ class ScriptedOrchestrator(
         }
         emit(Progress(Stage.COMPUTING)); delay(300)
         val parsed = ParsedMeal(
-            items = items.map { ParsedItem(it.spoken, it.quantity, it.unit, it.foodCode, ConfidenceRules.of(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.QUANTITY_STATED)) },
-            confidence = ConfidenceRules.of(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.QUANTITY_STATED),
+            items = items.map { ParsedItem(it.spoken, it.quantity, it.unit, it.foodCode, it.confidence) },
+            confidence = ConfidenceRules.combine(items.map { it.confidence }),
             rawTranscript = text,
         )
         val figures = totals(items)
-        emit(OrchestratorEvent.MealResolved(parsed, figures, hypothetical = !save))
+        // `items` is what the real orchestrator emits (the contract, 21 Sep): one resolved item
+        // per parsed item, the same order; the dal's carries 0035's assumed katori.
+        emit(OrchestratorEvent.MealResolved(parsed, figures, hypothetical = !save, items = items.map { it.resolved }))
         val now = Instant.now()
         val snapshot = MealSnapshot(mealId = if (save) 1L else 0L, items = items.map { it.snapshot }, loggedAt = now)
         if (save) {
@@ -218,15 +223,25 @@ class ScriptedOrchestrator(
         }
     }
 
-    private class Item(val spoken: String, val quantity: Double, val unit: String, val foodCode: String, val displayName: String, val grams: Double, val per100: Map<Nutrient, Double>) {
+    private class Item(
+        val spoken: String, val quantity: Double, val unit: String, val foodCode: String, val displayName: String, val grams: Double,
+        val per100: Map<Nutrient, Double>,
+        /** The item's reasons, as the resolver would set them; a served dish with no amount said is 0035's. */
+        val reasons: List<ConfidenceReason> = listOf(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.QUANTITY_STATED),
+    ) {
         val nutrients get() = per100.mapValues { it.value * grams / 100.0 }
         val snapshot get() = MealItemSnapshot(displayName, foodCode, grams, nutrients)
+        val confidence get() = ConfidenceRules.of(reasons)
+        val resolved get() = ResolvedItem(
+            snapshot, DataSource.USDA_SR_LEGACY,
+            NutrientProfile(nutrients.mapValues { (n, v) -> NutrientValue.Measured(v, n.unit) }), confidence,
+        )
     }
 
     private fun totals(items: List<Item>): List<NutritionFigure> = Nutrient.entries.map { n ->
         NutritionFigure(
             total = NutrientTotal(n, items.sumOf { it.nutrients[n] ?: 0.0 }, n.unit, Completeness.COMPLETE, emptyList()),
-            confidence = ConfidenceRules.of(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.QUANTITY_STATED, ConfidenceReason.AUTHORED_REFERENCE_RECIPE),
+            confidence = ConfidenceRules.combine(items.map { it.confidence } + ConfidenceRules.of(ConfidenceReason.AUTHORED_REFERENCE_RECIPE)),
             sources = listOf(DataSource.USDA_SR_LEGACY),
         )
     }
@@ -234,7 +249,8 @@ class ScriptedOrchestrator(
     companion object {
         /** The presenter's sentences, `data-authoring/demo-utterance-set.csv` ids 2, 7, 8, 9. */
         val SENTENCES = listOf(
-            "Two rotis, a katori of dal, and I used two spoons of oil." to SpokenIntent.LOG,
+            // Row 1 of the set is FROZEN: the plate is two rotis, said, and dal with no amount said (0035).
+            "I had two rotis and a little dal." to SpokenIntent.LOG,
             "How much protein was in my lunch?" to SpokenIntent.ANSWER,
             "I'm having rice and dal, what should I add?" to SpokenIntent.SUGGEST,
             "I have anaemia, what should I eat for iron?" to SpokenIntent.RECOMMEND,
@@ -246,15 +262,18 @@ class ScriptedOrchestrator(
             Nutrient.FIBRE to fibre, Nutrient.IRON to iron, Nutrient.VITAMIN_B12 to b12, Nutrient.SODIUM to sodium,
         )
         private val ITEMS = listOf(
-            Item("roti", 2.0, "piece", "chapati", "Chapati / roti", 80.0, g(258.0, 8.6, 49.0, 3.6, 5.0, 1.6, 0.0, 300.0)),
-            Item("dal", 1.0, "katori", "toor_dal_tadka", "Dal tadka", 150.0, g(110.0, 6.0, 15.0, 3.0, 3.5, 1.4, 0.0, 250.0)),
-            Item("oil", 2.0, "spoon", "sunflower_oil", "Sunflower oil", 10.0, g(884.0, 0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0)),
+            Item("roti", 2.0, "piece", "chapati", "Chapati / roti", 90.0, g(258.0, 8.6, 49.0, 3.6, 5.0, 1.6, 0.0, 300.0)),
+            // "a little dal": no amount said, so the katori and its 180 g are ours and the band is Rough (0035).
+            Item(
+                "dal", 1.0, "katori", "toor_dal_tadka", "Dal tadka", 180.0, g(110.0, 6.0, 15.0, 3.0, 3.5, 1.4, 0.0, 250.0),
+                reasons = listOf(ConfidenceReason.EXACT_FOOD_MATCH, ConfidenceReason.QUANTITY_INFERRED, ConfidenceReason.HOUSEHOLD_UNIT_DEFAULT),
+            ),
             Item("rice", 1.0, "plate", "rice_cooked", "Cooked rice", 200.0, g(130.0, 2.7, 28.0, 0.3, 0.4, 0.2, 0.0, 1.0)),
         )
-        private val ROTI_AND_DAL = ITEMS.take(3)
+        private val ROTI_AND_DAL = ITEMS.take(2)
         /** Foods the shipped database does not hold, for the Confirm card. */
         private val UNKNOWN_FOODS = listOf("quinoa", "kale", "tofu")
-        private val RICE_AND_DAL = listOf(ITEMS[3], ITEMS[1])
+        private val RICE_AND_DAL = listOf(ITEMS[2], ITEMS[1])
 
         private val PROFILE = ProfileSnapshot(
             ageYears = 22, weightKg = 62.0, heightCm = 168.0, sex = null, goal = null,

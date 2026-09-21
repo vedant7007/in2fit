@@ -61,7 +61,7 @@ import io.github.vedant7007.katori.domain.model.ConfidenceBand
         HouseholdRecipeEntity::class,
         HouseholdRecipeIngredientEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(KatoriConverters::class)
@@ -108,8 +108,24 @@ abstract class KatoriDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Version 2 to 3: the profile's name, activity level and speech language (21 Sep). Three
+         * nullable columns added; every existing row keeps every value it had. The statements
+         * are a list so `ProfileMigrationTest` runs the SAME SQL over a populated v2 database
+         * on the JVM and checks the result against the exported `3.json`.
+         */
+        val MIGRATION_2_3_SQL = listOf(
+            "ALTER TABLE `profile` ADD COLUMN `name` TEXT",
+            "ALTER TABLE `profile` ADD COLUMN `activity` TEXT",
+            "ALTER TABLE `profile` ADD COLUMN `speech_language_tag` TEXT",
+        )
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) = MIGRATION_2_3_SQL.forEach(db::execSQL)
+        }
+
         /** Every migration, in order. AppModule passes this to the builder. */
-        val MIGRATIONS = arrayOf<Migration>(MIGRATION_1_2)
+        val MIGRATIONS = arrayOf<Migration>(MIGRATION_1_2, MIGRATION_2_3)
     }
 }
 

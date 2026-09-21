@@ -103,6 +103,19 @@ data class ProfileEntity(
     val life_context: String?,
     val diet_type: String?,
     val updated_at_epoch_ms: Long,
+    // Version 3 (21 Sep). Every field here is DECLARED BY THE USER at first run or in settings and
+    // never inferred: that is the row's source, the same for every column, so it carries no
+    // source column. Absent means not stated; a screen shows nothing for it, never a default.
+    /** What the person asked to be called. Null: the greeting has no name in it. */
+    val name: String? = null,
+    /** Activity level, an enum name once Priya's target rule names the levels; stored verbatim until then. */
+    val activity: String? = null,
+    /**
+     * The language the person speaks to the app in (spec 10.2: chosen, never detected), exactly a
+     * `SpeechLanguage.tag`: "te", "hi" or "en-IN". THE ONE HOME of the setting (21 Sep 07:33);
+     * null reads as Hindi, the default ruled 21 Sep, in `ProfileStore`, not here.
+     */
+    val speech_language_tag: String? = null,
 )
 
 /**
