@@ -4955,3 +4955,10 @@ is off and Nila hears the day before), storage and the models.
 NILA: every number the deck claims is the realme's until block 0 runs; a slide that says a time
 should say "realme RMX3780" or nothing. Demo suite 457, 0 failures; demo, androidTest and full
 APKs build.
+
+[Arjun 12:29] CLAIMING 0037, 0038, 0039 for three records of today's system-side rulings, files
+in the next landing: 0037 a setting has one home (the speech language on the profile row, an
+appearance preference in a preference file, never both); 0038 a marker explanation says what the
+marker measures and nothing else (the file, the aliases, the test that refuses a digit, a unit
+or a condition word); 0039 a schema version is never changed in place once it has landed (the
+two shapes of v3 and the tolerant 3 -> 4 that repairs it).
