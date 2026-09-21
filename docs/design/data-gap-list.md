@@ -258,3 +258,47 @@ and the counts. You: age, weight, height, goal kind, conditions, speech language
 units, the offline fact, version, help. First run: language → about you → conditions → report
 (optional) → mic → ready. Empty, deliberately: the greeting's name, the ring's goal, water,
 nudges, streaks, reminders, per-food advice, marker explanations, the weekly summary, accounts.
+
+---
+
+## Overrides, ruled 21 September, so nobody re-adds them from the design
+
+Vedant's rulings on the fourteen, and two amendments. Each is one line and one reason. The
+visual treatment of every overridden element stays exactly as drawn; only what it says or
+where it gets its words changes.
+
+### The network seven (the demo build has no INTERNET permission, 0004; the whitelist is three)
+
+| as drawn | built as | reason |
+| --- | --- | --- |
+| Phone number → OTP → account | The welcome page pixel for pixel; "Sign in" shows one honest sentence (a prototype, no account is created, nothing leaves the phone) and goes straight in; the profile-details step happens locally in the OTP screen's slot | no SMS, no server; amendment 1 |
+| "I already have an account" | The same one-sentence notice, then in | no accounts |
+| Sign out | Removed; the row's slot is empty | no accounts |
+| Cloud sync / "On-device mode" toggle | Removed, no disabled switch; the same slot carries the offline statement the product makes | a toggle implies a cloud mode that does not exist |
+| Share with Dr. … · Monthly | An Android share sheet handing over a file the app generated on the device | no upload; the permission set must stay the three (`verifyDemoDebugPermissions`) |
+| Contact support · Chat | Cut; the row becomes a Help page built from content shipped in the app | no network |
+| "Keep your log across devices" | Cut | no server |
+
+### The clinical seven (spec 15.1; 0018; rule 14)
+
+| as drawn | built as | reason |
+| --- | --- | --- |
+| Flags "Prediabetic", "Low", "Slightly high", "Normal" | Same chip, colour, position; the words are the report's: "above the range printed on your report", "below the printed range", "within the printed range" | the app never originates a judgement; attribution is what makes it safe, not a disclaimer |
+| "6.4 % · prediabetic range" | "6.4 % · above the printed range" | as above |
+| A report's comments or impression | Shown in quotation marks as "Your report says: <exact words>" **only once `LabReport.comments` exists** (Priya; today the extractor reads value rows and the date only) | the report speaking, the app repeating |
+| "IFCT 2017 food table" | `DataSource.displayName` (USDA SR Legacy / Foundation / the authored recipe) | not licensed to name IFCT; hard rule 14 |
+| "Mixed" speech | Removed from the language list | one checkpoint per chosen language, 0022 |
+| "Speech and replies" | "Speech" | replies are English whatever is spoken, 0019 addendum 7 |
+| The coach's typing dots | The stage list with its name and counter | no spinner without a name and a number, 0026 |
+
+### Also ruled
+
+- Every digit in IBM Plex Sans whatever face the design sets it in; the label may be Instrument
+  Serif, the number is Plex at the same optical size (tabular digits do not jitter on a projector).
+- The safety wording appears wherever a reading or a suggestion appears, in the design's style;
+  it is the attribution, not the disclaimer, that makes a reading safe.
+- Targets are computed by the rules engine from the profile, never by the model; the shape is
+  in COORDINATION (21 Sep) and the home components are built against it and render empty until
+  it lands.
+- System notifications need `POST_NOTIFICATIONS`; nudges are an in-app list unless Vedant adds
+  the permission with a written reason.
