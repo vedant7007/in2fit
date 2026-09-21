@@ -4854,3 +4854,44 @@ the last meal, no ring fill and no "/ target" anywhere (Priya's rule is not in);
 water twice: 0.5 appears, survives a kill and reopen; (34) after Rao's Beat 1 with a rule fired:
 the nudge card carries the engine's sentence and "Ask about this" opens Coach.
 NEXT, NOW: You (5) with the dark/cream switch and the language; then Welcome and first run (6).
+
+[Arjun 12:25] LANDING FIVE, UNPROVEN: THE PDF INPUT, THE V3 CRASH IRA FOUND, AND MY QUEUE AS ONE
+SCRIPT. Rebased on Ira's `5b77e88`; demo 459/0/0 (XML 06:48Z), full 460/0/0 (06:51Z), demo and
+demo-androidTest APKs build, whitelist exactly CAMERA + RECORD_AUDIO.
+(1) THE PDF INPUT, Ira's (ac), built as Vedant asked rather than deferred. `ml/vision/PdfPages`:
+the platform's `PdfRenderer` renders up to three pages at ~200 dpi on white (a PDF page's
+transparent background renders black and reads as nothing), into the SAME `FrameStore`, the SAME
+`MlKitOcrEngine` and the SAME `LabReportExtractor` as a photograph; `LabReportExtractor.merge`
+makes the pages one report (a row a summary page repeats verbatim once, a repeat sample kept,
+the first date wins; `LabReportExtractorTest`). `ScanViewModel.pdf(uri)`; `ui/PdfPick.kt`:
+`PdfPickButton(onPicked = vm::pdf)` opens the system document picker for `application/pdf`, one
+file's read granted by the picker, NO permission, NO library. A password-protected file, a
+non-PDF, a blank page: each named, never guessed around. IRA: I put the button on the OLD Scan
+screen (two lines in `ScanScreen.kt`, yours; logged here as the per-file rule asks: with the
+camera, and INSTEAD of the camera when its permission is refused, since a PDF needs none). For
+v2, drop `PdfPickButton(onPicked = scanVm::pdf)` beside "Add report"; nothing else is needed.
+(2) THE CRASH IRA FOUND AT 11:55 IS MINE AND IS FIXED FOR BOTH SHAPES: `da67d04` shipped
+version 3 with three profile columns; `d6efa54` put two more columns into the same version 3.
+A database opened by the first build is at 3 without them, Room refuses it with no migration
+to run, and the app does not open, which is the failure Vedant named as the only one worse than
+a slow answer. Now `KatoriDatabase.migrate3To4` adds `meals.source` and `meal_items.
+display_name` WHEN MISSING (checked by `PRAGMA table_info`, because `ADD COLUMN` is not
+idempotent) before the three v4 tables, so both v3 shapes arrive at the exported v4;
+`ProfileMigrationTest` (4 tests) now runs the first shape with rows through it, then runs the
+migration a second time and shows nothing duplicated. The realme never opened da67d04, so 2 -> 3
+-> 4 runs there in one open; the emulator would have opened with this build without the wipe.
+(3) MY QUEUE ITEMS ARE ONE SCRIPTED RUN, queue item 36: `tools\arjun-checks.ps1` (default adb
+server only, refuses a second server, stops the app, runs `ArjunDeviceChecksTest` against the
+phone's OWN database file through the app's migrations, prints every `ARJUN-CHECK <item>
+PASS|FAIL …` line with the numbers it saw, log in `logs/arjun-checks-*.txt`). It covers 10/24,
+11, 13 (Diary's day figures EQUAL the context source's TODAY figures, so a card and ANSWER cannot
+disagree), 14/26 (a two-item meal it writes and removes), 15, 25 (writes then restores), 27, 28,
+and 35 (draws a PDF, renders it, reads it with ML Kit ON THE DEVICE, extracts Haemoglobin 9.8
+[13-17]). Every row it writes it deletes; the diary is read, never left changed. RAO: run 36
+first among mine, before any by-eye item; what remains by eye is 11's tap (choose Telugu, kill,
+reopen) and 12/19's plate through the sheet. VEDANT'S HIGH ITEM, the migration on the actual
+device with real rows: 36's first line is exactly that, and if Room refuses the file the run
+fails on it by name before anything else.
+NEXT: Ira. `TodayViewModel`, `ReportsViewModel` and `DiaryViewModel` are bound; Trends, Search,
+You and first run are not. Ira, name the shape you are on and I come to it; if none is waiting
+on me I take Trends' summary card's binding myself in your file only on your word.
