@@ -18,6 +18,64 @@ re-threads the live model before the next call, and the `katori-llama: generate:
 line says which count each number was made at; `settings delete global katori_llama_threads`
 returns to 8.
 
+## Block 0: the cold phone (runs first on the iQOO, before anything else is attempted on it)
+
+Every number the team holds is the realme's. The demo handset is an iQOO collected on the day:
+different chip, thermal curve, skin and housekeeping, and it starts with no profile, no diary
+and no report. This block turns it into the demo's starting state and measures that state; the
+rest of the queue runs against the realme until the iQOO exists.
+
+`powershell -File tools\cold-phone.ps1` (add `-Report` for the Beat 3 fallback report; see the
+card below for the three steps that need a thumb). It runs, with a check after each: the link
+(USB debugging authorised, default server, arm64, API >= 29 for the transliteration), the
+platform voice data (a card: needs a network, so before the radios go off), install of the demo
+and test APKs (three tries), microphone and camera permissions (`pm grant`, and a card when the
+skin refuses it as ColorOS does), the models (`stage-models.ps1`, then the five files checked
+present and non-empty), THE SEED through the app's own stores (`DemoSeedTest`: the profile at
+19 / 62 / 172 with speech Hindi, six meals on six days through the real resolver and
+`RoomMealStore.save`, the report only with `-Report`), radios off, the app launched and its own
+0032 warm-up reported in logcat (`katori-warmup: llm … asr … tts … total …`), and the pre-flight,
+ending READY or WAIT. The last line is the total time.
+
+| 0.# | What | Status |
+|-----|------|--------|
+| 0.1 | `cold-phone.ps1` on the iQOO, end to end, once, and the TOTAL line written here | UNPROVEN. Dry run on the emulator 21 Sep 12:17: steps 0-6 ran (install 23 s, seed 13 s, radios 3 s) and step 7 could not, the emulator kills the model at 2.3 GB; the models step is unmeasured on any phone (`stage-models.ps1` has never run on one; 1.6 GB at the realme's 6.3 MB/s is about 4.5 min). Estimate for a cooperative phone: 6-8 min of script plus 3-6 min of thumbs (voice data on a network, permission taps), so 10-15 min: before the judges if the phone is in hand 30 min early, in front of them if not |
+| 0.2 | The first sixty seconds as the judges see them: open the app on the seeded phone, Home/Diary/Talk each once; nothing empty where the seed says there is data | UNPROVEN |
+| 0.3 | The iQOO's own pre-flight numbers, three runs ten minutes apart: what READY looks like on THIS phone | UNPROVEN |
+| 0.4 | The thread count on the iQOO: hi_07 through the microphone at `katori_llama_threads` 8, 6, 4, two each, in one session (about 6 min); the count with the best warm figure is the day's | UNPROVEN |
+| 0.5 | The thermal shape: the four beats in order, twice, thermal status read before each; if status reaches 2 before Beat 3, the LOG beats move apart or the phone rests between rehearsals | UNPROVEN |
+| 0.6 | The memory ceiling: `preflight` prints the app's PSS; `HardwareProbeTest` prints the arbiter's ceiling; if the ceiling is under ~3.5 GB the co-residency of LLM + hi + voice is the thing to run first, and the sign it broke is a `lowmemorykiller` line naming the app (the emulator's failure), not a slow turn | UNPROVEN |
+| 0.7 | Jacob's row on the iQOO's microphone: `AsrDeviceTest.b` twice (cold, warm), and Beat 1 through the microphone three times | UNPROVEN |
+
+The card for the thumb, in order, printed by the script at the moment each is needed:
+
+1. USB debugging: on the phone, "Allow USB debugging?" -> tick "Always allow" -> Allow. On a
+   vivo/iQOO skin also Developer options -> "Install via USB" ON and "USB debugging (Security
+   settings)" ON (it may ask for a vivo sign-in; do it on the network, before airplane mode).
+2. Voice data: Settings -> System -> Languages & input -> Text-to-speech output -> Speech
+   Services by Google -> gear -> Install voice data -> Hindi (India) and English (India). Both
+   must say Installed. Then Enter on the laptop.
+3. Permissions, only if the script says the skin refused `pm grant`: in IN2FIT press and hold
+   the microphone once -> Allow -> let go; Scan report tab -> Allow. The script continues by
+   itself the moment both are granted.
+
+## What might be different on the iQOO, and what we do about each
+
+| Difference | What we measure first | The action |
+|------------|-----------------------|------------|
+| Thread count (a different core layout; the realme's 8 threads may be wrong here) | 0.4: hi_07 at 8 / 6 / 4 threads, two runs each, in one session; the `generate: threads N` line names each number | The best warm figure's count goes into the run of show as `adb shell settings put global katori_llama_threads N` on the day's checklist; if 8 wins, nothing changes |
+| Thermals (throttles sooner or later; the realme reached status 3 on the third LOG) | 0.5: the beats in order twice with `dumpsys thermalservice` read before each | If status reaches 2 before Beat 3: rest the phone five minutes between rehearsals, and do not rehearse Beat 1 more than once in the last fifteen minutes; if it reaches 3 on the first pass, Beat 1 goes last in rehearsal and the phone sits face-up off the table |
+| Memory ceiling (the realme's is 4.39 GB; the warm-up now loads the LLM at launch) | 0.6: the arbiter's ceiling and the PSS after warm-up; the sign of trouble is a `lowmemorykiller` line naming the app | Under ~3.5 GB: warm only the LLM and the hi recogniser (drop the voice from the warm-up), and if it still dies, the launch warm-up is turned off for the day and row 9 goes back to a person running a sentence |
+| The skin's opinion of background apps (ColorOS's athena killed a pass at 2 GB; Funtouch/OriginOS has its own) | 0.1 and 0.3: whether the app survives ten idle minutes with the model resident (pre-flight's PSS line, three runs) | On a fresh iQOO before anything else: battery optimisation OFF for IN2FIT, "allow background activity", autostart ON if the skin has it, and every pre-installed social app force-stopped (Instagram restarted itself after every reboot on the realme); if the app is still killed while idle, the presenter reopens it two minutes before the table and the warm-up covers the reopen |
+| The microphone and the speaker (every ASR number is one microphone's; the platform voice is a different install) | 0.7: `AsrDeviceTest.b` cold and warm, and Beat 1 through the microphone three times; `TtsVoiceProbeTest` for the voices | Trusted across devices: the recogniser's accuracy on the clips (the model is the model) and the endpointer-free push-to-talk logic. NOT trusted: the cold/warm milliseconds, the first-word clipping (`AudioRecord` start latency is per device), the gain (a quieter mic changes the voiced-span onset: watch the `SpeechStarted` timing and the `not speech` refusals), and the platform voice's availability. If Beat 1 through the microphone fails twice where the typed row passes, the microphone is the difference and the hold gets a full second before the first word |
+| The Android version (the transliteration needs API 29; the realme is 15) | Step 0 of the script prints the API and says so | Below 29 the model reads Devanagari again and Beat 1 in Hindi is back to unproven: the Hinglish typed row is the fallback, and Nila is told the day before |
+| Storage and the models (1.6 GB over a cable that may drop) | 0.1's models step, timed | `stage-models.ps1` is chunked and resumable by design and unproven on any phone; if it dies twice, the LLM goes over first alone and the rest after, and the time is written down |
+
+Nothing above makes the realme's numbers the iQOO's. Anything the deck claims says which
+handset produced it; Nila has the list of what does not (COORDINATION, 21 Sep).
+
+## The realme queue
+
 | # | What | How | Proves | Status |
 |---|------|-----|--------|--------|
 | 1 | Task 1, the 68 s ANSWER, through the UI | hi_07 through the laptop's speakers, `measure_case.ps1` shape (thumb = DOWN/UP in one device shell), four warm runs after one cold; `logcat` now carries one `katori-llama: generate: wall … prompt … gen …` line per model call; sample `top -p <pid>` and `dumpsys thermalservice` every 2 s alongside | whether the 68 s is real and repeatable, and whether it is the model call (the log line) or around it | UNPROVEN; the log line landed 21 Sep |

@@ -4921,3 +4921,37 @@ is its one home (the one-home rule forbids TWO homes, not a preference file). If
 field the row does not have, name it and I add the column and the migration within the hour
 (the 3 -> 4 pattern; five is fine). I am free now: say "Trends" or "Search" and I bind it in
 your file on your word, or I stay out.
+[Rao 12:35] THE COLD PHONE, AS A SCRIPT, AND THE IQOO LIST. LANDED AND UNPROVEN on any phone.
+`tools/cold-phone.ps1`: from never-seen-this-app to demo-ready, one run, a check and a time after
+every step: the link (USB debugging, default server, arm64, the API for the transliteration), the
+platform voice data (a card, before the radios go off), install (three tries), microphone and
+camera permissions (`pm grant`, and a card when the skin refuses it), the models
+(`stage-models.ps1`, five files checked), THE SEED THROUGH THE APP'S OWN STORES (`DemoSeedTest`:
+the profile 19 / 62 / 172 with speech Hindi through `ProfileStore.save`, six meals on six days
+through the real resolver and `RoomMealStore.save(meal, at)`, the report only with `-Report`,
+nothing written behind a store's back), radios off, the app launched and its own warm-up
+reported, then the pre-flight, READY or WAIT, and the TOTAL. Dry run on the emulator: steps 0-6
+ran (install 23 s, seed 6 of 6 meals in 13 s, radios 3 s); step 7 could not, the emulator kills
+the model at 2.3 GB. TIME: unmeasured on a phone; the models step alone is about 4.5 min at the
+realme's 6.3 MB/s and `stage-models.ps1` has never run on one; estimate 6-8 min of script plus
+3-6 min of thumbs (voice data on a network, permission taps), so 10-15 min: before the judges if
+the iQOO is in hand thirty minutes early, in front of them if not. That is queue item 0.1, and
+the first thing that happens to the iQOO.
+THE WARM-UP IS NOW THE APP'S OWN (0032, the engine side): `KatoriApp` starts `WarmUp` off the
+main thread at launch, LLM (one token from a two-word prompt), the recogniser for the profile's
+language, the voice, each through its own lease, and logs `katori-warmup: llm N ms, asr N ms,
+tts N ms, total N ms`. ARJUN: `WarmUp.ready` is a StateFlow for the "getting ready" state and
+the microphone that refuses, never queues, before it; that half is yours. The launch now maps
+1.1 GB on every start: on a low-ceiling phone the sign it broke is a `lowmemorykiller` line
+naming the app, and the fallback is written in the queue.
+THE IQOO LIST is in `docs/demo/device-queue.md` under block 0, one row per difference with the
+measurement first and the action beside it: thread count (0.4, one session at 8/6/4), thermals
+(0.5, the beats twice with status read before each; status 2 before Beat 3 changes the
+rehearsal order), memory ceiling (0.6; drop the voice from the warm-up, then the warm-up), the
+skin (battery optimisation off, autostart on, social apps force-stopped, the reopen covered by
+the warm-up), microphone and speaker (0.7; accuracy on the clips transfers, milliseconds,
+first-word clipping, gain and the platform voice do not), the API (below 29 the transliteration
+is off and Nila hears the day before), storage and the models.
+NILA: every number the deck claims is the realme's until block 0 runs; a slide that says a time
+should say "realme RMX3780" or nothing. Demo suite 457, 0 failures; demo, androidTest and full
+APKs build.
