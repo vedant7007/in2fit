@@ -4228,3 +4228,70 @@ typing dots (0026); the reply's budget arithmetic; the learned katori; the weekl
 gym days nobody logs. Build order stands: Talk and the voice flow, Reports, Home with only the
 produced and derivable rows, Settings with light/dark and the language, first run. The current
 screens stay working until each new one is proven on the device; nothing is deleted.
+[Rao 07:25] PUSH-TO-TALK IS WIRED AND PROVEN ON THE REALME, BEAT 1 IN HINDI IS NOT, AND THAT
+IS THE FINDING. Landed this commit: the two lines (spoken() collects pushToTalk.hold, SpeechStarted
+-> MicrophoneLive; EndSpeech -> release()), Priya's one line (NutrientWords, AnswerFiguresDefectsTest
+green, 427 JVM tests 0 failures), and two things the phone found on the way.
+ARJUN, YOUR BUTTON: on the first device run every hold ran to the 30 s cap. `MicButton` keyed its
+gesture on `enabled`, the press flips `enabled` (the turn goes busy), and `pointerInput(enabled)`
+restarted mid-gesture, so `tryAwaitRelease` never returned and `onRelease` never fired. Fixed in
+Mic.kt: `rememberUpdatedState(enabled)`, key on Unit. Your two tests could not see it (one reads
+the source, one drives the view-model); it needed a thumb.
+JACOB, YOUR CLIP: a hold is the thumb's, not the sentence's. Five silent seconds under babble and
+then the sentence: the recording held (only the release ended it) and the engine refused it, "16
+pieces in 11220 ms (1.4/s) is not speech", because the density guard divides by the whole hold.
+`PushToTalk` now hands the recogniser the voiced span (energy-floor onset less pre-roll, to the last
+frame above threshold plus hangover; never inside a word; whole clip when there is no onset).
+The same sentence then read exactly from a 4.0 s span of an 11.1 s hold. One JVM test pins it.
+THE FOUR CHECKS, real room, the laptop's speakers saying Vedant's own recorded Hindi clips into the
+phone, the on-screen button held by injected DOWN/UP on the device clock, logcat for the timeline,
+screenshots for the cue:
+  a. PASS. hi_09 with 1.5 s of silence cut into its middle, held 9.2 s: transcript "मेरे खून में आयरन
+     कम है मुझे क्या खाना चाहिए", both halves; the recording ran the whole hold.
+  b. PASS. Six-talker babble 10 dB under the voice, 5 s of nothing, then hi_07, held 11.1 s:
+     AudioRecord start 59.649 -> stop 27.206 (only the release at 26.80 + 300 ms tail ended it);
+     transcript "मेरे लंच में कितना प्रोटीन था", exact.
+  c. PASS. Touch-down at 21.037; at +126 ms the button is greyed "Hold to speak" (not lit);
+     MicrophoneLive at +328 ms (AudioRecord.start at +144 ms, first non-zero frame +184 ms later);
+     at +1.99 s "Listening…"; 150 ms after TRANSCRIBING began it is dark again.
+  d. PASS. A 37 s hold with hi_06 at 2 s: the cap ended the recording at 30.0 s + 0.3 s tail
+     (AudioRecord.stop at +30.53 s) with the thumb still down. WHAT THE USER SEES: at 29 s
+     "Listening…" and the stage "Listening 29 s"; at 31.5 s the button greys and the stage reads
+     "Writing down what you said 1 s" while the thumb is still down; at 36 s the transcript card
+     and "Answering" are up; the release at 37 s is accepted and releases nothing. One of three
+     runs came back with the sentence transcribed twice from a 21.2 s voiced span (a second sound
+     reached the phone that time; not reproduced in the two runs after, one of which a foreign
+     touch on the left edge cut at 8.5 s: a cancelled gesture also ends the hold and keeps the
+     clip, as it should).
+THE TYPED PAIR. "I ate two chapatiis" logged Chapati / roti with the full plate. Then the
+screenshot's sentence, exact, comma and all: "I said that I ate two chapatiis, can you tell me the
+nutritional information of it" -> Answer on the device: "The nutritional information of two
+chapatiis is 49.2 g of carbohydrate, 232.3 kcal of energy, 1.7 g of fat, 7.3 g of fibre, 2.5" (cut
+there by the SHORT cap; PRIYA, that is yours). Real figures, no refusal.
+BEAT 1 IN HINDI DOES NOT WORK ON THE PHONE. The run of show freezes "मैंने दो रोटी और थोड़ी दाल
+खाई" and cites 9.2 / 19.0 s under it; those were measured on the ENGLISH row (e2e-demo-condition
+row #1 is "I had two rotis and a little dal."). Through the microphone the transcript was EXACT and
+the extraction came back "डॉटरी: 2", twice; typed into the rig (`OrchestratorDeviceTest.d_hindiLogRows`,
+`logs/e2e-hindi-rows-20260921-0714.txt`): row 1 "डॉटरी: 2" again, row 2 "two rotis=null, one
+kadha, two chhambchis" (NO_MATCH), row 5 "एक प्लेट चावल, दाल और एक कटोरी दही" RESOLVED (rice, dal,
+curd, plate 13.5 s, spoken 27.0 s), and Beat 1 in roman Hinglish "maine do roti aur thodi dal
+khayi" RESOLVED (roti -> chapati, thodi dal -> toor_dal_tadka, plate 11.9 s, spoken 21.6 s). The
+recogniser writes Devanagari; the 1.5B model reads it badly. PRIYA and JACOB: this is the demo's
+first beat. Either the extraction prompt learns Devanagari, or the transcript is transliterated
+to roman before the model sees it (the roman path works), or Beat 1 is spoken in English. NILA:
+the run of show's Beat 1 numbers are unmeasured for the sentence it freezes.
+NUMBERS WITH THE MICROPHONE IN THE PATH (Hindi speech, this build, after a reboot, thermal 0,
+loadavg ~20 with 1 runnable throughout): ANSWER hi_07, cold process: release -> transcript 2.84 s,
+-> own figures 3.09 s, -> answer 23.3 s (model load inside), spoken 26.1 s. Warm: release ->
+transcript 1.07 s, -> own figures 1.35 s, -> answer 68.1 s (PHRASING alone 66.4 s; the 00:38 pass
+read 9.7-10.2 s for the same intent without the UI; I do not know why and did not chase it).
+RECOMMEND hi_09: transcript 1.24 s, own figures 1.52 s, then phrased=null at 28.2 s (the refusal
+Priya owns, third time tonight). LOG Beat 1 (Hindi): transcript 2.65 s cold / 0.55 s warm after
+the release, then extraction 23.6 s cold / 9.0 s warm, then NeedsConfirmation, no plate. The
+ANSWER figure the deck needs is the roman or English path's; the Hindi mic path has no plate
+number to give. The pass script itself cannot hold a real microphone (it drives the orchestrator);
+these are the numbers.
+HAZARDS: the model stalled at 0 % CPU once more (46 s of CPU then nothing; reboot cleared it);
+Instagram restarts itself after every reboot on this phone; `input text` cannot type Devanagari
+(the rig can). The phone's diary now holds tonight's test meals (chapatiis 06:43, and the rig's are
+in-memory). The clean build (no diagnostics) is installed, 07:21:38.
