@@ -4504,3 +4504,59 @@ NEXT: v4, the new tables (water, weight history, reminders) with the same migrat
 the marker-explanations file and the weekly summary as shipped content. MEAL SLOTS: deferred to
 Priya's (l) ruling; by-hour is a derivation from `loggedAt`, "no slots" is nothing, neither
 needs a column, so none is added today.
+[Rao 08:40] LANDED AND UNPROVEN (the phone is away until this evening): the Devanagari-to-roman
+hop before the model, the per-call model log line, and THE DEVICE QUEUE at
+`docs/demo/device-queue.md`, one list, in run order, mine. Every device-dependent thing from
+here goes on it, and stays "LANDED AND UNPROVEN" until its line carries a date and a log.
+TASK 2, TRANSLITERATION. Scheme: ICU's `Devanagari-Latin` transform, which is ISO 15919 and
+ships in the platform as `android.icu` (API 29+; the demo phones are on 15). NOT a dependency in
+the app; icu4j 75.1 is a `testImplementation` only, so the JVM runs the same transform ID. What
+ICU cannot know is how a Hindi speaker spells the result: ISO writes every inherent vowel
+("iḍalī", "dāla", "sāmbara") and marks with diacritics. `HinglishSpelling` is the second step,
+pure and tested word by word: apostrophes ICU adds for reversibility go; c/ś/ṣ -> ch/sh; the
+nukta flap ड़ -> d (thodi, pakoda); the anusvara before p/b/m is m (ICU already does this: सांबर
+comes out sāmbara), elsewhere n; the candrabindu (m + U+0310) reads as the anusvara; schwa
+deletion runs BEFORE the marks fold, so only the inherent a is ever a candidate: the final one
+goes (dāla -> dal, never dosā -> dos), a medial one between two vowelled consonants goes (iḍalī ->
+idli, caṭanī -> chatni); then the marks fold (ā ē ī ō ū ṭ ḍ ṇ). Wired in `DefaultOrchestrator.turn`:
+`forModel = romaniser.romanise(text)` goes to classify, extract, the ANSWER question and the
+RECOMMEND request; the screen, the router, the guards and the diary keep the transcript as spoken.
+THE NINE WORDS, every one tested on the JVM (`DevanagariTest`): रोटी roti, दाल dal, चावल chaval,
+दही dahi, अंडा anda, इडली idli, सांबर sambar, दोसा dosa, चटनी chatni. Through the real matcher:
+eight of nine resolve (roti -> chapati, dal -> toor_dal_tadka, chaval -> rice_cooked, dahi -> curd,
+anda -> egg, idli, sambar, dosa). PRIYA, THE LIST FOR YOU: "chatni" resolves to nothing; chutney
+exists only as the recipes "coconut chutney" / "peanut chutney" with no bare alias. Also worth an
+alias each, from the forms this produces (checked against the DB): "chaval" (it has "chawal";
+chaval resolves today only through the fuzzy step), "chay" (it has "chai"), "dudh" (it has
+"doodh"), and पनीर comes out "panir" and the DB has neither "panir" nor "paneer". The matcher test allows exactly the चटनी miss and tightens itself when the alias lands.
+Vowel length and nasals, checked explicitly, all green: dosa/kela keep the final ā; dudh, panir,
+am fold the long vowels; sambar/anda/mainne/hun for the nasals; kam and do keep their vowel.
+THE FROZEN BEAT 1 SENTENCE comes out "mainne do roti aur thodi dal khai", which is within a
+letter of the Hinglish that resolved on the phone at 07:14 ("maine do roti aur thodi dal khayi");
+rows 2 and 5 and the idli row are pinned too. The phone half is queue items 4, 5 and 6: the rows
+through the rig, Beat 1 through the microphone with the plate and the timings, and the nine words
+through `android.icu` against icu4j's strings (`DevanagariDeviceTest`). Suite 436, 0 failures.
+TASK 1, THE 68 s ANSWER, FROM THE LOGS I HAVE (no phone; item 1-3 of the queue chase it):
+what the logs RULE OUT: (a) context growth: the native shim calls `llama_memory_clear` before
+every prompt (`katori_llama.cpp:217`), nothing survives a call, and the prompt is rebuilt per
+turn from the same diary and the same question, so run 2's prompt was run 1's; (b) retries:
+`answer()` makes exactly one `guarded()` call, no re-ask, and the orchestrator does not loop
+either (the RECOMMEND refusal is a single call refused); (c) eviction and re-warm: the same
+process (pid 23472) served all three turns, the arbiter keeps a model resident until it needs
+the room, and the 1.1 GB model plus the 190 MB hi recogniser sit well under the 4.39 GB ceiling;
+(d) thermal: status 0 and CPU 56 C read immediately after the slow run, and the pass's thermal-3
+LOGs cost 2x, not 7x. What the logs POINT AT: the three UI runs (07:16-07:19) were seven to nine
+minutes after a reboot on a phone whose post-boot indexing, `android.process.acore`, I had
+measured at 142-229 % CPU with loadavg 20-44 until at least 07:13:51, with Instagram restarted
+underneath; the cold run at 07:16 took 23.3 s (load included), the warm one at 07:17 66.4 s, the
+RECOMMEND at 07:18 27.7 s, i.e. the slowdown TRACKED the background load, not the warmth. llama.cpp
+with 8 threads on 8 cores synchronises every layer on its slowest thread: two cores taken by
+another process do not cost 25 %, they cost the barrier, which is how a 10 s call becomes 60.
+That is a hypothesis with a name, not a cause: it needs the phone. The log line landed now
+(`LlamaCppRuntime.generate`: wall, prompt tokens/ms, gen tokens/ms, per call) so the next slow
+turn carries its own number, and queue items 1-3 are the bisection Vedant asked for (UI x4 warm,
+the rig in the same session, `top`/thermal sampled alongside, six threads if it reproduces).
+IF IT IS the barrier, the fix is a thread count that leaves the phone a core, and "reboot, wait
+ten minutes, nothing else running" on the day; that is a design point about the demo phone, not
+about the pipeline. The 0 %-CPU stall (three times now, each after an idle spell, each cleared
+by a reboot) is a separate hazard and stays on the list.

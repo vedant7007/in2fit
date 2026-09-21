@@ -217,6 +217,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.sqlite.jdbc)
+    testImplementation(libs.icu4j)
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.runner)

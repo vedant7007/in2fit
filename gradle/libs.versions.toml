@@ -62,6 +62,8 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 # Test only. Lets the food layer be tested on the JVM against the REAL bundled database
 # rather than against fixtures, which is what catches a bad import or a renamed column.
 sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqliteJdbc" }
+# ICU on the JVM, for the transliteration tests only: the app uses the platform's android.icu (the same rules, ICU 75 on Android 15).
+icu4j = { group = "com.ibm.icu", name = "icu4j", version = "75.1" }
 
 onnxruntime-android = { group = "com.microsoft.onnxruntime", name = "onnxruntime-android", version.ref = "onnxruntime" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }

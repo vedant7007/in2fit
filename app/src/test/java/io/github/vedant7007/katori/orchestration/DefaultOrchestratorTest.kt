@@ -53,6 +53,7 @@ import io.github.vedant7007.katori.ml.asr.AudioSource
 import io.github.vedant7007.katori.ml.asr.EndlessAudio
 import io.github.vedant7007.katori.ml.asr.FakeAudio
 import io.github.vedant7007.katori.ml.asr.PushToTalk
+import io.github.vedant7007.katori.ml.asr.Romaniser
 import io.github.vedant7007.katori.ml.asr.loud
 import io.github.vedant7007.katori.ml.asr.quiet
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
@@ -106,8 +107,9 @@ class DefaultOrchestratorTest {
         val phrasings = mutableListOf<PhrasingRequest>()
         val answers = mutableListOf<AnswerRequest>()
         val recommendations = mutableListOf<RecommendRequest>()
+        val extractions = mutableListOf<ExtractionRequest>()
         override suspend fun classify(transcript: String, languageTag: String) = intent
-        override suspend fun extract(request: ExtractionRequest) = extraction
+        override suspend fun extract(request: ExtractionRequest) = extraction.also { extractions += request }
         override suspend fun phrase(request: PhrasingRequest) = phrased.also { phrasings += request }
         override suspend fun answer(request: AnswerRequest, length: AnswerLength) = answered.also { answers += request }
         override suspend fun recommend(request: RecommendRequest, length: AnswerLength) = recommended.also { recommendations += request }
@@ -226,6 +228,7 @@ class DefaultOrchestratorTest {
         val audio: AudioSource = FakeAudio(frames = emptyList()),
         var ctx: UserContext,
         val facts: KnowledgeFacts,
+        val romaniser: Romaniser = Romaniser { it },
     ) {
         val advice = MemoryAdvice()
         val orchestrator = DefaultOrchestrator(
@@ -237,6 +240,7 @@ class DefaultOrchestratorTest {
             clock = Clock.fixed(Instant.parse("2026-09-20T08:00:00Z"), ZoneOffset.UTC),
             // The real gesture over a fake microphone: the JVM proves the wiring, the phone the room.
             pushToTalk = PushToTalk(asr, audio),
+            romaniser = romaniser,
         )
         fun run(intent: UserIntent) = runBlocking { orchestrator.handle(intent).toList() }
     }
@@ -525,6 +529,17 @@ class DefaultOrchestratorTest {
     }
 
     // --- the voice front end ----------------------------------------------------------------
+
+    /** The model reads the romanised copy; the screen and the diary keep what was said. */
+    @Test fun `a Devanagari transcript reaches the model romanised and the screen as spoken`() {
+        val r = Rig(llm = FakeLlm(intent = Outcome.Ok(Intent.LOG)), ctx = context(), facts = facts, romaniser = Romaniser { if (it == "मैंने दो रोटी खाई") "mainne do roti khai" else it })
+        val events = r.run(UserIntent.Type("मैंने दो रोटी खाई", SpeechLanguageRef("hi")))
+        assertEquals("मैंने दो रोटी खाई", events.filterIsInstance<OrchestratorEvent.Transcribed>().single().text)
+        assertEquals("mainne do roti khai", r.llm.extractions.single().transcript)
+        val q = Rig(llm = FakeLlm(intent = Outcome.Ok(Intent.ANSWER)), ctx = context(), facts = facts, romaniser = Romaniser { "roman: $it" })
+        q.run(UserIntent.Type("did I get enough iron this week", en))
+        assertEquals("roman: did I get enough iron this week", q.llm.answers.single().question)
+    }
 
     private val heard = Transcript("I had rice and palak paneer", SpeechLanguage.ENGLISH_INDIA, io.github.vedant7007.katori.ml.asr.AsrConfidence.LOW, 1800)
 

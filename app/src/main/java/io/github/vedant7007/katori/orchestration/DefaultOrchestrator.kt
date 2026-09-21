@@ -36,6 +36,7 @@ import io.github.vedant7007.katori.ml.asr.AsrConfidence
 import io.github.vedant7007.katori.ml.asr.AsrEngine
 import io.github.vedant7007.katori.ml.asr.AsrEvent
 import io.github.vedant7007.katori.ml.asr.PushToTalk
+import io.github.vedant7007.katori.ml.asr.Romaniser
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import io.github.vedant7007.katori.ml.asr.Transcript
 import io.github.vedant7007.katori.ml.llm.AnswerLength
@@ -110,6 +111,14 @@ class DefaultOrchestrator(
      * in a rig that never speaks; a Speak without one fails, it does not pretend.
      */
     private val pushToTalk: PushToTalk? = null,
+    /**
+     * What the model reads when the transcript is Devanagari (`Devanagari.kt`): the recogniser
+     * writes it exactly and the 1.5B model reads it badly ("डॉटरी: 2" for the frozen Beat 1
+     * sentence, three of three on the realme, 21 Sep); the same words in roman resolved. The
+     * screen, the router, the guards and the diary keep the transcript as spoken; only the
+     * model's copy is romanised. Identity in a rig that speaks English.
+     */
+    private val romaniser: Romaniser = Romaniser { it },
 ) : Orchestrator {
 
     override fun handle(intent: UserIntent): Flow<OrchestratorEvent> = flow {
@@ -173,6 +182,7 @@ class DefaultOrchestrator(
         text: String, language: SpeechLanguageRef, heard: AsrConfidence, decided: SpokenIntent?,
     ) {
         emit(OrchestratorEvent.Transcribed(text))
+        val forModel = romaniser.romanise(text)
         // THE WORDS DECIDE WHERE THEY CAN (IntentRouter, 0027): a certain log, a question about
         // what they ate, a plate in front of them, a request for what to eat. The model is asked
         // only when the evidence is silent or conflicts, and its LOG verdict on any question is
@@ -190,7 +200,7 @@ class DefaultOrchestrator(
         }
         val intent = decided ?: (routed as? IntentRouter.Decision.Decided)?.intent?.toDomain() ?: run {
             emit(Progress(Stage.CLASSIFYING))
-            when (val c = withLlm { it.classify(text, language.tag) }) {
+            when (val c = withLlm { it.classify(forModel, language.tag) }) {
                 is Outcome.Ok -> IntentRouter.accept(c.value, text)?.toDomain() ?: run {
                     // The model said something the words refuse (a LOG on a question, or an
                     // intent the evidence ruled out). Ask the person; never guess.
@@ -217,10 +227,10 @@ class DefaultOrchestrator(
         val leadIn = contextText.leadIn(intent).takeIf { speechLanguage(language)?.let { l -> l in tts.supportedLanguages } == true }
         emit(OrchestratorEvent.IntentKnown(intent, leadIn))
         when (intent) {
-            SpokenIntent.LOG -> plate(text, language, heard, save = true, leadIn)
-            SpokenIntent.SUGGEST -> plate(text, language, heard, save = false, leadIn)
-            SpokenIntent.ANSWER -> answer(text, language, leadIn)
-            SpokenIntent.RECOMMEND -> recommend(text, language, leadIn)
+            SpokenIntent.LOG -> plate(text, forModel, language, heard, save = true, leadIn)
+            SpokenIntent.SUGGEST -> plate(text, forModel, language, heard, save = false, leadIn)
+            SpokenIntent.ANSWER -> answer(text, forModel, language, leadIn)
+            SpokenIntent.RECOMMEND -> recommend(text, forModel, language, leadIn)
         }
     }
 
@@ -238,10 +248,10 @@ class DefaultOrchestrator(
     // --- LOG and SUGGEST: a plate, saved or hypothetical ---------------------------------------
 
     private suspend fun FlowCollector<OrchestratorEvent>.plate(
-        text: String, language: SpeechLanguageRef, heard: AsrConfidence, save: Boolean, leadIn: String?,
+        text: String, forModel: String, language: SpeechLanguageRef, heard: AsrConfidence, save: Boolean, leadIn: String?,
     ) {
         emit(Progress(Stage.EXTRACTING))
-        val extracted = when (val e = withLlmSpoken(leadIn, language) { it.extract(ExtractionRequest(text, language.tag)) }) {
+        val extracted = when (val e = withLlmSpoken(leadIn, language) { it.extract(ExtractionRequest(forModel, language.tag)) }) {
             is Outcome.Ok -> e.value
             is Outcome.Unavailable -> return fail(e.reason, e.detail)
             is Outcome.NotImplemented -> return notBuilt(e.component)
@@ -415,7 +425,7 @@ class DefaultOrchestrator(
 
     // --- ANSWER: their diary and their reports, in the request ----------------------------------
 
-    private suspend fun FlowCollector<OrchestratorEvent>.answer(text: String, language: SpeechLanguageRef, leadIn: String?) {
+    private suspend fun FlowCollector<OrchestratorEvent>.answer(text: String, forModel: String, language: SpeechLanguageRef, leadIn: String?) {
         emit(Progress(Stage.EVALUATING_RULES))
         val now = clock.instant()
         val ctx = contextSource.current()
@@ -458,7 +468,7 @@ class DefaultOrchestrator(
         val given = periodLines + mealLines + listOfNotNull(evaluation.trigger?.let { triggerText.render(it) })
         val facts = knowledge.find((listOf(text) + declared + ruleWords(evaluation)).joinToString(" "), limit = FACT_ROWS)
         val request = AnswerRequest(
-            question = text, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
+            question = forModel, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
             figures = given.map(::DisplayFigure),
             facts = facts,
             referralFollows = referral != null,
@@ -488,7 +498,7 @@ class DefaultOrchestrator(
 
     // --- RECOMMEND: their profile, their reports, the allowed list, in the request ---------------
 
-    private suspend fun FlowCollector<OrchestratorEvent>.recommend(text: String, language: SpeechLanguageRef, leadIn: String?) {
+    private suspend fun FlowCollector<OrchestratorEvent>.recommend(text: String, forModel: String, language: SpeechLanguageRef, leadIn: String?) {
         emit(Progress(Stage.EVALUATING_RULES))
         val now = clock.instant()
         val ctx = contextSource.current()
@@ -506,7 +516,7 @@ class DefaultOrchestrator(
         val allowed = evaluation.rankedCandidates.take(ALLOWED_FOODS).map { spokenNames.of(it.candidate.foodCode, it.candidate.displayName) }
         val facts = knowledge.find((listOf(text) + declared + ruleWords(evaluation)).joinToString(" "), limit = FACT_ROWS)
         val request = RecommendRequest(
-            request = text, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
+            request = forModel, languageTag = language.tag, declaredConditions = declared, context = situation(ctx),
             constraints = listOfNotNull(ctx.profile.dietType?.let(contextText::neverSuggest)),
             triggerText = trigger, facts = facts, allowedFoodNames = allowed, referralFollows = referral != null,
         )

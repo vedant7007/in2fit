@@ -23,7 +23,18 @@ class LlamaCppRuntime private constructor(private var handle: Long) : LlamaRunti
     override fun generate(prompt: String, maxTokens: Int, stop: List<String>): String {
         val h = handle
         check(h != 0L) { "this runtime has been closed" }
-        return nativeGenerate(h, prompt, maxTokens, stop.toTypedArray())
+        val t0 = System.nanoTime()
+        val out = nativeGenerate(h, prompt, maxTokens, stop.toTypedArray())
+        // One line per call in logcat, so a slow turn on the phone can be read without a
+        // diagnostic build: the 68 s warm ANSWER of 21 Sep 07:17 had no number under it.
+        val wall = (System.nanoTime() - t0) / 1_000_000
+        val t = lastTimings()
+        android.util.Log.i(
+            "katori-llama",
+            "generate: wall ${wall} ms, prompt ${t?.promptTokens} tok / ${"%.0f".format(t?.promptMillis ?: 0.0)} ms, " +
+                "gen ${t?.evalTokens} tok / ${"%.0f".format(t?.evalMillis ?: 0.0)} ms, max $maxTokens, prompt chars ${prompt.length}, out chars ${out.length}",
+        )
+        return out
     }
 
     override fun close() {

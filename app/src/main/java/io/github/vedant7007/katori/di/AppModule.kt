@@ -46,6 +46,7 @@ import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.ml.asr.AndroidAudioSource
 import io.github.vedant7007.katori.ml.asr.AsrEngine
 import io.github.vedant7007.katori.ml.asr.DefaultAsrEngine
+import io.github.vedant7007.katori.ml.asr.IcuRomaniser
 import io.github.vedant7007.katori.ml.asr.PushToTalk
 import io.github.vedant7007.katori.ml.asr.SherpaOnnxAsrLoader
 import io.github.vedant7007.katori.ml.llm.LlamaCppLlmEngine
@@ -247,5 +248,6 @@ object AppModule {
     ): Orchestrator = DefaultOrchestrator(
         asr, llm, tts, rules, resolver, store, advice, labs, contextSource, knowledge, triggerText, contextText, spokenNames,
         pushToTalk = PushToTalk(asr, AndroidAudioSource(context)),
+        romaniser = IcuRomaniser(),
     )
 }
