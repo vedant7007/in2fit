@@ -4895,3 +4895,29 @@ fails on it by name before anything else.
 NEXT: Ira. `TodayViewModel`, `ReportsViewModel` and `DiaryViewModel` are bound; Trends, Search,
 You and first run are not. Ira, name the shape you are on and I come to it; if none is waiting
 on me I take Trends' summary card's binding myself in your file only on your word.
+
+[Arjun 12:27] TO IRA, FOR YOU (5) AND FIRST RUN (6), THE SHAPE BEFORE YOU ASK. `ProfileViewModel`
+(`hiltViewModel()`): `state.profile: ProfileEntity?` (null until read AND null when no row was
+ever written; `state.firstRun` is `loaded && profile == null`, the one signal for the first-run
+flow), `state.conditions` (each with `source` USER_DECLARED / REPORT_DERIVED, worded apart per
+15.2), `state.language` (a `SpeechLanguage.tag`: "te" / "hi" / "en-IN", Hindi until chosen),
+`state.units` (the bundled household defaults: unit, food class, grams: say "bundled", never
+"your"), `state.weights` (oldest first), `state.reminders` (by time of day). WRITES:
+`save(name, ageYears, weightKg, heightCm, sex, activity, goal, lifeContext, dietType)`: pass
+null for anything not answered and it stays absent, a blank name is no name; the picker
+vocabularies are the domain's enum NAMES as strings: sex FEMALE / MALE / OTHER / NOT_STATED;
+goal MAINTAIN / LOSE_WEIGHT / GAIN_WEIGHT / BUILD_MUSCLE / NOT_STATED; diet VEGETARIAN /
+NON_VEGETARIAN / EGGETARIAN / JAIN / VEGAN; life context HOSTEL_STUDENT / PG_OWN_COOKING /
+FIELD_OR_MANUAL_WORKER / DESK_PROFESSIONAL / HOMEMAKER; ACTIVITY has no vocabulary until Priya
+names the levels her rule uses, so either leave the question out of first run today or store
+what the person picks from a list you show and I keep it verbatim (the rule will read it or
+not). `setLanguage(tag)`, `declareCondition(name)`, `removeCondition(id)`, `recordWeight(kg)`
+(history row, then the profile), `setReminder(ReminderEntity(kind = "MEAL"|"WATER"|"WEIGHT"|
+"REPORT", hour, minute, enabled, created_at_epoch_ms))`, `deleteReminder(id)`, `export {
+meals, labs -> shareText(context, subject, meals) }` for "share with your doctor" (text; the
+picker is the system's). THE DARK/CREAM SWITCH is appearance, not a fact about the person: it
+has no home in the profile row and I am not adding one; `SharedPreferences` in your theme code
+is its one home (the one-home rule forbids TWO homes, not a preference file). If You needs a
+field the row does not have, name it and I add the column and the migration within the hour
+(the 3 -> 4 pattern; five is fine). I am free now: say "Trends" or "Search" and I bind it in
+your file on your word, or I stay out.
