@@ -4739,3 +4739,51 @@ never differ.
 WAITING ON: Priya (`TargetRules`, the slot ruling, a strike-or-keep on the seven marker rows);
 Nila (the wording of the seven rows, English only); Rao (the phone: queue 10-16 and 24-28).
 Until those run, nothing I landed today counts as done.
+[Ira 11:55] LANDED, UNPROVEN ON THE DEVICE: REPORTS AND THE MARKER SCREEN (item 3 of the order),
+on Arjun's `ReportsViewModel` and `LabRow`; and the sheet's DISCARD is a real control now
+(`DiaryViewModel.delete`, `deleteMealAndAdvice`: the plate the pipeline just saved goes with its
+items and its advice; dimmed only for a hypothetical plate or before MealLogged). Demo suite
+445/0/0 from my own run (XML 06:17Z), NetworkIsolationTest 2/0/0, permissions unchanged.
+WHAT IS BUILT (`ui/v2/ReportsScreen.kt`): the serif title and its line; one 26 dp card per
+report, newest first, "Report date 12 Sep 2026" where the design names the panel, "Saved 5
+values from this report." where it names the lab, the ACTIVE pill on every card because the
+coach reads every saved value (`RoomUserContextSource`); one row per value with the PRINTED
+range under the name in Nila's own words ("printed range 4 to 5.6", "printed range up to 100",
+"no range printed, so nothing will be judged against it") and on the right the value in the
+warm colour with "above the printed range" / "below the printed range", the accent with
+"within the printed range", or the text colour and no flag when nothing was printed; "How this
+changes your day" with the engine's stored trigger sentence for the last meal as its one
+bullet, the card absent when no rule fired; the dashed "Add another report" (opens the old Scan
+screen inside the v2 shell until the scan flow is redrawn with first run, step 6); the safety
+line under it. The marker screen: the back link, the test name in serif 29, the latest value
+in serif 44 (Plex ×1.02) coloured by its standing, "% · above the printed range" beside it,
+"Last four tests" with one bar per report (the last four, oldest first, the newest in the warm
+colour when out of range, the earlier out-of-range ones at 35%), the safety line.
+NOT AS DRAWN, and why: (1) the flags "Prediabetic" / "Low" / "Slightly high" / "Normal" are the
+attributed wording (amendment 2), one colour for out of range because the app cannot grade
+"slightly"; (2) the lab's name ("Apollo Diagnostics") and the panel's name ("Full blood panel")
+are not read by the extractor (MISSING, Priya's comments row): the date and the count stand
+there; (3) the explanation card ("HbA1c is your average blood sugar…") waits on Priya's sourced
+marker file ((t)) and is absent until then; (4) "Photo or PDF · read on device" says "Photo ·
+read on device" until Arjun's (ac) PDF input exists; (5) the bars' heights span the person's own
+values (lowest 12 dp, highest 64 dp) as the design's do, because four values within 0.5 of each
+other drawn from zero are four equal bars; (6) lab values print to two decimals at most (0.85
+stays 0.85; the contract's one-decimal rule is for nutrients).
+A DEFECT FOUND ON THE WAY, ARJUN'S: the emulator's database, created by the 10:45 build's v3
+schema (da67d04), CRASHES the 10:55 build at open: "Room cannot verify the data integrity…
+expected fcf9c6ab… found 042eafa2…", because `d6efa54` changed the v3 schema (`meals.source`,
+`meal_items.display_name`) without a v4. The realme never opened a v3 build so 2→3 will run
+there, but any device that opened da67d04 (the emulator did) is broken until the app's data is
+cleared. Not mine; I wiped the emulator's database to continue. Also, `scan_saved` reads "Saved 1
+values" for one value (Nila: a plural, or a v2 key of my own if you prefer).
+SCREENSHOTS, EMULATOR, LAYOUT ONLY, ROWS TYPED BY HAND: the emulator has no scanned report, so
+I inserted nine `lab_values` rows by hand (HbA1c 6.4 / 6.1 / 6.3 / 6.6 across four dates,
+Vitamin D, LDL, Haemoglobin, a TSH with no printed range) to see the layout; every number in
+`emulator-v2-reports-seeded-rows.png`, `…-end-…` and `emulator-v2-marker-hba1c-seeded-rows.png`
+is mine, not the extractor's, and the files say so in their names.
+FOR RAO'S DEVICE LIST, added as items 29-31: (29) Reports on the realme's own scanned report:
+every value the Scan tab saved is on a card under its printed date, each flag matches the
+printed range the row shows, no word but "above / below / within the printed range" appears;
+(30) tap a value: the marker screen with that report's bar in the warm colour when out of
+range; (31) after a spoken LOG: Discard on the sheet, then Diary and the next ANSWER no longer
+carry the meal. NEXT, NOW: Today (4), every element, on `TodayViewModel`.

@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.domain.Stage
 import io.github.vedant7007.katori.ui.AboutScreen
+import io.github.vedant7007.katori.ui.DiaryViewModel
 import io.github.vedant7007.katori.ui.PreflightScreen
 import io.github.vedant7007.katori.ui.ScanScreen
 import io.github.vedant7007.katori.ui.TalkScreen
@@ -73,6 +74,7 @@ import java.util.Date
 @Composable
 fun Shell2() {
     val vm: TalkViewModel = hiltViewModel()
+    val diaryVm: DiaryViewModel = hiltViewModel()
     val quiet = remember(vm) { vm.state.map { it.copy(level = 0f, elapsedSeconds = 0) }.distinctUntilChanged() }
     val state by quiet.collectAsState(vm.state.value.copy(level = 0f, elapsedSeconds = 0))
     val level: State<Float> = remember(vm) { vm.state.map { it.level } }.collectAsState(0f)
@@ -90,6 +92,10 @@ fun Shell2() {
     // The pre-flight check (Arjun's), reached from the old About screen's title as before.
     var preflight by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = preflight) { preflight = false }
+    // A screen over the tab: "reports", "marker" (with the test's name) or "scan". Back closes it.
+    var over by rememberSaveable { mutableStateOf<String?>(null) }
+    var marker by rememberSaveable { mutableStateOf("") }
+    BackHandler(enabled = over != null) { over = if (over == "marker") "reports" else null }
 
     val open = {
         if (!vm.state.value.busy) {
@@ -155,15 +161,18 @@ fun Shell2() {
                 ) {
                     when {
                         preflight -> Legacy { PreflightScreen() }
+                        over == "reports" -> ReportsScreen(onOpenMarker = { marker = it; over = "marker" }, onScan = { over = "scan" })
+                        over == "marker" -> MarkerScreen(marker, onBack = { over = "reports" })
+                        over == "scan" -> Legacy { ScanScreen() }
                         tab == Tab2.COACH -> CoachScreen(vm, state, elapsed, onTitleLongPress = { ThemePreference.setLegacy(context, true) })
                         tab == Tab2.TODAY -> Legacy { TalkScreen(vm) }
                         tab == Tab2.DIARY -> Legacy { ScanScreen() }
-                        else -> Legacy { AboutScreen(onPreflight = { preflight = true }) }
+                        else -> Legacy { AboutScreen(onPreflight = { preflight = true }, onReports = { over = "reports" }) }
                     }
                 }
                 TabBar2(
                     selected = tab,
-                    onSelect = { tab = it; preflight = false },
+                    onSelect = { tab = it; preflight = false; over = null },
                     micEnabled = !state.busy,
                     onMicPress = {
                         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
@@ -179,8 +188,9 @@ fun Shell2() {
                         levels = samples,
                         elapsed = elapsed,
                         onClose = { sheet = false },
-                        // Discard waits on a delete for the logged meal (Arjun, (d)).
-                        onDiscard = null,
+                        // Discard: the plate the pipeline just saved is deleted with its items and its
+                        // advice (`deleteMealAndAdvice`, d6efa54); nothing to discard for a hypothetical.
+                        onDiscard = state.lastMealId?.takeIf { plate?.logged == true }?.let { id -> { diaryVm.delete(id); sheet = false } },
                     )
                 }
             }

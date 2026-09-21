@@ -356,6 +356,17 @@
     <string name="v2_coach_send">Send</string>
     <!-- Temporary, until the You screen lands: long-press the Coach title to open the old screens. -->
     <string name="v2_old_screens">Old screens</string>
+    <!-- Reports (the design's words). "Active": the coach reads every saved value, so every report carries it. -->
+    <string name="v2_reports_title">Reports</string>
+    <string name="v2_reports_sub">What your coach reads before it answers.</string>
+    <string name="v2_reports_active">Active</string>
+    <string name="v2_reports_effects">How this changes your day</string>
+    <string name="v2_reports_add">Add another report</string>
+    <!-- The design says "Photo or PDF · read on device"; PDF input is not built (Arjun, (ac)), so the line says what is true until it is. -->
+    <string name="v2_reports_add_sub">Photo · read on device</string>
+    <string name="v2_marker_history">Last four tests</string>
+    <!-- A value inside the range the report printed (amendment 2: the app never says "normal"). -->
+    <string name="v2_within_range">within the printed range</string>
     <string name="v2_new_screens">New screens</string>
 
     <!-- SHIPPED CONTENT FOR THE V2 SCREENS (Arjun, 21 Sep, post-freeze: English only). The weekly

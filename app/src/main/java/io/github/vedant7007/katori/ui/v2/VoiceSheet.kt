@@ -79,10 +79,11 @@ sealed interface SheetPhase {
  * the whole sentence is written down and the level bars carry the signal instead, each bar one
  * real sample of the microphone level. (2) The design spins the current stage's ring; nothing
  * animates during inference (ruled 20 Sep), so the current ring is the accent outline and the
- * seconds counter beside it is the honesty device (0026). (3) The design's per-item energy and
- * protein, and the "taken as" grams, wait on `MealResolved.items` (Rao, Arjun; asked 07:33).
- * (4) The design's "Portions use your katori" caption states a learned katori the system does
- * not have; the slot carries the safety line, which the screen must show once anyway.
+ * seconds counter beside it is the honesty device (0026). (3) The design's "Add to today" is a
+ * confirm-before-save; the pipeline saves at MealResolved, so the pill says "Added to today" and
+ * Discard deletes what was saved. (4) The design's "Portions use your katori" caption states a
+ * learned katori the system does not have; the slot carries the safety line, which the screen
+ * must show once anyway.
  */
 @Composable
 fun VoiceSheet(
@@ -246,8 +247,8 @@ private fun ResultBody(plate: Entry.Plate, at: String, onClose: () -> Unit, onDi
         // The caption slot: the safety line, once per screen, in the design's caption style.
         T(stringResource(R.string.safety_not_medical_advice), sans(12.5f, FontWeight.Normal, 1.5f), color = s.text3, modifier = Modifier.padding(start = 2.dp, end = 2.dp, bottom = 20.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Discard needs a delete for the meal the pipeline has already logged (Arjun, (d));
-            // until it lands the button is drawn and dimmed, never a lie.
+            // Discard deletes the meal the pipeline has already logged; with nothing to delete
+            // (a hypothetical plate, or before MealLogged) it is drawn and dimmed, never a lie.
             Pill2(stringResource(R.string.v2_discard), onClick = onDiscard ?: {}, filled = false, enabled = onDiscard != null, modifier = Modifier.alpha(if (onDiscard != null) 1f else 0.32f))
             val primary = when {
                 plate.hypothetical -> R.string.v2_close
