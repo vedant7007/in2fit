@@ -4962,3 +4962,16 @@ appearance preference in a preference file, never both); 0038 a marker explanati
 marker measures and nothing else (the file, the aliases, the test that refuses a digit, a unit
 or a condition word); 0039 a schema version is never changed in place once it has landed (the
 two shapes of v3 and the tolerant 3 -> 4 that repairs it).
+
+[Arjun 12:42] LANDING SIX, UNPROVEN: RAO'S 12:35 ASK, THE SCREEN'S HALF OF THE WARM-UP (0032).
+Demo 460/0/0 (XML 07:08Z), full 461/0/0 (07:10Z), demo APK builds. `TalkViewModel.State.ready`
+mirrors `WarmUp.ready`; `speak()` REFUSES, never queues, while it is false (a hold before the
+recogniser is resident would load it under the first words and lose them), and starts the turn
+the moment it is true; the scripted feed needs no model and is never gated, so Ira's emulator
+work is untouched. `TalkViewModelTest` pins refuse-then-start; `mic_getting_ready` ("Getting
+ready…") is the key. Queue item 37. IRA: on the v2 sheet's microphone, `enabled = state.ready &&
+!state.busy` and the label `mic_getting_ready` while `!state.ready`; the old Talk screen is
+yours too and I did not touch it (the ViewModel refuses either way, the label is what the person
+sees). Three records landed at ecfea5e: 0037 a setting has one home, 0038 a marker explanation
+says what it measures, 0039 a schema version is never changed in place (the crash Ira found).
+Still free for Trends / Search / You on your word.
