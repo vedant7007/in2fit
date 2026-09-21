@@ -4703,3 +4703,39 @@ measures" under a report row, the weekly summary card, Discard/delete at item le
 WAITING ON: Priya for `TargetRules` (the ring stays empty until then) and the meal-slot
 ruling; Rao for the phone. Everything I have landed today is unproven until he runs 10-16 and
 24-27.
+
+[Arjun 11:48] LANDING FOUR, UNPROVEN, and THE DAY'S STATE FOR VEDANT. Demo 457/0/0 (XML 06:08Z),
+full 458/0/0 (06:16Z), `assembleDemoDebug` builds with the permission whitelist exactly CAMERA +
+RECORD_AUDIO (the verify task's line in `logs/merged-manifest-demoDebug.xml`), so the Hilt graph
+with the six ViewModels, `Diary`, `ProfileStore` and `TargetsSource` resolves.
+THIS LANDING, Ira's (ab): "share with your doctor" as TEXT through `ACTION_SEND`, no file, no
+`FileProvider`, no permission. `Diary.exportCsv()` gives two CSVs from the rows as stored (one
+line per item per nutrient with its state, an UNKNOWN with no amount, a no-data item with its
+spoken name, never a total: a doctor's spreadsheet sums what it likes; and the lab values by
+report date with the printed range or blanks). `ProfileViewModel.export { meals, labs -> }` and
+`ui/Share.kt: shareText(context, subject, text)` for Ira's You screen. `ExportTest` pins the
+format. Queue item 28. `ProfileStoreTest` (5) landed at 3391ecd.
+WHERE THE BRIEF STANDS, part by part, every one LANDED AND UNPROVEN: PART 1 done, and Rao's
+line is in, so the plate rows are on the real path (queue 12/19). PART 2 done (name, first-run
+fields, activity, the language on the profile row with Hindi as the default; `ProfileStore.save`
+is the write path for first run and settings; the greeting gets null for no name). PART 3 my
+half done: `TargetsSource` over the profile and `TargetRules`; THE RING IS EMPTY UNTIL PRIYA
+FILLS `targetsFor` AND `progress`, and I have nothing from her yet today; if that is not
+landing today, say so and Ira ships the ring empty, which is what it does now. PART 4 done, the
+28 derivable rows have their queries and ViewModels. PART 5 done for water, weight history,
+reminders, delete meal, delete item, streak (derived); MEAL SLOTS deferred to Priya's ruling
+(no column needed either way); EDIT of an amount is Rao's `CorrectValue`, not built by me.
+PART 6 done: seven cited marker rows and the loader, the weekly summary as templates.
+NOT BUILT TODAY, SAID NOW, NOT TONIGHT: Ira's (ac), PDF input via `ACTION_OPEN_DOCUMENT` +
+`PdfRenderer` into the lab reader. It is buildable (a page rendered to a bitmap into the same
+extractor) but cannot be proven today: the phone is away and the emulator is layout-only by
+rule, and it would add a rendering path to the queue behind 28 items. If you want it in the
+26th's build, say so and I build it tomorrow morning with its own queue row; if not, it stays
+cut cleanly.
+TO IRA: the Coach context line ("knows your report of …") is `TodayViewModel.latestReport` +
+`outOfRange` already; use that ViewModel on Coach rather than asking me for a second source.
+`ShownFigure.text` is the sentence the app speaks for the same figure, so a card and the voice
+never differ.
+WAITING ON: Priya (`TargetRules`, the slot ruling, a strike-or-keep on the seven marker rows);
+Nila (the wording of the seven rows, English only); Rao (the phone: queue 10-16 and 24-28).
+Until those run, nothing I landed today counts as done.
