@@ -77,6 +77,7 @@ fun TodayScreen(
     onAddManually: () -> Unit,
     onDiary: () -> Unit,
     onCoach: () -> Unit,
+    onReports: () -> Unit,
     modifier: Modifier = Modifier,
     vm: TodayViewModel = hiltViewModel(),
 ) {
@@ -112,7 +113,7 @@ fun TodayScreen(
             }
         }
         val nudge = state.lastMealAdvice ?: state.lastMealTrigger
-        if (nudge != null) NudgeCard(nudge, state.latestReport, onCoach)
+        if (nudge != null) NudgeCard(nudge, state.latestReport, onCoach, onReports)
         T(stringResource(R.string.safety_not_medical_advice), sans(12.5f, FontWeight.Normal, 1.5f), color = s.text3, modifier = Modifier.padding(top = 14.dp, bottom = 8.dp))
     }
 }
@@ -303,7 +304,7 @@ private fun QuietButton(text: String, modifier: Modifier, onClick: () -> Unit) {
 }
 
 @Composable
-private fun NudgeCard(text: String, report: LocalDate?, onCoach: () -> Unit) {
+private fun NudgeCard(text: String, report: LocalDate?, onCoach: () -> Unit, onReports: () -> Unit) {
     val s = scheme()
     val shape = RoundedCornerShape(26.dp)
     Column(
@@ -314,8 +315,9 @@ private fun NudgeCard(text: String, report: LocalDate?, onCoach: () -> Unit) {
             .padding(20.dp),
     ) {
         if (report != null) {
+            // The pill looks like a control, so it is one (stranger walk, 21 Sep): it opens Reports.
             Row(
-                Modifier.padding(bottom = 12.dp).background(s.accent.copy(alpha = 0.12f), RoundedCornerShape(100.dp)).padding(horizontal = 11.dp, vertical = 5.dp),
+                Modifier.padding(bottom = 12.dp).background(s.accent.copy(alpha = 0.12f), RoundedCornerShape(100.dp)).clickable(onClick = onReports).padding(horizontal = 11.dp, vertical = 5.dp),
                 horizontalArrangement = Arrangement.spacedBy(7.dp), verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(Modifier.size(5.dp).background(s.accent, CircleShape))

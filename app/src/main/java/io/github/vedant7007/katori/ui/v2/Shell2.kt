@@ -198,6 +198,7 @@ fun Shell2() {
                             onAddManually = { over = "search" },
                             onDiary = { tab = Tab2.DIARY },
                             onCoach = { tab = Tab2.COACH },
+                            onReports = { over = "reports" },
                         )
                         tab == Tab2.DIARY -> DiaryScreen(onTrends = { over = "trends" }, onMeal = { mealId = it; mealDate = ""; over = "meal" }, onLog = { tab = Tab2.COACH })
                         else -> YouScreen(

@@ -113,9 +113,12 @@ private fun MicFab(enabled: Boolean, ready: Boolean, onPress: () -> Unit, onRele
     val isEnabled by rememberUpdatedState(enabled)
     val stop by rememberUpdatedState(onStop)
     val label = stringResource(if (ready) R.string.v2_mic_hold else R.string.mic_getting_ready)
+    Box(Modifier.offset(y = (-26).dp), contentAlignment = Alignment.TopCenter) {
+    // A dim button with no words is a silent failure (stranger walk, 21 Sep): while the models
+    // warm, the word sits under the button in the tab label's own style; gone the moment it is ready.
+    if (!ready) N(label, sans(10f, FontWeight.SemiBold, 1.2f), color = s.text4, modifier = Modifier.padding(top = 68.dp))
     Box(
         Modifier
-            .offset(y = (-26).dp)
             .size(64.dp)
             .graphicsLayer { scaleX = press.value; scaleY = press.value; alpha = if (ready) 1f else 0.32f }
             .shadow(14.dp, CircleShape, ambientColor = s.accent.copy(alpha = 0.5f), spotColor = s.accent.copy(alpha = 0.5f))
@@ -138,5 +141,6 @@ private fun MicFab(enabled: Boolean, ready: Boolean, onPress: () -> Unit, onRele
         contentAlignment = Alignment.Center,
     ) {
         Icon2(Glyphs.mic, 27.dp, s.onAccent)
+    }
     }
 }

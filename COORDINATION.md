@@ -5408,3 +5408,55 @@ NOTE FOR RAO'S QUEUE: while I was on the emulator, Arjun's `ArjunDeviceChecksTes
 (14:33, "9 tests, 0 failed") and force-stopped my app mid-walk, and its DB seeding replaced my
 Devanagari rows twice. The emulator is shared; fine, but a walk that needs an hour needs a quiet
 hour, and the realme certainly does.
+
+[Ira 15:35] (3) THE STRANGER WALK OF V2, all four beats on the emulator through the feed, tapping
+only what a judge sees. LANDED AND UNPROVEN ON THE DEVICE: the fixes that are mine. Demo suite
+460/0/0 from my own run (XML 09:59Z), NetworkIsolationTest 2/0/0, the whitelist unchanged.
+EVERY MOMENT, in the order met, then who owns it:
+  1. Welcome: the ring of moving bars reads as "it is already listening to me" before anything
+     was said. Hesitation, not a defect; the design's choice. Noted for Vedant.
+  2. First run, "A little about you": nothing says what to type in Activity ("days/wk" is the
+     only hint) and Continue with every box empty is allowed. By design (rough numbers are fine,
+     nulls stay absent). Noted.
+  3. First run, "Add a blood report": with a report already on the phone BOTH "Skip for now" and
+     "Continue" showed, and I did not know which to press. FIXED: Skip until a report exists,
+     then Continue alone; the dashed card still offers a scan.
+  4. First run, "You're set": Watching was a wall of eight lines because the rig's data carries
+     each out-of-range test twice. FIXED: each test once (the same rule as Coach's line).
+  5. Today, the microphone dim with no words while the models warm (and forever on the
+     emulator, where the warm-up is skipped): a hold did nothing and the screen said nothing —
+     the app silent when it should have spoken. FIXED: "Getting ready…" sits under the button in
+     the tab label's style until `ready`, then goes; the button lights.
+  6. Today, the pill "Reading your report · 12 Sep" looks like a control and did nothing.
+     FIXED: it opens Reports.
+  7. Today, the bell looks like a control and does nothing (no Nudges page yet, no dot). NOT
+     MINE TO FIX TODAY: it waits on Arjun's stored-advice-over-time (asked 13:25 and 14:00); if
+     there is no source it comes out, per Vedant.
+  8. The voice sheet, result: "ROUGH" beside the time is a word with no explanation anywhere on
+     v2 (the old screen had the band's reasons on tap). Hesitation; the reason sentences exist
+     (`confidence_reason_*`) and could sit under the caption slot. Vedant's call; not built.
+  9. The voice sheet, result: while it is open the microphone is under it; to speak again you
+     tap Saved or Discard first. Fine, but a judge who holds the bottom of the screen gets nothing
+     until they do. Noted.
+ 10. After Saved: Today does not change on the emulator (the feed writes nothing); on the phone
+     the last-meal card and the ring change, which is queue row 40's check.
+ 11. Coach after a question: the first bubble reads "Today so far: energy: 430.2 kcal; protein:
+     18.5 g; carbohydrate: 71.1 g; fat: 8.6 g; fibre: 10.8 g; iron: 4.0 mg; vitamin B12: 0 µg;
+     sodium: 720 mg" — the person's own figures as one long line; a stranger asks why iron and
+     B12 are in an answer about protein. NOT MINE: it is the contract's `OwnFigures` line (Rao's
+     `ContextText.period`), shown verbatim by rule; the screen could show only the nutrients the
+     question named if the contract carried them apart (Arjun's figure-parts ask, still open).
+ 12. Coach: Beat 4 had NO CONTROL in v2 — the old Talk had "Advise again on my last meal" as a
+     button after a report was saved; the design has no such thing and I had dropped it. FIXED:
+     once a meal is logged, the first suggestion chip is "Advise again on my last meal" and runs
+     `AdviseOnMeal` on it; lit, in the chip style. The deck's fourth beat depends on it.
+ 13. Reports → a value → the marker screen: fine. Reports → "Add another report" → the scan: fine
+     (the camera card, Capture, the PDF pill). The chip "1 katori · taken as 180 g" is one line
+     again at a normal font scale (the hostile fix had put the caption on a second line always).
+ 14. You: the Appearance row flips the whole app with no confirmation and no animation; a judge
+     may not connect the tap and the change. Noted, not changed (reduce-motion rule: no theatre).
+ 15. Diary → a day in the strip: the selection is a dot and a tint; the card list changes under
+     it with nothing announcing the day. Noted; the design's own strip.
+WHAT WAS SILENT AND IS NOT NOW: 5 and 6. WHAT A STRANGER STILL CANNOT DO: open Nudges (7), see
+why a figure is "Rough" (8), and, on the emulator only, speak (the warm-up is skipped by design).
+Screenshots: `docs/screenshots/2026-09-21-ira/stranger-v2-*.png` (emulator, feed, seeded rows).

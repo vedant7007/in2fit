@@ -324,13 +324,16 @@ fun PortionChip(amount: String?, takenAs: String?) {
             .border(1.dp, s.accent.copy(alpha = 0.22f), RoundedCornerShape(100.dp))
             .padding(horizontal = 11.dp, vertical = 5.dp),
     ) {
+        // One line as drawn where it fits; the caption under the amount at a large font scale.
+        val oneLine = androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.3f
+        val first = if (oneLine) listOfNotNull(amount, takenAs?.let(::noBreakUnit)).joinToString(" · ") else amount
         Row(horizontalArrangement = Arrangement.spacedBy(7.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (amount != null) N(amount, sans(12.5f, FontWeight.Normal, 1.2f), color = s.accent, modifier = Modifier.weight(1f, fill = false))
+            if (first != null) N(first, sans(12.5f, FontWeight.Normal, 1.2f), color = s.accent, modifier = Modifier.weight(1f, fill = false))
             // The pencil is drawn; the portion editor it opens waits on a correction path in the
             // contract (Correction.Quantity exists, no intent sends it).
             Icon2(Glyphs.pencil, 11.dp, s.accent)
         }
-        if (takenAs != null) T(noBreakUnit(takenAs), sans(12.5f, FontWeight.Normal, 1.3f), color = s.accent)
+        if (!oneLine && takenAs != null) T(noBreakUnit(takenAs), sans(12.5f, FontWeight.Normal, 1.3f), color = s.accent)
     }
 }
 

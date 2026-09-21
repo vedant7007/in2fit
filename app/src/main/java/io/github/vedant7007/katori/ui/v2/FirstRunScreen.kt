@@ -219,10 +219,9 @@ fun FirstRunScreen(
                     T(stringResource(R.string.v2_scan_report), sans(15f, FontWeight.SemiBold, 1.3f), color = s.text)
                     T(stringResource(R.string.v2_scan_report_sub), sans(13f, FontWeight.Normal, 1.5f), color = s.text2, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 6.dp))
                 }
-                Pill2(stringResource(R.string.v2_skip_for_now), onClick = { step = Step.MIC }, modifier = Modifier.fillMaxWidth(), filled = false, size = 15f, vertical = 17.dp)
-                if (t.latestReport != null) {
-                    Pill2(stringResource(R.string.v2_continue), onClick = { step = Step.MIC }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), size = 15f, vertical = 17.dp)
-                }
+                // "Skip for now" until a report exists; then "Continue" alone (two ways forward was a hesitation, stranger walk 21 Sep).
+                if (t.latestReport == null) Pill2(stringResource(R.string.v2_skip_for_now), onClick = { step = Step.MIC }, modifier = Modifier.fillMaxWidth(), filled = false, size = 15f, vertical = 17.dp)
+                else Pill2(stringResource(R.string.v2_continue), onClick = { step = Step.MIC }, modifier = Modifier.fillMaxWidth(), size = 15f, vertical = 17.dp)
             }
             Step.MIC -> {
                 val reduce = LocalReduceMotion.current
@@ -246,7 +245,7 @@ fun FirstRunScreen(
                     val above = stringResource(R.string.scan_above_range)
                     val below = stringResource(R.string.scan_below_range)
                     // The newest report's values outside their printed range, in those words (amendment 2).
-                    val watching = t.outOfRange.filter { it.reportDate == t.latestReport }.joinToString(" · ") { it.testName + " " + (if (it.status == LabStatus.ABOVE) above else below) }
+                    val watching = t.outOfRange.filter { it.reportDate == t.latestReport }.distinctBy { it.testName }.joinToString(" · ") { it.testName + " " + (if (it.status == LabStatus.ABOVE) above else below) }
                     ReadyRow(stringResource(R.string.v2_ready_watching), watching.ifEmpty { null })
                     ReadyRow(stringResource(R.string.v2_ready_voice), stringResource(languageName(state.language)))
                 }

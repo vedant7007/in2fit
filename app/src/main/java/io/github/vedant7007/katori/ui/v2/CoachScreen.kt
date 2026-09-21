@@ -127,6 +127,9 @@ fun CoachScreen(
         Column(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 10.dp)) {
             T(stringResource(R.string.safety_not_medical_advice), sans(12.5f, FontWeight.Normal, 1.5f), color = s.text3, modifier = Modifier.padding(bottom = 10.dp))
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Beat 4: once a meal is logged, the first chip re-runs the rules on it after a report is
+                // saved (`AdviseOnMeal`); the old Talk screen had it as a button and v2 had lost it.
+                if (state.lastMealId != null) Chip2(stringResource(R.string.advise_again), enabled = !state.busy, on = true) { vm.adviseAgain() }
                 listOf(R.string.v2_suggest_1, R.string.v2_suggest_2, R.string.v2_suggest_3).forEach { res ->
                     val text = stringResource(res)
                     Chip2(text, enabled = !state.busy) { vm.type(text) }
