@@ -5174,3 +5174,59 @@ PDF has no angle.
 VEDANT: run `tools\cold-phone.ps1` the moment the iQOO is in your hand on the 26th, not on demo
 morning, and do the voice-data card on a network before the radios go off; it is written into
 the queue above block 0.
+
+[Ira 14:00] VEDANT'S SEVEN RULINGS, DONE IN ORDER, LANDED AND UNPROVEN ON THE DEVICE. Demo suite
+460/0/0 from my own run (XML 08:27Z), NetworkIsolationTest 2/0/0, the whitelist unchanged. The
+local guard I carried since 13:20 is DELETED: Rao landed the skip at `31d967b` while this entry
+was being written (see (7)); from this landing my builds are master's again.
+(1) THE MIC HOLDS, and the sheet says so: the label under the bars reads "HOLD TO SPEAK" from
+the press until `MicrophoneLive`, then "LISTENING · <language>", never on the press; Jacob's
+five-word hint "PRESS · PAUSE · SPEAK · FINISH THE WORD · LET GO" sits in the transcript's slot
+under it in the label style (`emulator-v2-sheet-listening-hint-feed.png`). The FAB's spoken
+name is "Hold to speak", "Getting ready…" before the warm-up.
+(2) "SAVED". The pill reads "Saved" once `logged` is true (`emulator-v2-sheet-result-saved-
+feed.png`), "Close" for a plate only asked about; Discard beside it deletes what was saved. The
+confirm-step question to Rao is withdrawn; the override is recorded.
+(3) THE KATORI CAPTION IS DRAWN, and has been since 11:15 on Arjun's rows and since 11:25 on
+the real path (my 11:15 item (3) was written before Rao's line landed; my 11:25 correction
+said so). Where it shows, only under QUANTITY_INFERRED, a stated amount as said: the sheet's
+rows (`VoiceSheet.kt` `ResolvedRow`: "1 katori · taken as 180 g" beside "2 piece"), the meal
+screen's rows (`DiaryScreen.kt` `MealScreen`), and now Coach's plate bubble too (this landing,
+`CoachScreen.kt` `PlateLines`, which read the spoken items before). Screenshots: `emulator-v2-
+sheet-result-logged-feed.png` (feed), `emulator-v2-meal-seeded-rows.png` (a hand-seeded row),
+`emulator-v2-sheet-result-saved-feed.png`. Queue row 40 is the device check.
+(4) OUT, NO REPLACEMENT, each recorded in `docs/design/data-gap-list.md` under "Out, with no
+replacement" with its reason: "Reverse prediabetes" (never drawn: the chips are the domain's
+four), Sign out (never drawn), Glycaemic load (never drawn), the row notes (never drawn; the
+one note that stays is "Bundled default" under a household unit, an attribution 0035
+requires, not a design note). No placeholder and no dimmed control stands in any of the four
+slots. The hold and "Saved" are recorded there too.
+(5) LAB NAMES: absent today. PRIYA: does `LabReportExtractor` read the laboratory's name off
+the sheet (a header line, a letterhead)? If it does, or can, I show it as the sheet's own text
+under the report date, the same rule as the wording; if not, the slot stays closed. No field is
+invented on my side.
+(6) NUDGES: ARJUN, again, on Vedant's word: the page shows what was actually said to the
+person and when. I need the stored advice over time, newest first, each row with the meal's
+`loggedAt`, `triggerText` and `phrased` (`AdviceStore` has `latest(mealId)` only; `suggestions`
+has `created_at_epoch_ms`). A flow on `Diary` or a `recent(n)` on the store and a list on
+`TodayViewModel` (with a count for the bell's dot) is all the page needs; nothing is generated
+at display time. The hour it lands I bind it; if you say it cannot be that, I tell Vedant and
+the page comes out like the rest.
+(7) RAO: the warm-up's SIGILL under x86 translation was told to you here at 13:20 and Vedant
+asked me to say it directly: it is yours, and you landed the skip at `31d967b` (`WarmUp.start`
+returns when the primary ABI is not arm64-v8a, the models load on first use) before this entry
+reached the file. My local guard, never landed, is deleted; the emulator screenshots from here
+on are master's build. Thank you.
+THE QUEUE, REORDERED BY THE ONLY QUESTION THAT MATTERS ("would I let a judge touch this"): my
+twenty-four rows are one block, rows 38-61 (Rao restructured the file this hour, so his
+numbers stay and mine follow them), in this order: the shell (38), the sheet listening
+(39), the plate with the caption (40), a question into Coach (41), Coach typed (42), the
+warm-up gate (43), reduce motion and 2× (44), Discard (45), Diary and the meal (46), the scan
+(47); then Today, water, the nudge card, Reports, the marker, You, cream, the language page,
+the share sheet, Welcome and first run, the sign-in link, Trends, Search, and last the old-
+shell switch (61). ROWS 38-47 DECIDE THE 26TH: v2 is demoed only if every one of them passes on
+the realme; otherwise the old shell is the demo. Rao's and Arjun's rows are untouched.
+THE OLD SHELL STILL WORKS after every landing of the day, checked on the emulator this hour:
+Coach title long-press → the three cream tabs, Talk's hold button and hint, About and the
+pre-flight (the feed switch) behind its wordmark, "New screens" back to v2 (`emulator-old-
+shell-talk-after-v2.png`). It is row 61 and the fallback for the 26th.

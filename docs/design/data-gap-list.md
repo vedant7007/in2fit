@@ -291,6 +291,20 @@ where it gets its words changes.
 | "Speech and replies" | "Speech" | replies are English whatever is spoken, 0019 addendum 7 |
 | The coach's typing dots | The stage list with its name and counter | no spinner without a name and a number, 0026 |
 
+### Out, with no replacement (ruled 21 September, midday)
+
+No placeholder and no dimmed control stands where these were drawn; the slot closes up.
+
+| as drawn | built as | reason |
+| --- | --- | --- |
+| "Reverse prediabetes" as a goal chip (first run, About you) | Not drawn; the goals are the domain's four (Maintain, Lose weight, Gain weight, Build muscle) | no source for the target it implies, and a clinical promise the app cannot make (spec 15.1) |
+| Sign out (You) | Not drawn | no accounts exist; the local first run replaced sign-in (amendment 1) |
+| "Glycaemic load · Low" (the food page) | Not drawn | nothing in the database produces it |
+| The row notes under You's lists ("Raised because your protein ran short…", "Capped for an HbA1c of 6.4", "Learned from 34 corrections") | Not drawn; a row is its label and its value | no source: each note is a claim the system does not make. The one note that stays is "Bundled default" under a household unit, which is an attribution the store requires (0035), not a design note |
+| "Add to today" (the voice sheet) | "Saved" | the pipeline saves at MealResolved and that is ruled right; the pill says what happened, Discard beside it deletes it. No confirm step is asked of the contract |
+| The microphone as a tap | Press and hold, release to end (0031) | ruled on measurement: the energy endpointer a tap needs scored 8/10 in a quiet room and 0/10 in babble; the hold survives a 1.5 s pause and a late sentence (Rao, 21 Sep). The sheet's label carries it: "Hold to speak" until MicrophoneLive, "Listening · <language>" after, the five-word hint under it |
+| The lab's name on a report card ("Apollo Diagnostics") | Absent until the extractor reads it off the sheet; then the sheet's own text, as the report wording is | attributed or absent; no invented field (asked of Priya, 21 Sep) |
+
 ### Also ruled
 
 - Every digit in IBM Plex Sans whatever face the design sets it in; the label may be Instrument

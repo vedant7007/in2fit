@@ -274,7 +274,18 @@ private fun PlateLines(plate: Entry.Plate) {
     }
     if (status != null) T(status.uppercase(), micro(11.5f, 0.14.em, FontWeight.SemiBold), color = s.text3, modifier = Modifier.padding(bottom = 6.dp))
     if (energy != null) T(energy.value, num(20f, FontWeight.SemiBold, lineHeight = 1.2f), color = s.onMessage, modifier = Modifier.padding(bottom = 4.dp))
-    Lines(plate.items.map { itemLine(it) })
+    // The resolved rows carry the name shown and, only when the amount was assumed, "taken as N g" (0035).
+    if (plate.rows.isNotEmpty()) {
+        Lines(
+            plate.rows.map { r ->
+                val amount = r.quantity?.let { q -> listOfNotNull(Sentences.number(q), r.unit).joinToString(" ") }
+                val takenAs = if (r.inferred && r.grams != null) stringResource(R.string.plate_unit_taken_as, fig(r.grams)) else null
+                listOfNotNull(r.name, amount, takenAs).joinToString(" · ")
+            },
+        )
+    } else {
+        Lines(plate.items.map { itemLine(it) })
+    }
     // The other figures as the contract renders them, untouched.
     val rest = plate.figures.map { it.first }.filter { FigureLine.fromRendered(it).name != energyWord }
     if (rest.isNotEmpty()) Column(Modifier.padding(top = 6.dp)) { rest.forEach { T(it, sans(12.5f, FontWeight.Normal, 1.45f), color = s.text2) } }

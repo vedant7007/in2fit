@@ -60,8 +60,8 @@ import io.github.vedant7007.katori.ui.theme.serif
 
 /** What the sheet shows, derived from `TalkViewModel.State` by the shell and nothing else. */
 sealed interface SheetPhase {
-    /** Recording. [language] is the name of the language the person chose to speak in. */
-    data class Listening(val language: String) : SheetPhase
+    /** The thumb is down. [live] from MicrophoneLive on; [language] is the name of the language chosen. */
+    data class Listening(val language: String, val live: Boolean) : SheetPhase
 
     /** The turn is running past the microphone: the transcript once it is known, the stages so far. */
     data class Analysing(val transcript: String?, val stages: List<Stage>) : SheetPhase
@@ -80,8 +80,8 @@ sealed interface SheetPhase {
  * real sample of the microphone level. (2) The design spins the current stage's ring; nothing
  * animates during inference (ruled 20 Sep), so the current ring is the accent outline and the
  * seconds counter beside it is the honesty device (0026). (3) The design's "Add to today" is a
- * confirm-before-save; the pipeline saves at MealResolved, so the pill says "Added to today" and
- * Discard deletes what was saved. (4) The design's "Portions use your katori" caption states a
+ * confirm-before-save; the pipeline saves at MealResolved (ruled right, 21 Sep), so the pill
+ * says "Saved" and Discard deletes what was saved. (4) The design's "Portions use your katori" caption states a
  * learned katori the system does not have; the slot carries the safety line, which the screen
  * must show once anyway.
  */
@@ -117,7 +117,7 @@ fun VoiceSheet(
         ) {
             Box(Modifier.align(Alignment.CenterHorizontally).padding(bottom = 22.dp).size(38.dp, 4.dp).background(s.text.copy(alpha = 0.18f), RoundedCornerShape(2.dp)))
             when (phase) {
-                is SheetPhase.Listening -> ListeningBody(phase.language, levels)
+                is SheetPhase.Listening -> ListeningBody(phase.language, phase.live, levels)
                 is SheetPhase.Analysing -> AnalysingBody(phase.transcript, phase.stages, elapsed)
                 is SheetPhase.Result -> ResultBody(phase.plate, phase.at, onClose, onDiscard)
             }
@@ -126,7 +126,7 @@ fun VoiceSheet(
 }
 
 @Composable
-private fun ListeningBody(language: String, levels: List<Float>) {
+private fun ListeningBody(language: String, live: Boolean, levels: List<Float>) {
     val s = scheme()
     val reduce = LocalReduceMotion.current
     Column(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -147,10 +147,18 @@ private fun ListeningBody(language: String, levels: List<Float>) {
             }
         }
         Spacer(Modifier.height(24.dp))
-        T(stringResource(R.string.v2_listening, language).uppercase(), micro(11.5f, 0.14.em, FontWeight.SemiBold), color = s.text3, textAlign = TextAlign.Center)
+        // The hold is deliberate (ruled 21 Sep, on measurement): "Hold to speak" until the first frame
+        // with signal, "Listening · <language>" from MicrophoneLive on, never on the press.
+        T(
+            (if (live) stringResource(R.string.v2_listening, language) else stringResource(R.string.mic_hold_to_speak)).uppercase(),
+            micro(11.5f, 0.14.em, FontWeight.SemiBold), color = if (live) s.text3 else s.accent, textAlign = TextAlign.Center,
+        )
         Spacer(Modifier.height(12.dp))
-        // The transcript's slot, as drawn (serif 25, 100 dp), empty until the sentence is written down.
-        Box(Modifier.fillMaxWidth().heightIn(min = 100.dp).padding(horizontal = 6.dp))
+        // The transcript's slot, as drawn (serif 25, 100 dp): the recogniser has no partial results, so
+        // the slot carries Jacob's five-word hint in the label style until the sentence is written down.
+        Box(Modifier.fillMaxWidth().heightIn(min = 100.dp).padding(horizontal = 6.dp), contentAlignment = Alignment.TopCenter) {
+            T(stringResource(R.string.mic_hold_hint), micro(10.5f, 0.12.em, FontWeight.SemiBold), color = s.text4, textAlign = TextAlign.Center)
+        }
     }
 }
 
@@ -251,11 +259,9 @@ private fun ResultBody(plate: Entry.Plate, at: String, onClose: () -> Unit, onDi
             // Discard deletes the meal the pipeline has already logged; with nothing to delete
             // (a hypothetical plate, or before MealLogged) it is drawn and dimmed, never a lie.
             Pill2(stringResource(R.string.v2_discard), onClick = onDiscard ?: {}, filled = false, enabled = onDiscard != null, modifier = Modifier.alpha(if (onDiscard != null) 1f else 0.32f))
-            val primary = when {
-                plate.hypothetical -> R.string.v2_close
-                plate.logged -> R.string.v2_added_to_today
-                else -> R.string.v2_add_to_today
-            }
+            // Ruled 21 Sep: the pipeline saves at MealResolved and that is right; the pill reads
+            // "Saved" (Discard is beside it), "Close" for a plate that was only asked about.
+            val primary = if (plate.hypothetical || !plate.logged) R.string.v2_close else R.string.v2_saved
             Pill2(stringResource(primary), onClick = onClose, modifier = Modifier.weight(1f), horizontal = 16.dp)
         }
     }

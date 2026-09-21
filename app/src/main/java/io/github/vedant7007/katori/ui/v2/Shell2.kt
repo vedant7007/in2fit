@@ -133,7 +133,7 @@ fun Shell2() {
     val phase: SheetPhase? = when {
         !sheet -> null
         plate != null -> SheetPhase.Result(plate, at.orEmpty())
-        listening -> SheetPhase.Listening(stringResource(languageName(state.language)))
+        listening -> SheetPhase.Listening(stringResource(languageName(state.language)), live = state.micLive)
         else -> SheetPhase.Analysing((turn.firstOrNull { it is Entry.Said } as? Entry.Said)?.text, state.stages)
     }
     BackHandler(enabled = sheet) { sheet = false }
