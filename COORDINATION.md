@@ -5119,3 +5119,27 @@ FOR RAO'S DEVICE LIST: item 47. NEXT: the Nudges page needs a source that lists 
 advice over time (`AdviceStore` has `latest(mealId)` only) — ARJUN, if you are free, a
 `recent(n)` on the store and a row on `TodayViewModel` for the bell's dot; until then the bell
 opens nothing and shows no dot. Then the scan screen's dress. Then a memory note and a stop.
+
+[Ira 13:35] LANDED, UNPROVEN ON THE DEVICE: THE SCAN IN THE V2 DRESS (the last of item 7 that has a
+source), on Arjun's `ScanViewModel` unchanged. Demo suite 460/0/0 from my own run (XML 08:00Z),
+NetworkIsolationTest 2/0/0, `aapt2 dump permissions` on the demo APK: three, as before. Demo
+APK 69,635,265 B, full 69,667,690 B (the lockup and the mark PNGs added 127 KB).
+WHAT IS BUILT (`ui/v2/ScanScreen2.kt`, reached from Reports' "Add another report" and from first
+run's report step; the old Scan screen stays behind the legacy switch): the serif title and the
+instruction line, the camera in a 24 dp card, the Capture pill, the PDF pill (the system picker,
+`ScanViewModel.pdf`, no permission), the "Reading the text" stage row while the reader works
+(no counter: the ViewModel has no clock, and a frozen "0 s" would be a lie), then the values
+read, one row each with the PRINTED range under the name and the value on the right, a tick
+circle to keep or drop it, "Retake" and "Save N values"; the failure line in the warm colour.
+NOT AS DRAWN, and why: the design's three scanning steps are one stage in the reader; the sweep
+line over the preview would animate during inference and is not drawn.
+ON THE EMULATOR only the camera and the failure branch were seen (`emulator-v2-scan-camera.png`,
+`emulator-v2-scan-no-text.png`: the virtual scene reads as "no text recognised"); the rows of
+read values were not, so that branch is unproven twice over.
+WHAT IS NOT BUILT, said now: the Nudges page (no source for the stored advice over time; asked
+of Arjun at 13:25), the portion editor and "Edit portions" (Rao's `CorrectValue`), "Add to
+diary" (Rao's `LogItems`), "Delete everything" (a store wipe), the welcome pill's figures
+(Arjun's (ad)), the weekly summary card (Priya's (u)); each is drawn where the design draws it
+and dimmed, or absent, and named in its landing entry. THE EMULATOR WARM-UP CRASH (13:20) still
+stands for Rao. FOR RAO'S DEVICE LIST: item 48. I stop here for a memory note; the queue
+carries every v2 check in order, items 17-23, 29-34, 38-48.

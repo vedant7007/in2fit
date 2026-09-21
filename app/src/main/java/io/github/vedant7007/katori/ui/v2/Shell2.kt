@@ -42,7 +42,6 @@ import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.domain.Stage
 import io.github.vedant7007.katori.ui.DiaryViewModel
 import io.github.vedant7007.katori.ui.PreflightScreen
-import io.github.vedant7007.katori.ui.ScanScreen
 import io.github.vedant7007.katori.ui.TalkViewModel
 import io.github.vedant7007.katori.ui.TalkViewModel.Entry
 import io.github.vedant7007.katori.ui.components.Splash
@@ -150,7 +149,7 @@ fun Shell2() {
                 // The scan sits OVER the steps so the step the person was on is still there on Back.
                 FirstRunScreen(onScan = { scanning = true }, onDone = { ThemePreference.setWelcomed(context, true) }, onBackOut = { firstRun = false })
                 if (scanning) {
-                    Legacy { ScanScreen() }
+                    Box(Modifier.fillMaxSize().background(s.ground).statusBarsPadding().padding(top = 8.dp)) { ScanScreen2(onBack = { scanning = false }) }
                     // Composed after the steps' own handler, so Back closes the scan first.
                     BackHandler { scanning = false }
                 }
@@ -185,7 +184,7 @@ fun Shell2() {
                         preflight -> Legacy { PreflightScreen() }
                         over == "reports" -> ReportsScreen(onOpenMarker = { marker = it; over = "marker" }, onScan = { over = "scan" })
                         over == "marker" -> MarkerScreen(marker, onBack = { over = "reports" })
-                        over == "scan" -> Legacy { ScanScreen() }
+                        over == "scan" -> ScanScreen2(onBack = { over = "reports" })
                         over == "edit" -> EditDetailsScreen(onBack = { over = null })
                         over == "trends" -> TrendsScreen(onBack = { over = null })
                         over == "search" -> SearchScreen(onBack = { over = null }, onVoice = { over = null; tab = Tab2.COACH })

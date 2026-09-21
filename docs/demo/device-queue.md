@@ -126,6 +126,7 @@ handset produced it; Nila has the list of what does not (COORDINATION, 21 Sep).
 | 45 | Ira's Diary | Diary on the realme: the day's meals as cards, the energy under the title equal to Today's ring, ticks on the days with meals; tap the chapati meal: the four totals equal the card, "taken as" only under the dal | Diary and the meal on real rows | LANDED AND UNPROVEN (Ira, 13:20) |
 | 46 | Ira's Trends | Diary → Trends: seven bars, no bar on an empty day, Avg over the logged days only, Protein hit and Weight empty | Trends on real rows | LANDED AND UNPROVEN (Ira, 13:20) |
 | 47 | Ira's Search and the food page | Today → "Add manually": "You log these often" from the realme's diary; type "dal": the matches with the bundled unit and grams and the energy for that portion; open one: 0.5 / 1 / 1.5 change the figures through the lookup (65.2 → 97.9 kcal on the emulator's row), "Add to diary" dim | Search on the real catalogue; a portion is a new lookup, never arithmetic on the screen | LANDED AND UNPROVEN (Ira, 13:25) |
+| 48 | Ira's scan in the v2 dress | Reports → "Add another report" (and first run's report step): the camera in the card, Capture on the realme's printed report: "Reading the text" as a row, then the values with their printed ranges and tick circles, "Save N values"; Reports shows the new card; "Open a PDF report" opens the picker | the v2 scan on `ScanViewModel`, camera and PDF paths | LANDED AND UNPROVEN (Ira, 13:35) |
 
 Struck lines stay in the table with the date and the log path, so the next person sees what was
 run and when.

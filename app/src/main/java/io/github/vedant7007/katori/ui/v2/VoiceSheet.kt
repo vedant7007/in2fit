@@ -170,7 +170,7 @@ fun AnalysingBody(transcript: String?, stages: List<Stage>, elapsed: State<Int>)
  * current one). The ring is 22 dp with a 1.5 dp border; done fills it with the accent and a tick.
  */
 @Composable
-fun StageRows(stages: List<Stage>, elapsed: State<Int>) {
+fun StageRows(stages: List<Stage>, elapsed: State<Int>, counter: Boolean = true) {
     val s = scheme()
     Column(Modifier.fillMaxWidth()) {
         stages.forEachIndexed { i, stage ->
@@ -186,7 +186,8 @@ fun StageRows(stages: List<Stage>, elapsed: State<Int>) {
                 ) { if (done) Icon2(Glyphs.tick, 12.dp, s.onAccent) }
                 Column(Modifier.weight(1f)) {
                     T(stringResource(Sentences.stage(stage)), sans(14.5f, FontWeight.SemiBold, 1.3f), color = s.text)
-                    if (!done) {
+                    // The counter only where a clock feeds it; a frozen "0 s" would be a lie.
+                    if (!done && counter) {
                         T(stringResource(R.string.talk_elapsed_seconds, elapsed.value), sans(13f, FontWeight.Normal, 1.45f), color = s.text2, modifier = Modifier.padding(top = 3.dp))
                     }
                 }
