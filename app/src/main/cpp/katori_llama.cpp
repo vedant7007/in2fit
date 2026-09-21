@@ -38,6 +38,7 @@ struct Handle {
     llama_context * ctx   = nullptr;
     const llama_vocab * vocab = nullptr;
     int32_t n_ctx = 0;
+    int32_t n_threads = 0;
     std::mutex lock;
 
     // Timings from the last generate call. They live here rather than being derived in Kotlin
@@ -148,6 +149,7 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeLoad(
     h->ctx   = ctx;
     h->vocab = llama_model_get_vocab(model);
     h->n_ctx = (int32_t) llama_n_ctx(ctx);
+    h->n_threads = cparams.n_threads;
     LOGI("loaded, n_ctx=%d threads=%d", h->n_ctx, cparams.n_threads);
     return reinterpret_cast<jlong>(h);
 }
@@ -291,6 +293,23 @@ Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeGenerate(
         return nullptr;
     }
     return env->NewStringUTF(out.c_str());
+}
+
+// The thread count, changed in place. llama.cpp lets a live context be re-threaded between
+// decodes (llama_set_n_threads), so a session on the phone can run the same utterance at 8, 6
+// and 4 threads without a rebuild or a reload (Vedant, 21 Sep: "three sessions into one").
+JNIEXPORT jint JNICALL
+Java_io_github_vedant7007_katori_ml_llm_LlamaCppRuntime_nativeSetThreads(
+        JNIEnv *, jobject, jlong handle, jint threads) {
+    auto * h = reinterpret_cast<Handle *>(handle);
+    if (h == nullptr || h->ctx == nullptr) return 0;
+    std::lock_guard<std::mutex> guard(h->lock);
+    if (threads > 0 && threads != h->n_threads) {
+        llama_set_n_threads(h->ctx, threads, threads);
+        h->n_threads = threads;
+        LOGI("threads set to %d", threads);
+    }
+    return h->n_threads;
 }
 
 // [prompt tokens, eval tokens, prompt microseconds, eval microseconds] from the last generate.

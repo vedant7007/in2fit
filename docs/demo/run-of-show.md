@@ -39,6 +39,52 @@ sentence, and the list at the end is the honest one.
 
 ---
 
+## Reboot, wait, check, then demo (Rao, 21 Sep; the procedure for the 26th)
+
+A warm ANSWER took 66 s on 21 Sep on a phone seven minutes past a reboot with its indexer
+(`android.process.acore`) on two cores; the same call is 10 s on a quiet phone. The speed of the
+demo depends on what Android is doing in the background, and in a hall nobody knows that by
+looking. So the state is measured, not assumed, in this order, at the table, with the laptop:
+
+1. **Reboot the phone.** Every 0 %-CPU model stall so far (three) followed an idle spell and
+   cleared with a reboot. Airplane mode survives the reboot; check it anyway.
+2. **Wait ten minutes.** The post-boot indexing ran at 140-230 % CPU for four minutes on 21 Sep
+   and the load average was still above 20 at nine minutes. Do nothing on the phone meanwhile.
+3. **Open IN2FIT and run one Beat 1 sentence** (row 9 of the pre-demo checklist): the model is
+   then resident and warm.
+4. **Run the check:** `powershell -File tools\preflight.ps1` on the laptop with the phone on the
+   default adb server. It prints every value with its threshold beside it (load average,
+   runnable count, thermal status, CPU temperature, any process above 30 % CPU by name, minutes
+   since boot, airplane mode, Wi-Fi, the app's PSS with the model resident, the adb ownership) and
+   ends with one line: **READY**, or **WAIT: <reasons>**. The thresholds are first guesses marked
+   as such in the script; every run writes `logs/preflight-<stamp>.txt`, so by the 26th READY is
+   a measured shape on this phone, not a hope.
+5. **WAIT means wait**, then run it again. A named process above 30 % is stopped (Instagram
+   restarts itself after every reboot on this phone: force-stop it). A thermal status above 0
+   means the phone sits for five minutes. A load average above 4 with nothing named means the
+   indexer is still working: wait.
+6. **READY, then unplug and hand the phone to P.** Nothing else is opened on it afterwards.
+
+## If it is slow on stage anyway
+
+The cause may not be found by the 26th, so this is planned for, not hoped against. WHAT THE APP
+DOES TODAY when an answer takes sixty seconds: nothing times out and nothing gives up, at any
+layer (no timeout in the view-model, the orchestrator, the engine or the arbiter). The person
+sees the stage list with the live stage and a running seconds counter ("Writing the reply · 41 s"),
+the hold button greyed, and, for a question (Beat 2) or a request, THEIR OWN FIGURES ALREADY ON
+SCREEN under "From your diary" before the model is even asked, because the figures are emitted
+first (0014). The spoken part arrives when it arrives. For Beat 1 the plate cannot appear before
+the model has picked out the foods, so a slow extraction shows only the counter under "Picking
+out the foods". There is no cancel while the model works; the only way out of a stalled turn is
+to kill the app (the playbook's restart branch), and a stall looks exactly like a slow turn until
+the counter passes a minute.
+
+WHAT P SAYS: the figures are the demo. At Beat 2, P reads the "From your diary" card aloud while
+the counter runs ("It already has my week: 6.1 mg of iron; it is writing the sentence now"). At
+Beat 1, P names the stage aloud and waits; at 60 s on the counter P uses the restart branch and
+the pre-saved diary (row 7), not a second attempt. Nothing in the app hides the wait, and nothing
+should: a spinner that hid the counter would turn an honest 40 s into a mystery.
+
 ## Before anyone walks to the table: the device state checklist
 
 Rao's report of 20 September showed what a hot phone with Instagram in the foreground does: every

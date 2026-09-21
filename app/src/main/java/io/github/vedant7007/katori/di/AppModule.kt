@@ -1,6 +1,7 @@
 package io.github.vedant7007.katori.di
 
 import android.content.Context
+import android.provider.Settings
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
@@ -21,6 +22,7 @@ import io.github.vedant7007.katori.domain.DefaultModelArbiter
 import io.github.vedant7007.katori.domain.DefaultRulesEngine
 import io.github.vedant7007.katori.domain.ModelArbiter
 import io.github.vedant7007.katori.ml.llm.LlamaCppModelLoader
+import io.github.vedant7007.katori.ml.llm.LlamaCppRuntime
 import io.github.vedant7007.katori.domain.RulesEngine
 import io.github.vedant7007.katori.data.food.LookupMealResolver
 import io.github.vedant7007.katori.data.food.SqliteSpokenNames
@@ -233,12 +235,21 @@ object AppModule {
     /** The LLM is leased from the arbiter per call; the engine is built over the admitted runtime. */
     @Provides
     @Singleton
-    fun provideLlmLease(arbiter: ModelArbiter): LlmLease = object : LlmLease {
+    fun provideLlmLease(@ApplicationContext context: Context, arbiter: ModelArbiter): LlmLease = object : LlmLease {
         override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> =
             arbiter.withModel(LlmModels.QWEN_2_5_1_5B_Q4_K_M) { loaded ->
-                block(LlamaCppLlmEngine(loaded.native as LlamaRuntime))
+                val runtime = loaded.native as LlamaRuntime
+                // The one-session bisection knob (21 Sep): `adb shell settings put global
+                // katori_llama_threads 6` re-threads the live model before the next call; 0 or
+                // unset leaves the loader's count. Readable by any app, writable from the shell.
+                val wanted = Settings.Global.getInt(context.contentResolver, LLAMA_THREADS_SETTING, 0)
+                if (wanted > 0 && runtime is LlamaCppRuntime) runtime.setThreads(wanted)
+                block(LlamaCppLlmEngine(runtime))
             }
     }
+
+    /** `adb shell settings put global katori_llama_threads N`; `settings delete global katori_llama_threads` to return to the loader's 8. */
+    const val LLAMA_THREADS_SETTING = "katori_llama_threads"
 
     @Provides
     @Singleton

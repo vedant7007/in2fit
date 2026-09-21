@@ -24,6 +24,9 @@
 param(
   [string]$Serial = "",
   [switch]$SkipInstall,
+  # The pre-flight (tools/preflight.ps1) runs first and a WAIT refuses the pass; this records the
+  # verdict and runs anyway, for a measurement that is ABOUT a bad state.
+  [switch]$IgnorePreflight,
   [string]$Runner = "io.github.vedant7007.katori.test/androidx.test.runner.AndroidJUnitRunner"
 )
 $ErrorActionPreference = 'Continue'
@@ -93,6 +96,18 @@ $wifi = (Sh 'settings get global wifi_on' | Select-Object -Last 1).Trim()
 if ($wifi -ne '0') { Refuse "device '$Serial' still has Wi-Fi on under airplane mode (wifi_on=$wifi); 'svc wifi disable' and run again" }
 
 $claimable = -not $isEmulator
+
+# --- 0c. the pre-flight: is the phone in a state worth measuring? -------------------------------
+# Every run of it writes its own log too, so READY accumulates a shape (Vedant, 21 Sep).
+$preflight = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'preflight.ps1') -Serial $Serial 2>&1 | ForEach-Object { "$_" }
+$verdictLine = ($preflight | Where-Object { $_ -match '^(READY|WAIT|NO DEVICE)' } | Select-Object -Last 1)
+Line "----- pre-flight -----"
+$preflight | ForEach-Object { Line $_ }
+Line "----- end -----"
+if ($verdictLine -notmatch '^READY') {
+  if ($IgnorePreflight) { Say "pre-flight said '$verdictLine'; running anyway (-IgnorePreflight), and the file says so" }
+  else { Refuse "pre-flight: $verdictLine (run tools\preflight.ps1, fix what it names, or pass -IgnorePreflight to measure the bad state on purpose)" }
+}
 $props = Sh 'getprop ro.product.manufacturer; getprop ro.product.model; getprop ro.build.version.release; getprop ro.build.version.sdk; getprop ro.hardware'
 Line "device:  $Serial  $(($props | ForEach-Object { $_.Trim() }) -join ' / ')"
 Line "claimable: $claimable$(if (-not $claimable) { '  <- EMULATOR: this run proves the harness, not the numbers' })"

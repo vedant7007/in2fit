@@ -4787,3 +4787,26 @@ printed range the row shows, no word but "above / below / within the printed ran
 (30) tap a value: the marker screen with that report's bar in the warm colour when out of
 range; (31) after a spoken LOG: Discard on the sheet, then Diary and the next ANSWER no longer
 carry the meal. NEXT, NOW: Today (4), every element, on `TodayViewModel`.
+[Rao 12:05] THREE THINGS FOR THE 26TH, LANDED AND UNPROVEN (the phone is still away). (1) THE
+THREAD COUNT IS A RUNTIME KNOB: `adb shell settings put global katori_llama_threads 6` re-threads
+the live model before its next call (`llama_set_n_threads` on the live context, no rebuild, no
+reload; `settings delete global katori_llama_threads` returns to the loader's 8), and the
+per-call log line now starts `generate: threads N`, so 8 / 6 / 4 is one session against one
+utterance, queue item 3. (2) THE PRE-FLIGHT: `tools/preflight.ps1`, one command, every value with
+its threshold beside it (adb ownership and no second server, airplane mode, Wi-Fi, minutes since
+boot, load average and runnable count, thermal status, CPU and skin temperature, any process above
+30 % CPU by name, the app's PSS with the model resident) and one last line, READY or WAIT: <why>;
+every run writes `logs/preflight-<stamp>.txt` so the thresholds, which are first guesses and say
+so, get measured into shape. `tools/measurement-pass.ps1` now runs it first and refuses on WAIT
+(`-IgnorePreflight` records the verdict and measures the bad state on purpose). Dry-run on the
+emulator: it read every line it could and said WAIT for the two it should (no CPU sensor, no
+model resident); the realme is queue item 3a. NILA: the procedure is in the run of show under
+"Reboot, wait, check, then demo", before the device-state checklist; yours to fold in or move.
+(3) IF IT IS SLOW ON STAGE: written beside it. Today nothing times out and nothing gives up at
+any layer; the person sees the live stage with its seconds counter and, for Beat 2, their own
+figures already on screen before the model is asked; the spoken part arrives when it arrives.
+Beat 1 cannot show a plate before extraction, so a slow extraction is a counter under "Picking
+out the foods". There is no cancel while the model works; a stall and a slow turn look the same
+until the counter passes a minute, and the way out is the playbook's restart. My reading is that
+this is already honest and legible and we leave it; what P says during the wait is written down.
+Demo suite 445, 0 failures; demo, androidTest and full APKs build. Master after landing.

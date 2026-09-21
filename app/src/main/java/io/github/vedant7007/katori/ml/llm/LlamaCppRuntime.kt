@@ -20,6 +20,21 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class LlamaCppRuntime private constructor(private var handle: Long) : LlamaRuntime {
 
+    /** The thread count now in force, or 0 when closed. */
+    val threads: Int get() = handle.takeIf { it != 0L }?.let { nativeSetThreads(it, 0) } ?: 0
+
+    /**
+     * Re-thread the live context, no reload: takes effect on the next call. Returns the count in
+     * force. The knob for one-session bisection on the phone; the lease reads it from the
+     * global setting `katori_llama_threads` before every call (`adb shell settings put global
+     * katori_llama_threads 6`), and the per-call log line says which count each number was made at.
+     */
+    fun setThreads(threads: Int): Int {
+        val h = handle
+        check(h != 0L) { "this runtime has been closed" }
+        return nativeSetThreads(h, threads)
+    }
+
     override fun generate(prompt: String, maxTokens: Int, stop: List<String>): String {
         val h = handle
         check(h != 0L) { "this runtime has been closed" }
@@ -31,7 +46,7 @@ class LlamaCppRuntime private constructor(private var handle: Long) : LlamaRunti
         val t = lastTimings()
         android.util.Log.i(
             "katori-llama",
-            "generate: wall ${wall} ms, prompt ${t?.promptTokens} tok / ${"%.0f".format(t?.promptMillis ?: 0.0)} ms, " +
+            "generate: threads $threads, wall ${wall} ms, prompt ${t?.promptTokens} tok / ${"%.0f".format(t?.promptMillis ?: 0.0)} ms, " +
                 "gen ${t?.evalTokens} tok / ${"%.0f".format(t?.evalMillis ?: 0.0)} ms, max $maxTokens, prompt chars ${prompt.length}, out chars ${out.length}",
         )
         return out
@@ -75,6 +90,7 @@ class LlamaCppRuntime private constructor(private var handle: Long) : LlamaRunti
     }
 
     private external fun nativeGenerate(handle: Long, prompt: String, maxTokens: Int, stop: Array<String>): String
+    private external fun nativeSetThreads(handle: Long, threads: Int): Int
     private external fun nativeLastTimings(handle: Long): LongArray?
     private external fun nativeFree(handle: Long)
 
