@@ -5011,7 +5011,7 @@ editor (the design draws none either); (8) the Goals row's "2100 kcal" and the R
 A NOTE ON THE EMULATOR'S DATA: the profile there reads "Vedant · 19 · 62 kg", written by the
 device rig (`OrchestratorDeviceTest`/`MeasurementPassTest` upsert that row); not the app's
 doing, and the greeting on Today reads "Afternoon, Vedant" from it.
-FOR RAO'S DEVICE LIST, items 37-40: (a) You on the realme: the rig's row shows as
+FOR RAO'S DEVICE LIST, items 38-41: (a) You on the realme: the rig's row shows as
 "19 · 62 kg", Language reads the picker's choice; (b) Appearance → Cream: every screen cream,
 status icons dark; kill and reopen: still cream; back to Dark; (c) Edit details: change the
 weight, Save: You shows it; (d) Language → Telugu: the sheet's label reads "LISTENING · తెలుగు"
