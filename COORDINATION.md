@@ -4360,3 +4360,67 @@ per-item rows and the "taken as" caption; Reports with the attributed wording; H
 element, empty where the data is not there; Settings with the switch and the language; Welcome
 and first run; the rest. The fourteen and the two amendments go into
 `docs/design/data-gap-list.md` as overrides with this landing.
+[Arjun 07:33] THE TARGET IS TODAY (Vedant, this morning): I land small, all day, and every
+report says whether it has been seen on the phone. I do not have the phone. EVERYTHING I LAND
+TODAY IS UNPROVEN UNTIL RAO RUNS IT, and I will name it as unproven every time until he says
+what he saw. Rao: each landing below ends with the one thing to look at on the realme.
+
+[Arjun 07:33] SCOPE, SO NOBODY BUILDS IT TWICE. Vedant's brief this morning gives me the SYSTEM
+SIDE of the v2 design: `data/local` (entities, DAOs, migrations, the store seams), the profile,
+the target figure's storage and exposure, the queries and ViewModels, and the new storage. So
+from Ira's 07:27 order, (b) profile fields + Room v3, (c) `MealEntity.source`, (d) `deleteMeal`,
+(f) the profile write, (n) totals outside a turn, (o) water, (p) weight, (x) profile extras,
+(y) reminders, (z) delete everything MOVE FROM RAO TO ME, on Vedant's word. Rao keeps (a) the
+one emit line, (e) the ruling, (w) `LogItems`, and every branch of `DefaultOrchestrator`: I
+build store seams and call them from ViewModels; I add no `UserIntent` and no orchestrator
+branch. Rao, if you have started any of these, say so in one line and I stop on that one.
+
+[Arjun 07:33] PART 1, TO RAO, THE SHAPE, ONE MESSAGE, NOTHING INVENTED. The resolver already
+builds the whole thing: `LookupMealResolver.one()` makes exactly one `ResolvedItem` per
+`ParsedItem`, in order, and writes the assumed quantity and unit back onto the parsed item. So:
+    OrchestratorEvent.MealResolved.items: List<ResolvedItem> = emptyList()
+one per `meal.items`, same order, REPLACING `grams: List<Double?>` (b168edd). Your side is the
+one line at `DefaultOrchestrator.kt:284`: `items = resolved.items` where `grams = resolved.items
+.map { it.snapshot.grams }` is now. From it the screen reads, per item i: the name as shown
+`items[i].snapshot.displayName`; the amount as said `meal.items[i].quantity` / `.unit` (the
+assumed katori is there when it was ours, per 0035); the grams `items[i].snapshot.grams` (null
+for a no-data item, never 0); the nutrients `items[i].snapshot.nutrients` (measured only; an
+Unknown is absent, never 0) and `items[i].nutrients` three-state for the detail; inferred =
+`QUANTITY_INFERRED in items[i].confidence.reasons`; the source `items[i].source`. I am adding
+the field to the contract with its default NOW so `Entry.Plate` and the scripted feed can carry
+it this hour and nothing else of yours changes; you flip the line and delete `grams` when you
+land. Say the hour, or say no and name the shape you want, and I follow it.
+
+[Arjun 07:33] PART 2, THE LANGUAGE HAS ONE HOME, MY CALL UNLESS VEDANT OVERRULES: THE PROFILE
+ROW. Jacob's 05:40 ruling put `speech_language_tag` on `ProfileEntity`; Vedant's 21 Sep ruling
+made Hindi the default that survives a restart; today it lives in `SharedPreferences`
+("talk"/"language", 5cd3fdc), which is a second home. Landing this morning: `ProfileEntity`
+gains `name`, `activity`, `speech_language_tag` (Room v3, hand-written migration, tested on a
+POPULATED v2 database, not an empty one), a `ProfileStore` seam with the first write path the
+profile has ever had, `TalkViewModel` reads the tag from the profile and writes it there, the
+prefs go, and an absent tag reads "hi" (the 21 Sep ruling, which is later than 05:40's "no
+default"). Greeting with no name: no name, not "Hi, ." — the ViewModel hands the screen null.
+
+[Arjun 07:33] PART 3, TO PRIYA, THE TARGETS BOUNDARY, IN WRITING, against Ira's 07:27 shape
+(`Targets`, `TargetProgress`, `TargetsSource.current()`). YOURS: the rule, pure, in `domain/`:
+`fun targetsFor(profile: ProfileSnapshot, at: Instant): Targets?` (null until the profile has
+what the rule needs, never a guess) and `fun progress(targets: Targets, consumed: Map<Nutrient,
+Double>): List<TargetProgress>` with the band thresholds you name; every `Targets.rule` string
+cites the source (ICMR-NIN 2020 RDA or whatever you stand behind). MINE: the profile behind
+`ProfileSnapshot` (stored with `updated_at_epoch_ms`, which is your `profileVersionMs`),
+`TargetsSource` over `ProfileDao` + your function, the consumed map from
+`nutrientTotalsForRange`, and the ViewModels that hand `TargetProgress` to Ira's ring and bars
+unchanged. No screen and no ViewModel does arithmetic on a target; no target reaches the
+model. Until your function lands, `TargetsSource.current()` returns null and the ring is empty,
+never a placeholder. If you want `ProfileSnapshot` to gain fields for the rule (activity,
+life context is there), name them and I store them today.
+
+[Arjun 07:33] THE THREE PHONE DEFECTS, WHERE THEY STAND. "Jaapats: 2" / "डॉटरी: 2": the
+producer is found, by Rao at 07:25, the 1.5B model reading Devanagari; not a screen defect, it
+is Priya's and Jacob's Beat 1 call. "Logging" clipped behind the offline banner, and the band's
+"tap to correct" that is not a control: both live in `TalkScreen.kt`, Ira's file, which she is
+replacing with the v2 Talk sheet today; I am not patching a screen being rebuilt this morning.
+IRA: the sheet you build must clear the banner (`statusBarsPadding` is on the banner, the
+content needs the banner's height too) and the band must be a control or say nothing about
+tapping; both are yours with the file. If the rebuild slips past noon, tell me and I patch the
+old screen.
