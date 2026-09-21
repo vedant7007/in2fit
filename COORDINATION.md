@@ -4295,3 +4295,68 @@ HAZARDS: the model stalled at 0 % CPU once more (46 s of CPU then nothing; reboo
 Instagram restarts itself after every reboot on this phone; `input text` cannot type Devanagari
 (the rig can). The phone's diary now holds tonight's test meals (chapatiis 06:43, and the rig's are
 in-memory). The clean build (no diagnostics) is installed, 07:21:38.
+
+[Ira 07:27] RULED BY VEDANT THIS MORNING, RELAYED: (1) every buildable MISSING row is in scope for
+the 26th; (2) the app looks exactly like the v2 design, dark by default (lime on #0E1312), cream
+behind the switch, Instrument Sans and Serif bundled as assets, EVERY DIGIT IN PLEX (tabular;
+a serif number that jitters between frames looks broken on a projector); (3) the fourteen: the
+network seven are built to look the same and need no network, the clinical seven change only
+their words to what the report prints; (4) targets are specced today and computed by the rules
+engine, never the model; (5) welcome page pixel for pixel, sign-in shows a one-sentence honest
+notice and goes straight in; (6) report flags by ATTRIBUTION: the printed range's wording, or
+the sheet's own comments in quotes as "Your report says: …", never a word the app originates.
+THE EXTRACTOR CHECK Vedant asked for: `LabReportExtractor` reads value rows and the report
+date only; `LabReport` is `fields` + `reportDate`, no comments or impression field anywhere.
+NEW MISSING ROW, PRIYA'S: a `comments: String?` on `LabReport` from an impression/comments
+block, verbatim. Until it lands the chip says "above the range printed on your report" /
+"below the printed range" and we lose nothing.
+THE ORDER OF THE 44, by Vedant's rule (the demo touches it → visible on Home → the rest), and
+who builds the data. Work ahead of me, not behind me.
+DEMO-TOUCHED, FIRST — RAO: (a) `MealResolved.items` with grams and per-item nutrients
+(supersedes 23:34); (b) `ProfileEntity.name`, `speech_language_tag`, Room v3; (c)
+`MealEntity.source` SPOKEN/TYPED; (d) `deleteMeal` + `UserIntent.DeleteMeal`; (e) LOG as
+resolve → confirm → save if it costs no second model call, else tell me; (f) a profile write
+(`UserIntent.UpdateProfile`). PRIYA: (g) `LabReport.comments`, verbatim; (h) the conditions
+vocabulary for the chips; (i) TARGETS (spec below). ARJUN: (j) `Entry.Plate` carrying (a).
+HOME-VISIBLE, SECOND — PRIYA: (k) the target rule and its sources; (l) a meal-slot rule by hour
+you stand behind, or "no slots"; (m) nudge rules the engine emits deterministically (a nudge is
+a template + figures, like a trigger sentence). RAO: (n) today's and the week's totals readable
+outside a turn (`UserContextSource.current()` or a `TotalsSource` seam); (o) a `water` table +
+`UserIntent.LogWater(ml)`; (p) a `weight` history table + write. ARJUN: (q) `TodayViewModel`
+(totals, last meal, stored advice, out-of-range labs, targets when they exist); (r) the streak
+query (consecutive days with a meal, from `mealsInRange`); (s) "you log these often" (most
+frequent `food_id`).
+THE REST — PRIYA: (t) marker explanations as a sourced file, one row per test name, Nila reviews;
+(u) the weekly summary prompt + guards (Rao the turn); (v) per-food quoted facts (exists:
+`KnowledgeFacts.find`). RAO: (w) `UserIntent.LogItems` for "Add to diary"; (x) profile
+`activity_days`, `city`, `doctor`; (y) reminders storage; (z) delete everything. ARJUN: (aa)
+`DiaryViewModel`, `TrendsViewModel`, `ReportsViewModel` (labs by date, `history(testName)`),
+`SearchViewModel`, `ProfileViewModel`; (ab) the export file (CSV from the DAO) and the Android
+share sheet for "share with your doctor" — no permission, confirm the whitelist unchanged; (ac)
+PDF input via `ACTION_OPEN_DOCUMENT` + `PdfRenderer`, no permission; (ad) the splash phrases'
+figures computed through the real resolver at first launch, not remembered (0029). NOBODY:
+system notifications. `POST_NOTIFICATIONS` is a permission and the demo whitelist is three;
+nudges are an in-app list unless Vedant adds the permission with its written reason.
+TARGETS, THE SHAPE, FOR PRIYA AND ARJUN, exact. A seam `TargetsSource.current(): Targets?`,
+computed by the rules engine from the profile, null until the profile carries what the rule
+needs (age, weight, height, sex, goal kind, life context), never a guess:
+    data class Targets(
+        val energyKcal: Double,          // the day's energy target
+        val proteinG: Double, val carbohydrateG: Double, val fatG: Double,
+        val waterMl: Double,
+        val rule: String,                 // the rule id and its source, e.g. "ICMR-NIN 2020 RDA, sedentary, maintain"
+        val profileVersionMs: Long,       // the profile it was computed from; a changed profile recomputes
+    )
+and per nutrient, what the screens read (engine-computed, so the screen never does arithmetic
+on a health figure): `TargetProgress(nutrient, target: Double, consumed: Double, remaining:
+Double, fraction: Double, status: WITHIN | UNDER | OVER)`; `status` is a threshold in the rule
+(Priya names the band), and the sentence for it is a template id from the string table
+("You're on track" is that template, never the model). The home ring reads `fraction` and
+`remaining` for energy; each macro bar reads `consumed / target` and `fraction`; Trends reads
+the same per day. The kcal ring and the bars are built today against exactly this shape and
+render EMPTY (no ring fill, no denominator, no "left") until `TargetsSource` returns non-null.
+BUILDING NOW, in Vedant's order: Talk and the voice sheet as drawn, dark; the plate with the
+per-item rows and the "taken as" caption; Reports with the attributed wording; Home, every
+element, empty where the data is not there; Settings with the switch and the language; Welcome
+and first run; the rest. The fourteen and the two amendments go into
+`docs/design/data-gap-list.md` as overrides with this landing.
