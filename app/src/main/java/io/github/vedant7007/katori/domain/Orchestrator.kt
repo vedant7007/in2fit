@@ -203,20 +203,12 @@ sealed interface OrchestratorEvent {
         val figures: List<NutritionFigure>,
         val hypothetical: Boolean,
         /**
-         * The grams each item was computed from, one per [ParsedMeal.items] in the same order,
-         * null for an item the database holds no figures for. The plate's "taken as 180 g"
-         * caption (0035) is this number beside an item whose reasons say QUANTITY_INFERRED;
-         * a stated amount keeps its grams behind the band's detail, never on the face.
-         * Ira's ask of 20 Sep 23:34; defaulted so a feed that has no grams still compiles.
-         */
-        val grams: List<Double?> = emptyList(),
-        /**
          * The resolved items, one per [ParsedMeal.items] in the same order, exactly as the
          * resolver built them (`LookupMealResolver.one()` makes one per parsed item): the name
-         * as shown, the grams, the per-item nutrients, the source and the reasons, with the
-         * amount as said on the parsed item beside it. Supersedes [grams]. Added by Arjun
-         * 21 Sep 07:33 with its default so the entry and the feed can carry it; the emit line
-         * that fills it is Rao's.
+         * as shown, the grams (the plate's "taken as 180 g" beside an item whose reasons say
+         * QUANTITY_INFERRED, 0035), the per-item nutrients, the source and the reasons, with
+         * the amount as said on the parsed item beside it. Arjun's shape, 21 Sep 07:33; filled
+         * by the orchestrator at the same line the event is emitted.
          */
         val items: List<ResolvedItem> = emptyList(),
     ) : OrchestratorEvent

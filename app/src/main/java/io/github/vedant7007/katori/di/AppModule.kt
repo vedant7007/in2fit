@@ -64,6 +64,7 @@ import io.github.vedant7007.katori.ml.vision.FrameStore
 import io.github.vedant7007.katori.ml.vision.MlKitOcrEngine
 import io.github.vedant7007.katori.ml.vision.OcrEngine
 import io.github.vedant7007.katori.orchestration.DefaultOrchestrator
+import io.github.vedant7007.katori.orchestration.CurrentTurn
 import io.github.vedant7007.katori.orchestration.LlmLease
 import javax.inject.Singleton
 
@@ -214,7 +215,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMealStore(db: KatoriDatabase): MealStore = RoomMealStore(db)
+    fun provideMealStore(db: KatoriDatabase): MealStore =
+        RoomMealStore(db, languageTag = { CurrentTurn.languageTag }, source = { CurrentTurn.source })
 
     @Provides
     @Singleton

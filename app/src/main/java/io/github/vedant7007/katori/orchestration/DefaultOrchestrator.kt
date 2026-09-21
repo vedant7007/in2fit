@@ -124,8 +124,8 @@ class DefaultOrchestrator(
     override fun handle(intent: UserIntent): Flow<OrchestratorEvent> = flow {
         when (intent) {
             is UserIntent.Speak -> spoken(intent.language)
-            is UserIntent.Type -> turn(intent.text, intent.language, AsrConfidence.HIGH, decided = null)
-            is UserIntent.Resolve -> turn(intent.text, intent.language, AsrConfidence.HIGH, decided = intent.intent)
+            is UserIntent.Type -> turn(intent.text, intent.language, AsrConfidence.HIGH, decided = null, spoken = false)
+            is UserIntent.Resolve -> turn(intent.text, intent.language, AsrConfidence.HIGH, decided = intent.intent, spoken = false)
             is UserIntent.AdviseOnMeal -> adviseOnMeal(intent.mealId)
             is UserIntent.SaveLabReport -> saveLabReport(intent.values)
             is UserIntent.CorrectValue -> notBuilt("orchestration.CorrectValue")
@@ -166,7 +166,7 @@ class DefaultOrchestrator(
         }
         failure?.let { return fail(it.reason, it.detail) }
         val transcript = result ?: return fail(UnavailableReason.INTERNAL_ERROR, "the recogniser ended without a result")
-        turn(transcript.text, language, transcript.confidence, decided = null)
+        turn(transcript.text, language, transcript.confidence, decided = null, spoken = true)
     }
 
     /**
@@ -179,8 +179,11 @@ class DefaultOrchestrator(
      * short-circuited into a write.
      */
     private suspend fun FlowCollector<OrchestratorEvent>.turn(
-        text: String, language: SpeechLanguageRef, heard: AsrConfidence, decided: SpokenIntent?,
+        text: String, language: SpeechLanguageRef, heard: AsrConfidence, decided: SpokenIntent?, spoken: Boolean,
     ) {
+        // What this turn is, for the store's save (`meals.source`, `meals.language_tag`).
+        CurrentTurn.source = if (spoken) "SPOKEN" else "TYPED"
+        CurrentTurn.languageTag = language.tag
         emit(OrchestratorEvent.Transcribed(text))
         val forModel = romaniser.romanise(text)
         // THE WORDS DECIDE WHERE THEY CAN (IntentRouter, 0027): a certain log, a question about
@@ -291,7 +294,7 @@ class DefaultOrchestrator(
             }
             is Outcome.NotImplemented -> return notBuilt(r.component)
         }
-        emit(OrchestratorEvent.MealResolved(resolved.parsed, resolved.figures, hypothetical = !save, grams = resolved.items.map { it.snapshot.grams }))
+        emit(OrchestratorEvent.MealResolved(resolved.parsed, resolved.figures, hypothetical = !save, items = resolved.items))
 
         val now = clock.instant()
         // THE ONLY WRITE. `save` is true on LOG and false on SUGGEST; a hypothetical plate never

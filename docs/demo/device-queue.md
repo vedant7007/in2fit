@@ -23,6 +23,13 @@ Build once: `assembleDemoDebug` + `assembleDemoDebugAndroidTest`, install both, 
 | 7 | The measurement pass, with the microphone | `tools/measurement-pass.ps1` after items 1-5, for the record; the pass itself types | the deck's numbers on the landed code | UNPROVEN |
 | 8 | Duplicate transcription on a long hold | `cap_case.ps1` twice more (37 s hold, hi_06 at 2 s), with the per-second level log | reproduces or goes on the hazard list | one hour, not more (Vedant) |
 | 9 | Jacob's row on the recorded set | stage the `vedant` clips, run `AsrDeviceTest.b` twice | cold/warm on Vedant's own voice | UNPROVEN |
+| 10 | Arjun's storage, (a) | install `da67d04`+ over the existing database: the app opens (Room v2 -> v3 migration ran), the diary still shows the 06:43 chapatiis, the rig's profile row still reads 19 / 62 / 172 | the migration on populated data, on the phone | LANDED AND UNPROVEN (Arjun, 08:01) |
+| 11 | Arjun's storage, (b) | Talk: the picker reads Hindi on first open after install; choose Telugu, kill the process, reopen: Telugu | the language now lives in the profile row | LANDED AND UNPROVEN (Arjun, 08:01) |
+| 12 | Arjun's plate, (c) | Beat 1 typed in English: the plate rows show "dal · 1 katori · taken as 180 g" and the rotis without "taken as" | `MealResolved.items` filled by the orchestrator (Rao, 21 Sep) reaching Ira's rows | LANDED AND UNPROVEN |
+| 13 | Arjun's screens, (d) | Home/Diary on the migrated database: the chapatiis as a meal named "Chapati / roti", 232.3 kcal, the day's total equal to what ANSWER speaks for today | the derivable rows on real data | LANDED AND UNPROVEN (Arjun, 10:55) |
+| 14 | Arjun's screens, (e) | delete that meal from Diary: gone from Diary, Today and the next ANSWER | `deleteMealAndAdvice` | LANDED AND UNPROVEN (Arjun, 10:55) |
+| 15 | Arjun's screens, (f) | Search "dal": rows with "1 katori" and grams, protein per portion | the search query | LANDED AND UNPROVEN (Arjun, 10:55) |
+| 16 | The meal's source | after a spoken LOG and a typed LOG, `meals.source` reads SPOKEN then TYPED and `language_tag` the picker's tag (`run-as` + sqlite, or Arjun's Diary row) | `CurrentTurn` feeding the store's lambdas (Rao, 21 Sep) | LANDED AND UNPROVEN |
 
 Struck lines stay in the table with the date and the log path, so the next person sees what was
 run and when.

@@ -4560,3 +4560,12 @@ IF IT IS the barrier, the fix is a thread count that leaves the phone a core, an
 ten minutes, nothing else running" on the day; that is a design point about the demo phone, not
 about the pipeline. The 0 %-CPU stall (three times now, each after an idle spell, each cleared
 by a reboot) is a separate hazard and stays on the list.
+[Rao 11:20] ARJUN, YOUR TWO LINES ARE IN, LANDED AND UNPROVEN: `MealResolved.items = resolved.items`
+at the emit line and `grams` deleted from the event (the JVM test now reads the grams off
+`items`); and `meals.source` / `language_tag`: `RoomMealStore(db, languageTag = { CurrentTurn.
+languageTag }, source = { CurrentTurn.source })` in AppModule, with `orchestration/CurrentTurn`
+set at the top of every turn ("SPOKEN" from the microphone, "TYPED" from the field, the picker's
+tag). One turn runs at a time, so it is two volatile fields; the day it carries a third fact it
+becomes a parameter of `MealStore.save`. Your (a)-(f) are queue items 10-15 and the source column
+is 16, all after the push-to-talk and Beat 1 items. Demo suite 445, 0 failures, my XML; demo,
+demo-androidTest and full APKs all build.
