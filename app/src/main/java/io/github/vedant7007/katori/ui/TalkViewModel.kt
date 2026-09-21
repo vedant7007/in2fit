@@ -17,6 +17,7 @@ import io.github.vedant7007.katori.domain.SpokenIntent
 import io.github.vedant7007.katori.domain.Stage
 import io.github.vedant7007.katori.domain.TriggerText
 import io.github.vedant7007.katori.domain.UserIntent
+import io.github.vedant7007.katori.orchestration.WarmUp
 import io.github.vedant7007.katori.domain.model.ConfidenceBand
 import io.github.vedant7007.katori.domain.model.ConfidenceReason
 import io.github.vedant7007.katori.domain.model.Nutrient
@@ -60,6 +61,8 @@ class TalkViewModel(
     private val scripted: Orchestrator?,
     /** The one home of the chosen language (a crash mid-demo must not switch it): the profile row. */
     private val profileStore: ProfileStore,
+    /** `WarmUp.ready` (0032): true once every model the voice round trip needs has run once. */
+    private val ready: StateFlow<Boolean>,
 ) : ViewModel() {
 
     @Inject
@@ -69,6 +72,7 @@ class TalkViewModel(
         contextText: ContextText,
         rules: RulesEngine,
         profileStore: ProfileStore,
+        warmUp: WarmUp,
         @ApplicationContext context: Context,
     ) : this(
         orchestrator, triggerText, contextText,
@@ -82,6 +86,7 @@ class TalkViewModel(
             ),
         ),
         profileStore = profileStore,
+        ready = warmUp.ready,
     )
 
     sealed interface Entry {
@@ -159,6 +164,13 @@ class TalkViewModel(
          * because anything said before it was not recorded (PushToTalk, 2f5f803).
          */
         val micLive: Boolean = false,
+        /**
+         * The models are warm (`WarmUp.ready`, 0032). Until then the microphone REFUSES, never
+         * queues: a hold before the recogniser is resident would load it under the person's first
+         * words and lose them. The screen shows "getting ready" and greys the button. The scripted
+         * feed needs no model and is never held back by this.
+         */
+        val ready: Boolean = false,
         /** Stages of the current turn in order; the last one is current until Completed. */
         val stages: List<Stage> = emptyList(),
         /** Seconds since the current stage began (0026: the counter is the honesty device). */
@@ -172,12 +184,15 @@ class TalkViewModel(
         val stage: Stage? get() = stages.lastOrNull()
     }
 
-    private val _state = MutableStateFlow(State())
+    private val _state = MutableStateFlow(State(ready = ready.value))
     val state: StateFlow<State> = _state.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
             profileStore.speechLanguage.collect { tag -> _state.update { it.copy(language = tag) } }
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            ready.collect { warm -> _state.update { it.copy(ready = warm) } }
         }
     }
 
@@ -186,7 +201,11 @@ class TalkViewModel(
         viewModelScope.launch(Dispatchers.Default) { profileStore.setSpeechLanguage(tag) }
     }
 
-    fun speak() = run(UserIntent.Speak(language()))
+    /** Refused, not queued, until the models are warm; the screen has said "getting ready" all along. */
+    fun speak() {
+        if (!state.value.ready && !(scripted != null && DemoFeed.enabled.value)) return
+        run(UserIntent.Speak(language()))
+    }
     fun type(text: String) = run(UserIntent.Type(text, language()))
     fun resolve(transcript: String, intent: SpokenIntent) = run(UserIntent.Resolve(transcript, language(), intent))
     fun adviseAgain() { state.value.lastMealId?.let { run(UserIntent.AdviseOnMeal(it)) } }

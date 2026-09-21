@@ -413,4 +413,6 @@
     <string name="marker_explanation_source">Source: %1$s</string>
     <!-- Scan: the button that opens the system document picker for a PDF report (Arjun, 21 Sep). -->
     <string name="scan_open_pdf">Open a PDF report</string>
+    <!-- Talk: the microphone's label while the models warm at launch (0032); the button is greyed and a press does nothing. -->
+    <string name="mic_getting_ready">Getting ready…</string>
 </resources>

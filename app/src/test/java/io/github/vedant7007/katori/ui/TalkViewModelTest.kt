@@ -55,10 +55,29 @@ class TalkViewModelTest {
         override suspend fun upsert(profile: ProfileEntity) { row.value = profile }
     }
 
-    private fun vm(orchestrator: Orchestrator, dao: ProfileDao = FakeProfileDao()) = TalkViewModel(
+    private fun vm(orchestrator: Orchestrator, dao: ProfileDao = FakeProfileDao(), ready: MutableStateFlow<Boolean> = MutableStateFlow(true)) = TalkViewModel(
         orchestrator, TriggerText(TriggerText.ENGLISH), ContextText(ContextText.ENGLISH, TriggerText.ENGLISH),
-        scripted = null, profileStore = ProfileStore(dao, conditionDao = null),
+        scripted = null, profileStore = ProfileStore(dao, conditionDao = null), ready = ready,
     )
+
+    /** 0032, the screen's half: before the models are warm a press does nothing at all; after, it starts the turn. */
+    @Test
+    fun `the microphone refuses, never queues, until the models are warm`() {
+        val ready = MutableStateFlow(false)
+        val o = Recording { listOf(OrchestratorEvent.Completed) }
+        val vm = vm(o, ready = ready)
+        waitUntil { !vm.state.value.ready }
+        vm.speak()
+        Thread.sleep(200)
+        assertTrue("a press before ready must not reach the orchestrator, and must not be queued", o.intents.isEmpty())
+        assertFalse(vm.state.value.busy)
+        ready.value = true
+        waitUntil { vm.state.value.ready }
+        vm.speak()
+        assertTrue(o.seen.await(5, TimeUnit.SECONDS))
+        assertEquals(1, o.intents.size)
+        assertTrue(o.intents.single() is UserIntent.Speak)
+    }
 
     @Test
     fun `the language defaults to Hindi`() {
