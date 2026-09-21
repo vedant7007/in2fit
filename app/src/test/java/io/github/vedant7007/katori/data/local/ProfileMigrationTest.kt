@@ -9,7 +9,7 @@ import java.sql.DriverManager
 
 /**
  * Version 2 to 3 on a POPULATED database, not an empty one: a person with a profile, meals,
- * items, nutrients and a lab value, migrated, keeps every row and every value, and gains three
+ * items, nutrients and a lab value, migrated, keeps every row and every value, and gains five
  * absent columns. The same SQL the app runs (`KatoriDatabase.MIGRATION_2_3_SQL`) runs here over
  * sqlite-jdbc against tables created from the exported `2.json`, and the result is checked
  * against the exported `3.json`, which is what Room validates the opened database against on
@@ -68,6 +68,19 @@ class ProfileMigrationTest {
                 assertNull(rs.getString("activity"))
                 assertNull(rs.getString("speech_language_tag"))
             }
+            db.createStatement().executeQuery("SELECT * FROM meals WHERE id = 7").use { rs ->
+                rs.next()
+                assertEquals("two rotis and a little dal", rs.getString("raw_transcript"))
+                assertEquals("hi", rs.getString("language_tag"))
+                assertNull("how a meal written before v3 was logged is not known, and not guessed", rs.getString("source"))
+            }
+            db.createStatement().executeQuery("SELECT * FROM meal_items WHERE id = 11").use { rs ->
+                rs.next()
+                assertEquals("dal", rs.getString("spoken_name"))
+                assertEquals(180.0, rs.getDouble("grams"), 0.0)
+                assertEquals("QUANTITY_INFERRED,HOUSEHOLD_UNIT_DEFAULT", rs.getString("confidence_reasons"))
+                assertNull(rs.getString("display_name"))
+            }
             // The unknown nutrient is still UNKNOWN with no amount, not a zero.
             db.createStatement().executeQuery("SELECT state, amount FROM meal_item_nutrients WHERE nutrient = 'VITAMIN_B12'").use { rs ->
                 rs.next(); assertEquals("UNKNOWN", rs.getString("state")); assertNull(rs.getObject("amount"))
@@ -79,14 +92,16 @@ class ProfileMigrationTest {
         }
     }
 
-    /** The exported v3 differs from v2 in the three profile columns and nothing else. */
+    /** The exported v3 differs from v2 in the five columns and nothing else. */
     @Test
-    fun `the schema change is the three profile columns and nothing else`() {
+    fun `the schema change is the five columns and nothing else`() {
         val v2 = tables(2)
         val v3 = tables(3)
         assertEquals(v2.keys, v3.keys)
-        v2.keys.filter { it != "profile" }.forEach { assertEquals(it, v2[it], v3[it]) }
+        v2.keys.filter { it !in setOf("profile", "meals", "meal_items") }.forEach { assertEquals(it, v2[it], v3[it]) }
         assertEquals(declared(v2.getValue("profile")) + listOf("name", "activity", "speech_language_tag"), declared(v3.getValue("profile")))
+        assertEquals(declared(v2.getValue("meals")) + listOf("source"), declared(v3.getValue("meals")))
+        assertEquals(declared(v2.getValue("meal_items")) + listOf("display_name"), declared(v3.getValue("meal_items")))
     }
 
     private fun count(db: Connection, table: String): Int =

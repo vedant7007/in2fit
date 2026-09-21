@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "042eafa2e3a405dcf1bae581d715662a",
+    "identityHash": "fcf9c6abba276dc8bb88d3567c69f25f",
     "entities": [
       {
         "tableName": "meals",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `logged_at_epoch_ms` INTEGER NOT NULL, `raw_transcript` TEXT, `confidence_band` TEXT NOT NULL, `language_tag` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `logged_at_epoch_ms` INTEGER NOT NULL, `raw_transcript` TEXT, `confidence_band` TEXT NOT NULL, `language_tag` TEXT, `source` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -35,6 +35,11 @@
             "fieldPath": "language_tag",
             "columnName": "language_tag",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -57,7 +62,7 @@
       },
       {
         "tableName": "meal_items",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meal_id` INTEGER NOT NULL, `spoken_name` TEXT NOT NULL, `quantity` REAL, `unit` TEXT, `grams` REAL, `food_source` TEXT, `food_id` TEXT, `confidence_band` TEXT NOT NULL, `confidence_reasons` TEXT NOT NULL, FOREIGN KEY(`meal_id`) REFERENCES `meals`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meal_id` INTEGER NOT NULL, `spoken_name` TEXT NOT NULL, `quantity` REAL, `unit` TEXT, `grams` REAL, `food_source` TEXT, `food_id` TEXT, `confidence_band` TEXT NOT NULL, `confidence_reasons` TEXT NOT NULL, `display_name` TEXT, FOREIGN KEY(`meal_id`) REFERENCES `meals`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -113,6 +118,11 @@
             "columnName": "confidence_reasons",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "display_name",
+            "columnName": "display_name",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -778,7 +788,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '042eafa2e3a405dcf1bae581d715662a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fcf9c6abba276dc8bb88d3567c69f25f')"
     ]
   }
 }

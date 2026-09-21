@@ -26,7 +26,12 @@ import java.time.Instant
  * Nothing here computes a total. The meal's band is the worst across its items, as the entity
  * says, and it is recomputed from the items' reasons on every edit by whoever edits.
  */
-class RoomMealStore(private val db: KatoriDatabase, private val languageTag: () -> String? = { null }) : MealStore {
+class RoomMealStore(
+    private val db: KatoriDatabase,
+    private val languageTag: () -> String? = { null },
+    /** "SPOKEN" or "TYPED" for the turn being saved; null when the caller does not say (the diary then says nothing). */
+    private val source: () -> String? = { null },
+) : MealStore {
 
     override suspend fun save(meal: ResolvedMeal, loggedAt: Instant): Outcome<Long> {
         if (meal.items.isEmpty()) {
@@ -40,6 +45,7 @@ class RoomMealStore(private val db: KatoriDatabase, private val languageTag: () 
                     raw_transcript = meal.parsed.rawTranscript,
                     confidence_band = meal.parsed.confidence.band,
                     language_tag = languageTag(),
+                    source = source(),
                 )
             )
             val itemIds = dao.insertItems(
@@ -55,6 +61,7 @@ class RoomMealStore(private val db: KatoriDatabase, private val languageTag: () 
                         food_id = item.snapshot.foodCode,
                         confidence_band = item.confidence.band,
                         confidence_reasons = item.confidence.reasons.joinToString(",") { it.name },
+                        display_name = item.snapshot.displayName.takeIf { item.snapshot.foodCode != null },
                     )
                 }
             )

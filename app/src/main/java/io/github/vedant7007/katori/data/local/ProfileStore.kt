@@ -1,8 +1,17 @@
 package io.github.vedant7007.katori.data.local
 
+import io.github.vedant7007.katori.data.local.dao.ConditionDao
 import io.github.vedant7007.katori.data.local.dao.ProfileDao
+import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ProfileEntity
+import io.github.vedant7007.katori.domain.ConditionSource
+import io.github.vedant7007.katori.domain.DietType
+import io.github.vedant7007.katori.domain.Goal
+import io.github.vedant7007.katori.domain.LifeContext
+import io.github.vedant7007.katori.domain.ProfileSnapshot
+import io.github.vedant7007.katori.domain.Sex
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -16,11 +25,21 @@ import javax.inject.Inject
  * that supplies the default: Hindi, ruled 21 Sep, so a fresh install and a restart come back in
  * Hindi without a tap.
  */
-class ProfileStore(private val dao: ProfileDao) {
+class ProfileStore(private val dao: ProfileDao, private val conditionDao: ConditionDao?) {
 
-    @Inject constructor(db: KatoriDatabase) : this(db.profileDao())
+    @Inject constructor(db: KatoriDatabase) : this(db.profileDao(), db.conditionDao())
 
     val profile: Flow<ProfileEntity?> = dao.observe()
+
+    /** Declared by the person, or derived from a report; the source travels with each (spec 15.2). */
+    val conditions: Flow<List<ConditionEntity>> = conditionDao?.observeAll() ?: flowOf(emptyList())
+
+    suspend fun declareCondition(name: String) {
+        val n = name.trim().takeIf(String::isNotEmpty) ?: return
+        conditionDao?.upsert(ConditionEntity(name = n, source = ConditionSource.USER_DECLARED.name, recorded_at_epoch_ms = System.currentTimeMillis()))
+    }
+
+    suspend fun removeCondition(id: Long) { conditionDao?.delete(id) }
 
     /** A `SpeechLanguage.tag`: the person's choice, or [DEFAULT_LANGUAGE] until they make one. */
     val speechLanguage: Flow<String> = profile.map { it?.speech_language_tag ?: DEFAULT_LANGUAGE }
@@ -61,3 +80,15 @@ class ProfileStore(private val dao: ProfileDao) {
         )
     }
 }
+
+/** The row as the rules engine reads it. A null row is a profile with nothing declared. */
+fun ProfileEntity?.toSnapshot(avoidedFoodCodes: Set<String> = emptySet()): ProfileSnapshot = ProfileSnapshot(
+    ageYears = this?.age_years,
+    weightKg = this?.weight_kg,
+    heightCm = this?.height_cm,
+    sex = this?.sex?.let { enumName<Sex>(it) },
+    goal = this?.goal?.let { enumName<Goal>(it) },
+    context = this?.life_context?.let { enumName<LifeContext>(it) },
+    dietType = this?.diet_type?.let { enumName<DietType>(it) },
+    avoidedFoodCodes = avoidedFoodCodes,
+)

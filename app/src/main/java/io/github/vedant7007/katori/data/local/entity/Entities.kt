@@ -32,6 +32,12 @@ data class MealEntity(
     /** The worst band across this meal's items, recomputed on every edit. Never a percentage. */
     val confidence_band: ConfidenceBand,
     val language_tag: String?,
+    /**
+     * Version 3: how the meal was logged, "SPOKEN" or "TYPED", set by the orchestrator through
+     * `RoomMealStore`'s source lambda. Null when not recorded, and then the diary says nothing
+     * about how it was logged: "22 by voice" is a count of rows that say SPOKEN, never a guess.
+     */
+    val source: String? = null,
 )
 
 @Entity(
@@ -58,6 +64,8 @@ data class MealItemEntity(
     val confidence_band: ConfidenceBand,
     /** Machine-readable reasons behind the band, comma-separated ConfidenceReason names. */
     val confidence_reasons: String,
+    /** Version 3: the catalogue's name for the match, as the plate showed it. Null for a row written before, or a no-data item. */
+    val display_name: String? = null,
 )
 
 /**

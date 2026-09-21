@@ -145,7 +145,30 @@ interface MealDao {
 
     @Query("DELETE FROM meal_items WHERE id = :itemId")
     suspend fun deleteItem(itemId: Long)
+
+    /** The meal and, by the foreign keys, its items and their nutrients. The advice stored for it goes with it. */
+    @Query("DELETE FROM meals WHERE id = :mealId")
+    suspend fun deleteMeal(mealId: Long)
+
+    @Query("DELETE FROM suggestions WHERE meal_id = :mealId")
+    suspend fun deleteSuggestionsFor(mealId: Long)
+
+    @Transaction
+    suspend fun deleteMealAndAdvice(mealId: Long) {
+        deleteSuggestionsFor(mealId)
+        deleteMeal(mealId)
+    }
+
+    /** The foods logged most often, by resolved id; a row that never matched has no id and is not counted. */
+    @Query("SELECT food_id AS food_id, COUNT(*) AS times FROM meal_items WHERE food_id IS NOT NULL GROUP BY food_id ORDER BY times DESC, food_id LIMIT :limit")
+    suspend fun frequentFoods(limit: Int): List<FrequentFoodRow>
+
+    /** The count of meals in a range that were logged by voice, from the rows that say so. */
+    @Query("SELECT COUNT(*) FROM meals WHERE logged_at_epoch_ms BETWEEN :fromEpochMs AND :toEpochMs AND source = 'SPOKEN'")
+    fun spokenMealCount(fromEpochMs: Long, toEpochMs: Long): Flow<Int>
 }
+
+data class FrequentFoodRow(val food_id: String, val times: Int)
 
 /** Projection for a derived total. Carries the completeness counts, never a bare number. */
 data class NutrientTotalRow(

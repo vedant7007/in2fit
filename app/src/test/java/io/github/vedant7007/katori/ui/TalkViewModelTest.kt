@@ -57,7 +57,7 @@ class TalkViewModelTest {
 
     private fun vm(orchestrator: Orchestrator, dao: ProfileDao = FakeProfileDao()) = TalkViewModel(
         orchestrator, TriggerText(TriggerText.ENGLISH), ContextText(ContextText.ENGLISH, TriggerText.ENGLISH),
-        scripted = null, profileStore = ProfileStore(dao),
+        scripted = null, profileStore = ProfileStore(dao, conditionDao = null),
     )
 
     @Test
