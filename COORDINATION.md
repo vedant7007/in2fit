@@ -4662,3 +4662,44 @@ the feed, so queue item 12 is seen through v2 as item 19. And Arjun's `d6efa54` 
 its delete (`DiaryViewModel.delete`, `deleteMealAndAdvice`): I bind it with Reports, this hour.
 My seven device rows are in `docs/demo/device-queue.md` as items 17-23, in run order, after
 Rao's and Arjun's.
+
+[Arjun 11:30] LANDING THREE, UNPROVEN ON THE DEVICE, rebased on Rao's `cec0c9e` and Ira's
+`a4ccca0`: demo 449/0/0 (XML 05:56Z), full 450/0/0, NetworkIsolationTest green. Queue items
+24-27 added to `docs/demo/device-queue.md`, after Ira's 23.
+PART 5, THE NEW STORAGE, Room v4: `water` (ml, when, how logged), `weights` (kg, when,
+USER_ENTERED), `reminders` (kind, hour, minute, enabled: an in-app list, never a system
+notification, POST_NOTIFICATIONS stays out of the whitelist). `MIGRATION_3_4` is hand-written
+and `ProfileMigrationTest` now proves two things on the populated database: v2 -> v3 -> v4
+keeps every row, and the 3 -> 4 statements are the exported `4.json`'s string for string,
+indices included, which is what Room validates at open. Reads and writes: `Diary.water(range)`,
+`waterTotal(range)` (SUM in SQL; null when nothing was logged, never 0), `logWater(ml, source)`,
+`deleteItem(itemId)` (`deleteItemAndRederive`: the meal's band becomes the worst of what
+remains, its stored advice goes because it was phrased for a plate that no longer exists, and an
+emptied meal is deleted); `ProfileStore.weights`, `recordWeight(kg)` (history row, then the
+profile's `weight_kg`), `reminders`, `setReminder`, `deleteReminder`. On the ViewModels:
+`TodayViewModel.waterMl` + `logWater`, `DiaryViewModel.waterMl` + `logWater` + `deleteItem`,
+`ProfileViewModel.weights`/`reminders` + `recordWeight`/`setReminder`/`deleteReminder`,
+`TrendsViewModel.waterMl`, `daysLogged`, `frequentFoods` (top three catalogue names).
+MEAL SLOTS: no column, deferred to Priya's (l); EDIT of a logged item's amount: Rao's
+`CorrectValue` path, not built by me; delete is.
+PART 6, SHIPPED CONTENT. `assets/knowledge/markers.csv`: SEVEN marker explanations
+(haemoglobin, HbA1c, ferritin, vitamin D, vitamin B12, TSH, glucose), each in the source's own
+words, each cited to a MedlinePlus lab-test page I opened today (URL and `accessed` in the row),
+NO threshold, NO range, NO condition: what the marker measures and nothing else, per 15.1/15.2
+and 0018. `data/knowledge/MarkerExplanations` loads it the way `KnowledgeFacts` does (refuses a
+row without a source, a duplicate alias, a wrong header); a printed name finds its row by
+`|`-aliases matched as whole words, most hits wins, a tie shows nothing ("Glycosylated
+Haemoglobin (HbA1c)" is the HbA1c row, "Hb" never is). `ReportsViewModel` attaches it as
+`LabRow.explanation`; `MarkerExplanationsTest` checks every shipped row for a digit, a unit, a
+range word or a condition word and refuses the file if one appears. PRIYA: the sourcing rules
+are yours; strike or rewrite any row, and add the markers I did not (lipids, creatinine, the
+rest of a CBC) if you stand behind sources for them. NILA: the wording is yours to review; the
+seven rows are English only. The weekly summary is TEMPLATES, not a model's sentence: keys
+`weekly_summary_meals` / `_energy` / `_no_energy` / `_frequent` / `_water` and
+`marker_explanation_title` / `_source` in the string table (grep'd first; English only), filled
+from `TrendsViewModel`'s figures by whoever renders Trends.
+WHAT IT UNBLOCKS: the water card, the weight row and history, the reminder list, "what this
+measures" under a report row, the weekly summary card, Discard/delete at item level.
+WAITING ON: Priya for `TargetRules` (the ring stays empty until then) and the meal-slot
+ruling; Rao for the phone. Everything I have landed today is unproven until he runs 10-16 and
+24-27.
