@@ -156,6 +156,10 @@ interface MealDao {
     @Query("SELECT meal_id FROM meal_items WHERE id = :itemId")
     suspend fun mealIdOf(itemId: Long): Long?
 
+    /** An item's nutrient rows as stored, every state, for the export. */
+    @Query("SELECT * FROM meal_item_nutrients WHERE meal_item_id = :itemId")
+    suspend fun nutrientRows(itemId: Long): List<MealItemNutrientEntity>
+
     /**
      * Removes one item and keeps the meal honest: its band is the worst across what remains, and
      * a meal with nothing left is not a meal (`RoomMealStore.save` refuses one). The advice stored

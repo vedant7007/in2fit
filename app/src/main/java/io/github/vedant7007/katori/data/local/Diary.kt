@@ -6,6 +6,7 @@ import io.github.vedant7007.katori.data.local.dao.NutrientTotalRow
 import io.github.vedant7007.katori.data.local.entity.LabValueEntity
 import io.github.vedant7007.katori.data.local.entity.MealEntity
 import io.github.vedant7007.katori.data.local.entity.MealItemEntity
+import io.github.vedant7007.katori.data.local.entity.MealItemNutrientEntity
 import io.github.vedant7007.katori.data.local.entity.WaterEntity
 import io.github.vedant7007.katori.domain.model.Completeness
 import io.github.vedant7007.katori.domain.model.ConfidenceReason
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -55,6 +57,11 @@ class Diary(private val db: KatoriDatabase, private val foods: FoodDbSource?, pr
     data class Day(val date: LocalDate, val meals: List<Meal>, val figures: List<NutritionFigure>)
 
     fun today(): LocalDate = LocalDate.now(clock)
+
+    val zone: ZoneId get() = clock.zone
+
+    /** An item's nutrient rows as stored: state and amount, an Unknown with no amount. */
+    suspend fun nutrientRows(itemId: Long): List<MealItemNutrientEntity> = db.mealDao().nutrientRows(itemId)
 
     /** Local midnight to the last millisecond of the day, in the epoch millis the DAO takes. */
     fun bounds(date: LocalDate): LongRange {

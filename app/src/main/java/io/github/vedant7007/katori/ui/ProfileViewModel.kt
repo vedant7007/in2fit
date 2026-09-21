@@ -6,7 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.vedant7007.katori.data.food.FoodDbSource
 import io.github.vedant7007.katori.data.food.dbl
 import io.github.vedant7007.katori.data.food.str
+import io.github.vedant7007.katori.data.local.Diary
 import io.github.vedant7007.katori.data.local.ProfileStore
+import io.github.vedant7007.katori.data.local.exportCsv
 import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ProfileEntity
 import io.github.vedant7007.katori.data.local.entity.ReminderEntity
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -27,7 +30,7 @@ import javax.inject.Inject
  * defaults they are (0035). [save] is the profile's one write path, through [ProfileStore].
  */
 @HiltViewModel
-class ProfileViewModel @Inject constructor(private val store: ProfileStore, private val foods: FoodDbSource) : ViewModel() {
+class ProfileViewModel @Inject constructor(private val store: ProfileStore, private val foods: FoodDbSource, private val diary: Diary) : ViewModel() {
 
     /** A shipped default: a katori of dal is 150 g in the bundle, and the screen says "bundled", never "your". */
     data class HouseholdUnit(val unit: String, val foodClass: String, val grams: Double)
@@ -91,5 +94,17 @@ class ProfileViewModel @Inject constructor(private val store: ProfileStore, priv
 
     fun deleteReminder(id: Long) {
         viewModelScope.launch(Dispatchers.IO) { store.deleteReminder(id) }
+    }
+
+    /**
+     * "Share with your doctor": every meal and every lab value as two CSV texts, from the rows as
+     * stored, handed to [onReady] on the main thread for the screen to put in a share intent as
+     * text (`shareText`). No file, no provider, no permission.
+     */
+    fun export(onReady: (meals: String, labs: String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val (meals, labs) = diary.exportCsv()
+            withContext(Dispatchers.Main) { onReady(meals, labs) }
+        }
     }
 }
