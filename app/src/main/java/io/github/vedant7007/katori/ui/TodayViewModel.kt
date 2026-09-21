@@ -56,7 +56,10 @@ class TodayViewModel @Inject constructor(
         val progress: List<TargetProgress> = emptyList(),
         /** Water logged today, ml; null when none was, never 0. */
         val waterMl: Int? = null,
+        /** The stored advice over time, newest first, at most [NUDGES]: the Nudges page and the bell's dot ([nudgeCount]). */
+        val nudges: List<Diary.Nudge> = emptyList(),
     ) {
+        val nudgeCount: Int get() = nudges.size
         val energy: ShownFigure? get() = totals.firstOrNull { it.nutrient == io.github.vedant7007.katori.domain.model.Nutrient.ENERGY }
     }
 
@@ -65,6 +68,10 @@ class TodayViewModel @Inject constructor(
 
     fun logWater(ml: Int) {
         viewModelScope.launch(Dispatchers.IO) { diary.logWater(ml, source = "TAPPED") }
+    }
+
+    companion object {
+        const val NUDGES = 20
     }
 
     init {
@@ -93,6 +100,7 @@ class TodayViewModel @Inject constructor(
             }.combine(targets.current().combine(targets.progressToday()) { t, p -> t to p }) { s, (t, p) ->
                 s.copy(targets = t, progress = p)
             }.combine(diary.waterTotal(today)) { s, water -> s.copy(waterMl = water) }
+                .combine(diary.recentAdvice(NUDGES)) { s, nudges -> s.copy(nudges = nudges) }
                 .collect { _state.value = it }
         }
     }

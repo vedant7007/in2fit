@@ -201,6 +201,17 @@ interface MealDao {
 
 data class FrequentFoodRow(val food_id: String, val times: Int)
 
+/** One piece of stored advice with the time of the meal it was for. `advice_text` empty: every phrasing failed a guard, the trigger sentence was what was said. */
+data class AdviceRow(
+    val id: Long,
+    val meal_id: Long,
+    val meal_logged_at_epoch_ms: Long,
+    val advice_text: String,
+    val trigger_text: String?,
+    val triggering_rule_id: String?,
+    val created_at_epoch_ms: Long,
+)
+
 /** Projection for a derived total. Carries the completeness counts, never a bare number. */
 data class NutrientTotalRow(
     val nutrient: String,
@@ -326,6 +337,18 @@ interface SuggestionDao {
 
     @Query("SELECT * FROM suggestions WHERE meal_id = :mealId ORDER BY created_at_epoch_ms DESC")
     fun forMeal(mealId: Long): Flow<List<SuggestionEntity>>
+
+    /** What was actually said to the person and when, newest first: the stored advice with its meal's time (the Nudges page, 21 Sep). */
+    @Query(
+        """
+        SELECT s.id AS id, s.meal_id AS meal_id, m.logged_at_epoch_ms AS meal_logged_at_epoch_ms,
+               s.advice_text AS advice_text, s.trigger_text AS trigger_text, s.triggering_rule_id AS triggering_rule_id,
+               s.created_at_epoch_ms AS created_at_epoch_ms
+        FROM suggestions s JOIN meals m ON m.id = s.meal_id
+        ORDER BY s.created_at_epoch_ms DESC LIMIT :limit
+        """
+    )
+    fun recent(limit: Int): Flow<List<AdviceRow>>
 
     /**
      * The two most recent suggestions for a meal, which is exactly the before-and-after pair shown

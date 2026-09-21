@@ -96,6 +96,24 @@ class Diary(private val db: KatoriDatabase, private val foods: FoodDbSource?, pr
 
     fun labs(): Flow<List<LabValueEntity>> = db.labValueDao().observeAll()
 
+    /** One nudge as the page shows it: what was said, for which meal, when. Nothing here is generated at display time. */
+    data class Nudge(
+        val id: Long,
+        val mealId: Long,
+        val mealLoggedAt: Instant,
+        val saidAt: Instant,
+        /** The engine's own sentence, when a rule fired. */
+        val trigger: String?,
+        /** The model's guarded sentence, when one passed. */
+        val phrased: String?,
+        val ruleId: String?,
+    )
+
+    /** The stored advice over time, newest first: what was actually said to the person and when. */
+    fun recentAdvice(limit: Int): Flow<List<Nudge>> = db.suggestionDao().recent(limit).map { rows ->
+        rows.map { Nudge(it.id, it.meal_id, Instant.ofEpochMilli(it.meal_logged_at_epoch_ms), Instant.ofEpochMilli(it.created_at_epoch_ms), it.trigger_text, it.advice_text.ifEmpty { null }, it.triggering_rule_id) }
+    }
+
     fun labHistory(testName: String): Flow<List<LabValueEntity>> = db.labValueDao().history(testName)
 
     /** The meal, its items, their nutrients and the advice stored for it. Nothing else remembers it. */

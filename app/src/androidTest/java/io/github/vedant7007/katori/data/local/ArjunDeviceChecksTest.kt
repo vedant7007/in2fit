@@ -12,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import io.github.vedant7007.katori.data.food.AndroidFoodDbSource
 import io.github.vedant7007.katori.data.food.FoodClass
 import io.github.vedant7007.katori.data.food.FoodQuery
+import io.github.vedant7007.katori.data.food.LookupMealResolver
 import io.github.vedant7007.katori.data.food.SqliteFoodLookup
 import io.github.vedant7007.katori.data.knowledge.MarkerExplanations
 import io.github.vedant7007.katori.domain.MealItemSnapshot
@@ -130,15 +131,19 @@ class ArjunDeviceChecksTest {
 
     @Test
     fun e_item15_search_gives_a_portion_with_grams_and_nutrients() = runBlocking {
+        // As `SearchViewModel.portion` does it: the match's portion through the plate's own resolver.
         val lookup = SqliteFoodLookup(foods)
         val matches = (lookup.candidates(FoodQuery("dal", "en-IN"), 10) as? Outcome.Ok)?.value.orEmpty()
         val first = matches.firstOrNull()
-        val unit = first?.let { USUAL_UNIT[it.foodClass.name] }
-        val weight = if (first != null && unit != null) (lookup.resolveUnit(unit, first.foodClass) as? Outcome.Ok)?.value else null
-        val nutrients = if (first != null && weight != null) (lookup.nutrientsFor(first.code, weight.grams) as? Outcome.Ok)?.value else null
-        val protein = nutrients?.get(Nutrient.PROTEIN) as? NutrientValue.Measured
-        check("15 search", first != null && weight != null && weight.grams > 0 && protein != null) {
-            "matches=${matches.size} first=${first?.displayName} class=${first?.foodClass} unit=$unit grams=${weight?.grams} default=${weight?.isDefaultConversion} protein=${protein?.amount}"
+        val resolved = first?.let { m ->
+            val item = ParsedItem(m.displayName, 1.0, null, m.code.id, ConfidenceRules.of(ConfidenceReason.QUANTITY_STATED))
+            (LookupMealResolver(lookup).resolve(ParsedMeal(listOf(item), item.confidence, m.displayName), "en-IN") as? Outcome.Ok)?.value
+        }
+        val portion = resolved?.items?.singleOrNull()
+        val said = resolved?.parsed?.items?.singleOrNull()
+        val protein = portion?.snapshot?.nutrients?.get(Nutrient.PROTEIN)
+        check("15 search", first != null && portion?.snapshot?.foodCode == first.code.id && said?.unit != null && (portion.snapshot.grams ?: 0.0) > 0 && protein != null) {
+            "matches=${matches.size} first=${first?.displayName} class=${first?.foodClass} unit=${said?.unit} grams=${portion?.snapshot?.grams} band=${portion?.confidence?.band} reasons=${portion?.confidence?.reasons} protein=$protein"
         }
     }
 
