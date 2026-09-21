@@ -24,6 +24,14 @@ if ($devices.Count -ne 1) { throw "REFUSED: expected exactly one device on the d
 
 "ARJUN CHECKS $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  commit $((& git -C $repo rev-parse --short HEAD).Trim())" | Tee-Object -FilePath $log
 & $adb shell am force-stop $pkg
+# A copy of the database BEFORE anything opens it, so a refused migration can be reproduced on the
+# JVM from the real rows and nothing the person logged is lost (debug build: run-as works).
+$backup = Join-Path $repo "logs\katori-user-$stamp.db"
+# Through cmd, because PowerShell's own redirection re-encodes bytes as text and corrupts a database.
+cmd /c "`"$adb`" exec-out run-as $pkg cat databases/katori-user.db > `"$backup`""
+$wal = (& $adb shell run-as $pkg ls databases/ 2>$null) -match 'katori-user\.db-wal'
+if ($wal) { cmd /c "`"$adb`" exec-out run-as $pkg cat databases/katori-user.db-wal > `"$backup-wal`"" }
+"database copied before the run: $backup ($((Get-Item $backup).Length) bytes$(if ($wal) { ' + wal' }))" | Tee-Object -FilePath $log -Append
 & $adb shell rm -f "/sdcard/Android/media/$pkg/katori-arjun-checks.txt" 2>$null
 & $adb logcat -c
 
