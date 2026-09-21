@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import io.github.vedant7007.katori.ui.theme.LocalReduceMotion
@@ -62,12 +64,16 @@ fun MicButton(
         else -> In2fitColors.hairline
     }
     val ink = if (enabled || active || stop != null) In2fitColors.onPerson else In2fitColors.inkSecondary
+    // Read through a state holder, never as a key: the press itself flips `enabled` (the turn
+    // goes busy), and a pointerInput keyed on it restarts mid-gesture, cancelling the wait for
+    // the release. That ran every hold to the 30 s cap on the realme (21 Sep 01:24).
+    val isEnabled by rememberUpdatedState(enabled)
     val gesture = if (stop != null) {
         Modifier.clickable(onClick = stop)
     } else {
-        Modifier.pointerInput(enabled) {
+        Modifier.pointerInput(Unit) {
             detectTapGestures(onPress = {
-                if (enabled) {
+                if (isEnabled) {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     if (!reduceMotion) scope.launch { press.animateTo(0.97f, Motion.spatial) }
                     onPress()

@@ -24,6 +24,23 @@ class PushToTalkTest {
     private fun engine(decoder: ScriptedDecoder, audio: AudioSource, loader: ScriptedLoader = ScriptedLoader(decoder)) =
         DefaultAsrEngine(testArbiter(loader), audio)
 
+    /** The realme, 21 Sep 01:38: five quiet seconds then a sentence, and the guard read 1.4 pieces/s over the hold. */
+    @Test
+    fun `a sentence inside a long hold goes to the recogniser as its voiced span, not the whole hold`() = runBlocking {
+        val decoder = ScriptedDecoder(heard)
+        // 5 s of room (not digital zero, so the microphone counts as live), 1 s of speech, 2 s of room, then the release.
+        val room = List(250) { frame(50) }; val speech = List(50) { frame(6_000) }; val after = List(100) { frame(50) }
+        val audio = FakeAudio(frames = room + speech + after)
+        val events = PushToTalk(engine(decoder, audio), audio).hold(SpeechLanguage.HINDI).toList()
+        assertTrue("$events", events.last() is AsrEvent.Result)
+        val (samples, _) = decoder.clips.single()
+        val keptMs = samples.size / 16
+        // Pre-roll before the onset, the second of speech, the hangover after: about 1.9 s of 8, never 8.
+        assertTrue("kept $keptMs ms", keptMs in 900..2200)
+        // Nothing the hold recorded is lost from inside the sentence: the loud second is all there.
+        assertEquals(50 * 320, samples.count { it == 6_000.toShort() || it == (-6_000).toShort() })
+    }
+
     @Test
     fun `the clip is the frames between press and release, and the events are the listen events`() = runBlocking {
         val decoder = ScriptedDecoder(heard)

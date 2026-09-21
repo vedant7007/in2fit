@@ -49,6 +49,12 @@ import io.github.vedant7007.katori.domain.model.UnavailableReason
 import io.github.vedant7007.katori.ml.asr.AsrEngine
 import io.github.vedant7007.katori.ml.asr.AsrEvent
 import io.github.vedant7007.katori.ml.asr.AudioClip
+import io.github.vedant7007.katori.ml.asr.AudioSource
+import io.github.vedant7007.katori.ml.asr.EndlessAudio
+import io.github.vedant7007.katori.ml.asr.FakeAudio
+import io.github.vedant7007.katori.ml.asr.PushToTalk
+import io.github.vedant7007.katori.ml.asr.loud
+import io.github.vedant7007.katori.ml.asr.quiet
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import io.github.vedant7007.katori.ml.asr.Transcript
 import io.github.vedant7007.katori.ml.llm.AnswerLength
@@ -65,7 +71,9 @@ import io.github.vedant7007.katori.ml.tts.TtsEngine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -170,12 +178,12 @@ class DefaultOrchestratorTest {
         override suspend fun stop() { stops++ }
     }
 
-    private class ScriptedAsr(private val events: List<AsrEvent>) : AsrEngine {
+    /** The recogniser behind push-to-talk: the clip the thumb cut comes back as [transcript]. */
+    private class ScriptedAsr(private val transcript: Outcome<Transcript> = Outcome.NotImplemented("test")) : AsrEngine {
         override val supportedLanguages = SpeechLanguage.entries.toSet()
         override suspend fun prepare(language: SpeechLanguage) = Outcome.Ok(Unit)
-        override fun listen(language: SpeechLanguage): Flow<AsrEvent> = flow { events.forEach { emit(it) } }
-        override suspend fun transcribe(clip: AudioClip, language: SpeechLanguage): Outcome<Transcript> =
-            Outcome.NotImplemented("test")
+        override fun listen(language: SpeechLanguage): Flow<AsrEvent> = flow { }
+        override suspend fun transcribe(clip: AudioClip, language: SpeechLanguage): Outcome<Transcript> = transcript
     }
 
     // --- the person ----------------------------------------------------------------------------
@@ -214,7 +222,8 @@ class DefaultOrchestratorTest {
         val store: RecordingStore = RecordingStore(),
         val resolver: FakeResolver = FakeResolver(),
         val tts: SilentTts = SilentTts(),
-        val asr: AsrEngine = ScriptedAsr(emptyList()),
+        val asr: AsrEngine = ScriptedAsr(),
+        val audio: AudioSource = FakeAudio(frames = emptyList()),
         var ctx: UserContext,
         val facts: KnowledgeFacts,
     ) {
@@ -226,6 +235,8 @@ class DefaultOrchestratorTest {
             knowledge = facts, triggerText = TriggerText(TriggerText.ENGLISH),
             contextText = ContextText(ContextText.ENGLISH, TriggerText.ENGLISH, ZoneId.of("Asia/Kolkata")),
             clock = Clock.fixed(Instant.parse("2026-09-20T08:00:00Z"), ZoneOffset.UTC),
+            // The real gesture over a fake microphone: the JVM proves the wiring, the phone the room.
+            pushToTalk = PushToTalk(asr, audio),
         )
         fun run(intent: UserIntent) = runBlocking { orchestrator.handle(intent).toList() }
     }
@@ -515,28 +526,56 @@ class DefaultOrchestratorTest {
 
     // --- the voice front end ----------------------------------------------------------------
 
-    @Test fun `Speak feeds the transcript into the same turn as Type`() {
-        val asr = ScriptedAsr(
-            listOf(
-                AsrEvent.Level(0.2f), AsrEvent.SpeechStarted, AsrEvent.SpeechEnded, AsrEvent.Transcribing,
-                AsrEvent.Result(Transcript("I had rice and palak paneer", SpeechLanguage.ENGLISH_INDIA, io.github.vedant7007.katori.ml.asr.AsrConfidence.LOW, 1800)),
-            )
-        )
-        val r = Rig(llm = FakeLlm(intent = Outcome.Ok(Intent.LOG)), asr = asr, ctx = context(), facts = facts)
+    private val heard = Transcript("I had rice and palak paneer", SpeechLanguage.ENGLISH_INDIA, io.github.vedant7007.katori.ml.asr.AsrConfidence.LOW, 1800)
+
+    @Test fun `Speak goes through push-to-talk and feeds the transcript into the same turn as Type`() {
+        // Two silent frames before the microphone delivers, then 600 ms of signal, then the source ends (a release).
+        val r = Rig(llm = FakeLlm(intent = Outcome.Ok(Intent.LOG)), asr = ScriptedAsr(Outcome.Ok(heard)), audio = FakeAudio(frames = quiet(2) + loud(30)), ctx = context(), facts = facts)
         val events = r.run(UserIntent.Speak(en))
         assertTrue(events.any { it is OrchestratorEvent.AudioLevel })
+        // The cue lights on the first frame with signal, after the level of no frame and before any level.
+        val live = events.indexOf(OrchestratorEvent.MicrophoneLive)
+        assertTrue("MicrophoneLive must be emitted: $events", live >= 0)
+        assertTrue("no level before the microphone is live", events.take(live).none { it is OrchestratorEvent.AudioLevel })
         assertEquals("I had rice and palak paneer", events.filterIsInstance<OrchestratorEvent.Transcribed>().single().text)
         val resolved = events.filterIsInstance<OrchestratorEvent.MealResolved>().single()
         assertTrue("low ASR confidence must reach the figure's reasons", resolved.meal.confidence.reasons.contains(ConfidenceReason.LOW_ASR_CONFIDENCE))
         assertEquals(1, r.store.saved.size)
     }
 
+    @Test fun `EndSpeech ends the hold and nothing else does, and the clip is transcribed`() {
+        val audio = EndlessAudio()
+        val r = Rig(llm = FakeLlm(intent = Outcome.Ok(Intent.LOG)), asr = ScriptedAsr(Outcome.Ok(heard)), audio = audio, ctx = context(), facts = facts)
+        val events = runBlocking {
+            val turn = async { r.orchestrator.handle(UserIntent.Speak(en)).toList() }
+            // A microphone that never stops on its own: only the release ends it.
+            while (audio.emitted < 40) yield()
+            assertTrue("still recording after 40 frames", turn.isActive)
+            val release = r.orchestrator.handle(UserIntent.EndSpeech).toList()
+            assertEquals(listOf(OrchestratorEvent.Completed), release)
+            turn.await()
+        }
+        assertTrue(events.contains(OrchestratorEvent.MicrophoneLive))
+        assertEquals("I had rice and palak paneer", events.filterIsInstance<OrchestratorEvent.Transcribed>().single().text)
+        assertEquals(1, r.store.saved.size)
+    }
+
     @Test fun `a recogniser failure ends the turn with its reason and writes nothing`() {
-        val asr = ScriptedAsr(listOf(AsrEvent.Unavailable(Outcome.Unavailable(UnavailableReason.PERMISSION_DENIED, "mic"))))
-        val r = Rig(llm = FakeLlm(), asr = asr, ctx = context(), facts = facts)
+        val r = Rig(llm = FakeLlm(), audio = FakeAudio(permitted = false, frames = emptyList()), ctx = context(), facts = facts)
         val events = r.run(UserIntent.Speak(en))
-        assertEquals(OrchestratorEvent.Failed(UnavailableReason.PERMISSION_DENIED, "mic"), events.last())
+        val failed = events.last() as OrchestratorEvent.Failed
+        assertEquals(UnavailableReason.PERMISSION_DENIED, failed.reason)
         assertEquals(0, r.store.saved.size)
+    }
+
+    @Test fun `EndSpeech without a microphone wired is a failure, never a silent no-op`() {
+        val bare = DefaultOrchestrator(
+            asr = ScriptedAsr(), llm = FakeLlm(), tts = SilentTts(), rules = DefaultRulesEngine(), resolver = FakeResolver(), store = RecordingStore(),
+            advice = MemoryAdvice(), labs = MemoryLabs { }, contextSource = object : UserContextSource { override suspend fun current() = context() },
+            knowledge = facts, triggerText = TriggerText(TriggerText.ENGLISH), contextText = ContextText(ContextText.ENGLISH, TriggerText.ENGLISH, ZoneId.of("Asia/Kolkata")),
+        )
+        val events = runBlocking { bare.handle(UserIntent.EndSpeech).toList() }
+        assertTrue("$events", events.single() is OrchestratorEvent.Failed)
     }
 
     @Test fun `a path not built says so and never shows a sample`() {

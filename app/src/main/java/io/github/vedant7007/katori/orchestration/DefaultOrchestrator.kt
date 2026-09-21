@@ -35,6 +35,7 @@ import io.github.vedant7007.katori.domain.model.UnavailableReason
 import io.github.vedant7007.katori.ml.asr.AsrConfidence
 import io.github.vedant7007.katori.ml.asr.AsrEngine
 import io.github.vedant7007.katori.ml.asr.AsrEvent
+import io.github.vedant7007.katori.ml.asr.PushToTalk
 import io.github.vedant7007.katori.ml.asr.SpeechLanguage
 import io.github.vedant7007.katori.ml.asr.Transcript
 import io.github.vedant7007.katori.ml.llm.AnswerLength
@@ -44,6 +45,7 @@ import io.github.vedant7007.katori.ml.llm.ExtractionRequest
 import io.github.vedant7007.katori.ml.llm.Intent
 import io.github.vedant7007.katori.ml.llm.IntentRouter
 import io.github.vedant7007.katori.ml.llm.LlmEngine
+import io.github.vedant7007.katori.ml.llm.NutrientWords
 import io.github.vedant7007.katori.ml.llm.PhrasedText
 import io.github.vedant7007.katori.ml.llm.PhrasingRequest
 import io.github.vedant7007.katori.ml.llm.RecommendRequest
@@ -103,6 +105,11 @@ class DefaultOrchestrator(
     private val clock: Clock = Clock.systemUTC(),
     /** The product decision on answer length (`0024`, measured in `0014`). One flip, here. */
     private val answerLength: AnswerLength = AnswerLength.SHORT,
+    /**
+     * The microphone gesture (`0031`): press holds, release ends, and nothing else ends it. Null
+     * in a rig that never speaks; a Speak without one fails, it does not pretend.
+     */
+    private val pushToTalk: PushToTalk? = null,
 ) : Orchestrator {
 
     override fun handle(intent: UserIntent): Flow<OrchestratorEvent> = flow {
@@ -117,10 +124,13 @@ class DefaultOrchestrator(
             is UserIntent.ScanPackagedLabel -> notBuilt("orchestration.ScanPackagedLabel")
             is UserIntent.CheckExerciseForm -> notBuilt("orchestration.CheckExerciseForm")
             UserIntent.StopSpeaking -> { tts.stop(); emit(OrchestratorEvent.Completed) }
-            // Rao's two lines replace this: `spoken()` collects `pushToTalk.hold(lang)` and maps
-            // SpeechStarted to MicrophoneLive; this branch calls `pushToTalk.release()`. Until then
-            // the contract's own not-built path, never a silent no-op (Arjun, 21 Sep).
-            UserIntent.EndSpeech -> notBuilt("orchestration.EndSpeech")
+            // The thumb lifted: the hold's flow sees it within one frame, keeps the clip and
+            // transcribes it. Sent into a running turn, so this turn only says it was accepted.
+            UserIntent.EndSpeech -> {
+                val mic = pushToTalk ?: return@flow fail(UnavailableReason.INTERNAL_ERROR, "no microphone is wired into this orchestrator")
+                mic.release()
+                emit(OrchestratorEvent.Completed)
+            }
         }
     }
 
@@ -128,16 +138,21 @@ class DefaultOrchestrator(
 
     private suspend fun FlowCollector<OrchestratorEvent>.spoken(language: SpeechLanguageRef) {
         val lang = speechLanguage(language) ?: return fail(UnavailableReason.INPUT_NOT_USABLE, "no speech language for '${language.tag}'")
+        val mic = pushToTalk ?: return fail(UnavailableReason.INTERNAL_ERROR, "no microphone is wired into this orchestrator")
         emit(Progress(Stage.RECORDING))
         var result: Transcript? = null
         var failure: Outcome.Unavailable? = null
-        asr.listen(lang).collect { ev ->
+        // Press-and-hold, not open listening: the energy endpointer scored 0 of ten in babble
+        // (`0031`), and the hackathon floor is babble. The clip ends at the release or the cap.
+        mic.hold(lang).collect { ev ->
             when (ev) {
+                // The first frame with signal, not the touch-down: the cue lights when it is true.
+                AsrEvent.SpeechStarted -> emit(OrchestratorEvent.MicrophoneLive)
                 is AsrEvent.Level -> emit(OrchestratorEvent.AudioLevel(ev.rms))
                 AsrEvent.SpeechEnded -> emit(Progress(Stage.TRANSCRIBING))
                 is AsrEvent.Result -> result = ev.transcript
                 is AsrEvent.Unavailable -> failure = ev.outcome
-                AsrEvent.SpeechStarted, AsrEvent.Transcribing -> Unit
+                AsrEvent.Transcribing -> Unit
             }
         }
         failure?.let { return fail(it.reason, it.detail) }
@@ -430,11 +445,16 @@ class DefaultOrchestrator(
         // no nutrient is about WHAT they ate, so it gets the meal lines with their dates and no
         // figures; a question that names one gets the period totals and the meals for that
         // nutrient only. Either way, two or three lines, not sixteen.
+        // Read the way a person means it (Priya, db2b443): "calories", "carbs", "salt" name a
+        // nutrient; "the nutritional information", "what did that give me" ask for all of them.
+        // Found on the phone 21 Sep: the meal line went out without its figures and the model
+        // wrote them from memory, which the numeric guard refused, as it must.
         val asked = nutrientsNamed(text)
-        val periodLines = if (asked.isEmpty()) emptyList() else ctx.periodTotals.map { p ->
-            contextText.period(p.copy(figures = p.figures.filter { it.total.nutrient in asked }))
+        val all = NutrientWords.asksForAll(text)
+        val periodLines = if (asked.isEmpty() && !all) emptyList() else ctx.periodTotals.map { p ->
+            contextText.period(if (all) p else p.copy(figures = p.figures.filter { it.total.nutrient in asked }))
         }
-        val mealLines = ctx.recentMeals.take(MEAL_LINES).map { contextText.meal(it, locale, only = asked) }
+        val mealLines = ctx.recentMeals.take(MEAL_LINES).map { contextText.meal(it, locale, only = if (all) null else asked) }
         val given = periodLines + mealLines + listOfNotNull(evaluation.trigger?.let { triggerText.render(it) })
         val facts = knowledge.find((listOf(text) + declared + ruleWords(evaluation)).joinToString(" "), limit = FACT_ROWS)
         val request = AnswerRequest(
@@ -517,11 +537,12 @@ class DefaultOrchestrator(
         setOf(Nutrient.ENERGY, Nutrient.PROTEIN) + evaluation.firedRules.mapNotNull { (it.evidence as? Evidence.MealComposition)?.nutrient } +
             evaluation.constraints.filterIsInstance<io.github.vedant7007.katori.domain.Constraint.PreferNutrient>().map { it.nutrient }
 
-    /** The nutrients a question names, by the English word or the locale's, whole-word. */
+    /** The nutrients a question names: the everyday words ([NutrientWords]), the rules engine's, or the locale's, whole-word. */
     private fun nutrientsNamed(text: String): Set<Nutrient> {
+        val everyday = NutrientWords.named(text)
         val lower = " " + text.lowercase().replace(Regex("[^\\p{L}\\p{N}]+"), " ") + " "
         return Nutrient.entries.filterTo(mutableSetOf()) { n ->
-            listOf(TriggerText.ENGLISH.nutrient(n), contextText.nutrientWord(n)).any { w -> lower.contains(" ${w.lowercase()} ") }
+            n.name in everyday || listOf(TriggerText.ENGLISH.nutrient(n), contextText.nutrientWord(n)).any { w -> lower.contains(" ${w.lowercase()} ") }
         }
     }
 

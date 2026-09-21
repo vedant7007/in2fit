@@ -245,6 +245,26 @@ class OrchestratorDeviceTest {
         rig.close()
     }
 
+    /**
+     * BEAT 1 AS THE PRESENTER SAYS IT. The run of show freezes the Devanagari sentence; every
+     * number under it was measured on the English row. Found 21 Sep 06:53 through the real
+     * microphone: the transcript was exact and the extraction came back "डॉटरी: 2", twice. The
+     * script for the demo rows, typed, so the recogniser is out of the question.
+     */
+    @Test
+    fun d_hindiLogRows() {
+        say(""); say("=== the Hindi LOG rows, typed (languageTag hi), ${java.time.LocalDateTime.now()} ===")
+        val rig = Rig(conditions = listOf("anaemia"))
+        val hi = SpeechLanguageRef("hi")
+        with(rig) {
+            turn("LOG (hi) row 1, frozen: मैंने दो रोटी और थोड़ी दाल खाई", UserIntent.Type("मैंने दो रोटी और थोड़ी दाल खाई", hi))
+            turn("LOG (hi) row 2: दो रोटी, एक कटोरी दाल, और दो चम्मच तेल", UserIntent.Type("दो रोटी, एक कटोरी दाल, और दो चम्मच तेल", hi))
+            turn("LOG (hi) row 5: एक प्लेट चावल, दाल और एक कटोरी दही", UserIntent.Type("एक प्लेट चावल, दाल और एक कटोरी दही", hi))
+            turn("LOG (hi) as Hinglish: maine do roti aur thodi dal khayi", UserIntent.Type("maine do roti aur thodi dal khayi", hi))
+        }
+        rig.close()
+    }
+
     companion object {
         private const val TAG = "katori-e2e"
         private const val THREADS = 8

@@ -118,9 +118,10 @@ class PushToTalk(
                 emit(unavailable(UnavailableReason.INPUT_NOT_USABLE, "held for $heldMs ms, under $MIN_HOLD_MS: a tap, not a sentence"))
                 return@flow
             }
-            val samples = ShortArray(frames.sumOf { it.size })
+            val kept = voicedSpan(frames)
+            val samples = ShortArray(kept.sumOf { it.size })
             var at = 0
-            for (f in frames) { f.copyInto(samples, at); at += f.size }
+            for (f in kept) { f.copyInto(samples, at); at += f.size }
             emit(AsrEvent.Transcribing)
             when (val result = engine.transcribe(AudioClip(samples, DefaultAsrEngine.SAMPLE_RATE_HZ), language)) {
                 is Outcome.Ok -> emit(AsrEvent.Result(result.value))
@@ -131,6 +132,29 @@ class PushToTalk(
             held.value = false
             active.set(false)
         }
+    }
+
+    /**
+     * THE VOICED SPAN. A hold is the thumb's, not the sentence's: five seconds of waiting in a
+     * noisy room before the first word, or a sentence early in a hold that runs to the cap. The
+     * engine's phantom-piece guard divides pieces by the clip's length, so a real sentence inside
+     * a long hold reads as noise (16 pieces in 11.2 s, refused on the realme, 21 Sep 01:38). What
+     * goes to the recogniser is cut to the span the energy floor calls speech: the onset less the
+     * pre-roll, to the last frame above threshold plus the hangover. Never inside a word, because
+     * only frames the floor calls quiet are cut; a hold with no onset (speech from the first
+     * frame, or none at all) goes whole, for the guard to judge as before.
+     */
+    private fun voicedSpan(frames: List<ShortArray>): List<ShortArray> {
+        val rms = frames.map { EnergyEndpointer.rms(it) }
+        val ep = EnergyEndpointer(frameMs = FRAME_MS, maxWaitMs = Int.MAX_VALUE, maxUtteranceMs = Int.MAX_VALUE)
+        var onset = -1
+        for (r in rms) if (ep.feed(r) == EnergyEndpointer.Step.STARTED) { onset = ep.onsetFrame; break }
+        if (onset < 0) return frames
+        var last = frames.lastIndex
+        while (last > onset && rms[last] <= ep.threshold) last--
+        val from = maxOf(0, onset - DefaultAsrEngine.PRE_ROLL_MS / FRAME_MS)
+        val to = minOf(frames.lastIndex, last + ep.hangoverMs / FRAME_MS)
+        return frames.subList(from, to + 1)
     }
 
     private fun unavailable(reason: UnavailableReason, detail: String) =

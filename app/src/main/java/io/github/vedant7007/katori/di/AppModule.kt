@@ -46,6 +46,7 @@ import io.github.vedant7007.katori.domain.model.Outcome
 import io.github.vedant7007.katori.ml.asr.AndroidAudioSource
 import io.github.vedant7007.katori.ml.asr.AsrEngine
 import io.github.vedant7007.katori.ml.asr.DefaultAsrEngine
+import io.github.vedant7007.katori.ml.asr.PushToTalk
 import io.github.vedant7007.katori.ml.asr.SherpaOnnxAsrLoader
 import io.github.vedant7007.katori.ml.llm.LlamaCppLlmEngine
 import io.github.vedant7007.katori.ml.llm.LlamaRuntime
@@ -239,8 +240,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideOrchestrator(
+        @ApplicationContext context: Context,
         asr: AsrEngine, llm: LlmLease, tts: TtsEngine, rules: RulesEngine, resolver: MealResolver, store: MealStore,
         advice: AdviceStore, labs: LabStore,
         contextSource: UserContextSource, knowledge: KnowledgeFacts, triggerText: TriggerText, contextText: ContextText, spokenNames: SpokenNames,
-    ): Orchestrator = DefaultOrchestrator(asr, llm, tts, rules, resolver, store, advice, labs, contextSource, knowledge, triggerText, contextText, spokenNames)
+    ): Orchestrator = DefaultOrchestrator(
+        asr, llm, tts, rules, resolver, store, advice, labs, contextSource, knowledge, triggerText, contextText, spokenNames,
+        pushToTalk = PushToTalk(asr, AndroidAudioSource(context)),
+    )
 }
