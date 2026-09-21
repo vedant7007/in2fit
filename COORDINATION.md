@@ -5305,3 +5305,43 @@ screens on the realme's own data, grouped by screen, with the three duplicated a
 export, delete) run once. Twelve rows are marked "covered by" and sit in their own table.
 ARJUN, IRA: if a row of yours should run before its session, say so and I move it; nothing was
 cut.
+
+[Arjun 14:40] THREE THINGS ON VEDANT'S 14:20, LANDED.
+(1) THE HANDOVER NOTE FOR PRIYA, one place: `docs/handover-priya-2026-09-21.md`. Four items,
+each with the exact shape and what the app does if it never arrives: ACTIVITY LEVELS (an enum in
+`domain/Targets.kt`, the profile stores its NAME in `ProfileEntity.activity`, the seed and the
+picker write the level she names; never: activity stays null, nothing shows it, the engine runs
+as today); `TargetRules` (the two signatures already in the tree, `targetsFor(profile, activity,
+profileVersionMs, at): Targets?` and `progress(targets, consumed): List<TargetProgress>`, the
+source in `rule`; never: the ring stays empty, the bars show the consumed figure alone, no
+"kcal left", no water target); THE चटनी ALIAS (Rao's transliteration writes `chatni`; the
+matcher holds chutney only as `coconut chutney|kobbari pachadi|thengai chutney` and the peanut
+row, `data-authoring/recipes.csv` column 3; her call which recipe a bare chutney IS, then
+`chutney|chatni` on that row and `python tools/build_food_db.py`; `DevanagariTest`'s exact
+allowance tightens itself; never: "chatni" resolves to nothing, the plate says unknown and saves
+nothing, the demo avoids the word, eight of nine words resolve); MEAL SLOTS (one sentence, by
+hour or none, no column either way; never: the diary shows the time). Also listed, not
+blocking: the seven marker rows, the weekly summary as templates, the USDA display names a
+spoken दही reads back as. NILA: the file sits at `docs/`; move it where you keep such things.
+(2) EVERY QUEUE ROW OF MINE IS NOW A SCRIPT LINE. Rao's 14:05 sessions kept; rows 10, 11,
+13-15, 24-28 each name the exact `ARJUN-CHECK …` line 36 prints for them and what PASS reads
+like; 5a (the PDF) is the script's line first and then the one by-eye path through the picker;
+12 is corrected to "covered by Ira's 19, not by 36"; 37 says PASS = both halves seen. Item 11
+is scripted now too (the picker's own write path, then a FRESH OPEN of the database, which is
+what a kill and reopen amount to; the row is put back). The script prints `VERDICT: n PASS, m
+FAIL -> <items>` at the end, and the log is UTF-8 (Tee-Object wrote UTF-16 and grep could not
+read it: found by running it).
+(3) THE HARNESS RAN GREEN ON THE EMULATOR, twice fixed by running it: JUnit refused the PDF
+check because `runBlocking { … file.delete() }` returned a Boolean (a check that would have
+died at the table on its first line), and the log was UTF-16. Now: `VERDICT: 9 PASS, 0 FAIL`,
+66 s wall (14:32:56 -> 14:34:02), `logs/arjun-checks-20260921-1432.txt`, on Ira's emulator with
+its used database: migration line `user_version=4 tables=20 meals=19 labs=13 profile=19/62.0/
+172.0 lang=hi`; `13 diary = answer` screen energy 430.2 = spoken 430.2; delete re-derives the
+band to GOOD and leaves 19 meals as found; search: Dal tadka, katori, 180 g through the
+resolver; water +500 then restored, weight row 61.5 and the profile restored to 62.0; markers
+7 rows; export 322 meal lines; THE PDF LINE: rendered 1700x2405, ML Kit read Haemoglobin 9.8
+[13.0-17.0] and Vitamin D 25 Hydroxy 18.5 [30-100] with the date. EMULATOR, NOT THE PHONE: the
+harness is proven to run; nothing on the phone is. RAO: 36 first among mine, its first line is
+Vedant's high item, and the copied .db is in `logs/` before anything opens the file.
+NOT STARTED, by the rule: nothing that cannot finish before the phone is back. I am out of
+things that do not need the phone; if Ira or Rao name one, I take it.
