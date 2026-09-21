@@ -47,7 +47,7 @@ import java.io.File
 import java.time.Instant
 
 /**
- * ARJUN'S DEVICE CHECKS, ONE SCRIPTED RUN (device queue items 10, 13-15, 24-29; 21 Sep). Opens
+ * ARJUN'S DEVICE CHECKS, ONE SCRIPTED RUN (device queue items 10, 13-15, 24-28 and 35; 21 Sep). Opens
  * THE APP'S OWN DATABASE FILE through the same migrations the app runs, on the real device,
  * with whatever rows the phone holds, and checks each item against it. Every row this class
  * writes it deletes again; the person's diary is read, never left changed.
@@ -190,9 +190,9 @@ class ArjunDeviceChecksTest {
         check("28 export", ok) { "meal lines=${mealLines.size} (items=$items nutrient rows=$nutrientRows) lab lines=${labLines.size} (rows=$labRows)" }
     }
 
-    /** Item 29: a PDF the test draws itself, rendered by the platform, read by ML Kit on THIS device, extracted. */
+    /** Item 35: a PDF the test draws itself, rendered by the platform, read by ML Kit on THIS device, extracted. */
     @Test
-    fun i_item29_a_pdf_page_renders_and_reads_through_the_real_recogniser() = runBlocking {
+    fun i_item35_a_pdf_page_renders_and_reads_through_the_real_recogniser() = runBlocking {
         val file = File(ctx.cacheDir, "arjun-check.pdf")
         val doc = PdfDocument()
         try {
@@ -214,7 +214,7 @@ class ArjunDeviceChecksTest {
         val read = bitmaps.firstOrNull()?.let { MlKitOcrEngine(frames).readText(frames.hold(it, 0)) }
         val report = (read as? Outcome.Ok)?.value?.let { LabReportExtractor.extract(it) }
         val hb = report?.fields?.firstOrNull { it.testName.contains("Haemoglobin", ignoreCase = true) }
-        check("29 pdf", bitmaps.size == 1 && hb != null && hb.value == 9.8 && hb.referenceLow == 13.0 && hb.referenceHigh == 17.0) {
+        check("35 pdf", bitmaps.size == 1 && hb != null && hb.value == 9.8 && hb.referenceLow == 13.0 && hb.referenceHigh == 17.0) {
             "render=${pages::class.java.simpleName} pages=${bitmaps.size} ${bitmaps.firstOrNull()?.let { "${it.width}x${it.height}" }} ocr=${read?.let { it::class.java.simpleName }} " +
                 "fields=${report?.fields?.map { "${it.testName}=${it.value}${it.unit ?: ""} [${it.referenceLow}-${it.referenceHigh}]" }} date=${report?.reportDate}"
         }

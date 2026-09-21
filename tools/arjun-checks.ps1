@@ -1,4 +1,4 @@
-# Arjun's device checks, one scripted run (docs/demo/device-queue.md items 10, 13-15, 24-29).
+# Arjun's device checks, one scripted run (docs/demo/device-queue.md items 10, 13-15, 24-28, 35).
 # Runs `ArjunDeviceChecksTest` on the phone through the DEFAULT adb server only, after stopping
 # the app so one process holds the database, and prints every ARJUN-CHECK line it decided.
 # Needs the demo debug APK and its androidTest APK installed (measurement-pass.ps1 builds and
