@@ -5230,3 +5230,59 @@ THE OLD SHELL STILL WORKS after every landing of the day, checked on the emulato
 Coach title long-press → the three cream tabs, Talk's hold button and hint, About and the
 pre-flight (the feed switch) behind its wordmark, "New screens" back to v2 (`emulator-old-
 shell-talk-after-v2.png`). It is row 61 and the fallback for the 26th.
+
+[Arjun 14:18] LANDING SEVEN: THE SEED THROUGH THE APP'S OWN PATHS (Vedant, 13:05), RUN ON THE
+EMULATOR TWICE; NUDGES AND THE DAL'S KATORI FOR IRA. Demo 460/0/0 (XML 08:38Z), full 461/0/0
+(08:43Z), demo and androidTest APKs build, whitelist unchanged.
+THE SEED (`DemoSeedTest`, Rao's file, taken for this and logged here; `cold-phone.ps1` step 5,
+four lines). What changed against Rao's 12:35 seed, all through the stores: (1) the profile is
+written with the values the first-run pickers write, enum NAMES: `sex = "male"` and
+`lifeContext = "hostel"` were words the app would never have stored, `toSnapshot()` read them as
+null, and the engine would have seen no sex and no context; now MALE / MAINTAIN / HOSTEL_STUDENT
+/ VEGETARIAN, speech hi, activity ABSENT until Priya names the levels (a word her rule does not
+know is a guess stored as a fact). (2) The six meals carry their source and language as
+`CurrentTurn` gives them: three SPOKEN/hi with the demo set's own Devanagari as the transcript
+(rows 1, 5, 10, verbatim) and roman items as the model extracts them, three TYPED/en-IN; the
+diary reads like someone used the app. (3) THE REPORT BY BEAT 3'S ROUTE: `-e report pdf` draws
+the report as a PDF, renders it with `PdfPages`, reads it with ML Kit ON THE PHONE and the real
+extractor, compares what was read with what was printed, and saves ONLY on an exact match (one
+misread number is a stop, 0036; `-e report true` remains the store-only fallback). The PDF is
+left in the app's media dir and `cold-phone.ps1 -Report` copies it to Downloads, so on stage the
+presenter opens THE SAME FILE through the picker. (4) A READ-BACK at the end through `Diary`
+and `ProfileStore`: every seeded meal id found with its source, each day's meals and energy,
+every lab value, the profile row, and a WARNING when today already has a meal (Beat 1 must log
+the first one live). (5) `SEED TIMING:` per part.
+RUN ON THE EMULATOR (Ira's, attached as emulator-5600; x86 translation; NOT the phone), twice,
+14:00: profile 136-276 ms; six meals through the real resolver 654-1015 ms, 6 of 6 resolved
+(chapati 90 g + toor_dal_tadka 180 g; idli 161.7 g + sambar 200 g; rice_cooked 200 g + dal +
+curd 150 g; milk_whole 200 g + egg 50 g; ...); THE PDF ROUTE READ EXACTLY on the emulator's ML
+Kit: "read 11 lines, extracted Haemoglobin=9.8 g/dL [12.0-15.0], Ferritin=8.0 ng/mL
+[15.0-150.0], date 2026-09-12", 2 values saved by the PDF route; read-back 6 of 6 meals with 3
+spoken/hi and 3 typed/en-IN. WALL TIME: 21 s from `am instrument` to done, of which ~8 s is the
+runner starting and the food database staging, the seed itself under 13 s. RAO: that is the
+number for step 5 on the emulator; the realme is unmeasured and on the queue, and it should be
+faster except ML Kit's first load. Both runs were with `-e report pdf`; the store-only fallback
+was not run today.
+IRA, YOUR EMULATOR: I installed master + my branch's APKs on it and ran the seed twice WITHOUT
+clearing your data (your nine hand rows for the marker bars are still there). It now also holds
+TWELVE seeded meals (two copies of the week, 15-20 Sep, six SPOKEN/hi) and FOUR seeded lab
+values (two copies of haemoglobin 9.8 and ferritin 8.0, 12 Sep), all through the real stores.
+If you want the clean state: `pm clear io.github.vedant7007.katori`, then one `am instrument -w
+-r -e report pdf -e class io.github.vedant7007.katori.orchestration.DemoSeedTest
+io.github.vedant7007.katori.test/androidx.test.runner.AndroidJUnitRunner`: a real week, a real
+report, 21 s, every figure the pipeline's. Sorry for the surprise; the phone is away and it was
+the only device.
+ALSO IN THIS LANDING, IRA'S TWO ASKS (13:25, 14:00): (a) NUDGES: `SuggestionDao.recent(limit)`
+joins the stored advice with its meal; `Diary.recentAdvice(limit): Flow<List<Nudge>>` (id,
+mealId, mealLoggedAt, saidAt, trigger, phrased, ruleId), newest first, nothing generated at
+display time; `TodayViewModel.State.nudges` (at most 20) and `nudgeCount` for the bell's dot.
+(b) THE DAL'S KATORI: `SearchViewModel.portion` now resolves each match THROUGH THE SAME
+RESOLVER THE PLATE USES (its name, the amount, no unit) so the household word, the grams and
+the nutrients are exactly what a logged plate shows: dal tadka reads "1 katori · 180 g", a roti
+"piece", milk "glass" (0035's own table, no second unit table in `ui/`); a match the resolver
+would resolve to a different record falls back to that record per 100 g, said as "g".
+`Row.match` is a new first field; nothing else on the row changed. Trends and Search were bound
+by you at 13:20 and 13:25 before I could take them, so I am not in your files; queue 36's
+search line now checks the resolver path. WHAT I AM NOT DOING, by Vedant's ruling: TargetRules,
+the चटनी alias, meal slots. VEDANT'S HIGH ITEM stands as queue 36's first line; item 35 (the
+PDF) is demo-critical per Vedant 13:05 and Rao has it high (31d967b).
