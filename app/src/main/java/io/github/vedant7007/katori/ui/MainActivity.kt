@@ -1,7 +1,10 @@
 package io.github.vedant7007.katori.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,6 +34,8 @@ import io.github.vedant7007.katori.ui.components.BottomTabs
 import io.github.vedant7007.katori.ui.components.Splash
 import io.github.vedant7007.katori.ui.demo.DemoFeed
 import io.github.vedant7007.katori.ui.theme.In2fitTheme
+import io.github.vedant7007.katori.ui.theme.ThemePreference
+import io.github.vedant7007.katori.ui.v2.Shell2
 
 /**
  * The demo shell: three tabs, no more. Talk carries beats 1, 2 and 4; Scan carries beat 3;
@@ -43,9 +49,20 @@ import io.github.vedant7007.katori.ui.theme.In2fitTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemePreference.load(this)
         setContent {
-            In2fitTheme {
-                Surface { Shell() }
+            // The v2 shell (Ira, 21 Sep) is the app; the old three-tab shell stays behind the
+            // legacy switch until every v2 screen is proven on the device. The bars follow the scheme.
+            val legacy = ThemePreference.legacy
+            val dark = ThemePreference.dark && !legacy
+            SideEffect {
+                enableEdgeToEdge(
+                    statusBarStyle = if (dark) SystemBarStyle.dark(Color.TRANSPARENT) else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+                    navigationBarStyle = if (dark) SystemBarStyle.dark(Color.TRANSPARENT) else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+                )
+            }
+            In2fitTheme(legacy = legacy) {
+                Surface { if (legacy) Shell(onLeaveLegacy = { ThemePreference.setLegacy(this@MainActivity, false) }) else Shell2() }
             }
         }
     }
@@ -54,7 +71,7 @@ class MainActivity : ComponentActivity() {
 private val tabs = listOf(R.string.tab_talk, R.string.tab_scan, R.string.tab_about)
 
 @Composable
-private fun Shell() {
+private fun Shell(onLeaveLegacy: () -> Unit) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var preflight by rememberSaveable { mutableStateOf(false) }
     val demo by DemoFeed.enabled.collectAsState()
@@ -90,7 +107,7 @@ private fun Shell() {
                 preflight -> PreflightScreen()
                 tab == 0 -> TalkScreen()
                 tab == 1 -> ScanScreen()
-                else -> AboutScreen(onPreflight = { preflight = true })
+                else -> AboutScreen(onPreflight = { preflight = true }, onLeaveLegacy = onLeaveLegacy)
             }
         }
     }

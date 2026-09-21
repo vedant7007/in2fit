@@ -325,4 +325,36 @@
     <string name="talk_type_instead">Type instead</string>
     <!-- Scan tab, over the camera: how to hold the page so the reader can read it (the playbook's own advice). -->
     <string name="scan_instruction">Lay the report flat, whole page in frame, light from the side.</string>
+    <!-- THE V2 DESIGN (Ira, 21 Sep, after the freeze: English only). The design's own words, verbatim, one key each. -->
+    <string name="v2_tab_today">Today</string>
+    <string name="v2_tab_diary">Diary</string>
+    <string name="v2_tab_coach">Coach</string>
+    <string name="v2_tab_you">You</string>
+    <!-- The microphone button between the tabs: press and hold (0031). -->
+    <string name="v2_mic_hold">Hold to speak</string>
+    <!-- The voice sheet while recording. 1 the language the person chose to speak in. -->
+    <string name="v2_listening">Listening · %1$s</string>
+    <!-- The voice sheet's totals: the unit beside the energy, and the three macro labels as the design writes them. -->
+    <string name="v2_kcal">kcal</string>
+    <string name="v2_protein">Protein</string>
+    <string name="v2_carbs">Carbs</string>
+    <string name="v2_fat">Fat</string>
+    <!-- One food's own figures on its row (da67d04): 1 the number, written by the app as the contract writes it. -->
+    <string name="v2_item_kcal">%1$s kcal</string>
+    <string name="v2_item_protein">%1$s g protein</string>
+    <!-- The voice sheet's two buttons. "Added" is what the pipeline has already done by the time the sheet shows a plate (MealLogged); "Add" waits for a confirm step that is not in the contract (asked 21 Sep). -->
+    <string name="v2_discard">Discard</string>
+    <string name="v2_add_to_today">Add to today</string>
+    <string name="v2_added_to_today">Added to today</string>
+    <string name="v2_close">Close</string>
+    <!-- Coach: the chat that carries every turn's text. -->
+    <string name="v2_coach_title">Coach</string>
+    <string name="v2_coach_placeholder">Ask your coach anything</string>
+    <string name="v2_suggest_1">Why is my sugar high in the evening?</string>
+    <string name="v2_suggest_2">Plan dinner under 500 kcal</string>
+    <string name="v2_suggest_3">What should I eat after today\'s gym?</string>
+    <string name="v2_coach_send">Send</string>
+    <!-- Temporary, until the You screen lands: long-press the Coach title to open the old screens. -->
+    <string name="v2_old_screens">Old screens</string>
+    <string name="v2_new_screens">New screens</string>
 </resources>

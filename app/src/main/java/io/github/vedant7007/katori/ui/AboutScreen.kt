@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,7 @@ import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.ui.components.Hairline
 import io.github.vedant7007.katori.ui.components.Label
 import io.github.vedant7007.katori.ui.components.SafetyLine
+import io.github.vedant7007.katori.ui.components.SecondaryButton
 import io.github.vedant7007.katori.ui.theme.In2fitColors
 import io.github.vedant7007.katori.ui.theme.In2fitText
 import io.github.vedant7007.katori.ui.theme.Space
@@ -37,7 +39,7 @@ import io.github.vedant7007.katori.ui.theme.Space
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AboutScreen(onPreflight: () -> Unit, vm: AboutViewModel = hiltViewModel()) {
+fun AboutScreen(onPreflight: () -> Unit, onLeaveLegacy: (() -> Unit)? = null, vm: AboutViewModel = hiltViewModel()) {
     val meta by vm.meta.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Space.l),
@@ -67,6 +69,8 @@ fun AboutScreen(onPreflight: () -> Unit, vm: AboutViewModel = hiltViewModel()) {
                 Text(line, style = In2fitText.bodySmall, color = In2fitColors.inkSecondary, modifier = Modifier.padding(vertical = Space.s))
             }
         }
+        // The way back to the v2 screens while the old shell is kept (21 Sep); gone with the old shell.
+        if (onLeaveLegacy != null) SecondaryButton(stringResource(R.string.v2_new_screens), onClick = onLeaveLegacy, modifier = Modifier.fillMaxWidth())
         SafetyLine(Modifier.padding(top = Space.s, bottom = Space.l))
     }
 }

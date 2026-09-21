@@ -4569,3 +4569,89 @@ tag). One turn runs at a time, so it is two volatile fields; the day it carries 
 becomes a parameter of `MealStore.save`. Your (a)-(f) are queue items 10-15 and the source column
 is 16, all after the push-to-talk and Beat 1 items. Demo suite 445, 0 failures, my XML; demo,
 demo-androidTest and full APKs all build.
+[Ira 11:15] LANDED, UNPROVEN ON THE DEVICE: THE V2 SHELL, THE VOICE SHEET AND COACH, dark, as drawn,
+bound to `TalkViewModel` and nothing else. Every number on every screenshot below is the scripted
+feed's, on the EMULATOR, for layout; none is a device screenshot. Demo suite 432/0/0 from my own
+run (XML 05:40Z), NetworkIsolationTest 2/0/0; `aapt2 dump permissions` on the demo APK: CAMERA,
+RECORD_AUDIO, DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION and nothing else; demo APK 68,687,232 B,
+full 68,761,345 B (the three Instrument files are 335,940 B of that).
+WHAT IS BUILT (`ui/theme/Scheme.kt`, `Type2.kt`, `ui/v2/`): the palette as two `Scheme`s (the
+design's hex values verbatim for dark; the ruled cream and green behind `ThemePreference.dark`,
+the switch itself is step 5); Instrument Sans (one variable file) and Serif bundled, Plex for
+EVERY digit through one text primitive (`T()`, which sets each digit run in Plex at the line's
+size, ×1.02 beside serif); the design's icons as its own SVG path data through `PathParser`,
+scaled as an SVG scales; the five-place bar (four equal slots, 22 dp glyphs, 10 sp labels, the
+64 dp accent microphone lifted 26 dp, the gradient); the voice sheet (scrim, 34 dp corners, the
+handle, 14/22/34 padding) in three bodies: listening (84 dp mic with the pulse, thirteen 4×30 bars
+each ONE REAL SAMPLE of the microphone level at 80 ms, "LISTENING · <language>"), analysing (the
+quoted transcript in serif 22, the stage rows: 22 dp rings, accent fill and tick when done, the
+seconds counter under the current one), result (the time and the band as the tracked label, the
+energy at 38 in Plex beside "kcal", Protein/Carbs/Fat on the right, one card per item with the
+name the database shows, the portion chip, the item's own kcal and protein, then the two pills);
+Coach (serif title, hairline, bubbles 84% wide at 13/16 with the design's radii and tints, the
+person's on the right, the stage rows where the design has typing dots, the three suggestion
+chips, the input pill with the accent send circle). The old three-tab shell stays whole behind
+`ThemePreference.legacy`: long-press the Coach title to open it, "New screens" on the old About
+to leave it; both go with step 5, where the switch belongs.
+THE PLATE'S PER-ITEM ROWS AND "TAKEN AS" (item 2 of the order) LANDED WITH IT, on Arjun's
+`Entry.Plate.rows` (da67d04): the chip reads "2 piece" for the stated rotis and "1 katori · taken
+as 180 g" for the assumed dal, the caption only under QUANTITY_INFERRED (0035, Priya's rule); the
+row's right side reads the item's own energy and protein from `snapshot.nutrients`, absent when
+unmeasured, never 0. Through the feed on the emulator both cases are in
+`docs/screenshots/2026-09-21-ira/emulator-v2-sheet-result-logged-feed.png`. The real path shows
+the rows the hour Rao's one line (`items = resolved.items`) lands; until then the sheet falls back
+to the items as said with no figures on the right.
+NOT AS DRAWN, EACH WITH ITS REASON, for Vedant to rule on: (1) the design TAPS the microphone; the
+app HOLDS it (push-to-talk, ruled 20 Sep, proven 07:25), because the recording has no other end;
+the sheet opens on the press and the release moves it to analysing. (2) The design streams the
+transcript word by word while listening; the recogniser has no partial results (0022, 0026), so
+that slot stays empty until the sentence is written down and the level bars carry the signal.
+(3) The design spins the current stage's ring; nothing animates during inference, so the current
+ring is the accent outline and the counter is the honesty device. (4) The design's "Add to today"
+is a confirm-before-save; the pipeline saves at MealResolved (MealLogged follows), so the primary
+pill reads "Added to today" once `logged` is true, "Close" for a hypothetical plate, and "Add to
+today" only in the state that cannot happen yet; "Discard" is drawn and dimmed because it needs
+the delete Arjun owns ((d), his list). If Vedant wants the design's confirm step, that is a
+contract change (the orchestrator would wait between MealResolved and SAVING for a
+ConfirmMeal / DiscardMeal intent), Rao's to own; I bind the two pills to it the hour it exists.
+(5) "Lunch · 1:42 pm": the slot waits on meal slots (MISSING); the label is the clock time the
+plate reached the screen plus the plate's band, said once. (6) The design's caption "Portions
+use your katori (180 ml) from earlier logs" states a learned katori the system does not have;
+the slot carries the safety line, which the screen owes once anyway. (7) The pencil on the chip
+is drawn; the portion editor it opens needs a correction path in the contract
+(`Correction.Quantity` exists, no intent sends it), so the chip is not a control and no "tap to
+correct" sentence is rendered anywhere in v2 (Arjun's 07:33 defect 3 is closed by that). (8)
+Coach's context line ("Knows your Sept blood report · HbA1c 6.4 · Vit D low") would originate
+"low" (amendment 2); the slot carries the offline mark until the report's attributed line has a
+source, and the safety line sits above the chips. (9) The three suggestion chips send the
+design's three questions through the REAL pipeline as typed turns; the answers will be the
+model's, not the design's copy. (10) The backdrop blur behind the sheet (14 px) exists from API
+31; below it the scrim alone. (11) The sheet's bottom corners are the screen's, not the mock's
+46 px. (12) Devanagari and Telugu are not in either Instrument face and fall to the system's
+Noto beside it ("LISTENING · हिन्दी" in the screenshot). (13) The demo-feed banner: v2 content
+sits UNDER it, not behind it (Arjun's 07:33 defect 2; verified with the banner on).
+RENDERS EMPTY OR INTERIM, and why: per-item figures on the real path (Rao's line); the meal slot
+(MISSING); Discard (Arjun's delete); the Coach context line (a report summary source, mine to
+ask of Arjun with Reports). INTERIM, GONE TODAY: Today, Diary and You open the OLD Talk, Scan and
+About screens in their own cream theme inside the v2 shell until steps 4, 3 and 5 land, so
+nothing the phone could do yesterday is lost (`emulator-v2-today-interim-old-talk.png` shows it,
+and it is ugly on purpose: the old cream on the new dark, nobody can mistake it for finished).
+CHECKED ON THE EMULATOR, LAYOUT ONLY: 2× font scale (tabs whole after I gave them equal slots,
+stage rows wrap, safety line whole, `emulator-v2-tabs-2x.png`, `emulator-v2-sheet-analysing-2x-
+feed.png`); Devanagari in the listening label; the four feed beats through the sheet (logged
+plate, question → the sheet closes and Coach opens with the answer, hypothetical plate → "Close",
+advice as a bubble). Reduce motion is code-checked only (no pulse, no rise, no press scale).
+TO NILA, for 0005: `res/font/instrument_sans.ttf` (194,336 B, sha256 b24f1812…33b1, OFL 1.1),
+`instrument_serif.ttf` (70,012 B, 498efd46…bb88, OFL 1.1), `instrument_serif_italic.ttf` (71,592
+B, 08939b8b…7385, OFL 1.1); the OFL texts are in my scratchpad and I hand them over where you say.
+FOR RAO'S DEVICE LIST, in this order, after Arjun's (a)–(c): (d) install the demo build over the
+existing data: the app opens in the dark v2 shell with light status icons, Today shows the old
+Talk in cream; (e) hold the microphone on any tab: the sheet opens ON THE PRESS with the pulse
+and the bars moving with your voice and "LISTENING · हिन्दी"; say Beat 1; release: the quoted
+transcript, the stage rows ticking with the counter, then the plate — check "taken as 180 g"
+under the dal ONLY (after your line; before it, no figures on the right), and "Added to today";
+(f) hold and ask Beat 4's question: the sheet closes by itself and Coach opens with the answer
+bubble; (g) Coach: type a question, Send: the stage rows appear where the typing dots would; (h)
+Coach title long-press: the old shell; old About "New screens": back; (i) reduce motion (animator
+scale 0): the sheet appears without the rise and the mic has no pulse; (j) the worst frame while
+the sheet is up, `dumpsys gfxinfo` as before. NEXT, NOW: Reports (3) with the attributed wording.

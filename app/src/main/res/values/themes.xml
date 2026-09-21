@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The window's chrome only; every colour and type on screen is ui/theme/Theme.kt (Ira).
-         Light bars, so the status icons are dark on the cream ground. -->
-    <style name="Theme.Katori" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:windowBackground">#ECEBE6</item>
+    <!-- The window's chrome only; every colour and type on screen is ui/theme (Ira). The v2
+         ground (dark by default, 21 Sep) before the first frame; MainActivity sets the bars'
+         icon colour at run time from the scheme, so the cream switch and the old shell get light bars. -->
+    <style name="Theme.Katori" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">#0E1312</item>
     </style>
 </resources>

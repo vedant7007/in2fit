@@ -141,10 +141,17 @@ private val shapes = Shapes(
     extraLarge = RoundedCornerShape(24.dp),
 )
 
+/**
+ * The theme. v2 screens read [LocalScheme] (dark by default, cream behind the switch, ruled 21
+ * Sep); the Material colour scheme follows it so the few Material components match; the old
+ * screens keep their own tokens and stay reachable until each v2 screen is proven on the device.
+ */
 @Composable
-fun In2fitTheme(content: @Composable () -> Unit) {
+fun In2fitTheme(dark: Boolean = ThemePreference.dark, legacy: Boolean = false, content: @Composable () -> Unit) {
     val reduceMotion = rememberReduceMotion()
-    CompositionLocalProvider(LocalReduceMotion provides reduceMotion) {
-        MaterialTheme(colorScheme = colorScheme, typography = typography, shapes = shapes, content = content)
+    // The old screens keep the cream tokens they were built on, whatever the switch says.
+    val scheme = if (dark && !legacy) Dark else Cream
+    CompositionLocalProvider(LocalReduceMotion provides reduceMotion, LocalScheme provides scheme) {
+        MaterialTheme(colorScheme = if (legacy) colorScheme else scheme.material(), typography = typography, shapes = shapes, content = content)
     }
 }
