@@ -144,12 +144,21 @@ Done "the five files are present and non-empty"
 # --- 5. the seed: profile, language, the week, optionally the report -------------------------------
 Step 5 'the seed, through the app''s own stores (DemoSeedTest into the app''s database)'
 Sh "am force-stop $pkg; rm -f $M/katori-seed-report.txt" | Out-Null
-$rep = if ($Report) { 'true' } else { 'false' }
+# -Report seeds the lab report BY BEAT 3'S ROUTE (Arjun, 21 Sep 13:00): DemoSeedTest draws it as a
+# PDF, renders it, reads it with ML Kit on this phone and saves only what was read; the PDF is then
+# put in Downloads so the presenter opens the same file through the picker on stage.
+$rep = if ($Report) { 'pdf' } else { 'false' }
 Adb @('-s', $Serial, 'shell', "am instrument -w -r -e report $rep -e class io.github.vedant7007.katori.orchestration.DemoSeedTest $runner") 600 | Where-Object { $_ -match 'INSTRUMENTATION_(RESULT|CODE)|STATUS_CODE: -2' } | ForEach-Object { Line "    $_" }
 $seed = Sh "cat $M/katori-seed-report.txt"
 $seed | ForEach-Object { Line "    $_" }
 if (($seed -join "`n") -notmatch 'SEED END') { Fail 'the seed did not finish; read the lines above' }
-Done ('profile (speech hi), six meals over six days' + $(if ($Report) { ', the report' } else { ', no report' }))
+if ($Report) {
+  Sh "mkdir -p /sdcard/Download; cp $M/in2fit-lab-report.pdf /sdcard/Download/in2fit-lab-report.pdf" | Out-Null
+  $pdfSize = "$(Sh 'stat -c %s /sdcard/Download/in2fit-lab-report.pdf' | Select-Object -Last 1)".Trim()
+  if (-not $pdfSize -or $pdfSize -eq '0') { Fail 'the report PDF is not in Downloads; the picker will have nothing to open on stage' }
+  Line "    the report PDF is in Downloads ($pdfSize bytes): Scan -> Open a PDF report -> Downloads -> in2fit-lab-report.pdf"
+}
+Done ('profile (speech hi), six meals over six days, three spoken in Hindi and three typed' + $(if ($Report) { ', the report by the PDF route' } else { ', no report' }))
 
 # --- 6. airplane mode -------------------------------------------------------------------------------
 Step 6 'radios off'
