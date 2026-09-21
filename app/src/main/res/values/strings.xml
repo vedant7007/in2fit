@@ -362,8 +362,7 @@
     <string name="v2_reports_active">Active</string>
     <string name="v2_reports_effects">How this changes your day</string>
     <string name="v2_reports_add">Add another report</string>
-    <!-- The design says "Photo or PDF · read on device"; PDF input is not built (Arjun, (ac)), so the line says what is true until it is. -->
-    <string name="v2_reports_add_sub">Photo · read on device</string>
+    <string name="v2_reports_add_sub">Photo or PDF · read on device</string>
     <string name="v2_marker_history">Last four tests</string>
     <!-- A value inside the range the report printed (amendment 2: the app never says "normal"). -->
     <string name="v2_within_range">within the printed range</string>
@@ -470,4 +469,87 @@
     <string name="v2_field_weight">Weight</string>
     <string name="v2_field_height">Height</string>
     <string name="v2_save_changes">Save changes</string>
+    <!-- Welcome and first run (the design's words; the phone and the code are gone, override). -->
+    <string name="v2_you_say">You say</string>
+    <string name="v2_phrase_1">Two rotis, a katori of dal, and some curd</string>
+    <string name="v2_phrase_2">Idli sambar and a filter coffee</string>
+    <string name="v2_phrase_3">Chicken curry with one cup rice</string>
+    <string name="v2_phrase_4">Just a handful of roasted chana</string>
+    <string name="v2_welcome_line">Plain language in. Portions sized the way you actually eat, read against your own blood report.</string>
+    <string name="v2_get_started">Get started</string>
+    <string name="v2_have_account">I already have an account</string>
+    <!-- Amendment 1: the one honest sentence behind the sign-in link, then straight in. -->
+    <string name="v2_sign_in_notice">This is a prototype: no account is created and nothing leaves the phone.</string>
+    <string name="v2_continue">Continue</string>
+    <!-- 1 the step, 2 the count. -->
+    <string name="v2_step_of">%1$d/%2$d</string>
+    <string name="v2_step_lang_title">How should I listen?</string>
+    <string name="v2_step_lang_sub">You can switch any time, mid-sentence too.</string>
+    <!-- Override: the design's "Speech and replies"; the replies are English (0019 addendum 7). -->
+    <string name="v2_language_speech_note">Speech</string>
+    <string name="v2_step_about_title">A little about you</string>
+    <string name="v2_step_about_sub">This sets your daily budget. Rough numbers are fine.</string>
+    <string name="v2_field_activity">Activity</string>
+    <string name="v2_unit_yrs">yrs</string>
+    <string name="v2_unit_kg">kg</string>
+    <string name="v2_unit_cm">cm</string>
+    <string name="v2_unit_days_wk">days/wk</string>
+    <string name="v2_goal">Goal</string>
+    <!-- The domain's four goals (Goal enum), in the person's words. -->
+    <string name="v2_goal_maintain">Maintain</string>
+    <string name="v2_goal_lose">Lose weight</string>
+    <string name="v2_goal_gain">Gain weight</string>
+    <string name="v2_goal_muscle">Build muscle</string>
+    <string name="v2_step_conditions_title">Anything I should watch?</string>
+    <string name="v2_step_conditions_sub">Pick what applies. It changes what the coach flags.</string>
+    <string name="v2_cond_prediabetes">Prediabetes</string>
+    <string name="v2_cond_t2d">Type 2 diabetes</string>
+    <string name="v2_cond_bp">High BP</string>
+    <string name="v2_cond_thyroid">Thyroid</string>
+    <string name="v2_cond_pcos">PCOS</string>
+    <string name="v2_cond_vitd">Vitamin D deficiency</string>
+    <string name="v2_cond_cholesterol">High cholesterol</string>
+    <string name="v2_cond_none">None</string>
+    <string name="v2_step_report_title">Add a blood report</string>
+    <string name="v2_step_report_sub">This is what turns generic advice into yours.</string>
+    <string name="v2_scan_report">Scan a blood report</string>
+    <string name="v2_scan_report_sub">Photo or PDF. Read on your phone,\nnever uploaded raw.</string>
+    <string name="v2_skip_for_now">Skip for now</string>
+    <string name="v2_step_mic_title">Let me hear you</string>
+    <string name="v2_step_mic_sub">Speaking a meal takes four seconds. Typing takes forty.</string>
+    <string name="v2_allow_microphone">Allow microphone</string>
+    <string name="v2_not_now">Not now</string>
+    <string name="v2_step_ready_title">You\'re set</string>
+    <string name="v2_step_ready_sub">Here is what I will use from today.</string>
+    <string name="v2_ready_budget">Daily budget</string>
+    <string name="v2_ready_protein">Protein target</string>
+    <string name="v2_ready_watching">Watching</string>
+    <string name="v2_ready_voice">Voice</string>
+    <string name="v2_start_logging">Start logging</string>
+    <!-- Diary and the meal (the design's words). -->
+    <string name="v2_kcal_logged">%1$s kcal logged</string>
+    <string name="v2_entries">%1$d entries</string>
+    <string name="v2_trends">Trends</string>
+    <string name="v2_day_logged" translatable="false">✓</string>
+    <string name="v2_day_today" translatable="false">•</string>
+    <string name="v2_day_none" translatable="false">–</string>
+    <!-- The design's "Log dinner" needs meal slots (deferred). -->
+    <string name="v2_log_a_meal">Log a meal</string>
+    <string name="v2_back">Back</string>
+    <!-- The meal's note: 1 the time it was logged, 2 the band word. -->
+    <string name="v2_meal_note">Logged at %1$s. The figures are %2$s.</string>
+    <string name="v2_delete_meal">Delete meal</string>
+    <string name="v2_edit_portions">Edit portions</string>
+    <!-- Trends (the design's words). -->
+    <string name="v2_this_week">This week</string>
+    <!-- 1 the first day, 2 the last day of the seven. -->
+    <string name="v2_date_span">%1$s – %2$s</string>
+    <string name="v2_calories_vs_goal">Calories vs goal</string>
+    <string name="v2_avg_calories">Avg calories</string>
+    <string name="v2_over_n_days">over %1$d days</string>
+    <string name="v2_protein_hit">Protein hit</string>
+    <string name="v2_logged_meals">Logged meals</string>
+    <string name="v2_n_days_logged">%1$d days logged</string>
+    <string name="v2_weight">Weight</string>
+    <string name="v2_since">since %1$s</string>
 </resources>

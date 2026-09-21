@@ -5017,3 +5017,82 @@ status icons dark; kill and reopen: still cream; back to Dark; (c) Edit details:
 weight, Save: You shows it; (d) Language → Telugu: the sheet's label reads "LISTENING · తెలుగు"
 on the next hold; (e) Privacy → "Share with your doctor": the chooser opens with the CSV text,
 no permission prompt. NEXT, NOW: Welcome and first run (6), then Diary and the rest (7).
+
+[Ira 13:20] LANDED, UNPROVEN ON THE DEVICE: WELCOME AND FIRST RUN (item 6), DIARY, THE MEAL AND
+THIS WEEK (the first of item 7), the microphone's warm-up gate on the v2 bar (Arjun's 12:42
+ask), the splash on the scheme and bound to the warm-up. Demo suite 460/0/0 from my own run (XML
+07:43Z), NetworkIsolationTest 2/0/0, the whitelist unchanged (no permission touched).
+WHAT IS BUILT. `WelcomeScreen.kt`, pixel for pixel (amendment 1): the two drifting glows (16 s
+and 21 s), the lockup at 198 dp (the design's own `in2fit-lockup.png`, fetched from the project's
+assets, 73 KB, in `drawable-nodpi/lockup.png`; `mark_lime.png` for the Ready step), the 208 dp
+ring with the 5.5 s sweep, the hairline, the 3.2 s pulse and the thirteen 4×54 bars, "YOU SAY",
+the four sentences cycling every 4.2 s with the design's rise and fade, the tagline sentence,
+"Get started", and "I already have an account", which shows one sentence in the link's place
+("This is a prototype: no account is created and nothing leaves the phone.") and a "Continue"
+that goes straight in. `FirstRunScreen.kt`, six steps (the phone and the code are gone,
+override): the back circle, the 3 dp bar and "n/6", the serif 31 titles and lines as written;
+Language (the three, "Speech" under Telugu and Hindi, a tap and Continue write
+`setLanguage`); A little about you (Age / Weight / Height / Activity in the 2×2 boxes, the
+values in Plex at the serif's size, the Goal chips from the domain's four, Continue writes
+`ProfileStore.save`); Anything I should watch? (the design's seven chips plus None, each a
+`declareCondition` / `removeCondition` on the spot, USER_DECLARED); Add a blood report (the
+dashed card opens the scan screen with the camera and Arjun's PDF button OVER the steps, Back
+returns to the step; Skip for now; Continue once a report exists); Let me hear you (the 96 dp
+pulse, "Allow microphone" asks the system, "Not now"); You're set (the mark at 128 dp, Daily
+budget and Protein target from the rule, Watching = the newest report's values outside their
+printed range in those words, Voice = the language; "Start logging" goes in). Either way in
+sets one flag (`ThemePreference.welcomed`, the preference file, 0037) so Welcome shows once.
+THE GATE: the v2 microphone is `enabled = state.ready && !state.busy`, dimmed to 32% and
+"Getting ready…" to a screen reader until the models are warm; the splash now ends at the next
+expand after `ready`, never before, and is drawn on the scheme (the wordmark PNG tinted to the
+lime, the tagline to text2), so the cream flash on a dark launch is gone.
+NOT AS DRAWN, and why: (1) the kcal · protein pill under the welcome sentences states figures
+the system has not produced for those sentences (Arjun's (ad), 0029) and is absent; (2)
+"Reverse prediabetes" is not a goal the domain has (a condition, not a goal) and is not a chip;
+(3) Activity is stored as typed (days a week) until Priya names the levels her rule reads;
+(4) the scanning step's own dress (the preview with the sweep line, the three ticks) is not
+drawn: the step IS the scan screen, in its old cream, until that screen is redrawn (with
+Diary and the rest, item 7); (5) the design's speech note "Speech and replies" reads "Speech"
+(0019: the replies are English).
+THE EMULATOR NOW DIES AT LAUNCH, RAO'S TO RULE: since `671c7a4` the warm-up runs the models in
+`Application.onCreate`; the x86_64 emulator runs the arm64 libraries through berberis and the
+process dies with `SIGILL` ("Undefined instruction 0x4f97e172", `logcat` 12:53:01) before the
+first frame, every launch, with the feed on or off (the feed switch is reached after launch).
+For my layout checks I carry an UNCOMMITTED two-line guard in `WarmUp.start` (skip when
+`Build.SUPPORTED_ABIS[0] == "x86_64"`); it is not in this landing and never will be from me.
+RAO: if the emulator is to stay a layout tool for anyone, the guard (or a system property) is
+yours; on an arm64 phone nothing changes.
+SCREENSHOTS, EMULATOR, LAYOUT ONLY: `emulator-v2-welcome.png`, `…-welcome-2.png` (two moments
+of the cycle), `emulator-v2-first-run-language.png`, `…-about-you-rig-row.png` (the rig's row
+prefills 19 / 62 / 172 and its word for activity), `…-conditions.png`, `…-report.png`,
+`…-mic.png`, `…-ready-seeded-rows.png` (Watching from the rows I typed for Reports).
+FOR RAO'S DEVICE LIST (numbers in the queue file): (a) clear the app's data, launch: the splash
+in lime on dark until the warm-up line, then Welcome; "Get started"; through the six steps with
+real answers (Hindi, 19 / 62 / 172 / 3, Maintain, Prediabetes, Skip, Allow → the system
+prompt, Start logging): Today greets by the name from step 2 only if a name was typed there
+(it is not asked; Edit details has it); (b) kill and reopen: no Welcome, Today; (c) clear
+data again, launch, "I already have an account": the sentence, Continue, Today, and no
+profile row (You shows an empty card); (d) a hold on the microphone within the first second
+after launch: nothing starts, the button is dim, and the hold after the warm-up line starts
+the sheet. DIARY, THE MEAL, THIS WEEK (`DiaryScreen.kt`, `TrendsScreen.kt`), on `DiaryViewModel`,
+`TrendsViewModel`, `ProfileViewModel`: Diary as drawn (the title with "430.2 kcal logged · 1
+entries" under it, the Trends pill, the seven-day strip with a tick / a dot / a dash and a tap
+that selects the day, one card per meal with the time, the items' names, "2 items", the energy in
+Plex at the serif's size, and the engine's stored flag under a hairline when a rule fired, then
+the dashed "Log a meal"); the meal (Back, the time, the items in serif 30, the four totals, one
+card per item with the portion chip and "taken as N g" only when assumed, its own kcal and
+protein, the note card with the band said once, "Delete meal" as a REAL delete through
+`deleteMeal`, "Edit portions" drawn and dimmed until Rao's `CorrectValue`); This week (the date
+span, the seven bars of each day's energy with no bar for a day with nothing, Avg calories
+"over N days", Logged meals "N days logged", Protein hit and Weight empty until a target and two
+weights exist). WORDS: "Breakfast · 9:05 am" is the time alone (slots deferred to Priya); "Log
+dinner" is "Log a meal"; "voice logged" and "22 by voice" wait for the source on the day rows;
+"137 under goal" and the warm over-goal bars wait for the rule; "What the coach noticed" is a
+weekly summary the system does not write yet (Priya's (u)) and its card is absent.
+`emulator-v2-diary-seeded-rows.png`, `…-meal-…`, `…-trends-…`: the emulator's diary now carries a
+week of meals somebody's rig wrote (not mine); every figure on them is that data's.
+FOR RAO'S DEVICE LIST (numbers in the queue file): (e) Diary on the realme: the day's meals as
+cards, the day's energy under the title equal to Today's ring, the strip's ticks on the days
+with meals; (f) tap the chapati meal: the four totals equal the diary card, "taken as" only
+under the dal; (g) Trends: seven bars, no bar on an empty day, Avg over the logged days only.
+NEXT, NOW: Search and the food page, Nudges, and the scan screen's dress (the rest of item 7).

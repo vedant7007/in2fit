@@ -120,6 +120,11 @@ handset produced it; Nila has the list of what does not (COORDINATION, 21 Sep).
 | 39 | Ira's cream switch | You → Appearance → Cream: every screen cream, status icons dark; kill and reopen: still cream; back to Dark | `ThemePreference` through `LocalScheme`, the bars' icon colour at run time | LANDED AND UNPROVEN (Ira, 12:50) |
 | 40 | Ira's language page | You → Language → Telugu: the sheet's label reads "LISTENING · తెలుగు" on the next hold | the language's one home (the profile row) read by both screens | LANDED AND UNPROVEN (Ira, 12:50) |
 | 41 | Ira's share sheet | You → Privacy → "Share with your doctor": the chooser opens with the CSV text, no permission prompt | the export through the v2 page | LANDED AND UNPROVEN (Ira, 12:50) |
+| 42 | Ira's Welcome and first run | clear the app's data, launch: the lime splash until the warm-up line, then Welcome; "Get started"; the six steps with real answers (Hindi, 19 / 62 / 172 / 3, Maintain, Prediabetes, Skip, Allow → the system prompt, Start logging); kill and reopen: Today, no Welcome | first run writes the profile row, the condition and the language; the flag holds | LANDED AND UNPROVEN (Ira, 13:20) |
+| 43 | Ira's sign-in link | clear data, launch, "I already have an account": the one sentence, Continue, Today; You shows an empty profile card | amendment 1 | LANDED AND UNPROVEN (Ira, 13:20) |
+| 44 | Ira's warm-up gate on the v2 bar | a hold within the first second after launch: nothing starts and the button is dim; a hold after the warm-up line starts the sheet | `state.ready` on the v2 microphone | LANDED AND UNPROVEN (Ira, 13:20) |
+| 45 | Ira's Diary | Diary on the realme: the day's meals as cards, the energy under the title equal to Today's ring, ticks on the days with meals; tap the chapati meal: the four totals equal the card, "taken as" only under the dal | Diary and the meal on real rows | LANDED AND UNPROVEN (Ira, 13:20) |
+| 46 | Ira's Trends | Diary → Trends: seven bars, no bar on an empty day, Avg over the logged days only, Protein hit and Weight empty | Trends on real rows | LANDED AND UNPROVEN (Ira, 13:20) |
 
 Struck lines stay in the table with the date and the log path, so the next person sees what was
 run and when.

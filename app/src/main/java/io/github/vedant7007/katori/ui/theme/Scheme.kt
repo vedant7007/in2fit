@@ -156,16 +156,26 @@ object ThemePreference {
     private const val FILE = "in2fit.ui"
     private const val KEY = "dark"
     private const val KEY_LEGACY = "legacy"
+    private const val KEY_WELCOMED = "welcomed"
     var dark by mutableStateOf(true)
         private set
     /** The old three-tab shell, kept reachable until every v2 screen is proven on the device. */
     var legacy by mutableStateOf(false)
+        private set
+    /** Welcome and first run have been passed once on this phone (either way in; amendment 1). */
+    var welcomed by mutableStateOf(false)
         private set
 
     fun load(context: Context) {
         val p = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
         dark = p.getBoolean(KEY, true)
         legacy = p.getBoolean(KEY_LEGACY, false)
+        welcomed = p.getBoolean(KEY_WELCOMED, false)
+    }
+
+    fun setWelcomed(context: Context, value: Boolean) {
+        welcomed = value
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit().putBoolean(KEY_WELCOMED, value).apply()
     }
 
     fun set(context: Context, value: Boolean) {

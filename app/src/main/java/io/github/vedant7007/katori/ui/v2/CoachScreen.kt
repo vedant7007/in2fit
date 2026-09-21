@@ -166,7 +166,7 @@ fun CoachScreen(
 
 /** The design's suggestion chip: 9 / 15 padding, 13 sp, a hairline, the button text colour. */
 @Composable
-fun Chip2(text: String, enabled: Boolean = true, on: Boolean = false, onClick: () -> Unit) {
+fun Chip2(text: String, enabled: Boolean = true, on: Boolean = false, size: Float = 13f, vertical: androidx.compose.ui.unit.Dp = 9.dp, horizontal: androidx.compose.ui.unit.Dp = 15.dp, onClick: () -> Unit) {
     val s = scheme()
     val shape = RoundedCornerShape(100.dp)
     Box(
@@ -174,9 +174,9 @@ fun Chip2(text: String, enabled: Boolean = true, on: Boolean = false, onClick: (
             .background(if (on) s.accent.copy(alpha = 0.14f) else s.text.copy(alpha = 0.05f), shape)
             .border(1.dp, if (on) s.accent.copy(alpha = 0.35f) else s.text.copy(alpha = 0.09f), shape)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 15.dp, vertical = 9.dp),
+            .padding(horizontal = horizontal, vertical = vertical),
     ) {
-        T(text, sans(13f, FontWeight.Normal, 1.2f), color = if (on) s.accent else s.button, maxLines = 1)
+        T(text, sans(size, FontWeight.Normal, 1.2f), color = if (on) s.accent else s.button, maxLines = 1)
     }
 }
 

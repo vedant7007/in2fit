@@ -51,6 +51,7 @@ object Glyphs {
     val arrowLeft = Glyph(14f, Stroke2("M11 7H3m0 0 3.5-3.5M3 7l3.5 3.5", width = 1.6f))
     val arrowRight = Glyph(14f, Stroke2("M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5", width = 1.6f))
     val chevronSmall = Glyph(14f, Stroke2("M5 2.5 9.5 7 5 11.5", width = 1.6f))
+    val scan = Glyph(24f, Stroke2("M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"))
     val back = Glyph(24f, Stroke2("M15 6l-6 6 6 6"))
 }
 

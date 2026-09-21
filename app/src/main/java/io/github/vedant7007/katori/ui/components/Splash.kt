@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun Splash(ready: () -> Boolean, onFinished: () -> Unit) {
     val reduceMotion = LocalReduceMotion.current
+    val scheme = io.github.vedant7007.katori.ui.theme.LocalScheme.current
     val scaleX = remember { Animatable(if (reduceMotion) 1f else 0.72f) }
     val tagline = remember { Animatable(if (reduceMotion) 1f else 0f) }
     val veil = remember { Animatable(1f) }
@@ -61,18 +63,21 @@ fun Splash(ready: () -> Boolean, onFinished: () -> Unit) {
         onFinished()
     }
     Box(
-        Modifier.fillMaxSize().graphicsLayer { alpha = veil.value }.background(In2fitColors.ground),
+        Modifier.fillMaxSize().graphicsLayer { alpha = veil.value }.background(scheme.ground),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(Space.l)) {
+            // One-colour PNGs, tinted to the scheme's mark (lime on the dark ground, the green on cream).
             Image(
                 painterResource(R.drawable.wordmark),
                 contentDescription = stringResource(R.string.app_name),
+                colorFilter = ColorFilter.tint(scheme.mark),
                 modifier = Modifier.width(260.dp).graphicsLayer { this.scaleX = scaleX.value },
             )
             Image(
                 painterResource(R.drawable.tagline),
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(scheme.text2),
                 modifier = Modifier.width(220.dp).padding(top = Space.s).graphicsLayer { alpha = tagline.value },
             )
         }

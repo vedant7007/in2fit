@@ -94,6 +94,8 @@ fun Shell2() {
     // A screen over the tab: "reports", "marker" (with the test's name) or "scan". Back closes it.
     var over by rememberSaveable { mutableStateOf<String?>(null) }
     var marker by rememberSaveable { mutableStateOf("") }
+    var mealId by rememberSaveable { mutableStateOf(0L) }
+    var mealDate by rememberSaveable { mutableStateOf("") }
     BackHandler(enabled = over != null) { over = if (over == "marker") "reports" else null }
 
     val open = {
@@ -137,6 +139,27 @@ fun Shell2() {
     }
     BackHandler(enabled = sheet) { sheet = false }
 
+    // Welcome and first run, once per phone (amendment 1: either way in marks it passed).
+    if (!ThemePreference.welcomed) {
+        var firstRun by rememberSaveable { mutableStateOf(false) }
+        var scanning by rememberSaveable { mutableStateOf(false) }
+        Box(Modifier.fillMaxSize().background(s.ground)) {
+            if (!firstRun) {
+                WelcomeScreen(onGetStarted = { firstRun = true }, onSignIn = { ThemePreference.setWelcomed(context, true) })
+            } else {
+                // The scan sits OVER the steps so the step the person was on is still there on Back.
+                FirstRunScreen(onScan = { scanning = true }, onDone = { ThemePreference.setWelcomed(context, true) }, onBackOut = { firstRun = false })
+                if (scanning) {
+                    Legacy { ScanScreen() }
+                    // Composed after the steps' own handler, so Back closes the scan first.
+                    BackHandler { scanning = false }
+                }
+            }
+            if (splash) Splash(ready = { vm.state.value.ready }, onFinished = { splash = false })
+        }
+        return
+    }
+
     Box(Modifier.fillMaxSize().background(s.ground)) {
         Column(Modifier.fillMaxSize()) {
             if (demo) {
@@ -164,17 +187,19 @@ fun Shell2() {
                         over == "marker" -> MarkerScreen(marker, onBack = { over = "reports" })
                         over == "scan" -> Legacy { ScanScreen() }
                         over == "edit" -> EditDetailsScreen(onBack = { over = null })
+                        over == "trends" -> TrendsScreen(onBack = { over = null })
+                        over == "meal" -> MealScreen(mealId, mealDate.takeIf { it.isNotEmpty() }?.let(java.time.LocalDate::parse), onBack = { over = null })
                         over?.startsWith("list:") == true -> ListScreen(YouList.valueOf(over!!.removePrefix("list:")), onBack = { over = null })
                         tab == Tab2.COACH -> CoachScreen(vm, state, elapsed, onTitleLongPress = { ThemePreference.setLegacy(context, true) })
                         tab == Tab2.TODAY -> TodayScreen(
                             onNudges = {},
                             onProfile = { tab = Tab2.YOU },
-                            onLastMeal = { tab = Tab2.DIARY },
+                            onLastMeal = { id, date -> mealId = id; mealDate = date.toString(); over = "meal" },
                             onAddManually = { tab = Tab2.COACH },
                             onDiary = { tab = Tab2.DIARY },
                             onCoach = { tab = Tab2.COACH },
                         )
-                        tab == Tab2.DIARY -> Legacy { ScanScreen() }
+                        tab == Tab2.DIARY -> DiaryScreen(onTrends = { over = "trends" }, onMeal = { mealId = it; mealDate = ""; over = "meal" }, onLog = { tab = Tab2.COACH })
                         else -> YouScreen(
                             onEdit = { over = "edit" },
                             onList = { over = "list:" + it.name },
@@ -186,7 +211,9 @@ fun Shell2() {
                 TabBar2(
                     selected = tab,
                     onSelect = { tab = it; preflight = false; over = null },
-                    micEnabled = !state.busy,
+                    // The models must be warm (0032): the ViewModel refuses a press before that, and the button says so.
+                    micEnabled = state.ready && !state.busy,
+                    micReady = state.ready,
                     onMicPress = {
                         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                         if (granted) open() else askMic.launch(Manifest.permission.RECORD_AUDIO)
@@ -208,7 +235,8 @@ fun Shell2() {
                 }
             }
         }
-        if (splash) Splash(ready = { true }, onFinished = { splash = false })
+        // The splash ends at the next expand after the models are warm (0028/0032), never before.
+        if (splash) Splash(ready = { vm.state.value.ready }, onFinished = { splash = false })
     }
 }
 

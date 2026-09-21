@@ -73,7 +73,7 @@ import java.util.Locale
 fun TodayScreen(
     onNudges: () -> Unit,
     onProfile: () -> Unit,
-    onLastMeal: (Long) -> Unit,
+    onLastMeal: (Long, LocalDate) -> Unit,
     onAddManually: () -> Unit,
     onDiary: () -> Unit,
     onCoach: () -> Unit,
@@ -240,9 +240,9 @@ private fun WaterCard(waterMl: Int?, targetMl: Double?, modifier: Modifier, onAd
 private fun litres(ml: Double): String = String.format(Locale.ROOT, "%.1f", ml / 1000.0)
 
 @Composable
-private fun LastMealCard(meal: ShownMeal?, modifier: Modifier, onOpen: (Long) -> Unit) {
+private fun LastMealCard(meal: ShownMeal?, modifier: Modifier, onOpen: (Long, LocalDate) -> Unit) {
     val s = scheme()
-    Card2(modifier, radius = 22.dp, onClick = meal?.let { { onOpen(it.id) } }) {
+    Card2(modifier, radius = 22.dp, onClick = meal?.let { { onOpen(it.id, it.loggedAt.atZone(ZoneId.systemDefault()).toLocalDate()) } }) {
         Column(Modifier.padding(18.dp)) {
             T(stringResource(R.string.v2_last_meal).uppercase(), micro(12f, 0.10.em, FontWeight.SemiBold), color = s.text3)
             if (meal != null) {

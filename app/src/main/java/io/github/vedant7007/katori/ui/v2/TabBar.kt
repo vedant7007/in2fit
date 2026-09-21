@@ -59,6 +59,8 @@ fun TabBar2(
     selected: Tab2,
     onSelect: (Tab2) -> Unit,
     micEnabled: Boolean,
+    /** False while the models warm up: the button is dimmed and says "Getting ready…" to a screen reader. */
+    micReady: Boolean = true,
     onMicPress: () -> Unit,
     onMicRelease: () -> Unit,
     onMicStop: (() -> Unit)?,
@@ -78,7 +80,7 @@ fun TabBar2(
         // land at the same places, and a label at a 2× font scale still has its whole slot.
         TabItem(Glyphs.home, stringResource(R.string.v2_tab_today), selected == Tab2.TODAY, Modifier.weight(1f)) { onSelect(Tab2.TODAY) }
         TabItem(Glyphs.diary, stringResource(R.string.v2_tab_diary), selected == Tab2.DIARY, Modifier.weight(1f)) { onSelect(Tab2.DIARY) }
-        MicFab(micEnabled, onMicPress, onMicRelease, onMicStop)
+        MicFab(micEnabled, micReady, onMicPress, onMicRelease, onMicStop)
         TabItem(Glyphs.coach, stringResource(R.string.v2_tab_coach), selected == Tab2.COACH, Modifier.weight(1f)) { onSelect(Tab2.COACH) }
         TabItem(Glyphs.you, stringResource(R.string.v2_tab_you), selected == Tab2.YOU, Modifier.weight(1f)) { onSelect(Tab2.YOU) }
     }
@@ -99,7 +101,7 @@ private fun TabItem(glyph: Glyph, label: String, on: Boolean, modifier: Modifier
 }
 
 @Composable
-private fun MicFab(enabled: Boolean, onPress: () -> Unit, onRelease: () -> Unit, onStop: (() -> Unit)?) {
+private fun MicFab(enabled: Boolean, ready: Boolean, onPress: () -> Unit, onRelease: () -> Unit, onStop: (() -> Unit)?) {
     val s = scheme()
     val haptics = LocalHapticFeedback.current
     val reduceMotion = LocalReduceMotion.current
@@ -109,12 +111,12 @@ private fun MicFab(enabled: Boolean, onPress: () -> Unit, onRelease: () -> Unit,
     // busy) and a pointerInput keyed on it would restart mid-gesture and lose the release.
     val isEnabled by rememberUpdatedState(enabled)
     val stop by rememberUpdatedState(onStop)
-    val label = stringResource(R.string.v2_mic_hold)
+    val label = stringResource(if (ready) R.string.v2_mic_hold else R.string.mic_getting_ready)
     Box(
         Modifier
             .offset(y = (-26).dp)
             .size(64.dp)
-            .graphicsLayer { scaleX = press.value; scaleY = press.value }
+            .graphicsLayer { scaleX = press.value; scaleY = press.value; alpha = if (ready) 1f else 0.32f }
             .shadow(14.dp, CircleShape, ambientColor = s.accent.copy(alpha = 0.5f), spotColor = s.accent.copy(alpha = 0.5f))
             .background(s.accent, CircleShape)
             .semantics { contentDescription = label }
