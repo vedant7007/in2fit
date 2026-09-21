@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ import javax.inject.Inject
  * as "over N days"; there is no goal, so no bar is coloured against one and nothing is "under".
  */
 @HiltViewModel
-class TrendsViewModel @Inject constructor(diary: Diary, private val contextText: ContextText) : ViewModel() {
+class TrendsViewModel @Inject constructor(private val diary: Diary, private val contextText: ContextText) : ViewModel() {
 
     data class State(
         val loaded: Boolean = false,
@@ -34,6 +34,12 @@ class TrendsViewModel @Inject constructor(diary: Diary, private val contextText:
         val averagedDays: Int = 0,
         /** The consecutive days ending today with a meal; 0 when today has none. */
         val streak: Int = 0,
+        /** Days of the seven with at least one meal. */
+        val daysLogged: Int = 0,
+        /** The catalogue names logged most often across the diary, most often first; at most three. */
+        val frequentFoods: List<String> = emptyList(),
+        /** Water logged over the seven days, ml; null when none was. */
+        val waterMl: Int? = null,
     )
 
     private val _state = MutableStateFlow(State())
@@ -41,7 +47,10 @@ class TrendsViewModel @Inject constructor(diary: Diary, private val contextText:
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            diary.days(7).map { days ->
+            val frequent = diary.frequentFoodNames(3)
+            val today = diary.today()
+            val week = diary.bounds(today.minusDays(6)).first..diary.bounds(today).last
+            combine(diary.days(7, today), diary.waterTotal(week)) { days, water ->
                 val energies = days.mapNotNull { d -> d.figures.firstOrNull { it.total.nutrient == Nutrient.ENERGY && it.total.completeness == Completeness.COMPLETE }?.total?.amount }
                 State(
                     loaded = true,
@@ -50,6 +59,9 @@ class TrendsViewModel @Inject constructor(diary: Diary, private val contextText:
                     averageEnergyKcal = energies.takeIf { it.isNotEmpty() }?.average(),
                     averagedDays = energies.size,
                     streak = Diary.streak(days),
+                    daysLogged = days.count { it.meals.isNotEmpty() },
+                    frequentFoods = frequent,
+                    waterMl = water,
                 )
             }.collect { _state.value = it }
         }

@@ -9,6 +9,8 @@ import io.github.vedant7007.katori.data.food.str
 import io.github.vedant7007.katori.data.local.ProfileStore
 import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ProfileEntity
+import io.github.vedant7007.katori.data.local.entity.ReminderEntity
+import io.github.vedant7007.katori.data.local.entity.WeightEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +40,10 @@ class ProfileViewModel @Inject constructor(private val store: ProfileStore, priv
         /** A `SpeechLanguage.tag`; Hindi until chosen. */
         val language: String = ProfileStore.DEFAULT_LANGUAGE,
         val units: List<HouseholdUnit> = emptyList(),
+        /** Every weight entered, oldest first. */
+        val weights: List<WeightEntity> = emptyList(),
+        /** The in-app reminder list, by time of day. */
+        val reminders: List<ReminderEntity> = emptyList(),
     ) {
         val firstRun: Boolean get() = loaded && profile == null
     }
@@ -50,8 +56,9 @@ class ProfileViewModel @Inject constructor(private val store: ProfileStore, priv
             val units = runCatching { foods.query("SELECT unit, food_class, grams FROM unit_conversions ORDER BY food_class, unit") }
                 .getOrDefault(emptyList()).map { HouseholdUnit(it.str("unit"), it.str("food_class"), it.dbl("grams")) }
             _state.update { it.copy(units = units) }
-            combine(store.profile, store.conditions, store.speechLanguage) { p, c, l -> Triple(p, c, l) }
-                .collect { (p, c, l) -> _state.update { it.copy(loaded = true, profile = p, conditions = c, language = l) } }
+            combine(store.profile, store.conditions, store.speechLanguage, store.weights, store.reminders) { p, c, l, w, r ->
+                State(loaded = true, profile = p, conditions = c, language = l, units = units, weights = w, reminders = r)
+            }.collect { _state.value = it }
         }
     }
 
@@ -72,5 +79,17 @@ class ProfileViewModel @Inject constructor(private val store: ProfileStore, priv
 
     fun removeCondition(id: Long) {
         viewModelScope.launch(Dispatchers.IO) { store.removeCondition(id) }
+    }
+
+    fun recordWeight(kg: Double) {
+        viewModelScope.launch(Dispatchers.IO) { store.recordWeight(kg) }
+    }
+
+    fun setReminder(reminder: ReminderEntity) {
+        viewModelScope.launch(Dispatchers.IO) { store.setReminder(reminder) }
+    }
+
+    fun deleteReminder(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) { store.deleteReminder(id) }
     }
 }

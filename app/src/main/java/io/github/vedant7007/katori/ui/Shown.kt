@@ -1,6 +1,8 @@
 package io.github.vedant7007.katori.ui
 
 import io.github.vedant7007.katori.data.local.Diary
+import io.github.vedant7007.katori.data.knowledge.MarkerExplanation
+import io.github.vedant7007.katori.data.knowledge.MarkerExplanations
 import io.github.vedant7007.katori.data.local.entity.LabValueEntity
 import io.github.vedant7007.katori.domain.ContextText
 import io.github.vedant7007.katori.domain.model.Completeness
@@ -105,9 +107,11 @@ data class LabRow(
     val referenceHigh: Double?,
     val reportDate: LocalDate,
     val status: LabStatus,
+    /** What the marker measures, from the shipped, cited file; null when the file has no row for it. */
+    val explanation: MarkerExplanation? = null,
 )
 
-fun LabValueEntity.shown() = LabRow(
+fun LabValueEntity.shown(markers: MarkerExplanations? = null) = LabRow(
     id, test_name, value, unit, reference_low, reference_high, LocalDate.parse(report_date),
     status = when {
         reference_low == null && reference_high == null -> LabStatus.NO_RANGE
@@ -115,4 +119,5 @@ fun LabValueEntity.shown() = LabRow(
         reference_high != null && value > reference_high -> LabStatus.ABOVE
         else -> LabStatus.WITHIN
     },
+    explanation = markers?.find(test_name),
 )

@@ -28,7 +28,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TodayViewModel @Inject constructor(
-    diary: Diary,
+    private val diary: Diary,
     profileStore: ProfileStore,
     targets: TargetsSource,
     private val advice: AdviceStore,
@@ -54,12 +54,18 @@ class TodayViewModel @Inject constructor(
         /** Null until Priya's rule answers; the ring and bars render empty. */
         val targets: Targets? = null,
         val progress: List<TargetProgress> = emptyList(),
+        /** Water logged today, ml; null when none was, never 0. */
+        val waterMl: Int? = null,
     ) {
         val energy: ShownFigure? get() = totals.firstOrNull { it.nutrient == io.github.vedant7007.katori.domain.model.Nutrient.ENERGY }
     }
 
     private val _state = MutableStateFlow(State())
     val state: StateFlow<State> = _state.asStateFlow()
+
+    fun logWater(ml: Int) {
+        viewModelScope.launch(Dispatchers.IO) { diary.logWater(ml, source = "TAPPED") }
+    }
 
     init {
         val today = diary.bounds(diary.today())
@@ -86,7 +92,8 @@ class TodayViewModel @Inject constructor(
                 )
             }.combine(targets.current().combine(targets.progressToday()) { t, p -> t to p }) { s, (t, p) ->
                 s.copy(targets = t, progress = p)
-            }.collect { _state.value = it }
+            }.combine(diary.waterTotal(today)) { s, water -> s.copy(waterMl = water) }
+                .collect { _state.value = it }
         }
     }
 }

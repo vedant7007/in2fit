@@ -39,6 +39,7 @@ class ProfileMigrationTest {
         DriverManager.getConnection("jdbc:sqlite::memory:").use { db ->
             val v2 = tables(2)
             v2.values.forEach { db.createStatement().execute(it) }
+            indices(2).values.forEach { db.createStatement().execute(it) }
             db.createStatement().apply {
                 execute("INSERT INTO profile VALUES (1, 19, 62.0, 172.0, 'MALE', 'MAINTAIN', 'HOSTEL_STUDENT', 'VEGETARIAN', 1758400000000)")
                 execute("INSERT INTO meals (id, logged_at_epoch_ms, raw_transcript, confidence_band, language_tag) VALUES (7, 1758400100000, 'two rotis and a little dal', 'ROUGH', 'hi')")
@@ -89,7 +90,48 @@ class ProfileMigrationTest {
             val v3 = tables(3)
             assertEquals(v2.keys, v3.keys)
             v3.forEach { (table, createSql) -> assertEquals(table, declared(createSql), columns(db, table)) }
+
+            // Then 3 -> 4 on the same populated database: three new tables, nothing else touched.
+            KatoriDatabase.MIGRATION_3_4_SQL.forEach { db.createStatement().execute(it) }
+            before.forEach { (table, n) -> assertEquals(table, n, count(db, table)) }
+            val v4 = tables(4)
+            assertEquals(v3.keys + setOf("water", "weights", "reminders"), v4.keys)
+            v4.forEach { (table, createSql) -> assertEquals(table, declared(createSql), columns(db, table)) }
+            indices(4).keys.forEach { name ->
+                db.createStatement().executeQuery("SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND name = '$name'").use { rs ->
+                    rs.next(); assertEquals("index $name after migration", 1, rs.getInt(1))
+                }
+            }
+            db.createStatement().execute("INSERT INTO water (ml, logged_at_epoch_ms, source) VALUES (250, 1758400200000, 'TAPPED')")
+            assertEquals(1, count(db, "water"))
         }
+    }
+
+    /** The hand-written 3 -> 4 statements are the export's, string for string, so Room's open-time validation passes. */
+    @Test
+    fun `the v4 migration creates exactly what the exported schema declares`() {
+        val v4 = tables(4)
+        val idx = indices(4)
+        val expected = listOf(
+            v4.getValue("water"), idx.getValue("index_water_logged_at_epoch_ms"),
+            v4.getValue("weights"), idx.getValue("index_weights_recorded_at_epoch_ms"),
+            v4.getValue("reminders"),
+        )
+        assertEquals(expected, KatoriDatabase.MIGRATION_3_4_SQL)
+        val v3 = tables(3)
+        v3.keys.forEach { assertEquals(it, v3[it], v4[it]) }
+    }
+
+    /** Index name to its CREATE statement with the table filled in, from an exported schema. */
+    private fun indices(version: Int): Map<String, String> {
+        val text = File(schemas, "$version.json").readText()
+        // Each entity block runs from its tableName to the next entity's; an index's createSql sits inside it.
+        val starts = Regex(""""tableName":\s*"(\w+)"""").findAll(text).toList()
+        return starts.mapIndexed { i, m ->
+            val block = text.substring(m.range.first, starts.getOrNull(i + 1)?.range?.first ?: text.length)
+            Regex(""""name":\s*"(index_\w+)"[\s\S]*?"createSql":\s*"((?:[^"\\]|\\.)*)"""").findAll(block)
+                .map { it.groupValues[1] to it.groupValues[2].replace("\${TABLE_NAME}", m.groupValues[1]) }.toList()
+        }.flatten().toMap()
     }
 
     /** The exported v3 differs from v2 in the five columns and nothing else. */

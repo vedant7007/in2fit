@@ -159,6 +159,44 @@ data class LabValueEntity(
     val captured_at_epoch_ms: Long,
 )
 
+/**
+ * Version 4 (21 Sep): water, one row per amount as logged, in millilitres, as the person said
+ * or tapped it. The day's total is a query (`WaterDao.totalForRange`), never stored.
+ */
+@Entity(tableName = "water", indices = [Index("logged_at_epoch_ms")])
+data class WaterEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val ml: Int,
+    val logged_at_epoch_ms: Long,
+    /** How it was logged: "SPOKEN", "TYPED" or "TAPPED". The fact's source, always the person. */
+    val source: String,
+)
+
+/** Version 4: weight history, kg, as the person entered it. The profile's `weight_kg` is the latest; this is the run. */
+@Entity(tableName = "weights", indices = [Index("recorded_at_epoch_ms")])
+data class WeightEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val kg: Double,
+    val recorded_at_epoch_ms: Long,
+    /** "USER_ENTERED": the only source there is; a scale that talks to the app would be a new value. */
+    val source: String,
+)
+
+/**
+ * Version 4: a reminder the person set. AN IN-APP LIST, never a system notification:
+ * POST_NOTIFICATIONS is not in the demo build's permission whitelist (Ira 07:27, NOBODY).
+ */
+@Entity(tableName = "reminders")
+data class ReminderEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    /** "MEAL", "WATER", "WEIGHT" or "REPORT". */
+    val kind: String,
+    val hour: Int,
+    val minute: Int,
+    val enabled: Boolean,
+    val created_at_epoch_ms: Long,
+)
+
 @Entity(tableName = "activity", indices = [Index("date", unique = true)])
 data class ActivityEntity(
     @PrimaryKey val date: String,

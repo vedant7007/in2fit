@@ -6,6 +6,7 @@ import io.github.vedant7007.katori.data.local.dao.NutrientTotalRow
 import io.github.vedant7007.katori.data.local.entity.LabValueEntity
 import io.github.vedant7007.katori.data.local.entity.MealEntity
 import io.github.vedant7007.katori.data.local.entity.MealItemEntity
+import io.github.vedant7007.katori.data.local.entity.WaterEntity
 import io.github.vedant7007.katori.domain.model.Completeness
 import io.github.vedant7007.katori.domain.model.ConfidenceReason
 import io.github.vedant7007.katori.domain.model.ConfidenceRules
@@ -92,6 +93,20 @@ class Diary(private val db: KatoriDatabase, private val foods: FoodDbSource?, pr
 
     /** The meal, its items, their nutrients and the advice stored for it. Nothing else remembers it. */
     suspend fun deleteMeal(mealId: Long) = db.mealDao().deleteMealAndAdvice(mealId)
+
+    /** One item; the meal's band is re-derived from what remains, and a meal left empty goes. */
+    suspend fun deleteItem(itemId: Long) = db.mealDao().deleteItemAndRederive(itemId)
+
+    /** Water logged in the range, and its total in ml: null when nothing was logged, never 0. */
+    fun water(range: LongRange): Flow<List<WaterEntity>> = db.waterDao().rows(range.first, range.last)
+    fun waterTotal(range: LongRange): Flow<Int?> = db.waterDao().totalForRange(range.first, range.last)
+
+    suspend fun logWater(ml: Int, source: String, at: Instant = clock.instant()) {
+        require(ml > 0) { "water is logged in whole millilitres above zero" }
+        db.waterDao().insert(WaterEntity(ml = ml, logged_at_epoch_ms = at.toEpochMilli(), source = source))
+    }
+
+    suspend fun deleteWater(id: Long) = db.waterDao().delete(id)
 
     /** The catalogue names of the foods logged most often, most often first. */
     suspend fun frequentFoodNames(limit: Int): List<String> {

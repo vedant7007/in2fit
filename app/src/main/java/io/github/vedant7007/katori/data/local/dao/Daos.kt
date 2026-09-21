@@ -20,6 +20,10 @@ import io.github.vedant7007.katori.data.local.entity.ProfileEntity
 import io.github.vedant7007.katori.data.local.entity.SuggestionEntity
 import io.github.vedant7007.katori.data.local.entity.UnitConversionOverrideEntity
 import io.github.vedant7007.katori.data.local.entity.UnmatchedUtteranceEntity
+import io.github.vedant7007.katori.data.local.entity.WaterEntity
+import io.github.vedant7007.katori.data.local.entity.WeightEntity
+import io.github.vedant7007.katori.data.local.entity.ReminderEntity
+import io.github.vedant7007.katori.domain.model.ConfidenceBand
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -146,6 +150,29 @@ interface MealDao {
     @Query("DELETE FROM meal_items WHERE id = :itemId")
     suspend fun deleteItem(itemId: Long)
 
+    @Query("UPDATE meals SET confidence_band = :band WHERE id = :mealId")
+    suspend fun setBand(mealId: Long, band: ConfidenceBand)
+
+    @Query("SELECT meal_id FROM meal_items WHERE id = :itemId")
+    suspend fun mealIdOf(itemId: Long): Long?
+
+    /**
+     * Removes one item and keeps the meal honest: its band is the worst across what remains, and
+     * a meal with nothing left is not a meal (`RoomMealStore.save` refuses one). The advice stored
+     * for the meal was phrased for a plate that no longer exists and goes too.
+     * @return the meal's id while it still exists, null when it went with its last item.
+     */
+    @Transaction
+    suspend fun deleteItemAndRederive(itemId: Long): Long? {
+        val mealId = mealIdOf(itemId) ?: return null
+        deleteItem(itemId)
+        deleteSuggestionsFor(mealId)
+        val remaining = itemsFor(mealId)
+        if (remaining.isEmpty()) { deleteMeal(mealId); return null }
+        setBand(mealId, remaining.maxOf { it.confidence_band })
+        return mealId
+    }
+
     /** The meal and, by the foreign keys, its items and their nutrients. The advice stored for it goes with it. */
     @Query("DELETE FROM meals WHERE id = :mealId")
     suspend fun deleteMeal(mealId: Long)
@@ -191,6 +218,46 @@ data class UnknownContributorRow(
     val nutrient: String,
     val spoken_name: String,
 )
+
+@Dao
+interface WaterDao {
+    @Insert
+    suspend fun insert(row: WaterEntity): Long
+
+    @Query("SELECT * FROM water WHERE logged_at_epoch_ms BETWEEN :fromEpochMs AND :toEpochMs ORDER BY logged_at_epoch_ms")
+    fun rows(fromEpochMs: Long, toEpochMs: Long): Flow<List<WaterEntity>>
+
+    /** The range's total in ml, or null when nothing was logged: absent, not zero. */
+    @Query("SELECT SUM(ml) FROM water WHERE logged_at_epoch_ms BETWEEN :fromEpochMs AND :toEpochMs")
+    fun totalForRange(fromEpochMs: Long, toEpochMs: Long): Flow<Int?>
+
+    @Query("DELETE FROM water WHERE id = :id")
+    suspend fun delete(id: Long)
+}
+
+@Dao
+interface WeightDao {
+    @Insert
+    suspend fun insert(row: WeightEntity): Long
+
+    @Query("SELECT * FROM weights ORDER BY recorded_at_epoch_ms ASC")
+    fun history(): Flow<List<WeightEntity>>
+
+    @Query("DELETE FROM weights WHERE id = :id")
+    suspend fun delete(id: Long)
+}
+
+@Dao
+interface ReminderDao {
+    @Upsert
+    suspend fun upsert(row: ReminderEntity): Long
+
+    @Query("SELECT * FROM reminders ORDER BY hour, minute")
+    fun observeAll(): Flow<List<ReminderEntity>>
+
+    @Query("DELETE FROM reminders WHERE id = :id")
+    suspend fun delete(id: Long)
+}
 
 @Dao
 interface ProfileDao {

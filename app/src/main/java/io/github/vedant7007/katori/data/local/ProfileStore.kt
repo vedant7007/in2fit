@@ -2,8 +2,12 @@ package io.github.vedant7007.katori.data.local
 
 import io.github.vedant7007.katori.data.local.dao.ConditionDao
 import io.github.vedant7007.katori.data.local.dao.ProfileDao
+import io.github.vedant7007.katori.data.local.dao.ReminderDao
+import io.github.vedant7007.katori.data.local.dao.WeightDao
 import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ProfileEntity
+import io.github.vedant7007.katori.data.local.entity.ReminderEntity
+import io.github.vedant7007.katori.data.local.entity.WeightEntity
 import io.github.vedant7007.katori.domain.ConditionSource
 import io.github.vedant7007.katori.domain.DietType
 import io.github.vedant7007.katori.domain.Goal
@@ -25,9 +29,36 @@ import javax.inject.Inject
  * that supplies the default: Hindi, ruled 21 Sep, so a fresh install and a restart come back in
  * Hindi without a tap.
  */
-class ProfileStore(private val dao: ProfileDao, private val conditionDao: ConditionDao?) {
+class ProfileStore(
+    private val dao: ProfileDao,
+    private val conditionDao: ConditionDao?,
+    private val weightDao: WeightDao? = null,
+    private val reminderDao: ReminderDao? = null,
+) {
 
-    @Inject constructor(db: KatoriDatabase) : this(db.profileDao(), db.conditionDao())
+    @Inject constructor(db: KatoriDatabase) : this(db.profileDao(), db.conditionDao(), db.weightDao(), db.reminderDao())
+
+    /** Every weight the person entered, oldest first; the profile's `weight_kg` is the latest of them. */
+    val weights: Flow<List<WeightEntity>> = weightDao?.history() ?: flowOf(emptyList())
+
+    /** Writes the history row and moves the profile's weight to it, in that order. */
+    suspend fun recordWeight(kg: Double) {
+        require(kg > 0) { "a weight is above zero" }
+        weightDao?.insert(WeightEntity(kg = kg, recorded_at_epoch_ms = System.currentTimeMillis(), source = "USER_ENTERED"))
+        update { it.copy(weight_kg = kg) }
+    }
+
+    suspend fun deleteWeight(id: Long) { weightDao?.delete(id) }
+
+    /** An in-app list, never a system notification (no POST_NOTIFICATIONS in the whitelist). */
+    val reminders: Flow<List<ReminderEntity>> = reminderDao?.observeAll() ?: flowOf(emptyList())
+
+    suspend fun setReminder(reminder: ReminderEntity) {
+        require(reminder.hour in 0..23 && reminder.minute in 0..59) { "a reminder is a time of day" }
+        reminderDao?.upsert(reminder)
+    }
+
+    suspend fun deleteReminder(id: Long) { reminderDao?.delete(id) }
 
     val profile: Flow<ProfileEntity?> = dao.observe()
 

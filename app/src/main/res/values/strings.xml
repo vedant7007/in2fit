@@ -325,6 +325,7 @@
     <string name="talk_type_instead">Type instead</string>
     <!-- Scan tab, over the camera: how to hold the page so the reader can read it (the playbook's own advice). -->
     <string name="scan_instruction">Lay the report flat, whole page in frame, light from the side.</string>
+<<<<<<< HEAD
     <!-- THE V2 DESIGN (Ira, 21 Sep, after the freeze: English only). The design's own words, verbatim, one key each. -->
     <string name="v2_tab_today">Today</string>
     <string name="v2_tab_diary">Diary</string>
@@ -357,4 +358,21 @@
     <!-- Temporary, until the You screen lands: long-press the Coach title to open the old screens. -->
     <string name="v2_old_screens">Old screens</string>
     <string name="v2_new_screens">New screens</string>
+=======
+
+    <!-- SHIPPED CONTENT FOR THE V2 SCREENS (Arjun, 21 Sep, post-freeze: English only). The weekly
+         summary is these templates filled with TrendsViewModel's figures, never a model's sentence
+         (0026). 1 meals, 2 days of the seven with a meal. -->
+    <string name="weekly_summary_meals">%1$d meals logged on %2$d of the last 7 days.</string>
+    <!-- 1 the mean energy, formatted by the app; 2 the days it is a mean over. -->
+    <string name="weekly_summary_energy">Energy averaged %1$s kcal over the %2$d days with a complete figure.</string>
+    <string name="weekly_summary_no_energy">No day this week has a complete energy figure.</string>
+    <!-- 1 the catalogue names, joined by the app. -->
+    <string name="weekly_summary_frequent">Logged most often: %1$s.</string>
+    <!-- 1 the millilitres, formatted by the app. Shown only when water was logged. -->
+    <string name="weekly_summary_water">Water: %1$s ml logged this week.</string>
+    <!-- Reports: the heading over a marker's explanation (knowledge/markers.csv), and its citation. 1 the source as written in the file. -->
+    <string name="marker_explanation_title">What this measures</string>
+    <string name="marker_explanation_source">Source: %1$s</string>
+>>>>>>> 9cf4fb4 (Add water, weight history and reminders as Room v4 with the migration tested on populated data, delete an item and re-derive its meal, ship seven cited marker explanations with a loader and the weekly summary's templates)
 </resources>

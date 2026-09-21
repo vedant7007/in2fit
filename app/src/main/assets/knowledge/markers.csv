@@ -1,0 +1,23 @@
+# IN2FIT marker explanations: what a lab marker MEASURES, one row per marker, shown under the
+# report row as "what this means". Read by data/knowledge/MarkerExplanations.kt.
+#
+# EVERY ROW CITES A REAL SOURCE THAT WAS READ ON THE DATE IN `accessed`; the loader refuses a row
+# without one. The explanation says what the marker is and what the test measures, in the
+# source's own words where possible, and NOTHING ELSE:
+#  - no threshold, no reference range, no "normal": the range is the one printed on the
+#    person's own report (spec 15.1, decision 0018), and the app's flag is "below / above the
+#    printed range" and no other word;
+#  - no condition, no diagnosis, no "may indicate": a marker outside its range is a fact about
+#    the report, not a finding about the person (spec 15.2).
+# test_name : the shown name, then `|`-separated aliases as reports print them; matched as
+#             whole words, case-insensitive, most aliases hit wins, a tie shows nothing.
+# Authored 21 Sep 2026 by Arjun against the sources below; Priya owns the sourcing rules and
+# Nila the wording; either may strike a row.
+test_name,explanation,source,source_url,accessed
+Haemoglobin|hemoglobin|hb,"Haemoglobin is an iron-rich protein in your red blood cells. It carries oxygen from your lungs to the rest of your body. The test measures the level of haemoglobin in your blood.","MedlinePlus (U.S. National Library of Medicine), ""Hemoglobin Test""",https://medlineplus.gov/lab-tests/hemoglobin-test/,2026-09-21
+HbA1c|a1c|glycosylated haemoglobin|glycosylated hemoglobin|glycated haemoglobin|glycated hemoglobin,"HbA1c shows your average level of blood glucose (blood sugar) over the past two to three months. Glucose sticks to haemoglobin for as long as the red blood cells are alive, and red blood cells live about three months.","MedlinePlus (U.S. National Library of Medicine), ""Hemoglobin A1C (HbA1c) Test""",https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/,2026-09-21
+Ferritin,"Ferritin is a protein that binds to iron and stores it in your body. The test measures the level of ferritin in your blood, which shows how much iron you have stored.","MedlinePlus (U.S. National Library of Medicine), ""Ferritin Blood Test""",https://medlineplus.gov/lab-tests/ferritin-blood-test/,2026-09-21
+Vitamin D|25-oh vitamin d|vitamin d 25 hydroxy|25 hydroxy vitamin d|vitamin d3|vitamin d total,"The test measures the level of vitamin D in your blood. Vitamin D helps your body absorb calcium to build healthy bones and teeth, and helps keep your muscles, nerves and immune system working normally.","MedlinePlus (U.S. National Library of Medicine), ""Vitamin D Test""",https://medlineplus.gov/lab-tests/vitamin-d-test/,2026-09-21
+Vitamin B12|b12|cobalamin,"The test measures the amount of vitamin B12 in your blood. B12 (cobalamin) gives your body energy and helps keep your nerves and blood cells healthy.","MedlinePlus (U.S. National Library of Medicine), ""Vitamin B Test""",https://medlineplus.gov/lab-tests/vitamin-b-test/,2026-09-21
+TSH|thyroid stimulating hormone|thyroid-stimulating hormone,"The pituitary gland makes thyroid-stimulating hormone (TSH), which tells your thyroid how much thyroid hormone it needs to make. The test measures this hormone in your blood.","MedlinePlus (U.S. National Library of Medicine), ""TSH (Thyroid-stimulating hormone) Test""",https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/,2026-09-21
+Glucose|blood glucose|fasting glucose|fasting blood sugar|fbs|random blood sugar|plasma glucose|glucose fasting|blood sugar,"A blood glucose test measures the glucose level in your blood. Glucose is a type of sugar; it is your body's main source of energy.","MedlinePlus (U.S. National Library of Medicine), ""Blood Glucose Test""",https://medlineplus.gov/lab-tests/blood-glucose-test/,2026-09-21

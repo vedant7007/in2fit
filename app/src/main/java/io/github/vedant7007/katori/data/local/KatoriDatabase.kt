@@ -15,7 +15,10 @@ import io.github.vedant7007.katori.data.local.dao.MealDao
 import io.github.vedant7007.katori.data.local.dao.OverridesDao
 import io.github.vedant7007.katori.data.local.dao.ProfileDao
 import io.github.vedant7007.katori.data.local.dao.SuggestionDao
+import io.github.vedant7007.katori.data.local.dao.ReminderDao
 import io.github.vedant7007.katori.data.local.dao.UnmatchedUtteranceDao
+import io.github.vedant7007.katori.data.local.dao.WaterDao
+import io.github.vedant7007.katori.data.local.dao.WeightDao
 import io.github.vedant7007.katori.data.local.entity.ActivityEntity
 import io.github.vedant7007.katori.data.local.entity.ConditionEntity
 import io.github.vedant7007.katori.data.local.entity.ContextFoodOverrideEntity
@@ -29,7 +32,10 @@ import io.github.vedant7007.katori.data.local.entity.MealItemNutrientEntity
 import io.github.vedant7007.katori.data.local.entity.ProfileEntity
 import io.github.vedant7007.katori.data.local.entity.SuggestionEntity
 import io.github.vedant7007.katori.data.local.entity.UnitConversionOverrideEntity
+import io.github.vedant7007.katori.data.local.entity.ReminderEntity
 import io.github.vedant7007.katori.data.local.entity.UnmatchedUtteranceEntity
+import io.github.vedant7007.katori.data.local.entity.WaterEntity
+import io.github.vedant7007.katori.data.local.entity.WeightEntity
 import io.github.vedant7007.katori.domain.model.ConfidenceBand
 
 /**
@@ -60,8 +66,11 @@ import io.github.vedant7007.katori.domain.model.ConfidenceBand
         UnmatchedUtteranceEntity::class,
         HouseholdRecipeEntity::class,
         HouseholdRecipeIngredientEntity::class,
+        WaterEntity::class,
+        WeightEntity::class,
+        ReminderEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(KatoriConverters::class)
@@ -76,6 +85,9 @@ abstract class KatoriDatabase : RoomDatabase() {
     abstract fun overridesDao(): OverridesDao
     abstract fun unmatchedUtteranceDao(): UnmatchedUtteranceDao
     abstract fun householdRecipeDao(): HouseholdRecipeDao
+    abstract fun waterDao(): WaterDao
+    abstract fun weightDao(): WeightDao
+    abstract fun reminderDao(): ReminderDao
 
     companion object {
         const val NAME = "katori-user.db"
@@ -127,8 +139,25 @@ abstract class KatoriDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) = MIGRATION_2_3_SQL.forEach(db::execSQL)
         }
 
+        /**
+         * Version 3 to 4 (21 Sep): the water, weight-history and reminder tables. Hand-written to
+         * match the exported `4.json` exactly, statements and indices both, because Room validates
+         * both at open; `ProfileMigrationTest` compares them with the export.
+         */
+        val MIGRATION_3_4_SQL = listOf(
+            "CREATE TABLE IF NOT EXISTS `water` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ml` INTEGER NOT NULL, `logged_at_epoch_ms` INTEGER NOT NULL, `source` TEXT NOT NULL)",
+            "CREATE INDEX IF NOT EXISTS `index_water_logged_at_epoch_ms` ON `water` (`logged_at_epoch_ms`)",
+            "CREATE TABLE IF NOT EXISTS `weights` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kg` REAL NOT NULL, `recorded_at_epoch_ms` INTEGER NOT NULL, `source` TEXT NOT NULL)",
+            "CREATE INDEX IF NOT EXISTS `index_weights_recorded_at_epoch_ms` ON `weights` (`recorded_at_epoch_ms`)",
+            "CREATE TABLE IF NOT EXISTS `reminders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kind` TEXT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `created_at_epoch_ms` INTEGER NOT NULL)",
+        )
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) = MIGRATION_3_4_SQL.forEach(db::execSQL)
+        }
+
         /** Every migration, in order. AppModule passes this to the builder. */
-        val MIGRATIONS = arrayOf<Migration>(MIGRATION_1_2, MIGRATION_2_3)
+        val MIGRATIONS = arrayOf<Migration>(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
     }
 }
 

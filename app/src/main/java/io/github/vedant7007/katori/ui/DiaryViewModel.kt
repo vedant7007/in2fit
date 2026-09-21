@@ -41,6 +41,8 @@ class DiaryViewModel @Inject constructor(
         val totals: List<ShownFigure> = emptyList(),
         /** The seven days ending on [date], oldest first: logged or not. No streak is implied. */
         val week: List<Pair<LocalDate, Boolean>> = emptyList(),
+        /** Water logged on [date], ml; null when none was, never 0. */
+        val waterMl: Int? = null,
     ) {
         val energy: ShownFigure? get() = totals.firstOrNull { it.nutrient == io.github.vedant7007.katori.domain.model.Nutrient.ENERGY }
     }
@@ -52,13 +54,14 @@ class DiaryViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             date.flatMapLatest { d ->
-                combine(diary.day(d), diary.days(7, d)) { day, week ->
+                combine(diary.day(d), diary.days(7, d), diary.waterTotal(diary.bounds(d))) { day, week, water ->
                     State(
                         date = d,
                         loaded = true,
                         entries = day.meals.map { Entry(it.shown(contextText), advice.latest(it.id)?.triggerText) },
                         totals = day.figures.map { it.shown(contextText) },
                         week = week.map { it.date to it.meals.isNotEmpty() },
+                        waterMl = water,
                     )
                 }
             }.collect { _state.value = it }
@@ -71,5 +74,14 @@ class DiaryViewModel @Inject constructor(
 
     fun delete(mealId: Long) {
         viewModelScope.launch(Dispatchers.IO) { diary.deleteMeal(mealId) }
+    }
+
+    /** One item off a meal; the meal's band follows what remains, and an emptied meal goes. */
+    fun deleteItem(itemId: Long) {
+        viewModelScope.launch(Dispatchers.IO) { diary.deleteItem(itemId) }
+    }
+
+    fun logWater(ml: Int) {
+        viewModelScope.launch(Dispatchers.IO) { diary.logWater(ml, source = "TAPPED") }
     }
 }

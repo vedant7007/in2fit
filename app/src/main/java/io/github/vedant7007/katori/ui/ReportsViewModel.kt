@@ -1,8 +1,11 @@
 package io.github.vedant7007.katori.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.vedant7007.katori.data.knowledge.MarkerExplanations
 import io.github.vedant7007.katori.data.local.Diary
 import io.github.vedant7007.katori.domain.AdviceStore
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +29,14 @@ import javax.inject.Inject
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class ReportsViewModel @Inject constructor(private val diary: Diary, private val advice: AdviceStore) : ViewModel() {
+class ReportsViewModel @Inject constructor(
+    private val diary: Diary,
+    private val advice: AdviceStore,
+    @ApplicationContext context: Context,
+) : ViewModel() {
+
+    /** The shipped, cited explanations, loaded once; a file that fails its own checks shows nothing rather than half a file. */
+    private val markers: MarkerExplanations? = runCatching { MarkerExplanations.load { context.assets.open(MarkerExplanations.ASSET_PATH) } }.getOrNull()
 
     data class Report(val date: LocalDate, val values: List<LabRow>) {
         val outOfRange: List<LabRow> get() = values.filter { it.status == LabStatus.BELOW || it.status == LabStatus.ABOVE }
@@ -53,9 +63,9 @@ class ReportsViewModel @Inject constructor(private val diary: Diary, private val
             combine(diary.labs(), history, selected, diary.lastMeal()) { labs, hist, test, last ->
                 State(
                     loaded = true,
-                    reports = labs.map { it.shown() }.groupBy { it.reportDate }.toSortedMap(compareByDescending { it }).map { (d, v) -> Report(d, v) },
+                    reports = labs.map { it.shown(markers) }.groupBy { it.reportDate }.toSortedMap(compareByDescending { it }).map { (d, v) -> Report(d, v) },
                     selectedTest = test,
-                    history = hist.map { it.shown() },
+                    history = hist.map { it.shown(markers) },
                     lastMealTrigger = last?.let { advice.latest(it.id)?.triggerText },
                 )
             }.collect { _state.value = it }
