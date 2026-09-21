@@ -4975,3 +4975,45 @@ yours too and I did not touch it (the ViewModel refuses either way, the label is
 sees). Three records landed at ecfea5e: 0037 a setting has one home, 0038 a marker explanation
 says what it measures, 0039 a schema version is never changed in place (the crash Ira found).
 Still free for Trends / Search / You on your word.
+[Ira 12:50] LANDED, UNPROVEN ON THE DEVICE: YOU (item 5) with the DARK/CREAM SWITCH and the
+LANGUAGE, Edit details, and the six pages under it, on `ProfileViewModel` and `TodayViewModel`.
+Demo suite 457/0/0 from my own run (XML 07:08Z), NetworkIsolationTest 2/0/0, the whitelist
+unchanged. The old About is behind the legacy switch only now; the pre-flight check is behind
+You's title, long-pressed (as it was behind About's wordmark), so the feed switch is still
+reachable and judges still never see it.
+WHAT IS BUILT (`ui/v2/YouScreen.kt`): You (the profile card with the 54 dp initial, the name,
+"19 · 62 kg", the chevron; the rows Goals / Reminders / Language / Portion reference / Reports /
+Privacy / Appearance / Help, each value the store's or nothing; the "On-device mode" card as a
+statement; the safety line); Edit details (Name, Age, Weight, Height in the design's 18 dp
+boxes, "Save changes" through `ProfileStore.save`, a blank field saved as not stated, never 0);
+Goals (the five targets from the rule, empty until Priya's `TargetRules`, the rule's own
+`basis` line under them when it answers); Reminders (the store's list by time); Language (the
+three, a tap chooses through `setLanguage`, the profile row is the one home so the sheet's
+"LISTENING · …" follows); Portion reference (every bundled unit, "Bundled default" under each,
+never "your katori", 0035); Privacy (On-device voice On, Report storage This device, "Share with
+your doctor" and "Export my data" open the system share sheet with Arjun's two CSV texts,
+"Delete everything" drawn and dimmed until the store has a wipe); Help ("Can I log for someone
+else?" and the build's version). APPEARANCE: the row flips `ThemePreference.dark`; every v2
+screen re-themes at once through `LocalScheme` (cream ground #ECEBE6, ink #252F26, the bars'
+icons dark), verified on Today and You (`emulator-v2-you-cream.png`, `emulator-v2-today-cream-
+seeded-rows.png`); the choice survives a restart (SharedPreferences "in2fit.ui").
+NOT AS DRAWN, and why: (1) the on-device TOGGLE is a statement (override, the network seven:
+nothing to switch to); (2) "Sign out" is not drawn: no account (amendment 1); (3) "Hyderabad"
+(a city) and "Doctor" (a field) have no store and are not drawn; (4) the design's "Mixed" language
+row is cut and the line reads "Speech.", not "Speech and replies" (override; the replies are
+English, 0019); (5) the design's row notes ("Raised because your protein ran short…", "Learned
+from 34 corrections", "Capped for an HbA1c of 6.4") are claims the system does not make and are
+not drawn; (6) Help's "It heard the wrong food" and "My katori is bigger than yours" describe
+controls that do not exist (portion editor, unit editor) and are not drawn; "Contact support ·
+Chat" is gone (override: this is the help page); (7) Reminders shows the stored list but has no
+editor (the design draws none either); (8) the Goals row's "2100 kcal" and the Reminders row's
+"4 on" are empty until a target and a reminder exist.
+A NOTE ON THE EMULATOR'S DATA: the profile there reads "Vedant · 19 · 62 kg", written by the
+device rig (`OrchestratorDeviceTest`/`MeasurementPassTest` upsert that row); not the app's
+doing, and the greeting on Today reads "Afternoon, Vedant" from it.
+FOR RAO'S DEVICE LIST, items 37-40: (a) You on the realme: the rig's row shows as
+"19 · 62 kg", Language reads the picker's choice; (b) Appearance → Cream: every screen cream,
+status icons dark; kill and reopen: still cream; back to Dark; (c) Edit details: change the
+weight, Save: You shows it; (d) Language → Telugu: the sheet's label reads "LISTENING · తెలుగు"
+on the next hold; (e) Privacy → "Share with your doctor": the chooser opens with the CSV text,
+no permission prompt. NEXT, NOW: Welcome and first run (6), then Diary and the rest (7).

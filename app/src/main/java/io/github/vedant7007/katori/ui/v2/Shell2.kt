@@ -40,7 +40,6 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.vedant7007.katori.R
 import io.github.vedant7007.katori.domain.Stage
-import io.github.vedant7007.katori.ui.AboutScreen
 import io.github.vedant7007.katori.ui.DiaryViewModel
 import io.github.vedant7007.katori.ui.PreflightScreen
 import io.github.vedant7007.katori.ui.ScanScreen
@@ -67,9 +66,9 @@ import java.util.Date
  * transition). A turn that ends in anything but a plate closes the sheet and opens Coach, where
  * every turn's text lives.
  *
- * UNTIL THEIR STEPS LAND (today, in order): Diary and You open the old Scan and About screens
- * in their own cream theme, so nothing the phone could do yesterday is lost; the old Talk is
- * behind the legacy switch.
+ * UNTIL ITS STEP LANDS (today): Diary opens the old Scan screen in its own cream theme, so
+ * nothing the phone could do yesterday is lost; the old Talk and About are behind the legacy
+ * switch (Coach's title, long-pressed). The pre-flight check is behind You's title, long-pressed.
  */
 @Composable
 fun Shell2() {
@@ -164,6 +163,8 @@ fun Shell2() {
                         over == "reports" -> ReportsScreen(onOpenMarker = { marker = it; over = "marker" }, onScan = { over = "scan" })
                         over == "marker" -> MarkerScreen(marker, onBack = { over = "reports" })
                         over == "scan" -> Legacy { ScanScreen() }
+                        over == "edit" -> EditDetailsScreen(onBack = { over = null })
+                        over?.startsWith("list:") == true -> ListScreen(YouList.valueOf(over!!.removePrefix("list:")), onBack = { over = null })
                         tab == Tab2.COACH -> CoachScreen(vm, state, elapsed, onTitleLongPress = { ThemePreference.setLegacy(context, true) })
                         tab == Tab2.TODAY -> TodayScreen(
                             onNudges = {},
@@ -174,7 +175,12 @@ fun Shell2() {
                             onCoach = { tab = Tab2.COACH },
                         )
                         tab == Tab2.DIARY -> Legacy { ScanScreen() }
-                        else -> Legacy { AboutScreen(onPreflight = { preflight = true }, onReports = { over = "reports" }) }
+                        else -> YouScreen(
+                            onEdit = { over = "edit" },
+                            onList = { over = "list:" + it.name },
+                            onReports = { over = "reports" },
+                            onPreflight = { preflight = true },
+                        )
                     }
                 }
                 TabBar2(
@@ -210,11 +216,4 @@ fun Shell2() {
 @Composable
 private fun Legacy(content: @Composable () -> Unit) {
     In2fitTheme(legacy = true) { Surface(Modifier.fillMaxSize()) { content() } }
-}
-
-/** The name of the language the person chose to speak in, for "Listening · English". */
-private fun languageName(tag: String): Int = when (tag) {
-    "te" -> R.string.language_telugu
-    "hi" -> R.string.language_hindi
-    else -> R.string.language_english
 }

@@ -123,7 +123,7 @@ private fun Header(name: String?, onNudges: () -> Unit, onProfile: () -> Unit) {
             Box(
                 Modifier
                     .size(40.dp)
-                    .background(Brush.linearGradient(listOf(Color(0xFF243029), s.card)), CircleShape)
+                    .background(Brush.linearGradient(listOf(s.avatar, s.card)), CircleShape)
                     .border(1.dp, s.text.copy(alpha = 0.10f), CircleShape)
                     .clickable(onClick = onProfile),
                 contentAlignment = Alignment.Center,

@@ -66,6 +66,8 @@ data class Scheme(
     val onMessage: Color,
     /** The dimmest mark (#55615C): an unlogged day, a hint inside a row. */
     val dim: Color,
+    /** The avatar circle's gradient start (145°, ending on [card]). */
+    val avatar: Color,
 )
 
 val Dark = Scheme(
@@ -97,6 +99,7 @@ val Dark = Scheme(
     onOwn = Color(0xFFE6F7C4),
     onMessage = Color(0xFFDDE2DE),
     dim = Color(0xFF55615C),
+    avatar = Color(0xFF243029),
 )
 
 /** The brand scheme behind the switch: the same roles, the ruled cream and green. */
@@ -129,6 +132,7 @@ val Cream = Scheme(
     onOwn = Color(0xFF252F26),
     onMessage = Color(0xFF252F26),
     dim = Color(0xFF8E9A95),
+    avatar = Color(0xFFD3DAD3),
 )
 
 val LocalScheme = compositionLocalOf { Dark }

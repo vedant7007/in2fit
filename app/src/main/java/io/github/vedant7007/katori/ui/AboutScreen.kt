@@ -39,7 +39,7 @@ import io.github.vedant7007.katori.ui.theme.Space
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AboutScreen(onPreflight: () -> Unit, onLeaveLegacy: (() -> Unit)? = null, onReports: (() -> Unit)? = null, vm: AboutViewModel = hiltViewModel()) {
+fun AboutScreen(onPreflight: () -> Unit, onLeaveLegacy: (() -> Unit)? = null, vm: AboutViewModel = hiltViewModel()) {
     val meta by vm.meta.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Space.l),
@@ -71,8 +71,6 @@ fun AboutScreen(onPreflight: () -> Unit, onLeaveLegacy: (() -> Unit)? = null, on
         }
         // The way back to the v2 screens while the old shell is kept (21 Sep); gone with the old shell.
         if (onLeaveLegacy != null) SecondaryButton(stringResource(R.string.v2_new_screens), onClick = onLeaveLegacy, modifier = Modifier.fillMaxWidth())
-        // The way into v2 Reports while this old screen stands in for You (21 Sep); gone with step 5.
-        if (onReports != null) SecondaryButton(stringResource(R.string.v2_reports_title), onClick = onReports, modifier = Modifier.fillMaxWidth())
         SafetyLine(Modifier.padding(top = Space.s, bottom = Space.l))
     }
 }
