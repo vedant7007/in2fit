@@ -4424,3 +4424,36 @@ IRA: the sheet you build must clear the banner (`statusBarsPadding` is on the ba
 content needs the banner's height too) and the band must be a control or say nothing about
 tapping; both are yours with the file. If the rebuild slips past noon, tell me and I patch the
 old screen.
+
+[Arjun 08:01] LANDED `da67d04`, UNPROVEN ON THE DEVICE (the phone is away; Rao's list gets the
+checks below). Demo suite 432/0/0 (XML 02:16Z), full 433/0/0 (02:29Z), NetworkIsolationTest 2/0/0.
+WHAT LANDED. (1) PART 1, my side: `OrchestratorEvent.MealResolved.items: List<ResolvedItem> =
+emptyList()` is in the contract with its default; `Entry.Plate.rows: List<PlateItem>` (name shown,
+quantity and unit as said or assumed, grams or null, measured nutrients, `inferred`, band,
+reasons), copied from the event index for index, empty until Rao's line fills `items`, and the
+card falls back to `items` while it is. The scripted feed obeys 0035: Beat 1's sentence is now
+the frozen row 1 ("I had two rotis and a little dal."), the rotis are 2 pieces / 90 g
+QUANTITY_STATED, the dal is an assumed katori at 180 g with QUANTITY_INFERRED +
+HOUSEHOLD_UNIT_DEFAULT, Rough, and the plate's figures are Rough with it;
+`ScriptedOrchestratorTest` pins all of that, `TalkViewModelTest` pins the rows (a no-data item
+has null grams, never 0). IRA: from the FULL flavour with the feed on, both proof screenshots
+(inferred beside stated) can be taken now; the real path shows rows the hour Rao's one line
+lands. RAO, STILL YOURS: `DefaultOrchestrator.kt:284`, `items = resolved.items`, delete `grams`.
+(2) PART 2: `ProfileEntity.name`, `activity`, `speech_language_tag`; Room v3, `MIGRATION_2_3`,
+`ProfileMigrationTest` runs the same SQL over a POPULATED v2 (profile, meal, items, an UNKNOWN
+nutrient, a lab value) and checks every row, every value and every column against the exported
+`3.json`; `ProfileStore` is the profile's first write path (`save`, `setSpeechLanguage`);
+`TalkViewModel` reads the language from the profile row and writes it there; `SharedPreferences`
+is gone. `ProfileDao.get()` added. The 3.json is committed.
+WHAT IT UNBLOCKS: Ira's per-item plate and "taken as" caption (feed now, real path on Rao's
+line); Priya's `TargetRules` (the profile now carries `activity`; see 07:33); the settings and
+first-run screens (they write through `ProfileStore.save`).
+FOR RAO'S DEVICE LIST, in this order: (a) install over the existing database: the app opens (v2
+-> v3 migration ran; a Room schema mismatch would crash at open), the diary still shows
+tonight's chapatiis, and the profile row the rig wrote still reads 19 / 62 / 172; (b) Talk:
+the picker reads Hindi on first open after install, choose Telugu, kill the process, reopen:
+Telugu; (c) after your line: Beat 1 typed in English shows the plate rows with "dal · 1 katori ·
+taken as 180 g" and the rotis without "taken as".
+NEXT, NOW: the derivable queries (`Diary`, `TargetsSource`) and the six ViewModels; then the
+new storage. `domain/Targets.kt` with Ira's exact shape and `TargetRules` (Priya's object,
+returning null until she fills it) lands with them so Ira can compile against the ring's type.
