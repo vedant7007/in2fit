@@ -121,7 +121,7 @@ fun SearchScreen(onBack: () -> Unit, onVoice: () -> Unit, modifier: Modifier = M
                                 T(portionLine(r), sans(12.5f, FontWeight.Normal, 1.3f), color = s.text2, modifier = Modifier.padding(top = 4.dp))
                             }
                             val e = r.nutrients[Nutrient.ENERGY]
-                            if (e != null) T(stringResource(R.string.v2_item_kcal, fig(e)), sans(14f, FontWeight.SemiBold, 1.2f), color = s.text, maxLines = 1)
+                            if (e != null) N(stringResource(R.string.v2_item_kcal, fig(e)), sans(14f, FontWeight.SemiBold, 1.2f), color = s.text, modifier = Modifier.weight(1f, fill = false))
                         }
                     }
                 }
@@ -161,7 +161,7 @@ private fun FoodPage(row: SearchViewModel.Row, onBack: () -> Unit, onQuantity: (
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Stepper(stringResource(R.string.v2_minus), enabled = row.quantity > 0.5) { onQuantity(row.quantity - 0.5) }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        T(if (row.unit == "g") stringResource(R.string.v2_grams, fig(row.grams)) else Sentences.number(row.quantity) + " " + row.unit, num(27f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = s.text)
+                        N(if (row.unit == "g") stringResource(R.string.v2_grams, fig(row.grams)) else Sentences.number(row.quantity) + " " + row.unit, num(27f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = s.text)
                         T(
                             if (row.defaultConversion) stringResource(R.string.v2_grams_bundled, fig(row.grams)) else stringResource(R.string.v2_grams, fig(row.grams)),
                             sans(12.5f, FontWeight.Normal, 1.2f), color = s.accent, modifier = Modifier.padding(top = 4.dp),

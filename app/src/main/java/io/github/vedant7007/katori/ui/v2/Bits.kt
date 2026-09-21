@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.vedant7007.katori.ui.theme.InstrumentSerif
 import io.github.vedant7007.katori.ui.theme.Plex
 import io.github.vedant7007.katori.ui.theme.Scheme
@@ -32,9 +33,10 @@ import io.github.vedant7007.katori.ui.theme.scheme
  * 722 units to Instrument Serif's 739). The rest of the line keeps its face. Used by [T] for
  * every v2 text, so no screen can forget it.
  */
-fun withPlexDigits(text: String, style: TextStyle): AnnotatedString {
+fun withPlexDigits(text: String, style: TextStyle, sized: Boolean = true): AnnotatedString {
     val size = if (style.fontFamily == InstrumentSerif) style.fontSize * 1.02f else style.fontSize
-    val span = SpanStyle(fontFamily = Plex, fontSize = size)
+    // [sized] false: the face alone, so a line that auto-sizes can scale its digits with it.
+    val span = if (sized) SpanStyle(fontFamily = Plex, fontSize = size) else SpanStyle(fontFamily = Plex)
     return buildAnnotatedString {
         var i = 0
         while (i < text.length) {
@@ -60,6 +62,29 @@ fun T(
     softWrap: Boolean = true,
 ) {
     Text(withPlexDigits(text, style), style = style, color = color, modifier = modifier, maxLines = maxLines, textAlign = textAlign, overflow = overflow, softWrap = softWrap)
+}
+
+/**
+ * A FIGURE: one line, never wrapped, never truncated. Where the line is too narrow for the
+ * design's size (a 320 dp screen at a 2× font scale), the number steps down to fit, to 9 sp at
+ * the least; a smaller figure is honest, a cut one is worse than none (hostile pass, 21 Sep).
+ */
+@Composable
+fun N(
+    text: String,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    textAlign: TextAlign? = null,
+) {
+    androidx.compose.foundation.text.BasicText(
+        text = withPlexDigits(text, style, sized = false),
+        modifier = modifier,
+        style = style.copy(color = if (color == Color.Unspecified) style.color else color, textAlign = textAlign ?: style.textAlign),
+        maxLines = 1,
+        softWrap = false,
+        autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = style.fontSize, stepSize = 0.5.sp),
+    )
 }
 
 /** The design's panel: card ground, a 1 dp hairline, the radius it sets (26, 22, 20, 18). */

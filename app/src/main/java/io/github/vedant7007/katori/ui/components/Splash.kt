@@ -34,7 +34,8 @@ import kotlinx.coroutines.launch
  * breathes open, `scaleX` 0.72 → 1.0 ease-out over 1.2 s, the tagline fades in as a separate
  * element with alpha only, its position fixed; from 3.5 s it contracts and fades, and loops. The
  * three rules that outrank fidelity: it never gates the app (the screen under it is already
- * built), it ends at the next expand the moment [ready] is true, and it has no minimum duration.
+ * built, and three breaths is the most it ever stays), it ends at the next expand the moment
+ * [ready] is true, and it has no minimum duration.
  *
  * Every animated property is a `graphicsLayer` transform, so nothing here lays out or recomposes
  * per frame. The wordmark is the PNG scaled (ruled: no trace; on a splash lossy is invisible).
@@ -49,16 +50,21 @@ fun Splash(ready: () -> Boolean, onFinished: () -> Unit) {
     val tagline = remember { Animatable(if (reduceMotion) 1f else 0f) }
     val veil = remember { Animatable(1f) }
     LaunchedEffect(Unit) {
-        // Reduce motion: the end state, no breathing, gone as soon as the app is ready.
+        // It never gates the app: it ends at the next expand once the models are warm, and after
+        // three breaths whatever the warm-up did (a skipped or a failed warm-up must not hold the
+        // screen; found on the emulator, 21 Sep, where the warm-up is skipped by design).
+        var breaths = 0
+        // Reduce motion: the end state, no breathing, gone as soon as the app is ready or at 1.5 s.
         while (!reduceMotion) {
             launch { tagline.animateTo(1f, tween(900, delayMillis = 200, easing = LinearOutSlowInEasing)) }
             scaleX.animateTo(1f, tween(1200, easing = LinearOutSlowInEasing))
-            if (ready()) break
+            breaths++
+            if (ready() || breaths >= 3) break
             delay(3500L - 1200L)
             launch { tagline.animateTo(0f, tween(600)) }
             scaleX.animateTo(0.72f, tween(600, easing = FastOutSlowInEasing))
         }
-        if (reduceMotion) { while (!ready()) delay(100) }
+        if (reduceMotion) { var waited = 0; while (!ready() && waited < 1500) { delay(100); waited += 100 } }
         veil.animateTo(0f, tween(if (reduceMotion) 0 else 250))
         onFinished()
     }

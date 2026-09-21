@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -96,14 +97,15 @@ fun TrendsScreen(onBack: () -> Unit, modifier: Modifier = Modifier, vm: TrendsVi
             Triple(R.string.v2_logged_meals, state.mealCount.takeIf { it > 0 }?.toString(), state.daysLogged.takeIf { it > 0 }?.let { stringResource(R.string.v2_n_days_logged, it) }),
             Triple(R.string.v2_weight, weightChange?.let { (if (it > 0) "+" else if (it < 0) "−" else "") + stringResource(R.string.v2_kg, fig(Math.abs(it))) }, weights.firstOrNull()?.let { stringResource(R.string.v2_since, DateTimeFormatter.ofPattern("d MMM", Locale.getDefault()).format(java.time.Instant.ofEpochMilli(it.recorded_at_epoch_ms).atZone(java.time.ZoneId.systemDefault()).toLocalDate())) }),
         )
-        stats.chunked(2).forEach { pair ->
+        // Two cards a row as drawn; one a row at a large font scale, so no label breaks inside a word.
+        stats.chunked(if (androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.3f) 2 else 1).forEach { pair ->
             Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 pair.forEach { (label, value, note) ->
                     Card2(Modifier.weight(1f), radius = 22.dp) {
                         Column(Modifier.padding(18.dp)) {
-                            T(stringResource(label).uppercase(), micro(11f, 0.10.em, FontWeight.SemiBold), color = s.text3)
-                            Box(Modifier.padding(top = 9.dp, bottom = 4.dp).height(32.dp), contentAlignment = Alignment.CenterStart) {
-                                if (value != null) T(value, num(27f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = if (label == R.string.v2_weight) s.accent else s.text, maxLines = 1)
+                            N(stringResource(label).uppercase(), micro(11f, 0.10.em, FontWeight.SemiBold), color = s.text3)
+                            Box(Modifier.padding(top = 9.dp, bottom = 4.dp).heightIn(min = 32.dp), contentAlignment = Alignment.CenterStart) {
+                                if (value != null) N(value, num(27f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = if (label == R.string.v2_weight) s.accent else s.text)
                             }
                             if (note != null) T(note, sans(12f, FontWeight.Normal, 1.4f), color = s.text2)
                         }

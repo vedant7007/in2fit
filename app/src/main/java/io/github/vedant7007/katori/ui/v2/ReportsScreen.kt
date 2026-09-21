@@ -118,10 +118,10 @@ private fun MarkerRow(row: LabRow, onClick: () -> Unit) {
                 T(row.testName, sans(14.5f, FontWeight.Normal, 1.3f), color = s.text)
                 T(printedRange(row), sans(12f, FontWeight.Normal, 1.3f), color = s.text3, modifier = Modifier.padding(top = 2.dp))
             }
-            Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 12.dp)) {
-                T(labValue(row.value) + " " + row.unit, sans(15f, FontWeight.SemiBold, 1.2f), color = tint, maxLines = 1)
+            Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f, fill = false).padding(start = 12.dp)) {
+                N(labValue(row.value) + " " + row.unit, sans(15f, FontWeight.SemiBold, 1.2f), color = tint)
                 val flag = statusWord(row.status)
-                if (flag != null) T(flag, sans(11.5f, FontWeight.Normal, 1.2f), color = tint.copy(alpha = 0.8f), modifier = Modifier.padding(top = 2.dp))
+                if (flag != null) T(flag, sans(11.5f, FontWeight.Normal, 1.2f), color = tint.copy(alpha = 0.8f), modifier = Modifier.padding(top = 2.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End)
             }
         }
     }
@@ -176,7 +176,7 @@ fun MarkerScreen(test: String, onBack: () -> Unit, modifier: Modifier = Modifier
         if (latest != null) {
             val tint = statusColor(latest.status)
             Row(Modifier.padding(top = 10.dp, bottom = 24.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Bottom) {
-                T(labValue(latest.value), num(44f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = tint)
+                N(labValue(latest.value), num(44f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = tint)
                 T(listOfNotNull(latest.unit, statusWord(latest.status)).joinToString(" · "), sans(14f, FontWeight.Normal, 1.2f), color = s.text2, modifier = Modifier.padding(bottom = 4.dp))
             }
             Card2(Modifier.fillMaxWidth().padding(bottom = 14.dp), radius = 26.dp) {
@@ -196,7 +196,7 @@ fun MarkerScreen(test: String, onBack: () -> Unit, modifier: Modifier = Modifier
                                 else -> s.text.copy(alpha = 0.12f)
                             }
                             Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                T(labValue(h.value), sans(12f, FontWeight.SemiBold, 1.2f), color = if (newest && out) s.warm else s.text2, maxLines = 1)
+                                N(labValue(h.value), sans(12f, FontWeight.SemiBold, 1.2f), color = if (newest && out) s.warm else s.text2)
                                 val ratio = if (history.size == 1) 1f else ((h.value - lo) / span).toFloat()
                                 Box(Modifier.fillMaxWidth().height(12.dp + 52.dp * ratio).background(bar, RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomStart = 4.dp, bottomEnd = 4.dp)))
                                 T(dateShort(h.reportDate), sans(10.5f, FontWeight.Normal, 1.2f), color = s.text3, maxLines = 1)

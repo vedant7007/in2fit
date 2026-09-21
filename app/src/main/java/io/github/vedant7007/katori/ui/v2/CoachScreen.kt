@@ -102,12 +102,13 @@ fun CoachScreen(
             // value outside its printed range in those words; the offline mark when there is no report.
             val report = known.latestReport
             val line = if (report == null) stringResource(R.string.talk_offline_mark) else {
-                val flags = known.outOfRange.filter { it.reportDate == report }.map { row ->
+                val flags = known.outOfRange.filter { it.reportDate == report }.distinctBy { it.testName }.map { row ->
                     row.testName + " " + stringResource(if (row.status == LabStatus.ABOVE) R.string.scan_above_range else R.string.scan_below_range)
                 }
                 (listOf(stringResource(R.string.v2_coach_knows_report, DateTimeFormatter.ofPattern("d MMM", Locale.getDefault()).format(report))) + flags).joinToString(" · ")
             }
-            T(line, sans(12.5f, FontWeight.Normal, 1.45f), color = s.text2, modifier = Modifier.padding(top = 4.dp))
+            // Three lines at most, so the thread keeps the screen at a large font scale; the full list is Reports.
+            T(line, sans(12.5f, FontWeight.Normal, 1.45f), color = s.text2, modifier = Modifier.padding(top = 4.dp), maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(s.text.copy(alpha = 0.06f)))
         LazyColumn(

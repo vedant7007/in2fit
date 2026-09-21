@@ -85,13 +85,31 @@ fun TodayScreen(
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
         Header(state.name, onNudges, onProfile)
         EnergyCard(state.totals, state.progress)
-        Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            WaterCard(state.waterMl, state.targets?.waterMl, Modifier.weight(1f)) { vm.logWater(250) }
-            LastMealCard(state.lastMeal, Modifier.weight(1f), onLastMeal)
+        // The water and last-meal cards side by side as drawn; one under the other at a large
+        // font scale, where half a 320 dp screen cannot hold "430.2 kcal" whole.
+        val twoUp = androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.3f
+        if (twoUp) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                WaterCard(state.waterMl, state.targets?.waterMl, Modifier.weight(1f)) { vm.logWater(250) }
+                LastMealCard(state.lastMeal, Modifier.weight(1f), onLastMeal)
+            }
+        } else {
+            Column(Modifier.fillMaxWidth().padding(bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                WaterCard(state.waterMl, state.targets?.waterMl, Modifier.fillMaxWidth()) { vm.logWater(250) }
+                LastMealCard(state.lastMeal, Modifier.fillMaxWidth(), onLastMeal)
+            }
         }
-        Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            QuietButton(stringResource(R.string.v2_add_manually), Modifier.weight(1f), onAddManually)
-            QuietButton(stringResource(R.string.v2_todays_diary), Modifier.weight(1f), onDiary)
+        // Side by side as drawn; one under the other at a large font scale, so neither label is cut.
+        if (twoUp) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                QuietButton(stringResource(R.string.v2_add_manually), Modifier.weight(1f), onAddManually)
+                QuietButton(stringResource(R.string.v2_todays_diary), Modifier.weight(1f), onDiary)
+            }
+        } else {
+            Column(Modifier.fillMaxWidth().padding(bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                QuietButton(stringResource(R.string.v2_add_manually), Modifier.fillMaxWidth(), onAddManually)
+                QuietButton(stringResource(R.string.v2_todays_diary), Modifier.fillMaxWidth(), onDiary)
+            }
         }
         val nudge = state.lastMealAdvice ?: state.lastMealTrigger
         if (nudge != null) NudgeCard(nudge, state.latestReport, onCoach)
@@ -157,7 +175,7 @@ private fun EnergyCard(totals: List<ShownFigure>, progress: List<TargetProgress>
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         // Today's energy, the store's own total; nothing logged today means no number.
-                        if (energy != null) T(fig(energy.amount), num(30f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.text)
+                        if (energy != null) N(fig(energy.amount), num(30f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.text, modifier = Modifier.padding(horizontal = 14.dp))
                         T(stringResource(R.string.v2_kcal_in).uppercase(), micro(10f, 0.12.em, FontWeight.SemiBold), color = s.text3, modifier = Modifier.padding(top = 4.dp), textAlign = TextAlign.Center)
                     }
                 }
@@ -171,7 +189,7 @@ private fun EnergyCard(totals: List<ShownFigure>, progress: List<TargetProgress>
             if (energyTarget != null) {
                 Box(Modifier.fillMaxWidth().padding(top = 20.dp).height(1.dp).background(s.text.copy(alpha = 0.07f)))
                 Row(Modifier.padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) {
-                    T(fig(energyTarget.remaining.coerceAtLeast(0.0)), num(26f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.accent)
+                    N(fig(energyTarget.remaining.coerceAtLeast(0.0)), num(26f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.accent)
                     T(stringResource(R.string.v2_kcal_left_today), sans(13f, FontWeight.Normal, 1.2f), color = s.text2, modifier = Modifier.padding(bottom = 1.dp))
                 }
             }
@@ -190,9 +208,18 @@ private fun MacroBar(label: String, figure: ShownFigure?, progress: TargetProgre
         else -> null
     }
     Column {
-        Row(Modifier.fillMaxWidth().padding(bottom = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            T(label, sans(13f, FontWeight.Normal, 1.2f), color = s.quote)
-            if (value != null) T(value, sans(13f, FontWeight.SemiBold, 1.2f), color = s.text, maxLines = 1)
+        // The figure never clips. Beside the label as drawn; over it when the font scale would
+        // leave the label no room (a 320 dp screen at 2×, hostile pass 21 Sep).
+        if (androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.3f) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) {
+                T(label, sans(13f, FontWeight.Normal, 1.2f), color = s.quote, modifier = Modifier.weight(1f, fill = false), maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                if (value != null) N(value, sans(13f, FontWeight.SemiBold, 1.2f), color = s.text)
+            }
+        } else {
+            Column(Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
+                T(label, sans(13f, FontWeight.Normal, 1.2f), color = s.quote, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                if (value != null) N(value, sans(13f, FontWeight.SemiBold, 1.2f), color = s.text)
+            }
         }
         Box(Modifier.fillMaxWidth().height(6.dp).background(s.text.copy(alpha = 0.08f), RoundedCornerShape(3.dp))) {
             if (progress != null) {
@@ -215,7 +242,7 @@ private fun WaterCard(waterMl: Int?, targetMl: Double?, modifier: Modifier, onAd
         Column(Modifier.padding(18.dp)) {
             T(stringResource(R.string.v2_water).uppercase(), micro(12f, 0.10.em, FontWeight.SemiBold), color = s.text3)
             Row(Modifier.padding(top = 10.dp, bottom = 12.dp).heightIn(min = 30.dp), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.Bottom) {
-                if (waterMl != null) T(litres(waterMl.toDouble()), num(28f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.text)
+                if (waterMl != null) N(litres(waterMl.toDouble()), num(28f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.text)
                 if (targetMl != null) T(stringResource(R.string.v2_water_of, litres(targetMl)), sans(13f, FontWeight.Normal, 1.2f), color = s.text2, modifier = Modifier.padding(bottom = 2.dp))
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -249,10 +276,11 @@ private fun LastMealCard(meal: ShownMeal?, modifier: Modifier, onOpen: (Long, Lo
                 T(meal.items.joinToString(", ") { it.name }, sans(15f, FontWeight.SemiBold, 1.3f), color = s.text, modifier = Modifier.padding(top = 10.dp, bottom = 3.dp))
                 val energy = meal.energy
                 val protein = meal.figures.firstOrNull { it.nutrient == Nutrient.PROTEIN }
+                // Each figure keeps its unit on its own line (no-break space): "430.2 kcal" never splits.
                 val detail = listOfNotNull(
-                    stringResource(R.string.v2_items_count, meal.items.size),
-                    energy?.let { stringResource(R.string.v2_item_kcal, fig(it.amount)) },
-                    protein?.let { stringResource(R.string.v2_item_protein, fig(it.amount)) },
+                    noBreakUnit(stringResource(R.string.v2_items_count, meal.items.size)),
+                    energy?.let { noBreakUnit(stringResource(R.string.v2_item_kcal, fig(it.amount))) },
+                    protein?.let { stringResource(R.string.v2_item_protein, fig(it.amount)).replaceFirst(" g", " g") },
                 ).joinToString(" · ")
                 T(detail, sans(12.5f, FontWeight.Normal, 1.45f), color = s.text2)
                 T(java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(java.util.Date(meal.loggedAt.toEpochMilli())), sans(12f, FontWeight.Normal, 1.2f), color = s.text3, modifier = Modifier.padding(top = 10.dp))

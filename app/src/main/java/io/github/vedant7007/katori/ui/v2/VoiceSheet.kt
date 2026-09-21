@@ -226,8 +226,10 @@ private fun ResultBody(plate: Entry.Plate, at: String, onClose: () -> Unit, onDi
         else -> null
     }
     Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(bottom = 20.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.Top) {
-            Column(Modifier.weight(1f)) {
+        // A FlowRow: on a narrow screen at a large font scale the three macros drop under the hero
+        // rather than squeeze it (hostile pass, 21 Sep); on the design's frame they sit beside it.
+        androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth().padding(bottom = 20.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f, fill = false)) {
                 // The design's "Lunch · 1:42 pm": the slot waits on meal slots (MISSING); the time
                 // is the clock, and the band is the plate's, said once.
                 T(listOfNotNull(at, status).joinToString(" · ").uppercase(), micro(11.5f, 0.14.em, FontWeight.SemiBold), color = s.text3)
@@ -235,7 +237,7 @@ private fun ResultBody(plate: Entry.Plate, at: String, onClose: () -> Unit, onDi
                     val split = energy?.let { splitValue(it.value) }
                     when {
                         split != null -> {
-                            T(split.first, num(38f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.text)
+                            N(split.first, num(38f, FontWeight.Normal, besideSerif = true, lineHeight = 1f), color = s.text)
                             T(split.second, sans(14f, FontWeight.Normal, 1.2f), color = s.text2, modifier = Modifier.padding(bottom = 2.dp))
                         }
                         energy != null -> T(energy.value, sans(14f, FontWeight.Normal, 1.2f), color = s.text2)
@@ -273,7 +275,7 @@ private fun Macro(figure: FigureLine?, label: String) {
     // Designed empty: a macro the store did not measure draws nothing in its column, never a 0.
     if (figure == null) return
     Column(horizontalAlignment = Alignment.End) {
-        T(figure.value, sans(15f, FontWeight.SemiBold, 1.2f), color = s.text, maxLines = 1)
+        N(figure.value, sans(15f, FontWeight.SemiBold, 1.2f), color = s.text)
         T(label, sans(11f, FontWeight.Normal, 1.2f), color = s.text3, modifier = Modifier.padding(top = 2.dp))
     }
 }
@@ -290,41 +292,52 @@ private fun ResolvedRow(row: Entry.PlateItem) {
     val quantity = row.quantity
     val amount = if (quantity != null) listOfNotNull(Sentences.number(quantity), row.unit).joinToString(" ") else null
     val takenAs = if (row.inferred && row.grams != null) stringResource(R.string.plate_unit_taken_as, fig(row.grams)) else null
-    val chip = listOfNotNull(amount, takenAs).joinToString(" · ").ifEmpty { null }
     val energy = row.nutrients[Nutrient.ENERGY]
     val protein = row.nutrients[Nutrient.PROTEIN]
     Card2(Modifier.fillMaxWidth(), radius = 20.dp, bg = s.card2, line = s.text.copy(alpha = 0.07f)) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 17.dp, vertical = 15.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 T(row.name, sans(15f, FontWeight.SemiBold, 1.3f), color = s.text)
-                if (chip != null) PortionChip(chip)
+                if (amount != null || takenAs != null) PortionChip(amount, takenAs)
             }
-            Column(horizontalAlignment = Alignment.End) {
-                if (energy != null) T(stringResource(R.string.v2_item_kcal, fig(energy)), sans(15f, FontWeight.SemiBold, 1.2f), color = s.text, maxLines = 1)
-                if (protein != null) T(stringResource(R.string.v2_item_protein, fig(protein)), sans(11.5f, FontWeight.Normal, 1.2f), color = s.text3, modifier = Modifier.padding(top = 3.dp), maxLines = 1)
+            Column(Modifier.weight(1f, fill = false), horizontalAlignment = Alignment.End) {
+                if (energy != null) N(stringResource(R.string.v2_item_kcal, fig(energy)), sans(15f, FontWeight.SemiBold, 1.2f), color = s.text)
+                if (protein != null) N(stringResource(R.string.v2_item_protein, fig(protein)), sans(11.5f, FontWeight.Normal, 1.2f), color = s.text3, modifier = Modifier.padding(top = 3.dp))
             }
         }
     }
 }
 
-/** The design's portion chip: accent at 10% over a 22% accent hairline, 12.5 sp, the pencil after. */
+/**
+ * The design's portion chip: accent at 10% over a 22% accent hairline, 12.5 sp, the pencil
+ * after. The amount is one line that shrinks before it wraps (a number never wraps from its
+ * unit); the "taken as N g" caption, when there is one, sits under it inside the chip with its
+ * number and unit joined by a no-break space.
+ */
 @Composable
-private fun PortionChip(text: String) {
+fun PortionChip(amount: String?, takenAs: String?) {
     val s = scheme()
-    Row(
+    Column(
         Modifier
             .padding(top = 8.dp)
             .background(s.accent.copy(alpha = 0.10f), RoundedCornerShape(100.dp))
             .border(1.dp, s.accent.copy(alpha = 0.22f), RoundedCornerShape(100.dp))
             .padding(horizontal = 11.dp, vertical = 5.dp),
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        T(text, sans(12.5f, FontWeight.Normal, 1.2f), color = s.accent, maxLines = 1)
-        // The pencil is drawn; the portion editor it opens waits on a correction path in the
-        // contract (Correction.Quantity exists, no intent sends it).
-        Icon2(Glyphs.pencil, 11.dp, s.accent)
+        Row(horizontalArrangement = Arrangement.spacedBy(7.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (amount != null) N(amount, sans(12.5f, FontWeight.Normal, 1.2f), color = s.accent, modifier = Modifier.weight(1f, fill = false))
+            // The pencil is drawn; the portion editor it opens waits on a correction path in the
+            // contract (Correction.Quantity exists, no intent sends it).
+            Icon2(Glyphs.pencil, 11.dp, s.accent)
+        }
+        if (takenAs != null) T(noBreakUnit(takenAs), sans(12.5f, FontWeight.Normal, 1.3f), color = s.accent)
     }
+}
+
+/** "taken as 180 g" with its last space made unbreakable, so the unit stays on the number's line. */
+fun noBreakUnit(text: String): String {
+    val i = text.lastIndexOf(' ')
+    return if (i > 0) text.substring(0, i) + " " + text.substring(i + 1) else text
 }
 
 /** The item as said, before the resolved rows reach the entry. */
@@ -336,7 +349,7 @@ private fun ItemRow(item: ParsedItem) {
             Column(Modifier.weight(1f)) {
                 T(item.spokenName, sans(15f, FontWeight.SemiBold, 1.3f), color = s.text)
                 val quantity = item.quantity
-                if (quantity != null) PortionChip(listOfNotNull(Sentences.number(quantity), item.unit).joinToString(" "))
+                if (quantity != null) PortionChip(listOfNotNull(Sentences.number(quantity), item.unit).joinToString(" "), null)
             }
             // The item's own figures: designed empty until the resolved rows reach the entry.
         }

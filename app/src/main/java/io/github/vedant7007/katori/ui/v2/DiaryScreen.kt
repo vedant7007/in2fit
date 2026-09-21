@@ -124,8 +124,8 @@ private fun MealCard(meal: ShownMeal, flag: String?, onOpen: () -> Unit) {
                 }
                 val energy = meal.energy
                 if (energy != null) {
-                    Column(horizontalAlignment = Alignment.End) {
-                        T(fig(energy.amount), num(22f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = s.text)
+                    Column(Modifier.weight(1f, fill = false), horizontalAlignment = Alignment.End) {
+                        N(fig(energy.amount), num(22f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = s.text)
                         T(stringResource(R.string.v2_kcal), sans(11f, FontWeight.Normal, 1.2f), color = s.text3)
                     }
                 }
@@ -166,41 +166,39 @@ fun MealScreen(mealId: Long, date: LocalDate?, onBack: () -> Unit, modifier: Mod
         if (meal != null) {
             T(timeOf(meal).uppercase(), micro(11.5f, 0.14.em, FontWeight.SemiBold), color = s.text3)
             T(meal.items.joinToString(", ") { it.name }, serif(30f, 1.2f), color = s.text, modifier = Modifier.padding(top = 8.dp, bottom = 22.dp))
-            Row(Modifier.fillMaxWidth().padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                listOf(Nutrient.ENERGY to R.string.v2_kcal, Nutrient.PROTEIN to R.string.v2_protein, Nutrient.CARBOHYDRATE to R.string.v2_carbs, Nutrient.FAT to R.string.v2_fat).forEach { (n, label) ->
-                    val f = meal.figures.firstOrNull { it.nutrient == n }
-                    Card2(Modifier.weight(1f), radius = 18.dp) {
-                        Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 15.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            if (f != null) T(fig(f.amount), num(21f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = s.text, maxLines = 1)
-                            T(stringResource(label).uppercase(), micro(10.5f, 0.06.em, FontWeight.SemiBold), color = s.text3, modifier = Modifier.padding(top = 4.dp), textAlign = TextAlign.Center)
+            // The four totals in one row as drawn; two rows of two at a large font scale, so no
+            // figure and no label is cut (hostile pass, 21 Sep).
+            val totals = listOf(Nutrient.ENERGY to R.string.v2_kcal, Nutrient.PROTEIN to R.string.v2_protein, Nutrient.CARBOHYDRATE to R.string.v2_carbs, Nutrient.FAT to R.string.v2_fat)
+            val perRow = if (androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.3f) 4 else 2
+            totals.chunked(perRow).forEach { rowOf ->
+                Row(Modifier.fillMaxWidth().padding(bottom = if (perRow == 4) 16.dp else 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    rowOf.forEach { (n, label) ->
+                        val f = meal.figures.firstOrNull { it.nutrient == n }
+                        Card2(Modifier.weight(1f), radius = 18.dp) {
+                            Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 15.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                if (f != null) N(fig(f.amount), num(21f, FontWeight.Normal, besideSerif = true, lineHeight = 1.1f), color = s.text)
+                                N(stringResource(label).uppercase(), micro(10.5f, 0.06.em, FontWeight.SemiBold), color = s.text3, modifier = Modifier.padding(top = 4.dp), textAlign = TextAlign.Center)
+                            }
                         }
                     }
                 }
             }
+            if (perRow == 2) Box(Modifier.height(6.dp))
             Column(Modifier.fillMaxWidth().padding(bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 meal.items.forEach { item ->
                     val amount = item.quantity?.let { q -> listOfNotNull(Sentences.number(q), item.unit).joinToString(" ") }
                     val takenAs = if (item.inferred && item.grams != null) stringResource(R.string.plate_unit_taken_as, fig(item.grams)) else null
-                    val chip = listOfNotNull(amount, takenAs).joinToString(" · ").ifEmpty { null }
                     val energy = item.nutrients[Nutrient.ENERGY]
                     val protein = item.nutrients[Nutrient.PROTEIN]
                     Card2(Modifier.fillMaxWidth(), radius = 20.dp) {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 17.dp, vertical = 15.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 T(item.name, sans(15f, FontWeight.SemiBold, 1.3f), color = s.text)
-                                if (chip != null) {
-                                    Row(
-                                        Modifier.padding(top = 8.dp).background(s.accent.copy(alpha = 0.10f), RoundedCornerShape(100.dp)).border(1.dp, s.accent.copy(alpha = 0.22f), RoundedCornerShape(100.dp)).padding(horizontal = 11.dp, vertical = 5.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(7.dp), verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        T(chip, sans(12.5f, FontWeight.Normal, 1.2f), color = s.accent, maxLines = 1)
-                                        Icon2(Glyphs.pencil, 11.dp, s.accent)
-                                    }
-                                }
+                                if (amount != null || takenAs != null) PortionChip(amount, takenAs)
                             }
-                            Column(horizontalAlignment = Alignment.End) {
-                                if (energy != null) T(stringResource(R.string.v2_item_kcal, fig(energy)), sans(15f, FontWeight.SemiBold, 1.2f), color = s.text, maxLines = 1)
-                                if (protein != null) T(stringResource(R.string.v2_item_protein, fig(protein)), sans(11.5f, FontWeight.Normal, 1.2f), color = s.text3, modifier = Modifier.padding(top = 3.dp), maxLines = 1)
+                            Column(Modifier.weight(1f, fill = false), horizontalAlignment = Alignment.End) {
+                                if (energy != null) N(stringResource(R.string.v2_item_kcal, fig(energy)), sans(15f, FontWeight.SemiBold, 1.2f), color = s.text)
+                                if (protein != null) N(stringResource(R.string.v2_item_protein, fig(protein)), sans(11.5f, FontWeight.Normal, 1.2f), color = s.text3, modifier = Modifier.padding(top = 3.dp))
                             }
                         }
                     }

@@ -211,9 +211,10 @@ fun Shell2() {
                 TabBar2(
                     selected = tab,
                     onSelect = { tab = it; preflight = false; over = null },
-                    // The models must be warm (0032): the ViewModel refuses a press before that, and the button says so.
-                    micEnabled = state.ready && !state.busy,
-                    micReady = state.ready,
+                    // The models must be warm (0032): the ViewModel refuses a press before that, and the button
+                    // says so; the scripted feed needs no model and is never gated (the ViewModel's own rule).
+                    micEnabled = (state.ready || demo) && !state.busy,
+                    micReady = state.ready || demo,
                     onMicPress = {
                         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                         if (granted) open() else askMic.launch(Manifest.permission.RECORD_AUDIO)

@@ -96,7 +96,8 @@ private fun TabItem(glyph: Glyph, label: String, on: Boolean, modifier: Modifier
     ) {
         Icon2(glyph, 22.dp, tint)
         Spacer(Modifier.height(5.dp))
-        T(label, sans(10f, FontWeight.SemiBold, 1.2f), color = tint, maxLines = 1, softWrap = false)
+        // One line, never clipped: at a 2× font scale on a 320 dp screen the word steps down instead.
+        N(label, sans(10f, FontWeight.SemiBold, 1.2f), color = tint)
     }
 }
 

@@ -5345,3 +5345,66 @@ harness is proven to run; nothing on the phone is. RAO: 36 first among mine, its
 Vedant's high item, and the copied .db is in `logs/` before anything opens the file.
 NOT STARTED, by the rule: nothing that cannot finish before the phone is back. I am out of
 things that do not need the phone; if Ira or Rao name one, I take it.
+[Ira 15:15] VEDANT'S THREE, THE FIRST TWO NOW. LANDED AND UNPROVEN ON THE DEVICE: the hostile
+pass on v2 and what it broke, fixed. Demo suite 460/0/0 from my own run (XML 09:41Z),
+NetworkIsolationTest 2/0/0, the whitelist unchanged; master's build, no local guard.
+(1) THE ICON was landed last night at `41adb01` and reported at [Ira 00:44] ("THE ICON, 41adb01:
+the katori in brand cream on #252F26, adaptive with a monochrome layer…"); the entry sat inside
+a three-part note and was missed, so here it is on its own. The launcher shows it: `adaptive-icon`
+with `@color/ic_launcher_background` = #252F26 sampled from the logo file, the katori as the
+foreground vector inside the 66 dp safe zone, a monochrome layer for themed launchers, PNG pairs
+(round and square) at mdpi–xxxhdpi, `AndroidManifest` `android:icon` and `roundIcon` pointing at
+them; the deck's "2" is not used (three crops were mush at 48 dp, your ruling of 20 Sep). THE 48
+PX RENDER: `docs/screenshots/2026-09-21-ira/icon-48px.png`, the emulator's launcher tile at 48
+dp, the recents pill at 24 dp, and the 96/48/24 renders side by side; the bowl reads at 48 and
+still reads at 24. It was in today's emulator launcher too (`emulator-old-shell-talk-after-v2`'s
+neighbour shots show the bowl in the app row). If "the bowl in the logo's green" means the bowl
+itself green on cream rather than cream on green, say so and I flip the two layers in ten minutes.
+(2) THE HOSTILE PASS ON V2, all four at once on the emulator: font scale 2.0 (the system's
+largest), `wm size 640x1280` at density 320 (320 × 640 dp, the smallest width Android supports),
+the app's locale set to Telugu (the longest script we ship; every shared key reads in Telugu, the
+v2 keys are English by the freeze) with Devanagari written into every stored string a screen
+shows (the name "वेदांत मन्मथ इदलगावे", the items' shown names, the lab test names, the stored
+advice), and animator scale 0. WHAT BROKE, in the order found, each fixed in this landing:
+  a. Welcome: the 208 dp ring was crushed to a sliver and the sign-in notice's Continue was
+     off-screen with no way to scroll: THE PERSON COULD NOT GET IN. Now the page scrolls when
+     the frame cannot hold the ring, the sentence and the buttons (the tall layout stays as drawn).
+  b. Today: "18.5 g" truncated to "1" and "71.1 g" to "71" beside the macro labels; the ring's
+     "430.2" cut at the right; "430.2 kcal" split "430.2 / kcal" in the last-meal card, then
+     "kc / al" once the unit was pinned; "Add manually" cut to "Add". Now: every figure goes
+     through one primitive `N()` that steps its size down before it clips and never wraps; a
+     macro's label sits over its value at a large scale; the water and last-meal cards and the two
+     buttons stack one under the other at a large scale.
+  c. The tab bar: "Today" ran into "Diary" and "Coach" was cut. Now the labels step down.
+  d. The sheet: "1 katori · taken as 180 g" was cut to "1 katori ·" — THE CAPTION THE DECK CLAIMS
+     WAS LOST at a large scale. Now the chip is the amount on one line that shrinks, and the
+     caption on its own line under it with "180 g" joined by a no-break space; the same chip
+     serves the meal screen. The three macros drop under the hero instead of squeezing it.
+  e. Reports: the marker names rendered ONE LETTER PER LINE ("F / e / r / r / i / t / i / n")
+     because the value column took the row; Coach's context line took two thirds of the screen
+     and repeated a test that appears twice in the rig's data. Now every name/figure row shares
+     the width half and half at most, the figure shrinks before it clips, the context line names
+     each test once and stops at three lines.
+  f. You: "Privacy On-device" ran together; "Reminders" and "Portion reference" broke inside the
+     word once the row was shared. Now the label wraps by word and the value shrinks; a row with
+     no value gives the label the row. An empty Reminders page showed an empty card; it now
+     shows its title and line and no card.
+  g. The meal: the four totals in one row cut "430." and broke "PROTEIN" per letter; This week's
+     stat cards cut "1963" vertically and broke "AVG CALORIES" inside the word. Now the totals
+     are two by two and the stats one a row at a large scale, and a stat's box grows with its text.
+  h. First run's "about you": "172" cut in half a screen; the 2×2 grid is one column at a large scale.
+  i. The splash never ended on the emulator: it waited for `ready`, which the skipped warm-up
+     never sets. It now ends at `ready` or after three breaths, whichever first (reduce motion:
+     `ready` or 1.5 s). On a phone where the warm-up FAILS this was a black screen forever.
+  j. With the feed on and `ready` false the v2 microphone was dim and unpressable: the
+     ViewModel's rule ("the feed is never gated") is mirrored on the button now.
+  WHAT HELD: the safety line is whole on every screen checked (Telugu, 2×, 320 dp); every
+  Devanagari string wraps and none is cut; reduce motion shows the sheet, the ring and the
+  splash at their end states. NOT CHECKED under the four (time): Search and the food page, the
+  scan screen, the marker screen after fix (e). Screenshots of the passes and the fixes are in
+  `docs/screenshots/2026-09-21-ira/hostile-v2-*.png`, emulator, seeded rows, and named so.
+(3) THE STRANGER WALK follows in the next entry.
+NOTE FOR RAO'S QUEUE: while I was on the emulator, Arjun's `ArjunDeviceChecksTest` ran on it
+(14:33, "9 tests, 0 failed") and force-stopped my app mid-walk, and its DB seeding replaced my
+Devanagari rows twice. The emulator is shared; fine, but a walk that needs an hour needs a quiet
+hour, and the realme certainly does.

@@ -13,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -73,16 +76,26 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onSignIn: () -> Unit, modifier: Modi
     val s = scheme()
     val reduce = LocalReduceMotion.current
     var notice by remember { mutableStateOf(false) }
-    Box(modifier.fillMaxSize().background(s.ground).clip(RoundedCornerShape(0.dp))) {
+    // The design's frame is 390×844. On a screen (or a font scale) where the ring, the sentence
+    // and the buttons cannot all stand, the page scrolls instead of crushing the ring (found at
+    // 320 dp × 2× on 21 Sep); the tall layout keeps the buttons at the bottom as drawn.
+    BoxWithConstraints(modifier.fillMaxSize().background(s.ground)) {
+        val fits = maxHeight >= 720.dp * LocalDensity.current.fontScale.coerceAtLeast(1f)
         Glows(reduce)
-        Column(Modifier.fillMaxSize().statusBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            Modifier.fillMaxSize().statusBarsPadding().then(if (fits) Modifier else Modifier.verticalScroll(rememberScrollState())),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Image(
                 painterResource(R.drawable.lockup),
                 contentDescription = stringResource(R.string.app_name),
                 colorFilter = if (s.isDark) null else ColorFilter.tint(s.mark),
                 modifier = Modifier.padding(top = 18.dp).width(198.dp),
             )
-            Column(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Column(
+                (if (fits) Modifier.weight(1f) else Modifier.padding(vertical = 30.dp)).fillMaxWidth().padding(horizontal = 26.dp),
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+            ) {
                 Ring(reduce)
                 Column(Modifier.heightIn(min = 128.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     T(stringResource(R.string.v2_you_say).uppercase(), micro(10.5f, 0.2.em, FontWeight.Bold), color = s.text4, modifier = Modifier.padding(bottom = 14.dp))

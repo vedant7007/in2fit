@@ -130,12 +130,12 @@ private fun YouRow(label: String, value: String?, onClick: () -> Unit) {
     val s = scheme()
     Column(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Box(Modifier.fillMaxWidth().height(1.dp).background(s.text.copy(alpha = 0.06f)))
-        Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            T(label, sans(14.5f, FontWeight.Normal, 1.2f), color = s.onMessage)
-            Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (value != null) T(value, sans(14f, FontWeight.Normal, 1.2f), color = s.text2, maxLines = 1)
-                Icon2(Glyphs.chevronSmall, 14.dp, s.dim)
-            }
+        // The label and the value share the row; the label wraps by word, the value shrinks before it clips.
+        Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            T(label, sans(14.5f, FontWeight.Normal, 1.2f), color = s.onMessage, modifier = Modifier.weight(1f))
+            // A value shares the row half and half at most and shrinks before it clips; no value, the label has the row.
+            if (value != null) N(value, sans(14f, FontWeight.Normal, 1.2f), color = s.text2, modifier = Modifier.weight(1f, fill = false), textAlign = androidx.compose.ui.text.style.TextAlign.End)
+            Icon2(Glyphs.chevronSmall, 14.dp, s.dim)
         }
     }
 }
@@ -250,7 +250,9 @@ fun ListScreen(which: YouList, onBack: () -> Unit, modifier: Modifier = Modifier
         BackLink(stringResource(R.string.v2_tab_you), onBack)
         T(stringResource(title), serif(27f, 1.2f), color = s.text)
         if (sub != null) T(stringResource(sub), sans(13f, FontWeight.Normal, 1.5f), color = s.text2, modifier = Modifier.padding(top = 5.dp, bottom = 20.dp)) else Box(Modifier.height(20.dp))
-        Card2(Modifier.fillMaxWidth(), radius = 26.dp) {
+        // A page with nothing to list shows its title and line and no empty card (Reminders before any is set).
+        val empty = which == YouList.REMINDERS && state.reminders.isEmpty()
+        if (!empty) Card2(Modifier.fillMaxWidth(), radius = 26.dp) {
             Column(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) {
                 when (which) {
                     YouList.GOALS -> {
@@ -317,7 +319,7 @@ private fun ListRow(label: String, value: String?, note: String? = null, color: 
                 T(label, sans(14.5f, FontWeight.Normal, 1.3f), color = Color(0xFFE4E8E5).takeIf { s.isDark } ?: s.text)
                 if (note != null) T(note, sans(12.5f, FontWeight.Normal, 1.45f), color = s.text3, modifier = Modifier.padding(top = 4.dp))
             }
-            if (value != null) T(value, sans(14f, FontWeight.Medium, 1.3f), color = color, maxLines = 1)
+            if (value != null) N(value, sans(14f, FontWeight.Medium, 1.3f), color = color)
         }
     }
 }

@@ -164,13 +164,18 @@ fun FirstRunScreen(
                 var height by rememberSaveable(p?.height_cm) { mutableStateOf(p?.height_cm?.let(::fig).orEmpty()) }
                 var activity by rememberSaveable(p?.activity) { mutableStateOf(p?.activity.orEmpty()) }
                 var goal by rememberSaveable(p?.goal) { mutableStateOf(p?.goal) }
-                Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    BodyField(stringResource(R.string.v2_field_age), age, stringResource(R.string.v2_unit_yrs), Modifier.weight(1f)) { age = it }
-                    BodyField(stringResource(R.string.v2_field_weight), weight, stringResource(R.string.v2_unit_kg), Modifier.weight(1f)) { weight = it }
-                }
-                Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    BodyField(stringResource(R.string.v2_field_height), height, stringResource(R.string.v2_unit_cm), Modifier.weight(1f)) { height = it }
-                    BodyField(stringResource(R.string.v2_field_activity), activity, stringResource(R.string.v2_unit_days_wk), Modifier.weight(1f)) { activity = it }
+                // The design's 2×2 grid; one column when the font scale would cut a number in half a screen.
+                val twoUp = androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.3f
+                val fields: List<@Composable () -> Unit> = listOf(
+                    { BodyField(stringResource(R.string.v2_field_age), age, stringResource(R.string.v2_unit_yrs), Modifier.fillMaxWidth()) { age = it } },
+                    { BodyField(stringResource(R.string.v2_field_weight), weight, stringResource(R.string.v2_unit_kg), Modifier.fillMaxWidth()) { weight = it } },
+                    { BodyField(stringResource(R.string.v2_field_height), height, stringResource(R.string.v2_unit_cm), Modifier.fillMaxWidth()) { height = it } },
+                    { BodyField(stringResource(R.string.v2_field_activity), activity, stringResource(R.string.v2_unit_days_wk), Modifier.fillMaxWidth()) { activity = it } },
+                )
+                fields.chunked(if (twoUp) 2 else 1).forEach { pair ->
+                    Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        pair.forEach { f -> Box(Modifier.weight(1f)) { f() } }
+                    }
                 }
                 val shape = RoundedCornerShape(18.dp)
                 Column(Modifier.fillMaxWidth().background(s.card2, shape).border(1.dp, s.text.copy(alpha = 0.08f), shape).padding(18.dp)) {
