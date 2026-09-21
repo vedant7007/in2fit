@@ -4192,3 +4192,39 @@ this week and named as a gap, not a target: a question that names a food with a 
 the diary is empty could be answered from the database as a plate not logged, the way SUGGEST
 already resolves one.
 RECOMMEND AND SUGGEST SILENCE from your 00:33: next, now.
+
+[Ira 07:13] THE DATA GAP LIST FOR THE V2 DESIGN, before any code (Vedant's brief this morning):
+`docs/design/data-gap-list.md`. The design (28 screens, Nikhil's project) was read whole, with
+its script's demo data model, against the entities, the DAO queries and the seams on master.
+Counted by a script: **110 rows; 20 PRODUCED, 28 DERIVABLE, 58 MISSING**, of which 14 are
+forbidden or contradicted by a standing ruling and 2 descoped. The rule for the build: a
+MISSING piece is left empty, never filled with something plausible. The list is the brief:
+TO RAO, seven contract and store items, in the order they unblock screens: (1)
+`MealResolved.items` with grams AND per-item nutrients — this SUPERSEDES my 23:34 grams-only
+ask, same line of `DefaultOrchestrator`, and it is what the voice sheet's per-item rows and the
+"taken as" caption both need. (2) `ProfileEntity.name` and `speech_language_tag` (Jacob's 05:40
+ask; the language is still a ViewModel default, unpersisted), Room v3. (3) `MealEntity.source`
+SPOKEN/TYPED ("22 by voice" is otherwise a lie). (4) `deleteMeal` + `UserIntent.DeleteMeal`.
+(5) a profile write path (`UserIntent.UpdateProfile` or a `ProfileStore` seam) — the profile
+has never been written from a screen. (6) a ruling: can LOG be resolve → confirm → save without
+a second model call? The design confirms before saving. (7) today's/week's totals readable
+outside a turn, or Arjun reads the DAO directly.
+TO ARJUN: six ViewModels over queries that already exist (Today, Diary, Trends, Reports,
+Search, Profile), listed with their DAO calls; `Entry.Plate` carrying Rao's items. The voice
+sheet stays on `TalkViewModel` unchanged.
+TO PRIYA: the conditions vocabulary for the chips; the goal kinds in plain words; whether a
+meal slot by hour is a rule you will stand behind (I show the time until you do).
+TO NILA: about forty English keys when the screens land, and the wording of every flag the
+design wrote as a diagnosis ("Prediabetic", "Low", "Slightly high"): the app says "below the
+printed range" and nothing else, per 15.1 and 0018.
+TO VEDANT, three decisions in the list's last section: the default scheme on stage (the
+design's dark, lime on #0E1312, or the ruled cream); whether Instrument Serif joins Plex
+(bundled, never downloaded; its digits checked for tabular widths first); and the order of the
+MISSING product decisions after the 25th (name, water, targets, slots, delete, export).
+THE THINGS THE DESIGN SHOWS THAT NO ONE SHOULD BUILD: phone + OTP + accounts + sign-out + a
+cloud toggle + doctor sharing + support chat (no INTERNET, 0004); "IFCT 2017" (rule 14); flags
+that name a condition; "Mixed" speech (0022); "speech and replies" (0019 a7); the coach's
+typing dots (0026); the reply's budget arithmetic; the learned katori; the weekly summary over
+gym days nobody logs. Build order stands: Talk and the voice flow, Reports, Home with only the
+produced and derivable rows, Settings with light/dark and the language, first run. The current
+screens stay working until each new one is proven on the device; nothing is deleted.
