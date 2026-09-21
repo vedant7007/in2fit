@@ -48,7 +48,7 @@ import java.io.File
 import java.time.Instant
 
 /**
- * ARJUN'S DEVICE CHECKS, ONE SCRIPTED RUN (device queue items 10, 13-15, 24-28 and 35; 21 Sep). Opens
+ * ARJUN'S DEVICE CHECKS, ONE SCRIPTED RUN (device queue items 10, 11, 13-15, 24-28 and 5a; 21 Sep). Opens
  * THE APP'S OWN DATABASE FILE through the same migrations the app runs, on the real device,
  * with whatever rows the phone holds, and checks each item against it. Every row this class
  * writes it deletes again; the person's diary is read, never left changed.
@@ -89,12 +89,21 @@ class ArjunDeviceChecksTest {
         }
     }
 
+    /** The picker's write path (`ProfileViewModel.setLanguage` -> `ProfileStore`) and a fresh open of the database, which is what a process kill and reopen amount to. */
     @Test
-    fun b_item11_the_language_reads_from_the_profile_row() = runBlocking {
+    fun b_item11_the_language_lives_on_the_profile_row_and_survives_a_reopen() = runBlocking {
         val store = ProfileStore(db)
-        val tag = store.speechLanguage.first()
-        val row = db.profileDao().get()?.speech_language_tag
-        check("11 language home", tag == (row ?: "hi")) { "row=$row read=$tag (null row reads hi)" }
+        val before = db.profileDao().get()?.speech_language_tag
+        val readBefore = store.speechLanguage.first()
+        store.setSpeechLanguage("te")
+        val fresh = Room.databaseBuilder(ctx, KatoriDatabase::class.java, KatoriDatabase.NAME).addMigrations(*KatoriDatabase.MIGRATIONS).build()
+        val afterReopen = try { ProfileStore(fresh).speechLanguage.first() } finally { fresh.close() }
+        // Put it back exactly: the row's own value, or the absence the row had.
+        if (before == null) db.openHelper.writableDatabase.execSQL("UPDATE profile SET speech_language_tag = NULL WHERE id = 1") else store.setSpeechLanguage(before)
+        val restored = store.speechLanguage.first()
+        check("11 language home", readBefore == (before ?: "hi") && afterReopen == "te" && restored == (before ?: "hi")) {
+            "row before=$before read=$readBefore; set te, fresh open reads=$afterReopen; restored read=$restored"
+        }
     }
 
     @Test
@@ -195,9 +204,9 @@ class ArjunDeviceChecksTest {
         check("28 export", ok) { "meal lines=${mealLines.size} (items=$items nutrient rows=$nutrientRows) lab lines=${labLines.size} (rows=$labRows)" }
     }
 
-    /** Item 35: a PDF the test draws itself, rendered by the platform, read by ML Kit on THIS device, extracted. */
+    /** Item 5a: a PDF the test draws itself, rendered by the platform, read by ML Kit on THIS device, extracted. */
     @Test
-    fun i_item35_a_pdf_page_renders_and_reads_through_the_real_recogniser() = runBlocking {
+    fun i_item5a_a_pdf_page_renders_and_reads_through_the_real_recogniser() = runBlocking {
         val file = File(ctx.cacheDir, "arjun-check.pdf")
         val doc = PdfDocument()
         try {
@@ -219,11 +228,12 @@ class ArjunDeviceChecksTest {
         val read = bitmaps.firstOrNull()?.let { MlKitOcrEngine(frames).readText(frames.hold(it, 0)) }
         val report = (read as? Outcome.Ok)?.value?.let { LabReportExtractor.extract(it) }
         val hb = report?.fields?.firstOrNull { it.testName.contains("Haemoglobin", ignoreCase = true) }
-        check("35 pdf", bitmaps.size == 1 && hb != null && hb.value == 9.8 && hb.referenceLow == 13.0 && hb.referenceHigh == 17.0) {
+        check("5a pdf", bitmaps.size == 1 && hb != null && hb.value == 9.8 && hb.referenceLow == 13.0 && hb.referenceHigh == 17.0) {
             "render=${pages::class.java.simpleName} pages=${bitmaps.size} ${bitmaps.firstOrNull()?.let { "${it.width}x${it.height}" }} ocr=${read?.let { it::class.java.simpleName }} " +
                 "fields=${report?.fields?.map { "${it.testName}=${it.value}${it.unit ?: ""} [${it.referenceLow}-${it.referenceHigh}]" }} date=${report?.reportDate}"
         }
         file.delete()
+        Unit
     }
 
     // --- helpers -----------------------------------------------------------------------------
