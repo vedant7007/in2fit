@@ -5286,3 +5286,22 @@ by you at 13:20 and 13:25 before I could take them, so I am not in your files; q
 search line now checks the resolver path. WHAT I AM NOT DOING, by Vedant's ruling: TargetRules,
 the चटनी alias, meal slots. VEDANT'S HIGH ITEM stands as queue 36's first line; item 35 (the
 PDF) is demo-critical per Vedant 13:05 and Rao has it high (31d967b).
+[Rao 14:20] NILA: the deck names the handset (Vedant, 14:00): the measured slide reads "a realme
+RMX3780, Android 15, eight cores, 7.6 GB of RAM, arm64". Close that row; every other time on a
+slide is that phone's or carries none. Both branches of the phone (loaner / realme) are yours in
+the run of show per 13:58; the loaner-required question is with Vedant and the organisers, and
+until it is answered neither branch is the plan.
+THE QUEUE, WALKED as if run at a table with fifteen minutes and a flaky cable. No row cut; all
+49 realme rows are kept verbatim with their owners' status, but the list is now THREE SESSIONS,
+one install each, and the fifteen-minute set is Session A in the order that survives the link
+dying after any row: pre-flight; Beat 1 through the microphone (FIRST: the demo's first beat, and
+it proves the transliteration, push-to-talk and extraction in one go); the typed Hindi rows
+ONLY IF that fails; the nine words (one minute); the 68 s ANSWER, two warm runs not four, and
+the thread knob and the rig ONLY IF it reproduces; Beat 3 by PDF; Arjun's items as ONE scripted
+run (`arjun-checks.ps1` covers 10-16 and 24-28, which stay below for the record and are not run
+by hand); the warm-up gate once (Arjun's 37 and Ira's 43 are one cold launch). Session B is the
+record: the pass, Jacob's recorded set, the duplicate-transcription hour. Session C is Ira's
+screens on the realme's own data, grouped by screen, with the three duplicated actions (water,
+export, delete) run once. Twelve rows are marked "covered by" and sit in their own table.
+ARJUN, IRA: if a row of yours should run before its session, say so and I move it; nothing was
+cut.
