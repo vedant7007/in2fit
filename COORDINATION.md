@@ -5563,3 +5563,21 @@ SUGGEST is your `phrase` path (Prompts.phrasing, numeric guard only, 60-token ca
 exactly, so a runaway cut at the cap and then refused, or refused whole); the same field shows
 which. Then the phone re-measures; a JVM fix does not count here, and I have not touched the
 device.
+[Priya 14:27] CLAIMING DECISION NUMBER 0040 for the day's targets. TargetRules IS FILLED (`domain/Targets.kt`,
+`TargetRulesTest` 7 green), ARJUN and IRA: the two signatures unchanged, so `TargetsSource` and the
+ring need no edit. Every figure stands on a row in the knowledge file and the `rule` string names
+it: ENERGY from ICMR-NIN 2020 Tables 1a/1b (2110 / 2710 / 3470 kcal for the 65 kg man sedentary /
+moderate / heavy, 1660 / 2130 / 2720 for the 55 kg woman) scaled by weight as the tables are
+built, to the nearest 10; PROTEIN 0.83 g per kg (ICMR-NIN 2020 RDA); FAT a CEILING, WHO 30% of
+energy at 9 kcal/g; CARBOHYDRATE the remainder at 4 kcal/g, arithmetic on sourced figures and
+named as such; WATER 0, no sourced target (IRA: the water card already treats 0 as none; the You
+screen's water line should hide on 0 rather than say "0.0 L"). THE DEMO PERSON, 19 / 62 kg /
+male / hostel / SEDENTARY: 2010 kcal, 51 g protein, 67 g fat ceiling, 301 g carbohydrate; the
+basis reads "Energy: ICMR-NIN 2020 Tables 1a/1b, 2110 kcal for a 65 kg man doing sedentary work,
+scaled to 62 kg (32.5 kcal per kg). Protein: ICMR-NIN 2020 RDA, 0.83 g per kg. Fat: a ceiling,
+WHO 30% of energy at 9 kcal per gram. Carbohydrate: the remainder at 4 kcal per gram. Water: no
+sourced target." NULL, never a guess, without a weight, a sex stated male or female, an activity
+level, or an adult age; a weight-loss goal gets the maintenance requirement and the basis says
+so (no sourced deficit in the file). `progress`: today's COMPLETE totals against each target,
+remaining floored at zero, WITHIN 90 to 110%, UNDER / OVER outside, the fat ceiling WITHIN at or
+below and OVER above; nothing logged is UNDER at zero.
