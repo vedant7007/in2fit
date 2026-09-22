@@ -117,7 +117,7 @@ android {
             it.inputs.file(rootProject.file("data-authoring/intent-test-set.csv"))
                 .withPropertyName("intentTestSet")
             // The safety set, the answer-quality set, the reviewer's word sheet (0024) and the
-            // ASR renderings the matcher is measured against (0026): all read through
+            // ASR renderings the matcher is measured against (0041): all read through
             // katori.projectDir, so all declared, per the rule recorded on 20 September.
             it.inputs.file(rootProject.file("data-authoring/safety-adversarial-set.csv"))
                 .withPropertyName("safetyAdversarialSet")

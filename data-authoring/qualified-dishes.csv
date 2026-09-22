@@ -6,7 +6,7 @@
 #      recipe, or an honest miss; never a base ingredient's figures under the dish's name.
 # A dish alias that is not in this file has not been asked, and does not ship.
 #
-# Qualified dish names, swept for the bug class found in 0026: a dish name that CONTAINS a base
+# Qualified dish names, swept for the bug class found in 0041: a dish name that CONTAINS a base
 # ingredient's name collapses onto that ingredient through the matcher's containment stage, and
 # the oil, the other ingredients and the dish's own figures are silently dropped. "fried rice"
 # resolved to plain cooked rice. This file is every such name the sweep tried, with what each
@@ -25,7 +25,7 @@
 #
 # base: the ingredient the name contains, which is what it would collapse onto.
 utterance,base,expect,note
-fried rice,rice,NODATA:fried_rice,the one 0026 found
+fried rice,rice,NODATA:fried_rice,the one 0041 found
 egg fried rice,rice,NODATA:fried_rice,
 chicken fried rice,rice,NODATA:fried_rice,
 veg fried rice,rice,NODATA:fried_rice,

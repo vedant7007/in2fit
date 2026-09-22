@@ -5697,3 +5697,26 @@ authorised paragraph now names SEVEN voices, because Ira is the seventh and a di
 lists six would be untrue; nothing else in it changed. Three items are waiting on you and are
 in the report, not in the README: Abhinav's line (his name is there with no role, not a
 guess), the demo video link, and what the history scan found.
+
+[Nila 22:46] THREE RULINGS APPLIED, one commit. (1) THE TEAM SECTION of the README carries the
+three lines Vedant confirmed, in his order and his words: Vedant Manmath Idlgave, system and
+orchestration; Abhinav, engineering and testing; Thanishka, design and UI/UX. The demo video
+is deliberately absent until the URL exists; no empty section and no dead anchor. (2) THE
+CORRUPT `refs/stash` IS GONE, locally and on origin. What it actually was: 41 NUL bytes, a
+zero-filled file with no SHA in it, so nothing was lost by removing it; `git update-ref -d`
+refused ("reference broken") and the file was removed by hand, as ruled. `git push origin
+:refs/stash` reported `[deleted] refs/stash`, so origin had been carrying it too, which is
+why every session's fetch failed. THE ELEVEN UNREACHABLE COMMITS ARE UNTOUCHED and still
+recoverable with `git fsck --unreachable`; the first five are 0fc0ff3, c441092, 368dbc4,
+a98e1ae, 671a65e. IF YOU LOST A STASH, that is where it is. Nobody stashes from now on: a WIP
+commit on your own branch, per the standing rule. (3) THE DUPLICATE 0026 IS RESOLVED. The two
+records were committed ten minutes apart on 20 Sep: 15:14:43 the spoken-turn-on-screen spec,
+15:24:02 the code-mixed food words. THE LATER ONE IS RENUMBERED, `0026-code-mixed-food-words`
+-> `0041-code-mixed-food-words`, and every inbound reference with it: HANDOVER, the deck
+audit, `0034`, `QualifiedDishesTest`, `codemix-renderings.csv`, `qualified-dishes.csv` (two)
+and a comment in `app/build.gradle.kts`. EVERY REMAINING `0026` IN THE REPOSITORY POINTS AT
+THE SPOKEN-TURN RECORD, which keeps its number: 56 of them, in `ui/` comments, `strings.xml`,
+the design system, the run of show and the research, all of them "0026 step N" or "the turn on
+screen". None was touched and none is stale. COORDINATION.md is append-only, so its twenty-odd
+historical `0026` mentions stand as written; this note is the record that one of the two has
+moved.

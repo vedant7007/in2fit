@@ -1,4 +1,4 @@
-# 0026. English food words said the Telugu way, and what the matcher does with them
+# 0041. English food words said the Telugu way, and what the matcher does with them
 
 Date: 20 September 2026. Status: accepted for the data and the rule. The number is a regression
 guard on one synthetic voice, not accuracy.

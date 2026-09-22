@@ -28,7 +28,7 @@ question it cares most about: whether anything has run on a phone. Something has
 >   repository (`docs/spec.md`, `df82e35`); the "no copy of the spec" line below is history.
 > - §3 and §6 rule 2 count thirteen no-data items and 81 ingredients; on 20 September the
 >   corpus is 93 ingredients, 626 aliases, 52 recipes, and the no-data list is FORTY: the
->   thirteen, paneer and fried rice (`0026-code-mixed-food-words`), and 25 dishes from Priya's
+>   thirteen, paneer and fried rice (`0041-code-mixed-food-words`), and 25 dishes from Priya's
 >   sweep (`data-authoring/qualified-dishes.csv`, 17:16). The rule is unchanged: none of the
 >   forty may resolve to a food; each refuses by name with its reason.
 > - The command order in §2 is stale for a fresh clone: `tools/4-fetch-models.bat` must run

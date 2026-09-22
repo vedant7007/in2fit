@@ -10,7 +10,7 @@ import org.junit.Test
 import java.io.File
 
 /**
- * The bug class `0026` found, swept: a qualified dish name that contains a base ingredient's
+ * The bug class `0041` found, swept: a qualified dish name that contains a base ingredient's
  * name collapses onto that ingredient through containment. "fried rice" became plain rice.
  *
  * WRONG FOOD is the number, and here it has a precise meaning: a name in

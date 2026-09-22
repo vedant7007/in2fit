@@ -1,4 +1,4 @@
-# English food words a Telugu speaker mixes in, as the te ASR model rendered them. docs/decisions/0026.
+# English food words a Telugu speaker mixes in, as the te ASR model rendered them. docs/decisions/0041.
 #
 # THE SOURCE IS A MEASUREMENT, NOT AN AUTHORING SESSION: `logs/asr-codemix-renderings.log`, Jacob,
 # 20 September 2026, one Piper te voice, one rendering per word, the model's output copied exactly.

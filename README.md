@@ -222,9 +222,9 @@ anyone.
 
 ## The team
 
-- **Vedant Manmath Idlgave** — built it, and presents it
-- **Thanishka** — design
-- **Abhinav**
+- **Vedant Manmath Idlgave**, system and orchestration
+- **Abhinav**, engineering and testing
+- **Thanishka**, design and UI/UX
 
 ## Licence and naming
 
