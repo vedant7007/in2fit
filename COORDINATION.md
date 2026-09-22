@@ -5581,3 +5581,40 @@ level, or an adult age; a weight-loss goal gets the maintenance requirement and 
 so (no sourced deficit in the file). `progress`: today's COMPLETE totals against each target,
 remaining floored at zero, WITHIN 90 to 110%, UNDER / OVER outside, the fat ceiling WITHIN at or
 below and OVER above; nothing logged is UNDER at zero.
+[Priya 14:29] BEAT 3 ON THE DAY: FROM THE PDF, NOT THE CAMERA. ARJUN, VEDANT, NILA, RAO. Worked out
+against the numbers, both mine and Arjun's:
+THE CAMERA ROUTE, measured on the realme (`LabReportOcrTest`, Rao 00:48): a square-on rendered
+page reads 8 of 8 (sheets 01 and 06, the warm-light one too); at about 20 degrees (sheet 05) ML
+Kit reads EVERY LINE correctly but the rows drift vertically across the page and `TextLayout.rows`
+(vertical-centre clustering within half a line height) joins none of them: 0 of 8, both demo rows
+NEITHER. Threshold 2 fails there and threshold 1 fails twice elsewhere, and both of those are real
+hazards, not fixture artefacts: (1) the two-column sheet was read as ONE row, "Fasting Glucose 142
+mg/dZ0- 100 HbA1c 6.4 % 4 -5.6", and the extractor returned Fasting Glucose = 6.4 % [4.0..5.6]: a
+WRONG NUMBER under the wrong name; (2) the monospace sheet's "TSH 2.1uIU/mL" came back "2.luIU/mL"
+(the glued 1 read as a letter) and the extractor read "2." as 2.0: a WRONG NUMBER. So the camera,
+live, in a room, at whatever angle the presenter's hand gives, is NOT a branch the numbers
+support, and I am not proposing to fix TextLayout by Thursday.
+THE PDF ROUTE (Arjun's `DemoSeedTest -e report pdf`, 5c): the report drawn as a PDF, rendered by
+`PdfPages`, read by ML Kit ON THE PHONE and the real extractor, saved ONLY on an exact match with
+what was printed, the same file copied to Downloads and opened through the picker on stage. A
+rendered page has no angle, no lamp and no hand: it is sheet 01's condition, the one that read
+8 of 8 on the phone, and it already read exactly on the emulator (Haemoglobin 9.8, Ferritin 8.0,
+date 2026-09-12). BEAT 3 RUNS FROM THE PDF ON THE DAY; the camera points at nothing live; the
+0036 thresholds stay as the gate for the camera route, which is not performed. RAO: the phone
+measurement of 5c is the one that makes this claimable.
+TWO THINGS TO ALIGN BEFORE THAT RUN: (a) WHICH REPORT. The deck and `DeckClaimsTest` carry
+fasting glucose 142 mg/dL and HbA1c 6.4 % (Beat 4 becomes "fibre higher, carbohydrate lower":
+cooked moong dal, chana dal, toor dal); Arjun's PDF carries Haemoglobin 9.8 and Ferritin 8.0
+(Beat 4 becomes "iron higher": chana dal, palakura pappu). They cannot both be the demo. VEDANT,
+yours: the deck's two values into Arjun's PDF, or the deck to the haemoglobin story. (b) THE PDF's
+LAYOUT must be sheet 01's shape, one column, "70 - 100" with spaces, the unit in its own column,
+a sans-serif: the two-column and glued-unit shapes are the ones that misread. NILA: Beat 3's
+line becomes "a blood report, as the lab sent it, opened from the phone's files; nothing about it
+leaves the phone", and the camera card is not touched during the beat.
+ARJUN, TWO EXTRACTOR HAZARDS FROM THE RUN, yours, not for Thursday unless you want them: a
+number that ends in a decimal point with no digit after it ("2." from "2.luIU/mL") must be
+refused, never read as X.0; and a row whose NAME contains a free-standing number followed by a
+unit-like token ("... 142 mg/dZ0- 100 HbA1c") is two tests on one line and must be dropped, never
+read as the second test's value under the first test's name. 0036's "one misread number is a
+stop" is what both of these are.
+Items 1 to 5 done as ruled; stopping.
