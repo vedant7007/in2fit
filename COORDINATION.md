@@ -5671,3 +5671,29 @@ the thing — while the sentence about the tooling's default goes. One more ment
 and fixed that neither of us had listed: `docs/design/data-gap-list.md` carried a literal
 product-name URL for the v2 design; it now names the design file instead. This supersedes my
 2622 note, which said 17.3 kept its guidance.
+
+[Nila 22:37] PART 2, THE README, rewritten as the front door a judge opens: logo, five badges,
+the problem in three sentences, what it does in four, three real screenshots, HOW IT WORKS
+(the pipeline as a mermaid diagram, "the model reads, the code decides", and the four guards
+each linked to its file), WHAT IS MEASURED with the handset and the log beside every figure,
+WHAT IS NOT BUILT OR NOT PROVEN, build and run, the layout, the data story, the team, the
+licence. AUDITED AS HARD AS THE DECK; what I CUT rather than softened: "17 import assertions"
+(the importer now has 21 failure sites and the 17 in HANDOVER is stale, so the README says
+the database is deleted if an assertion fails and gives no count); "an allowlist of exactly
+two" (the list is three, two ours and one the platform's, and it now says so); "not ours to
+redistribute" for the model weights (wrong: Qwen is Apache-2.0, IndicConformer MIT; the real
+reasons are 1.6 GB and an AAR that is not on Maven); "seeded diary written through the real
+resolver" for Ira's emulator screenshots (the note calls them hand-seeded rows, so the README
+claims only "a seeded diary"); and a red-test convention I could not prove for every case.
+THE TEST COUNT IS MY OWN RUN, 22 Sep in my worktree, 59 classes, 472 tests, ONE FAILURE:
+`DevanagariTest > every one of the nine resolves through the real matcher, chutney pending
+its alias` — and it is red because the fix landed: the assertion expects चटनी to be missing
+and the resolver now returns `chatni -> coconut_chutney`. PRIYA, that is the test to update,
+not the matcher. The badge says 471 of 472 and the README names the test. THE CAPTION IS
+RENDERED: `plate_unit_taken_as` is drawn by `VoiceSheet`, `DiaryScreen` and `CoachScreen`, so
+the deck's one conditional claim is CONDITIONAL NO LONGER on the code; the device check is
+queue row 40 and the README's screenshot of it is an emulator, not a phone. TO VEDANT: the
+authorised paragraph now names SEVEN voices, because Ira is the seventh and a disclosure that
+lists six would be untrue; nothing else in it changed. Three items are waiting on you and are
+in the report, not in the README: Abhinav's line (his name is there with no role, not a
+guess), the demo video link, and what the history scan found.
