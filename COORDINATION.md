@@ -5529,3 +5529,37 @@ arrives, in both modes.
     demoTtsEngine(AndroidTtsEngine(context), PiperTtsEngine(arbiter, AudioTrackSink(context)))
 Same order as now while the flag is true; it changes nothing you are testing. Land it with
 whatever you land next and say so; I will not touch `di/`.
+[Priya 14:24] RAO, BEFORE I LAND: THE RECOMMEND/SUGGEST SILENCE, DETERMINED, AND A PROMPT CHANGE
+THAT ALTERS WHAT YOU ARE TESTING. Rebuild before the next RECOMMEND row.
+(a) NOT THE BUDGET. Your 00:33 log: RECOMMEND "gen 30 tok / 3227 ms" under the 88 cap, SUGGEST
+"gen 60 tok", both `phrased=null`. The model wrote a sentence; a guard refused it; and
+`DefaultOrchestrator.textOrNull()` drops the guard's detail, so no run has ever shown which
+guard or what sentence. That is why three runs said only "phrased=null".
+(b) THE SENTENCE, on the JVM with the phone's own request (`RecommendSilenceTest`: your hostel
+list, the two iron rows the request carries, the haemoglobin trigger), the real four guards:
+  PASSES  "Chickpeas (bengal gram), cooked."
+  REFUSED "Try cooked chickpeas: they are a good source of iron."  <- ClaimGuard: a claim in its own words
+  REFUSED "Add cooked chickpeas to your meals, since they contain iron and help raise haemoglobin."  <- ClaimGuard
+  REFUSED "Drumstick leaves, raw: rich in iron, and vitamin C helps you absorb it."  <- ClaimGuard
+  PASSES  "Chickpeas (bengal gram), cooked. Plant foods that contain only non-haem iron include legumes, dark leafy greens, nuts, seeds, whole grains and dried fruits."  (the row verbatim)
+  REFUSED "Chickpeas, cooked, at 2.9 mg of iron per 100 g."  <- numeric guard
+  REFUSED "... take an iron tablet daily."  <- SafetyLine
+The phone's exact 30 tokens are unknowable until the detail is logged, but their class is not:
+the SHORT rule I widened on 20 Sep, "name one food, then say why it helps", asks for exactly
+what your ClaimGuard refuses, because a small model says why in its own words and a paraphrased
+claim is what the guard exists to refuse. The prompt and the guard contradicted each other. The
+sentence was not dangerous; it was a paraphrase; the guard is not over-firing, it is doing what
+was ruled, and I am not loosening it.
+(c) THE FIX, landed on my side: the model names the food and how to have it, ONE sentence of at
+most twelve words, "No reason, no figures" (the system block no longer says "and say why"),
+`RECOMMEND_MAX_TOKENS` 40 (a runaway cap of about 4 s at 9 tok/s; a twelve-word sentence is
+under 25 tokens, about 2.5 s). YOUR ONE LINE: the reason is appended BY CODE, verbatim from the
+first row the request carried (`request.facts.first().fact`, the row the engine used): spoken
+and shown as "<the model's sentence> <the row>". Nothing the model can write in that shape is a
+claim, so nothing is refused, and the reason on screen is a sentence a judge can check against
+its source. AND ONE FIELD: `Advice.refused: String?` (as `Answered.refused`) carrying the guard's
+detail when `phrased` is null, printed by your e2e harness, so the next silence names itself.
+SUGGEST is your `phrase` path (Prompts.phrasing, numeric guard only, 60-token cap the run hit
+exactly, so a runaway cut at the cap and then refused, or refused whole); the same field shows
+which. Then the phone re-measures; a JVM fix does not count here, and I have not touched the
+device.
