@@ -16,6 +16,10 @@
   <img alt="No internet permission" src="https://img.shields.io/badge/INTERNET%20permission-none%2C%20enforced%20at%20build-0b7285">
 </p>
 
+<p align="center">
+  <a href="https://youtu.be/IESWo7uO6aI"><b>Watch the demo</b></a>
+</p>
+
 ---
 
 ## The problem
@@ -51,7 +55,7 @@ and *the figures are Rough* under it. The orange sentence on the right is the ru
 template, filled from values read off a printed report. More, including the hostile-read passes
 over long text and Devanagari, in [`docs/screenshots/`](docs/screenshots/).
 
-*A recorded run of the four demo beats will be linked here once it exists.*
+A recorded run of the four demo beats: [the demo video](https://youtu.be/IESWo7uO6aI).
 
 ## How it works
 

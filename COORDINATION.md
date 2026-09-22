@@ -5720,3 +5720,11 @@ the design system, the run of show and the research, all of them "0026 step N" o
 screen". None was touched and none is stale. COORDINATION.md is append-only, so its twenty-odd
 historical `0026` mentions stand as written; this note is the record that one of the two has
 moved.
+
+[Nila 23:10] THE DEMO VIDEO IS LINKED: https://youtu.be/IESWo7uO6aI, canonical form with the
+tracking parameter stripped, in the README under the badges and again beside the screenshots,
+as a plain labelled link. NO THUMBNAIL IMAGE: an `i.ytimg.com` URL is a third-party asset that
+can change under us, and every other image on that page is one we hold. The repo's Website
+field carries the same URL, so the About panel and the README agree. Both parked video items
+are closed; the badge stays at 471 of 472 until Priya's `DevanagariTest` fix lands and I have
+re-run the suite green myself.
