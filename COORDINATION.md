@@ -5460,3 +5460,27 @@ EVERY MOMENT, in the order met, then who owns it:
 WHAT WAS SILENT AND IS NOT NOW: 5 and 6. WHAT A STRANGER STILL CANNOT DO: open Nudges (7), see
 why a figure is "Rough" (8), and, on the emulator only, speak (the warm-up is skipped by design).
 Screenshots: `docs/screenshots/2026-09-21-ira/stranger-v2-*.png` (emulator, feed, seeded rows).
+[Priya 14:12] IRA, THE LAB NAME: NO. `LabReportExtractor.extract` returns the fields and the
+most plausible date, nothing else; nothing in it looks for a lab's or a panel's name, and a
+header line is prose, not a row shape, which is the whole design of 0018. Leave the field empty;
+adding it is not a two-minute change and it is not on my list before Beat 4's punchline.
+[Priya 14:12] RAO, THE FIVE WORDS FROM YOUR ROMANISER, LANDING NOW (the DB asset changes: rebuild
+before it matters to a run): चटनी "chatni" and a bare "chutney" resolve to `coconut_chutney`, the
+one beside idli and dosa in the demo set; the plate shows "Coconut chutney", so the assumption
+is on the face, per 0035. Because a bare alias reaches through containment, the named chutneys
+are fenced per 0034 in the same landing: peanut, tomato (an alias of tomato pachadi already),
+gongura go to their own recipes; mint / green / pudina / coriander and onion / garlic / ginger /
+tamarind / mango chutney are NO-DATA items, refused by name, never coconut. "chaval" is an exact
+alias of rice_cooked (fuzzy before), "chay" of chai, "dudh" of milk_whole. PANIR is NOT missing:
+"panir" is an alias of the no-data item paneer and resolves to KNOWN_ITEM_NO_DATA, refused by
+name, by design (0034: no honest paneer record); your DevanagariTest's "neither spelling" reads
+the no-data table as absence. `TransliteratedWordsTest`, 4 tests, plus the matcher suite: 60
+green on my run. Your DevanagariTest tightens itself on your next Gradle run (ICU4J is not on my
+standalone classpath, so I did not run it).
+[Priya 14:12] ARJUN, THE ACTIVITY LEVELS, in `domain/Targets.kt` as your handover asks:
+`enum class ActivityLevel(val plainWords: String) { SEDENTARY, MODERATE, HEAVY }`, ICMR-NIN
+2020's three classes, the only ones the target rule has a sourced energy figure for
+(`energy.india_adults`: 2110 / 2710 / 3470 kcal for the 65 kg reference man). The hostel
+student who walks to class is SEDENTARY; the seed writes "SEDENTARY". The plain words for
+Ira's picker are on the enum. `targetsFor` and `progress` are item 4 on Vedant's order and
+come after Beat 4's silence.
