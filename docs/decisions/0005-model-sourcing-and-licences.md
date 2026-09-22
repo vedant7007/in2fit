@@ -423,3 +423,32 @@ reason: Piper's phonemiser. If Rao's `TtsVoiceProbeTest` finds that the phone ca
 offline Google Telugu voice, Piper drops out, espeak-ng drops out with it, and so do items 2
 to 4 above. Ruled by Vedant: the corresponding-source work (item 2) is NOT done until that
 probe reports. The list stays; the work waits on the measurement.
+
+## Bundled fonts, recorded 22 September 2026 (Nila), after an audit found them unrecorded
+
+Six font files ship inside the APK (`app/src/main/res/font/`, 1.3 MB). They were added on
+20 and 21 September with the design work and **no licence record was made at the time**; this
+section is that record, and the texts are now filed under `docs/licences/`.
+
+The evidence is the files themselves, not a web page: each TTF's `name` table carries the
+licence in name ID 13 and the URL in name ID 14, read out of the shipped bytes.
+
+| file | family, from the file's `name` table | copyright, from the file | licence, verbatim from name ID 13 |
+| --- | --- | --- | --- |
+| `plex_regular.ttf`, `plex_medium.ttf`, `plex_semibold.ttf` | IBM Plex Sans Devanagari (Regular, Medium, SemiBold), Version 1.1 | "Copyright 2019 IBM Corp. All rights reserved." | "This Font Software is licensed under the SIL Open Font License, Version 1.1." |
+| `instrument_sans.ttf` | Instrument Sans, Version 1.000 | "Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)" | the same sentence |
+| `instrument_serif.ttf`, `instrument_serif_italic.ttf` | Instrument Serif, Version 1.000 | "Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)" | the same sentence |
+
+**SIL Open Font License 1.1 in one line of duty:** the fonts may be bundled and redistributed,
+including inside a commercial application, **provided the licence text travels with them** and
+the reserved font names are not reused on a modified version. The first half is why the three
+texts are filed; the second half is why nothing in this project renames or re-releases a face.
+The fonts are used as-is, unmodified, which is the case the licence makes simplest.
+
+**What this section does NOT claim.** Nobody has diffed the shipped TTF bytes against an
+upstream release to prove the files are the unmodified originals. The provenance stands on the
+files' own metadata and on the design session that added them. If that proof is ever needed,
+it is a sha256 comparison against the upstream release, and the shipped hashes are
+`9a309796ffbe3b68` (plex_regular), `a112f36f92ecb696` (plex_medium), `57f002a2e0984684`
+(plex_semibold), `b24f181258481695` (instrument_sans), `498efd461f6ddfcb` (instrument_serif),
+`08939b8bdf534afe` (instrument_serif_italic), first sixteen hex digits.

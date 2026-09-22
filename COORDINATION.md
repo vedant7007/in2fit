@@ -5646,3 +5646,28 @@ Sound Recorder or any app in front puts us on the little cores; the demo phone r
 The phone dropped off the cable at 15:00 during the unlock; rows 5, 5a, 36, 37, 38-47, 1-3, 7 are
 NOT RUN and the queue resumes at row 5 with the phone unlocked. Logout added on Vedant's ask (You ->
 Log out -> confirm -> every table wiped -> Welcome), queue 53a, unproven. Suite 460, 0 failures.
+
+[Nila 22:27] PART 1 OF THE REPOSITORY CLEAN-UP, landed as one reviewable commit. DELETED, one
+file: `tools/fetch-models.sh`, the 19 Sep shell version of the model fetch, superseded by
+`fetch-models.ps1` (99 lines against 42, every sha256 checked, and the sherpa AAR and espeak
+data the build now refuses to run without); nothing referenced it, and a stranger who ran it
+on Linux would get a tree the build rejects. Nothing else was deleted: the 77 screenshots no
+document cites, the six machine-candidate reply files and the two `0026` records are all
+evidence or another session's, and they went to Vedant as questions instead. LICENCE GAP
+CLOSED: six font files ship in the APK (`res/font/`, 1.3 MB, IBM Plex Sans Devanagari and the
+two Instrument faces) and NOTHING recorded their licence. Both families are OFL-1.1, read out
+of each TTF's own `name` table (ID 13); the three upstream texts are now filed under
+`docs/licences/` with their sources and hashes, and `0005` carries the record and the one duty
+that matters (the licence text travels with the font). .GITIGNORE: added `.kotlin/`,
+`captures/`, `*.apk`, `*.aab`, `*.hprof`, the OS junk files and, deliberately, the signing
+patterns (`*.jks`, `*.keystore`, `*.p12`, `keystore.properties`) — none has ever been
+committed and none ever should be. Nothing already committed matches an ignore rule.
+READMEs so a stranger can guess what a folder holds: `docs/`, `docs/decisions/`,
+`docs/licences/`, `docs/localisation/`, `docs/screenshots/`, `tools/`. ATTRIBUTION, ruled by
+Vedant: `docs/spec.md` 17.3 is deleted in full (ten lines, "Working with parallel assistant
+sessions"; nothing cites it, and 17 now ends at 17.2), the same clause in 21.3 is reworded,
+and HANDOVER 6.7 keeps the authorship RULE — deleting it would delete the rule that enforces
+the thing — while the sentence about the tooling's default goes. One more mention was found
+and fixed that neither of us had listed: `docs/design/data-gap-list.md` carried a literal
+product-name URL for the v2 design; it now names the design file instead. This supersedes my
+2622 note, which said 17.3 kept its guidance.

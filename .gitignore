@@ -3,6 +3,11 @@
 /app/build
 .gradle/
 .cxx/
+.kotlin/
+captures/
+*.apk
+*.aab
+*.hprof
 
 # Machine-specific
 local.properties
@@ -11,6 +16,17 @@ local.properties
 .idea/
 *.iml
 .vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Signing material. Nothing here has ever been committed and nothing ever should be: the demo
+# build is debug-signed by the local debug keystore, which lives outside the repository.
+*.jks
+*.keystore
+*.p12
+keystore.properties
 
 # Logs produced by the build and toolchain scripts
 /logs/

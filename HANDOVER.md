@@ -414,11 +414,10 @@ attached, and in several cases the reason is a bug that was actually found.
    `Vedant Manmath Idlgave <vedantidlgave16@gmail.com>`. Commits carry no co-author trailer and no
    generation line; no attribution of any kind appears in commits, pull requests, contributors,
    comments or files, with one authorised exception: the paragraph in `README.md` that says what
-   the six named voices in the working records are. When this handover was written the repository
-   recorded no convention and the tooling's default was to add a trailer; Vedant ruled against
-   it before the thirteenth commit, and an audit of the whole history before the first push
-   (141 commits, 20 September) found every author and committer to be him and no trailer
-   anywhere. A commit that fails that audit is reported, not rewritten.
+   the six named voices in the working records are. Vedant ruled this before the thirteenth
+   commit, and an audit of the whole history before the first push (141 commits, 20 September)
+   found every author and committer to be him, with no trailer anywhere. A commit that fails
+   that audit is reported, not rewritten.
 
 8. **`Unknown` is never collapsed to zero.** Not on import, not in a sum, not in the UI. There is
    deliberately no `getOrZero()` helper and no default value anywhere on `NutrientValue`. USDA states

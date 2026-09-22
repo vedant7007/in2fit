@@ -818,16 +818,6 @@ In priority order, drop from the bottom:
 
 Items 1 to 5 are the four demo beats. Everything else is score on top.
 
-### 17.3 Working with parallel assistant sessions
-
-The plan is to hand this document to parallel assistant sessions in the editor and let them drive the build. Some guidance for that:
-
-- **Parallelise by package, not by feature.** The `ml/asr`, `ml/llm`, `data/food` and `ui` packages have clean boundaries. Two sessions touching the same package will conflict.
-- **Define the interfaces first**, in one session, before parallel work starts. Every parallel session then codes against a fixed contract.
-- **Keep one session as integrator.** Parallel agents produce parts; something has to assemble and run them on a real device.
-- **Test on a physical phone from stage 1.** An emulator will not tell you whether the ASR latency is acceptable.
-- **Commit after every working stage**, so a broken parallel session never costs you a working build.
-
 ## 18. Testing
 
 ### 18.1 Devices available
@@ -933,7 +923,7 @@ What she can start now without blocking: the visual identity, the colour and typ
 
 ### 21.3 On Abhinav
 
-Even with assistant sessions driving most of the build, there is real work that does not conflict with parallel code generation and cannot be automated:
+There is real work here that does not conflict with the code being written and cannot be automated:
 
 - **Building the voice test set.** 100+ recorded meal logs from different speakers. This is the highest-value task in the project, it needs a human recruiting real people, and section 10.6 depends on it entirely.
 - **Weighing real meals** for the nutrition accuracy validation in section 18.4.

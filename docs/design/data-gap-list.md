@@ -1,7 +1,7 @@
 # The data gap list: what the v2 design shows, against what the system produces
 
 Written 21 September 2026 by Ira, before any code, from the design at
-`claude.ai/design/p/444c0e27-…` (`IN2FIT App v2.dc.html`, 28 screens, its script's demo data
+the v2 design file (`IN2FIT App v2.dc.html`, 28 screens, its script's demo data
 model, `assets/in2fit-mark.png`, `assets/in2fit-lockup.png`) read against the code on master
 (`data/local/entity/Entities.kt`, `data/local/dao/Daos.kt`, `domain/Orchestrator.kt`,
 `domain/OrchestratorSeams.kt`, `data/food/FoodLookup.kt`).
