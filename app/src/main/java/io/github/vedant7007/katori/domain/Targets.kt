@@ -40,6 +40,23 @@ data class TargetProgress(
 enum class TargetStatus { WITHIN, UNDER, OVER }
 
 /**
+ * The three physical-activity classes of ICMR-NIN 2020 (`A Brief Note on Nutrient Requirements
+ * for Indians`, the source the energy row `energy.india_adults` in the knowledge file cites),
+ * which are the only classes the target rule has a sourced energy figure for. The profile
+ * stores the NAME verbatim (`ProfileEntity.activity`); Ira's picker shows [plainWords].
+ *
+ * A hostel student who walks to class is [SEDENTARY]: ICMR-NIN classes students, office and
+ * desk work as sedentary; "moderate" is a day of physical work (a field, a shop floor, a
+ * delivery round); "heavy" is manual labour. The demo person (19, 62 kg, 172 cm, male, hostel
+ * student) is SEDENTARY and the seed writes that name.
+ */
+enum class ActivityLevel(val plainWords: String) {
+    SEDENTARY("Mostly sitting: class, desk, study; walking to and fro"),
+    MODERATE("On my feet most of the day: field, shop floor, deliveries"),
+    HEAVY("Hard physical work most of the day"),
+}
+
+/**
  * PRIYA'S RULE. Both functions are pure. Until she lands them this object returns no target,
  * which the screens show as nothing, per the rule that a stub never returns a plausible value.
  */

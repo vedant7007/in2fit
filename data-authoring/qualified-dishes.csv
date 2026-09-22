@@ -95,3 +95,12 @@ fruit salad,fruit,NODATA:fruit_salad,
 cheese sandwich,cheese,cheese_sandwich,authored in the sweep; resolved to cheese alone before
 veg sandwich,bread,NODATA:veg_sandwich,
 bread butter,bread,bread_butter,authored in the sweep; resolved to butter alone before
+chutney,chutney,coconut_chutney,"22 Sep: a bare chutney is the coconut one beside idli and dosa; the plate shows 'Coconut chutney', so the assumption is on the face (0035)"
+chatni,chutney,coconut_chutney,"22 Sep: Rao's transliteration of chatni; the same recipe"
+peanut chutney,chutney,peanut_chutney,"22 Sep: must not collapse onto the bare alias"
+tomato chutney,chutney,tomato_pachadi,"22 Sep: an alias of the pachadi recipe, not the bare chutney"
+gongura chutney,chutney,gongura_pachadi,"22 Sep"
+mint chutney,chutney,NODATA:mint_chutney,"22 Sep: no recipe; refused by name, never coconut"
+green chutney,chutney,NODATA:mint_chutney,"22 Sep"
+garlic chutney,chutney,NODATA:onion_chutney,"22 Sep"
+mango chutney,chutney,NODATA:onion_chutney,"22 Sep"

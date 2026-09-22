@@ -43,3 +43,5 @@ onion_dosa,"Onion dosa","onion dosa|onion uthappam|uttapam|uthappam|onion uttapa
 mango_lassi,"Mango lassi","mango lassi","No mango fruit record (only the nectar) and no recipe. Refused by name."
 fruit_salad,"Fruit salad","fruit salad|mixed fruit|fruit bowl","No recipe: the fruit varies by the bowl. Say the fruits."
 veg_sandwich,"Veg sandwich","veg sandwich|vegetable sandwich|bombay sandwich","No recipe: the filling varies. Bread and butter, cheese sandwich and egg sandwich have recipes."
+mint_chutney,"Mint chutney","mint chutney|pudina chutney|pudina chatni|green chutney|hari chutney|coriander chutney|dhania chutney|kothimeera pachadi","No recipe. Without this entry the name would contain 'chutney' and collapse onto coconut chutney through the bare alias landed 22 Sep (0034 sweep). Refused by name until a recipe is authored."
+onion_chutney,"Onion chutney","onion chutney|ullipaya pachadi|garlic chutney|vellulli pachadi|ginger chutney|allam pachadi|tamarind chutney|imli chutney|mango chutney|red chutney","No recipe; the same containment hazard as mint chutney (0034 sweep, 22 Sep). Refused by name, never coconut chutney."
