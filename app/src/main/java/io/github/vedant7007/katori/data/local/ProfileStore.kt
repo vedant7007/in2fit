@@ -34,9 +34,23 @@ class ProfileStore(
     private val conditionDao: ConditionDao?,
     private val weightDao: WeightDao? = null,
     private val reminderDao: ReminderDao? = null,
+    /** The whole database, gone: what "log out" means on a phone that holds everything locally. Null in a rig without one. */
+    private val wipe: (suspend () -> Unit)? = null,
 ) {
 
-    @Inject constructor(db: KatoriDatabase) : this(db.profileDao(), db.conditionDao(), db.weightDao(), db.reminderDao())
+    @Inject constructor(db: KatoriDatabase) : this(db.profileDao(), db.conditionDao(), db.weightDao(), db.reminderDao(), wipe = { db.clearAllTables() })
+
+    /**
+     * LOG OUT. There is no account to leave (the app is offline by build), so logging out is the
+     * phone forgetting the person: profile, conditions, diary, reports, weights, reminders, every
+     * table, in one call. The screen asks first and then shows Welcome again. Nothing is kept.
+     */
+    suspend fun logOut() {
+        wipe?.invoke() ?: run {
+            // A rig without the database: forget what this store can reach.
+            dao.get()?.let { dao.upsert(EMPTY) }
+        }
+    }
 
     /** Every weight the person entered, oldest first; the profile's `weight_kg` is the latest of them. */
     val weights: Flow<List<WeightEntity>> = weightDao?.history() ?: flowOf(emptyList())

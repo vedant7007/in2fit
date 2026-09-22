@@ -112,7 +112,7 @@ class OrchestratorDeviceTest {
             assertTrue("stage the LLM at ${model.absolutePath}", model.length() > 0L)
             val t0 = System.nanoTime()
             runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = THREADS)
-            say("model load ${(System.nanoTime() - t0) / 1_000_000} ms")
+            say("model load ${(System.nanoTime() - t0) / 1_000_000} ms  cpuset ${cpuset()}")
             val engine = LlamaCppLlmEngine(runtime)
             val lease = object : LlmLease {
                 override suspend fun <T> use(block: suspend (LlmEngine) -> T): Outcome<T> = Outcome.Ok(block(engine))
@@ -266,6 +266,9 @@ class OrchestratorDeviceTest {
         }
         rig.close()
     }
+
+    /** Which cores this process may run on: /background is the four little cores, and every number made there is a little-core number (22 Sep). */
+    private fun cpuset(): String = runCatching { java.io.File("/proc/self/cgroup").readLines().firstOrNull { it.contains("cpuset") }?.substringAfterLast(':') ?: "?" }.getOrDefault("?")
 
     companion object {
         private const val TAG = "katori-e2e"

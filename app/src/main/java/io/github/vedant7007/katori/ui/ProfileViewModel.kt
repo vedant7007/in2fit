@@ -101,6 +101,14 @@ class ProfileViewModel @Inject constructor(private val store: ProfileStore, priv
      * stored, handed to [onReady] on the main thread for the screen to put in a share intent as
      * text (`shareText`). No file, no provider, no permission.
      */
+    /** "Log out": the phone forgets the person (every table), then [onDone] on the main thread so the screen can show Welcome. */
+    fun logOut(onDone: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            store.logOut()
+            withContext(Dispatchers.Main) { onDone() }
+        }
+    }
+
     fun export(onReady: (meals: String, labs: String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val (meals, labs) = diary.exportCsv()

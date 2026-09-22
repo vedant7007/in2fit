@@ -5618,3 +5618,31 @@ unit-like token ("... 142 mg/dZ0- 100 HbA1c") is two tests on one line and must 
 read as the second test's value under the first test's name. 0036's "one misread number is a
 stop" is what both of these are.
 Items 1 to 5 done as ruled; stopping.
+[Rao 15:40] THE DEVICE WINDOW, 14:14-15:00, AND THE CAUSE OF THE STALLS. Rows run: 1 install PASS,
+migration v2->v4 on the phone's real rows PASS (Today shows yesterday's chapatiis); 3a pre-flight
+WAIT on loadavg and ran anyway (this realme idles at loadavg 15-20 with 1 runnable: phantom
+D-state threads, the runnable count is its real signal); row 5 Beat 1 through the microphone FAIL
+twice AT THE RECOGNISER (mangled transcripts, the chain itself ran: hold ended on release, one
+model call), while the phone was being handled (the recorder in front, a meal logged by hand at
+2:27 PM, the shade pulled, then locked); row 4 typed Hindi rows: THE FROZEN BEAT 1 SENTENCE
+EXTRACTED AND RESOLVED (roti -> chapati, dal -> toor_dal_tadka, the first Hindi plate on a
+device), row 2 too (roti, dal, tel -> groundnut_oil), then the run stalled mid-phrasing.
+THE STALL, MEASURED, FOURTH TIME, WITH ITS CAUSE: whenever IN2FIT is not the focused window
+(lock screen, notification shade, the recorder, any dialog over it) the process is moved to
+cpuset /background = cores 0-3, the four little cores, and eight llama threads there collapse
+on the per-layer barrier: the warm-up's two-token prompt took 14,864 ms against 348 ms in front,
+the LLM load 49-83 s against 5.5, the ASR prepare 55 s against 2. The rig (am instrument) has no
+window at all, so every rig number since the start may be a little-core number when the screen
+was not on our activity; the reports now print the process's cpuset beside the load line. This is
+the 66 s ANSWER, the 83 s and 108 s warm-ups, and every "0 % CPU stall" (the little cores shared
+with the system, threads waiting on each other; FUSE re-reads of the mmap'd model on top when
+MemFree fell to 137 MB with the model mapped twice: the rig's runtime and the app's own warm-up in
+one process; `adb shell settings put global katori_warmup 0` now turns the launch warm-up off for
+rig runs). NOT thermal, NOT context growth, NOT the model. FOR THE DAY: the phone unlocked, IN2FIT
+in front, the shade closed, DND on, nobody touching it; `tools/preflight.ps1` now checks the lock
+screen, the focused window and the app's cpuset and says WAIT on any of them. NILA: "Reboot, wait,
+check, then demo" gets "unlocked, IN2FIT in front, shade closed, DND" as its own line. IRA: the
+Sound Recorder or any app in front puts us on the little cores; the demo phone runs nothing else.
+The phone dropped off the cable at 15:00 during the unlock; rows 5, 5a, 36, 37, 38-47, 1-3, 7 are
+NOT RUN and the queue resumes at row 5 with the phone unlocked. Logout added on Vedant's ask (You ->
+Log out -> confirm -> every table wiped -> Welcome), queue 53a, unproven. Suite 460, 0 failures.

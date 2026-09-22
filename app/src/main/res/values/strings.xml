@@ -452,6 +452,10 @@
     <string name="v2_delete_everything">Delete everything</string>
     <string name="v2_delete">Delete</string>
     <string name="v2_help">Help</string>
+    <string name="v2_log_out">Log out</string>
+    <string name="v2_log_out_title">Log out of this phone?</string>
+    <string name="v2_log_out_body">There is no account: logging out means this phone forgets you. Your profile, diary, reports, weights and reminders are deleted and cannot be recovered. Share or export first if you want to keep them.</string>
+    <string name="v2_cancel">Cancel</string>
     <string name="v2_help_q_someone_else">Can I log for someone else?</string>
     <string name="v2_help_a_someone_else">Not yet. Family profiles are next.</string>
     <string name="v2_version">Version</string>

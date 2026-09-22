@@ -147,7 +147,7 @@ class MeasurementPassTest {
         val foods = AndroidFoodDbSource.open(ctx)
         val t0 = System.nanoTime()
         val runtime = LlamaCppRuntime.load(model, contextTokens = 2048, threads = THREADS)
-        say("model load ms=${(System.nanoTime() - t0) / 1_000_000} threads=$THREADS")
+        say("model load ms=${(System.nanoTime() - t0) / 1_000_000} threads=$THREADS cpuset=${runCatching { File("/proc/self/cgroup").readLines().firstOrNull { it.contains("cpuset") }?.substringAfterLast(':') }.getOrNull()}")
         raw(4, "pss_after_load_kb" to Debug.getPss())
         val engine = LlamaCppLlmEngine(runtime)
         val lease = object : LlmLease {

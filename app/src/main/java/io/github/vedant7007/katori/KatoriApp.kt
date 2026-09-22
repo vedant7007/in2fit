@@ -28,6 +28,11 @@ class KatoriApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // `adb shell settings put global katori_warmup 0` keeps the launch warm-up off: a rig that
+        // loads its own runtime in this process would otherwise map the model twice (22 Sep).
+        if (android.provider.Settings.Global.getInt(contentResolver, "katori_warmup", 1) == 0) {
+            android.util.Log.i("katori-warmup", "skipped: global setting katori_warmup=0"); return
+        }
         CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             val tag = profile.speechLanguage.first()
             warmUp.start(SpeechLanguage.entries.firstOrNull { it.tag == tag } ?: SpeechLanguage.HINDI)

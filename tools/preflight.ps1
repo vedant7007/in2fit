@@ -86,5 +86,17 @@ $pssMb = if ($pss -match '^\d+$') { [math]::Round([int]$pss / 1024) } else { 0 }
 Check 'app process' $(if ($appPid -match '\d') { "pid $appPid" } else { 'not running' }) ($appPid -match '\d') 'open the app first'
 Check 'model resident (PSS MB)' $pssMb ($pssMb -ge 1400) 'first guess: at least 1400 MB with the 1.1 GB model mapped (1990 MB after load on 21 Sep)'
 
+# --- the window and the cores ----------------------------------------------------------------------
+# FOUND 22 Sep 14:55: behind the lock screen (or under the recorder, the shade, any other window)
+# the process sits in cpuset /background = the four little cores, and eight llama threads there
+# collapse (a 2-token prompt: 14.9 s against 0.35 s in front). The 66 s answer, the 83 s load and
+# every "0 % CPU stall" were this. The app must be the focused window, on the foreground cpuset.
+$focus = "$(First (Sh 'dumpsys window | grep mCurrentFocus') 'mCurrentFocus=Window\{[0-9a-f]+ u0 ([^}]+)\}')".Trim()
+$keyguard = "$(First (Sh 'dumpsys window | grep isKeyguardShowing') 'isKeyguardShowing=(true|false)')".Trim()
+$cpuset = if ($appPid -match '\d') { "$(First (Sh "cat /proc/$appPid/cgroup") 'cpuset:(\S+)')".Trim() } else { '' }
+Check 'lock screen' $(if ($keyguard -ne '') { "showing=$keyguard" } else { 'unreadable' }) ($keyguard -eq 'false') 'the phone must be unlocked'
+Check 'focused window' $(if ($focus -ne '') { $focus } else { 'unreadable' }) ($focus -match $pkg) 'IN2FIT in front: no shade, no recorder, no dialog over it'
+Check 'app cpuset' $(if ($cpuset -ne '') { $cpuset } else { 'unreadable' }) ($cpuset -match '^/(top-app|foreground)') 'foreground or top-app = cores 0-7; /background = the four little cores'
+
 # --- verdict ------------------------------------------------------------------------------------
 if ($reasons.Count -eq 0) { Line "READY"; exit 0 } else { Line ("WAIT: " + ($reasons -join '; ')); exit 1 }

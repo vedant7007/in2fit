@@ -112,6 +112,23 @@ fun YouScreen(
                 YouRow(stringResource(R.string.v2_privacy), stringResource(R.string.v2_on_device)) { onList(YouList.PRIVACY) }
                 YouRow(stringResource(R.string.v2_appearance), stringResource(if (ThemePreference.dark) R.string.v2_dark else R.string.v2_cream)) { ThemePreference.set(context, !ThemePreference.dark) }
                 YouRow(stringResource(R.string.v2_help), null) { onList(YouList.HELP) }
+                // Log out: the phone forgets the person. Asked first; then Welcome again.
+                var askLogOut by rememberSaveable { mutableStateOf(false) }
+                YouRow(stringResource(R.string.v2_log_out), null) { askLogOut = true }
+                if (askLogOut) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = { askLogOut = false },
+                        title = { androidx.compose.material3.Text(stringResource(R.string.v2_log_out_title)) },
+                        text = { androidx.compose.material3.Text(stringResource(R.string.v2_log_out_body)) },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(onClick = {
+                                askLogOut = false
+                                vm.logOut { ThemePreference.setWelcomed(context, false) }
+                            }) { androidx.compose.material3.Text(stringResource(R.string.v2_log_out)) }
+                        },
+                        dismissButton = { androidx.compose.material3.TextButton(onClick = { askLogOut = false }) { androidx.compose.material3.Text(stringResource(R.string.v2_cancel)) } },
+                    )
+                }
             }
         }
         // The on-device statement (override: the cloud toggle is gone; there is nothing to switch to).
