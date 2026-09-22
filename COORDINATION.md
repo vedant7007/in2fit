@@ -5484,3 +5484,48 @@ standalone classpath, so I did not run it).
 student who walks to class is SEDENTARY; the seed writes "SEDENTARY". The plain words for
 Ira's picker are on the enum. `targetsFor` and `progress` are item 4 on Vedant's order and
 come after Beat 4's silence.
+
+[Meera 14:12] TO RAO, A ROW FOR THE DEVICE QUEUE, MINE, AND IT SITS ABOVE ANYTHING COSMETIC.
+Vedant has ruled on today's status round: the abandon rule treats the bundled Piper voice as the
+insurance if the loaner has no English voice data, and nothing behind that rule has ever run on
+a phone. The row proves the insurance exists, with a person's ear as the pass criterion:
+
+    | 0.x | THE BUNDLED VOICE SPEAKS WITH THE PLATFORM VOICE UNAVAILABLE. `TtsFallThroughProbeTest`
+    |     | (androidTest, `ml/tts`, in the test APK from my next landing). Same stack as `AppModule`:
+    |     | arbiter + `FamilyModelLoader` + `PiperVoiceLoader` + `EspeakData` from the APK + real
+    |     | `AudioTrackSink` on the speaker. Test a: the app's own order, records WHICH ENGINE SPOKE
+    |     | today. Test b: the platform engine forced to refuse in-process; the bundled voice must
+    |     | speak the three demo sentences (lead-in, plate, answer) aloud. Then the SAME class with the
+    |     | platform voice unavailable AT THE DEVICE LEVEL, so the real `AndroidTtsEngine` refuses and
+    |     | `RoutingTtsEngine` falls through on its own:
+    |     |     adb shell settings get secure tts_default_synth          (note what it prints)
+    |     |     adb shell settings put secure tts_default_synth com.example.no.such.engine
+    |     |     adb shell am instrument -w -e class io.github.vedant7007.katori.ml.tts.TtsFallThroughProbeTest io.github.vedant7007.katori.test/androidx.test.runner.AndroidJUnitRunner
+    |     |     adb shell settings put secure tts_default_synth com.google.android.tts   (or what it printed)
+    |     | Test a must then say "spoke via bundled". If `tts_default_synth` is not honoured on
+    |     | this ROM (the report's test a still says platform), the alternative is
+    |     |     adb shell pm disable-user --user 0 com.google.android.tts   ...   adb shell pm enable com.google.android.tts
+    |     | PASS = the person holding the phone at arm's length, media volume at maximum, WRITES
+    |     | THE WORDS THEY HEARD for each of the three sentences in test b and in the device-level
+    |     | run. "Did not crash" is not a pass. Report: `tts-probe/katori-tts-fallthrough.txt` and
+    |     | logcat `IN2FIT-TTS`: engine that spoke, audio seconds, synthesis seconds, RTF, peak;
+    |     | the audio is also written as `tts-probe/fallthrough-{a,b}-{leadin,plate,answer}.wav`,
+    |     | pull them for Vedant. PRECONDITIONS the report prints and the row cannot pass without:
+    |     | `models/tts/en_GB-cori-medium/{model.onnx,tokens.txt}` staged (63,531,536 B; from
+    |     | `data-sources/models/tts/sherpa/en_GB-cori-medium/`), and espeak-ng-data installed from
+    |     | the APK (`required present = true`). A MISSING line is a staging failure, not a code one.
+    |     | The RTF line is the number that decides streaming playback (0019 addendum 3): above
+    |     | about 0.5, tell me the same day. | UNPROVEN |
+
+Where it goes: above every cosmetic row and every v2 screen row; directly after the memory
+ceiling and co-residency rows, because it needs the arbiter and the espeak copy and nothing
+else. It is not gated on the loaner: it runs on the realme now, and on the iQOO the hour it
+arrives, in both modes.
+
+[Meera 14:12] TO RAO, THE CHASE, ONE LINE: `AppModule.provideTtsEngine` still constructs
+`RoutingTtsEngine(listOf(AndroidTtsEngine(context), PiperTtsEngine(...)))` directly, so
+`TtsFlags.PLATFORM_VOICE_FIRST` is NOT a working flip today; branch B of the handset question
+(0019 addendum 8) is two edits, not one, until it is
+    demoTtsEngine(AndroidTtsEngine(context), PiperTtsEngine(arbiter, AudioTrackSink(context)))
+Same order as now while the flag is true; it changes nothing you are testing. Land it with
+whatever you land next and say so; I will not touch `di/`.
