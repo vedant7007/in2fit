@@ -56,3 +56,24 @@ as the remainder. Both system blocks are about half their length, one clause per
 behind the model (numeric, condition, `SafetyLine`) hold what the longer wording only asked for.
 Unmeasured on the phone until the demo-condition run; the number to report is prompt tokens and
 generation tokens separately, as `0014` does.
+
+## Addendum, 22 September: RECOMMEND asks for a food, not a reason; the reason is quoted by code
+
+Three e2e runs on the phone (21 Sep, 00:33 the last) ended RECOMMEND and SUGGEST with
+`phrased = null`. Not the budget: the RECOMMEND turn generated 30 tokens in 3.2 s and the
+orchestrator's `textOrNull()` dropped a guard's refusal, detail and all. On the JVM with the
+same request (`RecommendSilenceTest`: the hostel list, the two iron rows, the haemoglobin
+trigger), every sentence that says WHY in the model's own words is refused by the ClaimGuard,
+"a good source of iron", "help raise haemoglobin", "vitamin C helps you absorb it", and only a
+bare food name, or a name followed by a row quoted verbatim, passes. The SHORT rule widened on
+20 Sep, "name one food, then say why it helps", asked for exactly what the guard refuses, and
+the guard is right: a paraphrased claim is what it exists to refuse.
+
+So: the model names the food and how to have it, one sentence of at most twelve words, no
+reason and no figures, and the REASON IS APPENDED BY CODE, verbatim from the first row the
+request carried (the row the engine used). `RECOMMEND_MAX_TOKENS` is 40, a runaway cap of about
+4 s at 9 tok/s; a twelve-word sentence is under 25. Nothing the model can write in that shape
+is a claim, so nothing is refused. The SUGGEST silence is the integrator's `phrase` path (its
+prompt, the numeric guard, a 60-token cap the run hit exactly); the same missing detail hides
+which guard, and the same fix applies: carry the refusal on the Advice event so the log names it.
+Unmeasured on the phone until the integrator's next run; a JVM fix does not count here.

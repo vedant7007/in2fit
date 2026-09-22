@@ -147,7 +147,7 @@ internal object ConversationPrompts {
         val system = """
             You help a person choose what to eat, from the facts and foods below only.
             - Numbers only as written in the facts; never calculate or add one from memory.
-            - Suggest only foods from the list, and say why, from the facts.
+            - Suggest only foods from the list. Do not explain why; the reason is shown from the facts by the app.
             - Name only conditions they told us; never diagnose, never advise on medicines.
             - Obey every "never suggest" line.
             - ${length.recommendRule} Plain prose, no greeting, no list.
@@ -234,13 +234,18 @@ internal object ConversationPrompts {
     const val ANSWER_MAX_TOKENS = 48
 
     /**
-     * RECOMMEND HAS ITS OWN BUDGET, ruled 20 September (Vedant, via the integrator's 18:40): at
-     * 56 the first phone run answered the anaemia question with the bare words "Spices, cumin
-     * seed", 6 tokens, a broken answer rather than a short one. SHORT is not reverted; this one
-     * intent gets room for a food name and its reason, two short sentences, about 9 s at the
-     * measured 9 tok/s. Unmeasured on the phone until the demo-condition run.
+     * RECOMMEND'S BUDGET, and why it no longer asks for a reason. 20 Sep: at 56 tokens the phone
+     * answered the anaemia question with the bare words "Spices, cumin seed", so the rule was
+     * widened to "name one food, then say why it helps" at 88. Then three runs in a row (21 Sep,
+     * 00:33 the last) came back `phrased = null`: the model wrote 30 tokens and the ClaimGuard
+     * refused them, because "say why" in a small model's own words is a paraphrased claim, and
+     * a paraphrased claim is what the guard exists to refuse (`RecommendSilenceTest` shows it on
+     * the JVM with the real request). The prompt and the guard contradicted each other, and the
+     * guard is right. So the model names the food and how to have it, in one sentence, and the
+     * REASON IS APPENDED BY CODE, verbatim from the row the request carried: no claim from the
+     * model, nothing to refuse, and the budget is a runaway cap of about 4 s at 9 tok/s.
      */
-    const val RECOMMEND_MAX_TOKENS = 88
+    const val RECOMMEND_MAX_TOKENS = 40
     val CONVERSATION_STOPS = listOf("\n\n", "</s>", "<|im_end|>")
 }
 
@@ -269,9 +274,10 @@ enum class AnswerLength(
      * the token cap is the backstop, set so a runaway answer is cut at roughly the length of one
      * long sentence rather than three.
      */
-    // The RECOMMEND rule asks for the sentences in so many words: the first phone run (20 Sep)
-    // answered "the one food to add and why" with the bare words "Spices, cumin seed".
-    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "Two short sentences: name one food from the list, then say why it helps, from the facts.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
+    // The RECOMMEND rule asks for a food and how to have it, and NOT for a reason: a reason in
+    // the model's own words is a paraphrased claim and the ClaimGuard refuses it (21 Sep, three
+    // silent runs); the reason is appended by code, verbatim from the row.
+    SHORT("one sentence of at most twenty words, saying the single most useful thing.", "One sentence of at most twelve words: the one food from the list to have, and with what or when. No reason, no figures.", ConversationPrompts.ANSWER_MAX_TOKENS, ConversationPrompts.RECOMMEND_MAX_TOKENS),
 }
 
 /** The four conversational intents of `0015`. Capture-shaped intents (scan, correct) are not spoken and are not routed here. */
